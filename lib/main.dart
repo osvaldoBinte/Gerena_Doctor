@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
+import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -7,13 +9,19 @@ void main() async {
   // Must add this line.
   await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = WindowOptions(
+  WindowOptions windowOptions = const WindowOptions(
     center: true,
     title: "ManageGym",
     backgroundColor: const Color.fromARGB(100, 33, 33, 33),
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
+    size: Size(1600, 1300), // Establece un tamaño inicial, no solo mínimo
+    minimumSize: Size(1600, 1300), // Un valor más pequeño pero razonable
   );
+
+  // Importante: primero configura el tamaño, luego muestra
+  await windowManager.setSize(Size(1600, 1300));
+
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
@@ -32,11 +40,13 @@ class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
 
   static const List<Widget> screens = <Widget>[
-    Text('Home Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    HomeScreen(),
     Text('Store Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
     Text('Clients Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
-    Text('Statistics Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
-    Text('Settings Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    Text('Statistics Screen',
+        style: TextStyle(color: Colors.white, fontSize: 24)),
+    Text('Settings Screen',
+        style: TextStyle(color: Colors.white, fontSize: 24)),
   ];
 
   void onItemTapped(int index) {
@@ -98,14 +108,12 @@ class _MyAppState extends State<MyApp> {
               onButtonPressed: onItemTapped,
             ),
             Expanded(
-              child: Padding(
+              child: Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(15),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: screens[_selectedIndex],
-                ),
+                child: screens[_selectedIndex],
               ),
-            )
+            ),
           ],
         ),
       ),

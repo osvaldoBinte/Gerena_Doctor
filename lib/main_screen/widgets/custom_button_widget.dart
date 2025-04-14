@@ -1,44 +1,36 @@
 import 'package:flutter/material.dart';
 
-class CustomButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String text;
-  final Color color;
-  final Color textColor;
-  final double borderRadius;
-  final double padding;
-
-  const CustomButton({
-    super.key,
+class CustomButtonHeader extends StatelessWidget {
+  final IconData icon;
+  final bool active;
+  final Function(int) onPressed;
+  final int index;
+  
+  const CustomButtonHeader({
+    required this.icon,
+    this.active = false,
     required this.onPressed,
-    required this.text,
-    this.color = Colors.blue,
-    this.textColor = Colors.white,
-    this.borderRadius = 10,
-    this.padding = 15,
+    required this.index,
+    super.key,
   });
-
+  
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(borderRadius),
-        onTap: onPressed,
-        child: Container(
-          padding: EdgeInsets.all(padding),
-          alignment: Alignment.center,
-          child: Text(
-            text,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+    return InkWell(
+      highlightColor: const Color.fromARGB(255, 167, 85, 85),
+      onTap: () => onPressed(index),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+        decoration: BoxDecoration(
+          color: active ? Colors.orange : Colors.black,
+          borderRadius: BorderRadius.circular(50),
         ),
+        child: Icon(icon, color: Colors.white, size: 20),
       ),
     );
   }
 }
+
+
+
