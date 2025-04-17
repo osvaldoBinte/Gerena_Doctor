@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
+import 'package:managegym/clientes/presentation/widgets/modal_editar_cliente_widget.dart';
 
 class RowTableClientsHomeWidget extends StatefulWidget {
   final int index;
@@ -29,6 +31,17 @@ class RowTableClientsHomeWidget extends StatefulWidget {
   State<RowTableClientsHomeWidget> createState() =>
       _RowTableClientsHomeWidgetState();
 }
+
+
+void _showModalEditarCliente(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const ModalEditarCliente();
+    },
+  );
+}
+
 
 class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
   Color isPair(int index) {
@@ -67,6 +80,8 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 if (widget.onRowTap != null) {
                   widget.onRowTap!(widget.index);
                 }
+                _showModalEditarCliente(context);
+
                 print("Clicked on row ${widget.index}");
               },
               onHover: (isHovering) {
@@ -219,6 +234,12 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 if (widget.onManageTap != null) {
                   widget.onManageTap!(widget.index);
                 }
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalAdministrarSuscripccion();
+                  },
+                );
                 print("Manage subscription for ${widget.index}");
               },
               onHover: (isHovering) {

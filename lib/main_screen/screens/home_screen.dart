@@ -3,6 +3,7 @@ import 'package:managegym/clientes/presentation/widgets/header_table_clients_hom
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
+import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,7 +33,7 @@ int? hoveringIndex;
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return ModalRegisterClientWidget(); // Usa el widget separado
+        return const ModalRegisterClientWidget(); 
       },
     );
   }
@@ -120,7 +121,11 @@ class _HomeScreenState extends State<HomeScreen> {
               QuickActionButton(
                 text: 'AGREGAR UNA NUEVA SUSCRIPCCION',
                 icon: Icons.person_add,
-                accion: () {},
+                accion: () {
+                  showDialog(context: context, builder: (context) {
+                    return ModalAgregarSuscripccion();
+                  });
+                },
               ),
               const SizedBox(width: 20),
               QuickActionButton(
@@ -185,6 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
+
 
 class QuickActionButton extends StatelessWidget {
   final String text;

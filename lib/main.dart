@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
@@ -42,7 +43,7 @@ class _MyAppState extends State<MyApp> {
   static const List<Widget> screens = <Widget>[
     HomeScreen(),
     Text('Store Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
-    Text('Clients Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    ClientsScreen(),
     Text('Statistics Screen',
         style: TextStyle(color: Colors.white, fontSize: 24)),
     Text('Settings Screen',

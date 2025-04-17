@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
+import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
+import 'package:managegym/shared/widgets/input_nombre_widget.dart';
+import 'package:managegym/shared/widgets/input_sexo_widget.dart';
+import 'package:managegym/shared/widgets/input_telefono_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_select_widget.dart';
 
 class ModalRegisterClientWidget extends StatefulWidget {
@@ -10,145 +16,6 @@ class ModalRegisterClientWidget extends StatefulWidget {
 }
 
 class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
-  List<String> meses = <String>[
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre'
-  ];
-
-  List<String> ano = <String>[
-    ''
-        '1930',
-    '1931',
-    '1932',
-    '1933',
-    '1934',
-    '1935',
-    '1936',
-    '1937',
-    '1938',
-    '1939',
-    '1940',
-    '1941',
-    '1942',
-    '1943',
-    '1944',
-    '1945',
-    '1946',
-    '1947',
-    '1948',
-    '1949',
-    '1950',
-    '1951',
-    '1952',
-    '1953',
-    '1954',
-    '1955',
-    '1956',
-    '1957',
-    '1958',
-    '1959',
-    '1960',
-    '1961',
-    '1962',
-    '1963',
-    '1964',
-    '1965',
-    '1966',
-    '1967',
-    '1968',
-    '1969',
-    '1970',
-    '1971',
-    '1972',
-    '1973',
-    '1974',
-    '1975',
-    '1976',
-    '1977',
-    '1978',
-    '1979',
-    '1980',
-    '1981',
-    '1982',
-    '1983',
-    '1984',
-    '1985',
-    '1986',
-    '1987',
-    '1988',
-    '1989',
-    '1990',
-    '1991',
-    '1992',
-    '1993',
-    '1994',
-    '1995',
-    '1996',
-    '1997',
-    '1998',
-    '1999',
-    '2000',
-    '2001',
-    '2002',
-    '2003',
-    '2004',
-    '2005',
-    '2006',
-    '2007',
-    '2008',
-    '2009',
-    '2010',
-    '2011',
-    '2012',
-    '2013',
-    '2014',
-    '2015',
-    '2016',
-    '2017',
-    '2018',
-    '2019',
-    '2020',
-    '2021',
-    '2022',
-    '2023',
-    '2024',
-    '2025',
-    '2026',
-    '2027',
-    '2028',
-    '2029',
-    '2030',
-    '2031',
-    '2032',
-    '2033',
-    '2034',
-    '2035',
-    '2036',
-    '2037',
-    '2038',
-    '2039',
-    '2040',
-    '2041',
-    '2042',
-    '2043',
-    '2044',
-    '2045',
-    '2046',
-    '2047',
-    '2048',
-    '2049',
-    '2050',
-  ];
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
   final ScrollController _scrollController = ScrollController();
@@ -162,6 +29,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   final TextEditingController _diaController = TextEditingController();
   String? _mesController;
   String? _anoController;
+  String? _sexoController;
   List<String> _suscripcionesSeleccionadas = [];
 
   @override
@@ -197,12 +65,11 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
       print('Apellidos: ${_apellidosController.text}');
       print('Telefono: ${_telefonoController.text}');
       print('Correo: ${_correoController.text}');
+      print('Sexo: $_sexoController');
       print('Dia: ${_diaController.text}');
       print('Mes: $_mesController');
       print('Ano: $_anoController');
     }
-
-    //asignar la suscripccion al usuario
   }
 
   @override
@@ -230,20 +97,36 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                 children: [
                   Row(
                     children: [
-                      BotonNombre(),
+                      InputNombreWidget(
+                          colorTextoDark: colorTextoDark,
+                          nombreController: _nombreController),
                       const SizedBox(width: 20),
-                      BotonApellidos(),
+                      InputApellidoWidget(
+                          colorTextoDark: colorTextoDark,
+                          apellidosController: _apellidosController),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      BotonNumeroDeTelefono(),
+                      InputTelefonoWidget(
+                          colorTextoDark: colorTextoDark,
+                          telefonoController: _telefonoController),
                       const SizedBox(width: 20),
-                      BotonCorreoElectronico(),
+                      InputCorreoElectronicoWidget(
+                          colorTextoDark: colorTextoDark,
+                          correoController: _correoController),
                     ],
                   ),
                   const SizedBox(height: 20),
+                  InputSexoWidget(
+                    sexoController: _sexoController,
+                    onSelected: (value) {
+                      setState(() {
+                        _sexoController = value;
+                      });
+                    },
+                  ),
                   const Text(
                     'Fecha de nacimiento',
                     style: TextStyle(
@@ -251,23 +134,21 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
                   ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 120,
-                        child: BotonDia(),
-                      ),
-                      const SizedBox(width: 20),
-                      SizedBox(
-                        width: 190,
-                        child: BotonMes(),
-                      ),
-                      const SizedBox(width: 20),
-                      SizedBox(
-                        width: 190,
-                        child: BotonAno(),
-                      ),
-                    ],
+                  InputFechaNacimientoWidget(
+                    colorTextoDark: colorTextoDark,
+                    diaController: _diaController,
+                    mesController: _mesController,
+                    anoController: _anoController,
+                    onMesSelected: (value) {
+                      setState(() {
+                        _mesController = value;
+                      });
+                    },
+                    onAnoSelected: (value) {
+                      setState(() {
+                        _anoController = value;
+                      });
+                    },
                   ),
                   const SizedBox(
                     height: 30,
@@ -504,95 +385,20 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
       ),
     );
   }
+}
 
-  DropdownMenu<String> BotonAno() {
-    return DropdownMenu<String>(
-      initialSelection: ano[0],
-      width: 400,
-      onSelected: (value) {
-        setState(() {
-          _anoController = value;
-        });
-      },
-      dropdownMenuEntries: ano
-          .map((ano) => DropdownMenuEntry<String>(
-                value: ano,
-                label: ano,
-              ))
-          .toList(),
-      label: const Text('Año', style: TextStyle(color: Colors.white)),
-      textStyle: const TextStyle(color: Colors.white),
-      inputDecorationTheme: const InputDecorationTheme(
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
-    );
-  }
+class InputCorreoElectronicoWidget extends StatelessWidget {
+  const InputCorreoElectronicoWidget({
+    super.key,
+    required this.colorTextoDark,
+    required TextEditingController correoController,
+  }) : _correoController = correoController;
 
-  DropdownMenu<String> BotonMes() {
-    return DropdownMenu<String>(
-      initialSelection: meses[0],
-      width: 400,
-      onSelected: (value) {
-        setState(() {
-          _mesController = value;
-        });
-      },
-      dropdownMenuEntries: meses
-          .map((mes) => DropdownMenuEntry<String>(
-                value: mes,
-                label: mes,
-              ))
-          .toList(),
-      label: const Text('Mes', style: TextStyle(color: Colors.white)),
-      textStyle: const TextStyle(color: Colors.white),
-      inputDecorationTheme: const InputDecorationTheme(
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
-    );
-  }
+  final Color colorTextoDark;
+  final TextEditingController _correoController;
 
-  TextFormField BotonDia() {
-    return TextFormField(
-      style: TextStyle(color: colorTextoDark),
-      controller: _diaController,
-      keyboardType: TextInputType.number,
-      maxLength: 2,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Campo requerido';
-        }
-        if (int.tryParse(value) == null) {
-          return 'Solo se permiten numeros';
-        }
-        if (int.parse(value) < 1 || int.parse(value) > 31) {
-          return 'Dia no valido';
-        }
-        return null;
-      },
-      decoration: const InputDecoration(
-        labelText: 'Dia',
-        labelStyle: TextStyle(color: Colors.white),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-  SizedBox BotonCorreoElectronico() {
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: 400,
       child: TextFormField(
@@ -611,94 +417,6 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
         },
         decoration: const InputDecoration(
           labelText: 'Correo electronico',
-          labelStyle: TextStyle(color: Colors.white),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  SizedBox BotonApellidos() {
-    return SizedBox(
-      width: 400,
-      child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
-        controller: _apellidosController,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Campo requerido';
-          }
-          if (value.length < 3) {
-            return 'El apellido debe tener al menos 3 caracteres';
-          }
-          return null;
-        },
-        decoration: const InputDecoration(
-          labelText: 'Apellidos',
-          labelStyle: TextStyle(color: Colors.white),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  SizedBox BotonNombre() {
-    return SizedBox(
-      width: 400,
-      child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
-        controller: _nombreController,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Campo requerido';
-          }
-          if (value.length < 3) {
-            return 'El nombre debe tener al menos 3 caracteres';
-          }
-          return null;
-        },
-        decoration: const InputDecoration(
-          labelText: 'Nombre',
-          labelStyle: TextStyle(color: Colors.white),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-
-  SizedBox BotonNumeroDeTelefono() {
-    return SizedBox(
-      width: 400,
-      child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
-        controller: _telefonoController,
-        keyboardType: TextInputType.phone,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Campo requerido';
-          }
-          if (value.length < 10) {
-            return 'El telefono debe tener al menos 10 digitos';
-          }
-          return null;
-        },
-        decoration: const InputDecoration(
-          labelText: 'Numero de telefono',
           labelStyle: TextStyle(color: Colors.white),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
