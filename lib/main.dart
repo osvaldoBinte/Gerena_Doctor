@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
@@ -27,6 +28,9 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
+
+  await Database.connect();
+  
   runApp(MyApp());
 }
 
