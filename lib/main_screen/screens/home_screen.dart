@@ -232,7 +232,7 @@ class QuickActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.person_add, color: Colors.white),
+            Icon(icon, color: Colors.white),
             const SizedBox(width: 5),
             Text(
               text,

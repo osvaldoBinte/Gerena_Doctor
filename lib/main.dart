@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/db/database_connection.dart';
+import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/main_screen/screens/venta_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
@@ -71,9 +72,10 @@ class PantallaInicial extends StatefulWidget {
 }
 
 class _PantallaInicialState extends State<PantallaInicial> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
 
   static const List<Widget> screens = <Widget>[
+    AdministradoresScreen(),
     HomeScreen(),
     Text('Store Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
     ClientsScreen(),
@@ -93,33 +95,39 @@ class _PantallaInicialState extends State<PantallaInicial> {
   Widget build(BuildContext context) {
     List<CustomButtonHeader> customButtons = [
       CustomButtonHeader(
-        icon: Icons.home,
+        icon: Icons.badge_outlined,
         index: 0,
         active: _selectedIndex == 0,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
-        icon: Icons.storefront_outlined,
+        icon: Icons.home,
         index: 1,
         active: _selectedIndex == 1,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
-        icon: Icons.group_outlined,
+        icon: Icons.storefront,
         index: 2,
         active: _selectedIndex == 2,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
-        icon: Icons.bar_chart,
+        icon: Icons.group_add_outlined,
         index: 3,
         active: _selectedIndex == 3,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
-        icon: Icons.settings_outlined,
+        icon: Icons.bar_chart_rounded,
         index: 4,
         active: _selectedIndex == 4,
+        onPressed: onItemTapped,
+      ),
+        CustomButtonHeader(
+        icon: Icons.settings_outlined,
+        index: 5,
+        active: _selectedIndex == 5,
         onPressed: onItemTapped,
       ),
     ];
