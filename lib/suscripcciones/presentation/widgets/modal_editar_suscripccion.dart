@@ -31,8 +31,6 @@ class ModalEditarSuscripccion extends StatelessWidget {
   final TextEditingController _precioController = TextEditingController();
   String tipoFecha = 'Dia';
 
-
-
   //registrar la suscripccion
   void registrarSuscripccion() {
     if (_formKey.currentState!.validate()) {
@@ -240,9 +238,9 @@ class ModalEditarSuscripccion extends StatelessWidget {
                         ),
                       ),
                       IconButton.filled(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.red)
-                        ),
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.red)),
                           onPressed: () {},
                           icon: const Icon(
                             Icons.delete,
