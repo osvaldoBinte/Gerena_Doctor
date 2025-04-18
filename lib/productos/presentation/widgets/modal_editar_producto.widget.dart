@@ -1,0 +1,229 @@
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter/material.dart';
+import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
+import 'package:managegym/productos/presentation/widgets/input_nombre_producto.dart';
+import 'package:managegym/productos/presentation/widgets/input_precio_producto.dart';
+import 'package:managegym/productos/presentation/widgets/input_stock_inicial_producto.dart.dart';
+
+class ModalEditarProducto extends StatefulWidget {
+  const ModalEditarProducto({super.key});
+
+  @override
+  State<ModalEditarProducto> createState() => _ModalEditarProductoState();
+}
+
+class _ModalEditarProductoState extends State<ModalEditarProducto> {
+  final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
+  final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
+
+  //controladores
+  final TextEditingController nombreProductoController =
+      TextEditingController();
+  final TextEditingController codigoBarrasController = TextEditingController();
+  final TextEditingController stockInicialController = TextEditingController();
+  final TextEditingController precioController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // logica del dropdown para obtener la categoria
+  String? _categoriaController;
+  List<String> categorias = [
+    'Categoria 1',
+    'Categoria 2',
+    'Categoria 3',
+    'Categoria 4',
+    'Categoria 5'
+  ];
+
+  //----------------------------LOGICA PARA OBTENER UNA IMAGEN
+  bool isImageSelected = false;
+  String? _selectedImagePath;
+  String textoBotonImagen = 'AGREGAR IMAGEN';
+  Future<void> selectImage() async {
+    // #docregion SingleOpen
+    XTypeGroup typeGroup = XTypeGroup(
+      label: 'images',
+      extensions: <String>['jpg', 'png'],
+    );
+    final XFile? file =
+        await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+    // #enddocregion SingleOpen
+    if (file == null) {
+      // Operation was canceled by the user.
+      return;
+    }
+    final String fileName = file.name;
+    final String filePath = file.path;
+
+    if (context.mounted) {
+      setState(() {
+        // Aquí puedes usar fileName y filePath como desees
+        print('Nombre del archivo: $fileName');
+        print('Ruta del archivo: $filePath');
+        _selectedImagePath = filePath; // Guardar la ruta de la imagen
+        textoBotonImagen = 'CAMBIAR IMAGEN';
+        isImageSelected = true;
+      });
+    }
+  }
+  //----------------------------LOGICA PARA OBTENER UNA IMAGEN
+
+
+  void editarProducto() {
+    if (_formKey.currentState!.validate()) {
+      print('Nombre: ${nombreProductoController.text}');
+      print('Codigo de barras: ${codigoBarrasController.text}');
+      print('Stock inicial: ${stockInicialController.text}');
+      print('Precio: ${precioController.text}');
+      print('Categoria: $_categoriaController');
+      print('Imagen: $_selectedImagePath');
+    }
+  }
+
+  //trae el registro del producto para poder hacer
+  /// nombreProductoController.text = 'nombre del producto';
+  /// codigoBarrasController.text = 'codigo de barras';
+  /// stockInicialController.text = 'stock inicial';
+  /// precioController.text = 'precio del producto';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: colorFondoDark,
+      content: Container(
+        width: 1400,
+        height: 558,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'AGREGAR PRODUCTO',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 255, 255, 255),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InputNombreProductoWidget(
+                          colorTextoDark: colorTextoDark,
+                          nombreProductoController: nombreProductoController),
+                      const SizedBox(height: 20),
+                      InputCodigoDeBarrasProductoWidget(
+                          colorTextoDark: colorTextoDark,
+                          codigoBarrasController: codigoBarrasController),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          InputPrecioProductoWidget(
+                              colorTextoDark: colorTextoDark,
+                              precioController: precioController),
+                          const SizedBox(width: 20),
+                          InputStockInicialProductoWidget(
+                              colorTextoDark: colorTextoDark,
+                              stockInicialController: stockInicialController),
+                          SizedBox(width: 20),
+                          SizedBox(
+                            width: 200,
+                            child: DropdownMenu<String>(
+                              initialSelection: "",
+                              width: 400,
+                              onSelected: (value) {
+                                setState(() {
+                                  _categoriaController = value;
+                                });
+                              },
+                              dropdownMenuEntries: categorias
+                                  .map((categoria) => DropdownMenuEntry<String>(
+                                        value: categoria,
+                                        label: categoria,
+                                      ))
+                                  .toList(),
+                              label: const Text('Categoria',
+                                  style: TextStyle(color: Colors.white)),
+                              textStyle: const TextStyle(color: Colors.white),
+                              inputDecorationTheme: const InputDecorationTheme(
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      // Agrega más campos según sea necesario
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // BOTONES ABAJO
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: editarProducto,
+                  child: Container(
+                    width: 350,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 255, 131, 55),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'GUARDAR NUEVO PRODUCTO',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    width: 200,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 255, 75, 55),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'CANCELAR',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

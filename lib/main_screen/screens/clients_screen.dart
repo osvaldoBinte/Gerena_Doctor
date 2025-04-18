@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
+import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
@@ -24,23 +25,53 @@ List<String> meses = [
   'Diciembre'
 ];
 
+bool hoverButtontodosLosClientes = false;
+bool hoverButtonSuscripccionesApuntoExpirar = false;
+bool hoverButtonNuevosClientes = false;
+int index = 0;
+
 class _ClientsScreenState extends State<ClientsScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
   @override
   Widget build(BuildContext context) {
     return Column(
-
       children: [
         //boton para filtrar a los usuarios
         Row(
           children: [
-            Text(
-              'Clientes',
-              style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
-            ),
+            SizedBox(
+              width: 100,
+              child: InkWell(
+                highlightColor: const Color.fromARGB(255, 167, 85, 85),
+                onTap: () => () {
+                  setState(() {
+                    index = 0;
+                  });
+                },
+                onHover: (value) {
+                  setState(() {
+                    hoverButtontodosLosClientes = value;
+                  });
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                  decoration: BoxDecoration(
+                    color: (index == 0) ? Colors.orange : Colors.black,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Text("Todos los clientes",
+                      style: TextStyle(
+                        color: hoverButtontodosLosClientes
+                            ? Colors.black
+                            : Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+              ),
+            )
           ],
         ),
         Row(

@@ -38,6 +38,7 @@ dependencies:
   window_manager: ^0.4.3
   sqflite: ^2.4.1
   postgres: ^3.4.8
+  file_selector: ^1.0.3
 
 dev_dependencies:
   flutter_test:

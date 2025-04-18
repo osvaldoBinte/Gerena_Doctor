@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
+import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 
@@ -28,26 +29,25 @@ List<String> meses = [
 ];
 int? hoveringIndex;
 
-
-  void _showModalRegisterUser(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const ModalRegisterClientWidget(); 
-      },
-    );
-  }
-
+void _showModalRegisterUser(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const ModalRegisterClientWidget();
+    },
+  );
+}
 
 class _HomeScreenState extends State<HomeScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
-    final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void dispose() {
     _scrollController.dispose(); // Limpia el controlador al destruir el widget
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -122,22 +122,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: 'AGREGAR UNA NUEVA SUSCRIPCCION',
                 icon: Icons.person_add,
                 accion: () {
-                  showDialog(context: context, builder: (context) {
-                    return ModalAgregarSuscripccion();
-                  });
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return ModalAgregarSuscripccion();
+                      });
                 },
               ),
               const SizedBox(width: 20),
               QuickActionButton(
                 text: 'AGREGAR UN NUEVO PRODUCTO',
                 icon: Icons.person_add,
-                accion: () {},
+                accion: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const ModalAgregarProducto();
+                    },
+                  );
+                },
               ),
               const SizedBox(width: 20),
               QuickActionButton(
                 text: 'REALIZAR UNA VENTA',
                 icon: Icons.person_add,
-                accion: () {},
+                accion: () {
+                  Navigator.pushNamed(
+                      context, '/venta'); // Navegar a la pantalla de venta
+                },
               ),
               const SizedBox(width: 20),
             ],
@@ -164,22 +176,24 @@ class _HomeScreenState extends State<HomeScreen> {
             height: double.infinity,
             child: Scrollbar(
               thumbVisibility: true,
-              controller: _scrollController,// Controlador para el desplazamiento
+              controller:
+                  _scrollController, // Controlador para el desplazamiento
               child: SingleChildScrollView(
-                controller: _scrollController,// se asigna el controlador del scrollbar 
+                controller:
+                    _scrollController, // se asigna el controlador del scrollbar
                 scrollDirection:
                     Axis.vertical, // Habilita el desplazamiento vertical
                 child: const Wrap(
                   spacing: 20, // Espaciado horizontal entre tarjetas
                   runSpacing: 20, // Espaciado vertical entre filas
                   children: [
-                     CardSubscriptionWidget(),
-                     CardSubscriptionWidget(),
-                     CardSubscriptionWidget(),
-                     CardSubscriptionWidget(),
-                     CardSubscriptionWidget(),
-                     CardSubscriptionWidget(),
-                     CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
+                    CardSubscriptionWidget(),
                   ],
                 ),
               ),
@@ -190,8 +204,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
 
 class QuickActionButton extends StatelessWidget {
   final String text;

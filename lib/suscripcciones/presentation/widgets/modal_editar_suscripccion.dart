@@ -31,6 +31,8 @@ class ModalEditarSuscripccion extends StatelessWidget {
   final TextEditingController _precioController = TextEditingController();
   String tipoFecha = 'Dia';
 
+
+
   //registrar la suscripccion
   void registrarSuscripccion() {
     if (_formKey.currentState!.validate()) {

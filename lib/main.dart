@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/main_screen/screens/venta_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
@@ -30,7 +31,7 @@ void main() async {
   });
 
   await Database.connect();
-  
+
   runApp(MyApp());
 }
 
@@ -42,6 +43,34 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  Widget build(BuildContext context) {
+    // Construir los botones aquí, no como una constante estática
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'ManageGym',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const PantallaInicial(),
+        '/venta': (context) => const ScreenVenta(),
+      },
+    );
+  }
+}
+
+class PantallaInicial extends StatefulWidget {
+  const PantallaInicial({super.key});
+
+  @override
+  State<PantallaInicial> createState() => _PantallaInicialState();
+}
+
+class _PantallaInicialState extends State<PantallaInicial> {
   int _selectedIndex = 0;
 
   static const List<Widget> screens = <Widget>[
@@ -62,7 +91,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // Construir los botones aquí, no como una constante estática
     List<CustomButtonHeader> customButtons = [
       CustomButtonHeader(
         icon: Icons.home,
@@ -95,32 +123,23 @@ class _MyAppState extends State<MyApp> {
         onPressed: onItemTapped,
       ),
     ];
-
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ManageGym',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: Column(
-          children: [
-            TitlebarWidget(
-              customButtons: customButtons,
-              selectedIndex: _selectedIndex,
-              onButtonPressed: onItemTapped,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          TitlebarWidget(
+            customButtons: customButtons,
+            selectedIndex: _selectedIndex,
+            onButtonPressed: onItemTapped,
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(15),
+              child: screens[_selectedIndex],
             ),
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(15),
-                child: screens[_selectedIndex],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
