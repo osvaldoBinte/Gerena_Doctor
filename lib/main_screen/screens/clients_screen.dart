@@ -41,8 +41,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
           children: [
             SizedBox(
               child: InkWell(
+                borderRadius: BorderRadius.circular(50),
                 highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: ()  {
+                onTap: () {
                   setState(() {
                     index = 0;
                     print("index: $index");
@@ -58,14 +59,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                   decoration: BoxDecoration(
-                    color: (index == 0) ? Colors.orange : Colors.black,
+                    color: (index == 0 || hoverButtontodosLosClientes)
+                        ? Colors.orange
+                        : Colors.black,
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Text("Todos los clientes",
                       style: TextStyle(
-                        color: hoverButtontodosLosClientes
-                            ? Colors.orange
-                            : Colors.white,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       )),
@@ -74,6 +75,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
             ),
             SizedBox(
               child: InkWell(
+                borderRadius: BorderRadius.circular(50),
                 highlightColor: const Color.fromARGB(255, 167, 85, 85),
                 onTap: () {
                   setState(() {
@@ -91,14 +93,15 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                   decoration: BoxDecoration(
-                    color: (index == 1) ? Colors.orange : Colors.black,
+                    color:
+                        (index == 1 || hoverButtonSuscripccionesApuntoExpirar)
+                            ? Colors.orange
+                            : Colors.black,
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Text("Suscripcciones a punto de expirar",
                       style: TextStyle(
-                        color: hoverButtonSuscripccionesApuntoExpirar
-                            ? Colors.orange
-                            : Colors.white,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       )),
@@ -107,6 +110,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
             ),
             SizedBox(
               child: InkWell(
+                borderRadius: BorderRadius.circular(50),
                 highlightColor: const Color.fromARGB(255, 167, 85, 85),
                 onTap: () {
                   setState(() {
@@ -124,14 +128,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
                   decoration: BoxDecoration(
-                    color: (index == 2) ? Colors.orange : Colors.black,
+                    color: (index == 2 || hoverButtonNuevosClientes)
+                        ? Colors.orange
+                        : Colors.black,
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: Text("Nuevos clientes",
                       style: TextStyle(
-                        color: hoverButtonNuevosClientes
-                            ? Colors.orange
-                            : Colors.white,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       )),
