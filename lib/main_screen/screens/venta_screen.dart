@@ -169,7 +169,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
           ),
           SizedBox(
               width: double.infinity,
-              height: 300,
+              height: 200,
               child: ListView.builder(
                 itemCount: 12,
                 itemBuilder: (context, index) {

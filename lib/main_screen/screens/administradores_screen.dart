@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/administradores/widgets/modal_agregar_administrador.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 
 class AdministradoresScreen extends StatelessWidget {
@@ -23,7 +24,9 @@ class AdministradoresScreen extends StatelessWidget {
             QuickActionButton(
               text: 'AGREGAR UN NUEVO ADMINISTRADOR',
               icon: Icons.add,
-              accion: () {},
+              accion: () {
+                showDialog(context: context, builder: (context) {return ModalAgregarAdministrador();});
+              },
             ),
           ],
         ),

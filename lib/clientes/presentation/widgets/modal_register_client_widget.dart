@@ -77,7 +77,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     return AlertDialog(
       backgroundColor: colorFondoDark,
       content: SizedBox(
-        height: 1160,
+        height: 1075,
         width: 1195,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,14 +119,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  InputSexoWidget(
-                    sexoController: _sexoController,
-                    onSelected: (value) {
-                      setState(() {
-                        _sexoController = value;
-                      });
-                    },
-                  ),
+
                   const Text(
                     'Fecha de nacimiento',
                     style: TextStyle(
@@ -134,22 +127,36 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
                   ),
-                  InputFechaNacimientoWidget(
-                    colorTextoDark: colorTextoDark,
-                    diaController: _diaController,
-                    mesController: _mesController,
-                    anoController: _anoController,
-                    onMesSelected: (value) {
-                      setState(() {
-                        _mesController = value;
-                      });
-                    },
-                    onAnoSelected: (value) {
-                      setState(() {
-                        _anoController = value;
-                      });
-                    },
+                  Row(
+                    children: [
+                      InputFechaNacimientoWidget(
+                        colorTextoDark: colorTextoDark,
+                        diaController: _diaController,
+                        mesController: _mesController,
+                        anoController: _anoController,
+                        onMesSelected: (value) {
+                          setState(() {
+                            _mesController = value;
+                          });
+                        },
+                        onAnoSelected: (value) {
+                          setState(() {
+                            _anoController = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 88),
+                      InputSexoWidget(
+                        sexoController: _sexoController,
+                        onSelected: (value) {
+                          setState(() {
+                            _sexoController = value;
+                          });
+                        },
+                      ),
+                    ],
                   ),
+
                   const SizedBox(
                     height: 30,
                   ),
@@ -170,7 +177,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   //AQUI VA EL GRID DE LAS SUSCRIPCCIONES
                   SizedBox(
                       width: double.infinity,
-                      height: 320,
+                      height: 260,
                       child: Scrollbar(
                         thumbVisibility: true,
                         controller: _scrollController,
@@ -268,7 +275,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   //AQUI VAN LAS ROWS DE LAS SUSCRIPCCIONES SELECCIONADAS
                   SizedBox(
                       width: double.infinity,
-                      height: 150,
+                      height: 140,
                       child: ListView.builder(
                           itemCount: _suscripcionesSeleccionadas.length,
                           itemBuilder: (context, index) {
