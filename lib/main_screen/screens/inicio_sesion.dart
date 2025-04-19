@@ -91,7 +91,7 @@ class LoginScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // aqui pones el navigator pa pa navegar al home antes evaluar la cosa esa de inicio de sesion 
-                      
+                      Navigator.pushNamed(context, '/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
