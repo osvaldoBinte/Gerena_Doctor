@@ -84,7 +84,7 @@ class _CardSuscriptionSelectWidgetState
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: const Color.fromRGBO(255, 255, 255, 1),
-                    fontSize: 14, // Texto más pequeño
+                    fontSize: 18, // Texto más pequeño
                     fontWeight: FontWeight.bold,
                     // Sombra al texto cuando está en hover
                     shadows: isHovering
@@ -127,7 +127,7 @@ class _CardSuscriptionSelectWidgetState
                           'Precio: 299',
                           style: TextStyle(
                               color: colorTextoDark,
-                              fontSize: 12,
+                              fontSize: 15,
                               fontWeight: FontWeight.w500),
                         ),
                       ),
@@ -153,7 +153,7 @@ class _CardSuscriptionSelectWidgetState
                           'Duración: 1m',
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: 12,
+                              fontSize: 15,
                               fontWeight: FontWeight.w500),
                         ),
                       ),

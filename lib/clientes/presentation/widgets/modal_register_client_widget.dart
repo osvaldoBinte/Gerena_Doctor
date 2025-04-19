@@ -77,8 +77,8 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     return AlertDialog(
       backgroundColor: colorFondoDark,
       content: SizedBox(
-        height: 1075,
-        width: 1195,
+        height: 900,
+        width: 1400,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -97,66 +97,129 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                 children: [
                   Row(
                     children: [
-                      InputNombreWidget(
-                          colorTextoDark: colorTextoDark,
-                          nombreController: _nombreController),
-                      const SizedBox(width: 20),
-                      InputApellidoWidget(
-                          colorTextoDark: colorTextoDark,
-                          apellidosController: _apellidosController),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      InputTelefonoWidget(
-                          colorTextoDark: colorTextoDark,
-                          telefonoController: _telefonoController),
-                      const SizedBox(width: 20),
-                      InputCorreoElectronicoWidget(
-                          colorTextoDark: colorTextoDark,
-                          correoController: _correoController),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    'Fecha de nacimiento',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Row(
-                    children: [
-                      InputFechaNacimientoWidget(
-                        colorTextoDark: colorTextoDark,
-                        diaController: _diaController,
-                        mesController: _mesController,
-                        anoController: _anoController,
-                        onMesSelected: (value) {
-                          setState(() {
-                            _mesController = value;
-                          });
-                        },
-                        onAnoSelected: (value) {
-                          setState(() {
-                            _anoController = value;
-                          });
-                        },
+                      // Columna izquierda (80%)
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                InputNombreWidget(
+                                    colorTextoDark: colorTextoDark,
+                                    nombreController: _nombreController),
+                                const SizedBox(width: 20),
+                                InputApellidoWidget(
+                                    colorTextoDark: colorTextoDark,
+                                    apellidosController: _apellidosController),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                InputTelefonoWidget(
+                                    colorTextoDark: colorTextoDark,
+                                    telefonoController: _telefonoController),
+                                const SizedBox(width: 20),
+                                InputCorreoElectronicoWidget(
+                                    colorTextoDark: colorTextoDark,
+                                    correoController: _correoController),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Fecha de nacimiento',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Row(
+                              children: [
+                                InputFechaNacimientoWidget(
+                                  colorTextoDark: colorTextoDark,
+                                  diaController: _diaController,
+                                  mesController: _mesController,
+                                  anoController: _anoController,
+                                  onMesSelected: (value) {
+                                    setState(() {
+                                      _mesController = value;
+                                    });
+                                  },
+                                  onAnoSelected: (value) {
+                                    setState(() {
+                                      _anoController = value;
+                                    });
+                                  },
+                                ),
+                                const SizedBox(width: 88),
+                                InputSexoWidget(
+                                  sexoController: _sexoController,
+                                  onSelected: (value) {
+                                    setState(() {
+                                      _sexoController = value;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 88),
-                      InputSexoWidget(
-                        sexoController: _sexoController,
-                        onSelected: (value) {
-                          setState(() {
-                            _sexoController = value;
-                          });
-                        },
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Total a pagar:',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text(
+                              'Paga con:',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              width: 400,
+                              child: TextFormField(
+                                style: TextStyle(color: colorTextoDark),
+                                decoration: const InputDecoration(
+                                  labelStyle: TextStyle(color: Colors.white),
+                                  icon: Icon(
+                                    Icons.attach_money,
+                                    color: Colors.white,
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            const Text(
+                              'Cambio:',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-
                   const SizedBox(
                     height: 30,
                   ),
@@ -177,7 +240,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   //AQUI VA EL GRID DE LAS SUSCRIPCCIONES
                   SizedBox(
                       width: double.infinity,
-                      height: 260,
+                      height: 200,
                       child: Scrollbar(
                         thumbVisibility: true,
                         controller: _scrollController,
@@ -187,7 +250,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
-                            childAspectRatio: 1.9,
+                            childAspectRatio: 2.6,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                           ),
@@ -275,7 +338,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   //AQUI VAN LAS ROWS DE LAS SUSCRIPCCIONES SELECCIONADAS
                   SizedBox(
                       width: double.infinity,
-                      height: 140,
+                      height: 110,
                       child: ListView.builder(
                           itemCount: _suscripcionesSeleccionadas.length,
                           itemBuilder: (context, index) {
@@ -287,53 +350,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Row(
-                    children: [
-                      const Text(
-                        'Total a pagar:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        width: 100,
-                      ),
-                      const Text(
-                        'Paga con:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        width: 400,
-                        child: TextFormField(
-                          style: TextStyle(color: colorTextoDark),
-                          decoration: const InputDecoration(
-                            labelStyle: TextStyle(color: Colors.white),
-                            icon: Icon(
-                              Icons.attach_money,
-                              color: Colors.white,
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 100,
-                      ),
-                      const Text(
-                        'Cambio:',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
+                
                   const SizedBox(
                     height: 22,
                   ),
