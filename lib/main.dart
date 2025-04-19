@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/main_screen/screens/inicio_sesion.dart';
 import 'package:managegym/main_screen/screens/venta_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
@@ -29,6 +30,7 @@ void main() async {
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
+    await windowManager.maximize();
   });
 
   await Database.connect();
@@ -57,7 +59,8 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const PantallaInicial(),
+        '/': (context) => const LoginScreen(),
+        '/home': (context) => const PantallaInicial(),
         '/venta': (context) => const ScreenVenta(),
       },
     );
