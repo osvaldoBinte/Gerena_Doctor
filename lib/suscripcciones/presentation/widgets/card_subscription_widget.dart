@@ -9,7 +9,7 @@ class CardSubscriptionWidget extends StatelessWidget {
     return InkWell(
       child: Container(
         width: 395,
-        height: 230,
+        height: 250,
         color: Color.fromARGB(60, 40, 40, 40),
         padding: const EdgeInsets.all(10),
         alignment: Alignment.centerLeft,
@@ -17,56 +17,85 @@ class CardSubscriptionWidget extends StatelessWidget {
           children: [
             const SizedBox(
               width: double.infinity,
-              child: Text(
-                  "Suscripccion basica sin coach por 1 mes y mas cosas xd ",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold)),
+              child:  Text(
+            'aqui va el titulo',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 21,
+              fontWeight: FontWeight.bold,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
             ),
             const SizedBox(
               height: 10,
             ),
             const SizedBox(
               width: double.infinity,
-              height: 100,
-              child: Text("Hola soy la descripccion de la suscripcccion",
-                  style: TextStyle(
-                    color: Colors.white,
-                  )),
+              height: 80,
+              child:   Text(
+            'aqui va la descripcion',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
             ),
             const SizedBox(
               height: 10,
             ),
+             Row(
+            children: [
+              const Icon(Icons.attach_money, color: Color.fromARGB(255, 255, 152, 0), size: 22),
+              const SizedBox(width: 4),
+              Text(
+                "Precio: ",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17,
+                ),
+              ),
+              Text(
+                "32",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 7),
+          // Duración
+          Row(
+            children: [
+              const Icon(Icons.calendar_today_rounded, color: Color.fromARGB(255, 54, 162, 255), size: 19),
+              const SizedBox(width: 6),
+              Text(
+                "Duración: ",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                "1 mes",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 2, horizontal: 13),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color.fromARGB(255, 55, 112, 255)),
-                  child: const Text("Precio: 1000",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 2, horizontal: 13),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: const Color.fromARGB(255, 55, 112, 255)),
-                  child: const Text("Duracion: 1 mes",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(width: 20),
                 IconButton.filled(
                     onPressed: () {
                       showDialog(context: context, builder: (context){
