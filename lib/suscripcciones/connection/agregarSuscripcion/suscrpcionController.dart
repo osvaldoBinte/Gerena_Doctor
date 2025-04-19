@@ -1,29 +1,60 @@
-import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
-class Agregarsuscrpcioncontroller {
-  static Future<TipoMembresia?> agregarSuscripcion(String titulo, String descripcion, double precio, int tiempoDuracion) async {
-    debugPrint('Datos de suscripción: titulo: $titulo, descripcion: $descripcion, precio: $precio, tiempoDuracion: $tiempoDuracion');
+class SuscripcionController extends GetxController {
+  var suscripciones = <TipoMembresia>[].obs;
+  var cargando = false.obs;
 
-    if (titulo.isEmpty || descripcion.isEmpty || precio <= 0 || tiempoDuracion <= 0) {
-      debugPrint('Error: Datos de suscripción inválidos');
-      throw Exception('Datos de suscripción inválidos');
-    }
+  @override
+  void onInit() {
+    super.onInit();
+    cargarSuscripciones();
+  }
 
-    final tipoMembresia = await AgregarSuscripcionModel.insertarTipoMembresia(
+  Future<void> cargarSuscripciones() async {
+    cargando.value = true;
+    final lista = await AgregarSuscripcionModel.obtenerTodasLasSuscripciones();
+    suscripciones.assignAll(lista);
+    cargando.value = false;
+  }
+
+  Future<bool> agregarSuscripcion({
+    required String titulo,
+    required String descripcion,
+    required double precio,
+    required int tiempoDuracion,
+  }) async {
+    final nueva = await AgregarSuscripcionModel.insertarTipoMembresia(
       titulo: titulo,
       descripcion: descripcion,
       precio: precio,
       tiempoDuracion: tiempoDuracion,
     );
-    if (tipoMembresia == null) {
-      debugPrint('Error: No se pudo insertar la suscripción');
-      throw Exception('No se pudo insertar la suscripción');
+    if (nueva != null) {
+      await cargarSuscripciones();
+      return true;
     }
-    return tipoMembresia;
+    return false;
   }
 
-  static Future<List<TipoMembresia>> listarSuscripciones() async {
-    return await AgregarSuscripcionModel.obtenerTodasLasSuscripciones();
+  Future<bool> actualizarSuscripcion({
+    required int id,
+    required String titulo,
+    required String descripcion,
+    required double precio,
+    required int tiempoDuracion,
+  }) async {
+    final ok = await AgregarSuscripcionModel.actualizarTipoMembresia(
+      id: id,
+      titulo: titulo,
+      descripcion: descripcion,
+      precio: precio,
+      tiempoDuracion: tiempoDuracion,
+    );
+    if (ok) {
+      await cargarSuscripciones();
+      return true;
+    }
+    return false;
   }
 }

@@ -1,30 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_editar_suscripccion.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class CardSubscriptionWidget extends StatelessWidget {
-  final String titulo;
-  final String descripcion;
-  final double precio;
-  final int tiempoDuracion;
+  final TipoMembresia suscripcion;
 
-  const CardSubscriptionWidget({
-    super.key,
-    required this.titulo,
-    required this.descripcion,
-    required this.precio,
-    required this.tiempoDuracion,
-  });
+  const CardSubscriptionWidget({super.key, required this.suscripcion});
 
   String getDuracionTexto() {
+    final tiempoDuracion = suscripcion.tiempoDuracion;
     if (tiempoDuracion < 30) {
-      // Menos de un mes, mostrar días
       return "$tiempoDuracion días";
     } else if (tiempoDuracion % 30 == 0 && tiempoDuracion < 365) {
-      // Multiplo de 30 y menos de un año, mostrar meses
       int meses = (tiempoDuracion / 30).round();
       return "$meses mes${meses > 1 ? 'es' : ''}";
     } else if (tiempoDuracion % 365 == 0) {
-      // Multiplo de 365, mostrar años
       int anios = (tiempoDuracion / 365).round();
       return "$anios año${anios > 1 ? 's' : ''}";
     } else {
@@ -52,9 +42,8 @@ class CardSubscriptionWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título
           Text(
-            titulo,
+            suscripcion.titulo,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 21,
@@ -64,9 +53,8 @@ class CardSubscriptionWidget extends StatelessWidget {
             maxLines: 2,
           ),
           const SizedBox(height: 9),
-          // Descripción
           Text(
-            descripcion,
+            suscripcion.descripcion,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 16,
@@ -75,7 +63,6 @@ class CardSubscriptionWidget extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
-          // Precio
           Row(
             children: [
               const Icon(Icons.attach_money, color: Color.fromARGB(255, 255, 152, 0), size: 22),
@@ -89,7 +76,7 @@ class CardSubscriptionWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                "$precio",
+                "${suscripcion.precio}",
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -99,7 +86,6 @@ class CardSubscriptionWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 7),
-          // Duración
           Row(
             children: [
               const Icon(Icons.calendar_today_rounded, color: Color.fromARGB(255, 54, 162, 255), size: 19),
@@ -123,7 +109,6 @@ class CardSubscriptionWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // Botón editar alineado a la derecha
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -132,7 +117,7 @@ class CardSubscriptionWidget extends StatelessWidget {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return ModalEditarSuscripccion();
+                      return ModalEditarSuscripccion(suscripcion: suscripcion);
                     },
                   );
                 },

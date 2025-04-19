@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
-class ModalEditarSuscripccion extends StatelessWidget {
-  ModalEditarSuscripccion({
-    super.key,
-  });
+class ModalEditarSuscripccion extends StatefulWidget {
+  final TipoMembresia suscripcion;
+
+  const ModalEditarSuscripccion({super.key, required this.suscripcion});
+
+  @override
+  State<ModalEditarSuscripccion> createState() => _ModalEditarSuscripccionState();
+}
+
+class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
 
-  List<DropdownMenuEntry<String>> dropdownMenuEntries = [
+  final List<DropdownMenuEntry<String>> dropdownMenuEntries = [
     const DropdownMenuEntry<String>(
       value: 'Dia',
       label: 'Dia',
@@ -22,23 +31,69 @@ class ModalEditarSuscripccion extends StatelessWidget {
     ),
   ];
 
-  //logica para manejar los inputs
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  //controlladorres
-  final TextEditingController _nombreController = TextEditingController();
-  final TextEditingController _descripccionController = TextEditingController();
-  final TextEditingController _cantidadController = TextEditingController();
-  final TextEditingController _precioController = TextEditingController();
-  String tipoFecha = 'Dia';
+  late TextEditingController _nombreController;
+  late TextEditingController _descripccionController;
+  late TextEditingController _cantidadController;
+  late TextEditingController _precioController;
+  late String tipoFecha;
 
-  //registrar la suscripccion
-  void registrarSuscripccion() {
+  @override
+  void initState() {
+    super.initState();
+    _nombreController = TextEditingController(text: widget.suscripcion.titulo);
+    _descripccionController = TextEditingController(text: widget.suscripcion.descripcion);
+    _precioController = TextEditingController(text: widget.suscripcion.precio.toString());
+    _cantidadController = TextEditingController(
+      text: widget.suscripcion.tiempoDuracion < 30
+          ? widget.suscripcion.tiempoDuracion.toString()
+          : widget.suscripcion.tiempoDuracion % 365 == 0
+              ? (widget.suscripcion.tiempoDuracion ~/ 365).toString()
+              : (widget.suscripcion.tiempoDuracion ~/ 30).toString(),
+    );
+    // Detecta el tipo de fecha según la duración
+    if (widget.suscripcion.tiempoDuracion % 365 == 0) {
+      tipoFecha = "Ano";
+    } else if (widget.suscripcion.tiempoDuracion % 30 == 0) {
+      tipoFecha = "Mes";
+    } else {
+      tipoFecha = "Dia";
+    }
+  }
+
+  void actualizarSuscripccion() async {
     if (_formKey.currentState!.validate()) {
-      print('Nombre: ${_nombreController.text}');
-      print('Descripccion: ${_descripccionController.text}');
-      print('Tipo de fecha: ${tipoFecha} ');
-      print('Cantidad: ${_cantidadController}');
-      print('Precio: ${_precioController.text}');
+      // Determinar tiempoDuracion según tipoFecha y cantidad
+      int cantidad = int.tryParse(_cantidadController.text.trim()) ?? 0;
+      int tiempoDuracion = 1;
+      switch (tipoFecha) {
+        case "Dia":
+          tiempoDuracion = cantidad;
+          break;
+        case "Mes":
+          tiempoDuracion = cantidad * 30;
+          break;
+        case "Ano":
+          tiempoDuracion = cantidad * 365;
+          break;
+      }
+
+      final controller = Get.find<SuscripcionController>();
+      bool ok = await controller.actualizarSuscripcion(
+        id: widget.suscripcion.id,
+        titulo: _nombreController.text.trim(),
+        descripcion: _descripccionController.text.trim(),
+        precio: double.tryParse(_precioController.text.trim()) ?? 0,
+        tiempoDuracion: tiempoDuracion,
+      );
+      if (ok) {
+        Navigator.of(context).pop();
+        Get.snackbar('Éxito', 'Suscripción actualizada correctamente',
+            backgroundColor: Colors.green, colorText: Colors.white);
+      } else {
+        Get.snackbar('Error', 'No se pudo actualizar la suscripción',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
     }
   }
 
@@ -46,7 +101,7 @@ class ModalEditarSuscripccion extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: colorFondoDark,
-      content: Container(
+      content: SizedBox(
         height: 585,
         width: 1458,
         child: Column(
@@ -56,7 +111,7 @@ class ModalEditarSuscripccion extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'AGREGAR UNA NUEVA SUSCRIPCCION',
+                  'EDITAR SUSCRIPCIÓN',
                   style: TextStyle(
                       color: colorTextoDark,
                       fontSize: 24,
@@ -107,7 +162,7 @@ class ModalEditarSuscripccion extends StatelessWidget {
                       style: TextStyle(color: colorTextoDark),
                       controller: _descripccionController,
                       decoration: const InputDecoration(
-                        labelText: 'Descripccion',
+                        labelText: 'Descripción',
                         labelStyle:
                             TextStyle(color: Colors.white, fontSize: 18),
                         enabledBorder: UnderlineInputBorder(
@@ -125,11 +180,12 @@ class ModalEditarSuscripccion extends StatelessWidget {
                       SizedBox(
                         width: 190,
                         child: DropdownMenu<String>(
-                          initialSelection: dropdownMenuEntries[0].value,
+                          initialSelection: tipoFecha,
                           width: 400,
                           onSelected: (value) {
-                            //actualizar el tipo de fecha
-                            tipoFecha = value!;
+                            setState(() {
+                              tipoFecha = value!;
+                            });
                           },
                           dropdownMenuEntries: dropdownMenuEntries,
                           label: const Text('Tipo de fecha',
@@ -155,11 +211,9 @@ class ModalEditarSuscripccion extends StatelessWidget {
                             if (value == null || value.isEmpty) {
                               return 'Campo requerido';
                             }
-                            //evaluar si es un numero
                             if (double.tryParse(value) == null) {
-                              return 'El valor debe ser un numero';
+                              return 'El valor debe ser un número';
                             }
-                            //evaluar si es un numero mayor a 0
                             if (double.parse(value) <= 0) {
                               return 'El valor debe ser mayor a 0';
                             }
@@ -190,11 +244,9 @@ class ModalEditarSuscripccion extends StatelessWidget {
                         if (value == null || value.isEmpty) {
                           return 'Campo requerido';
                         }
-                        //evaluar si es un numero
                         if (double.tryParse(value) == null) {
-                          return 'El valor debe ser un numero';
+                          return 'El valor debe ser un número';
                         }
-                        //evaluar si es un numero mayor a 0
                         if (double.parse(value) <= 0) {
                           return 'El valor debe ser mayor a 0';
                         }
@@ -218,12 +270,12 @@ class ModalEditarSuscripccion extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                        onTap: () {},
+                        onTap: () => Navigator.of(context).pop(),
                         child: Container(
                           width: 200,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 75, 55),
+                            color: const Color.fromARGB(255, 255, 75, 55),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Center(
@@ -241,21 +293,21 @@ class ModalEditarSuscripccion extends StatelessWidget {
                           style: ButtonStyle(
                               backgroundColor:
                                   MaterialStateProperty.all(Colors.red)),
-                          onPressed: () {},
+                          onPressed: () {
+                            // Aquí puedes implementar lógica para eliminar la suscripción si lo deseas
+                          },
                           icon: const Icon(
                             Icons.delete,
                             color: Colors.white,
                             size: 40,
                           )),
                       InkWell(
-                        onTap: () {
-                          registrarSuscripccion();
-                        },
+                        onTap: actualizarSuscripccion,
                         child: Container(
                           width: 300,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 131, 55),
+                            color: const Color.fromARGB(255, 255, 131, 55),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Center(
