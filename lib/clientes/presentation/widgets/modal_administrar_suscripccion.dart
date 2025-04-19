@@ -1,22 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_select_widget.dart';
 
-class ModalAdministrarSuscripccion extends StatelessWidget {
-  ModalAdministrarSuscripccion({
+class ModalAdministrarSuscripccion extends StatefulWidget {
+  final List<TipoMembresia> suscripcionesDisponibles;
+  final String nombreUsuario;
+  const ModalAdministrarSuscripccion({
     super.key,
+    required this.suscripcionesDisponibles,
+    required this.nombreUsuario,
   });
+
+  @override
+  State<ModalAdministrarSuscripccion> createState() => _ModalAdministrarSuscripccionState();
+}
+
+class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripccion> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
-
   final ScrollController _scrollController = ScrollController();
 
-  void seleccionarSuscripcion(String id) {}
+  List<String> _suscripcionesSeleccionadas = [];
+
+  void seleccionarSuscripcion(String id) {
+    setState(() {
+      if (_suscripcionesSeleccionadas.contains(id.toString())) {
+        _suscripcionesSeleccionadas.remove(id.toString());
+      } else {
+        _suscripcionesSeleccionadas.add(id.toString());
+      }
+    });
+  }
+
+  void eliminarSuscripcion(String id) {
+    setState(() {
+      _suscripcionesSeleccionadas.remove(id.toString());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: colorFondoDark,
-      content: Container(
+      content: SizedBox(
         height: 850,
         width: 1458,
         child: Column(
@@ -25,7 +51,7 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Administrar Suscripccion del usuario: Mario Alfredo',
+                  'Administrar Suscripcción del usuario: ${widget.nombreUsuario}',
                   style: TextStyle(
                       color: colorTextoDark,
                       fontSize: 24,
@@ -50,10 +76,12 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                     ),
-                    itemCount: 30,
+                    itemCount: widget.suscripcionesDisponibles.length,
                     itemBuilder: (context, index) {
+                      final suscripcion = widget.suscripcionesDisponibles[index];
                       return CardSuscriptionSelectWidget(
-                        index: index,
+                        suscripcion: suscripcion,
+                        isSelected: _suscripcionesSeleccionadas.contains(suscripcion.id.toString()),
                         selectSuscription: seleccionarSuscripcion,
                       );
                     },
@@ -65,9 +93,11 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
               width: double.infinity,
               height: 200,
               child: ListView.builder(
-                  itemCount: 12,
+                  itemCount: _suscripcionesSeleccionadas.length,
                   itemBuilder: (context, index) {
-                    return RowTable(index);
+                    final idSuscripcion = _suscripcionesSeleccionadas[index];
+                    final suscripcion = widget.suscripcionesDisponibles.firstWhere((s) => s.id.toString() == idSuscripcion);
+                    return RowTable(suscripcion, index);
                   }),
             ),
             const SizedBox(
@@ -127,12 +157,14 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
                   child: Container(
                     width: 200,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 75, 55),
+                      color: const Color.fromARGB(255, 255, 75, 55),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Center(
@@ -147,12 +179,14 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    // Acción de pagar aquí
+                  },
                   child: Container(
                     width: 300,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 131, 55),
+                      color: const Color.fromARGB(255, 255, 131, 55),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Center(
@@ -174,7 +208,7 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
     );
   }
 
-  Container RowTable(int index) {
+  Widget RowTable(TipoMembresia suscripcion, int index) {
     Color isPair(int index) {
       if (index % 2 == 0) {
         return const Color.fromARGB(255, 33, 33, 33);
@@ -191,28 +225,28 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
           Expanded(
               flex: 3,
               child: Text(
-                'Suscripcion $index',
+                suscripcion.titulo,
                 textAlign: TextAlign.start,
                 style: const TextStyle(color: Colors.white),
               )),
-          Expanded(
+          const Expanded(
               flex: 1,
               child: Text(
                 '1',
                 textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
               )),
           Expanded(
               flex: 2,
               child: Text(
-                '100.00',
+                '${suscripcion.precio}',
                 textAlign: TextAlign.start,
                 style: const TextStyle(color: Colors.white),
               )),
           Expanded(
               flex: 2,
               child: Text(
-                '100.00',
+                '${suscripcion.precio}',
                 textAlign: TextAlign.start,
                 style: const TextStyle(color: Colors.white),
               )),
@@ -221,7 +255,7 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
     );
   }
 
-  Container HeaderTable() {
+  Widget HeaderTable() {
     return Container(
       width: double.infinity,
       height: 40,
@@ -233,7 +267,7 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
           Expanded(
               flex: 3,
               child: Text(
-                'Suscrpccion',
+                'Suscripción',
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: colorTextoDark,
@@ -253,7 +287,7 @@ class ModalAdministrarSuscripccion extends StatelessWidget {
           Expanded(
               flex: 2,
               child: Text(
-                'precio unitario',
+                'Precio unitario',
                 textAlign: TextAlign.start,
                 style: TextStyle(
                     color: colorTextoDark,

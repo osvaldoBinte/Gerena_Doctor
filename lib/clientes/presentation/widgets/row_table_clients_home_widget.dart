@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_editar_cliente_widget.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class RowTableClientsHomeWidget extends StatefulWidget {
   final int index;
@@ -10,9 +11,10 @@ class RowTableClientsHomeWidget extends StatefulWidget {
   final String status;
   final String dateRange;
   final String sex;
-  final Function(int index)? onRowTap; // Callback para cuando se toca la fila
-  final Function(int index)?
-      onManageTap; // Callback para cuando se toca el botón de administrar
+  final Function(int index)? onRowTap;
+  final Function(int index)? onManageTap;
+
+  final List<TipoMembresia> suscripcionesDisponibles; // <-- AGREGA ESTA LÍNEA
 
   const RowTableClientsHomeWidget({
     super.key,
@@ -25,13 +27,13 @@ class RowTableClientsHomeWidget extends StatefulWidget {
     required this.sex,
     this.onRowTap,
     this.onManageTap,
+    required this.suscripcionesDisponibles, // <-- Y EN EL CONSTRUCTOR
   });
 
   @override
   State<RowTableClientsHomeWidget> createState() =>
       _RowTableClientsHomeWidgetState();
 }
-
 
 void _showModalEditarCliente(BuildContext context) {
   showDialog(
@@ -237,7 +239,10 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return ModalAdministrarSuscripccion();
+                    return ModalAdministrarSuscripccion(
+                      suscripcionesDisponibles: widget.suscripcionesDisponibles,
+                      nombreUsuario: widget.name,
+                    );
                   },
                 );
                 print("Manage subscription for ${widget.index}");

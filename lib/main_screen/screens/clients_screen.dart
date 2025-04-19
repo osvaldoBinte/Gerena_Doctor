@@ -1,210 +1,279 @@
 import 'package:flutter/material.dart';
-import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
-import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
-import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
+import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
+import 'package:managegym/clientes/presentation/widgets/modal_editar_cliente_widget.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
-class ClientsScreen extends StatefulWidget {
-  const ClientsScreen({super.key});
+class RowTableClientsHomeWidget extends StatefulWidget {
+  final int index;
+  final String name;
+  final String phoneNumber;
+  final String lastSubscription;
+  final String status;
+  final String dateRange;
+  final String sex;
+  final Function(int index)? onRowTap; // Callback para cuando se toca la fila
+  final Function(int index)? onManageTap; // Callback para cuando se toca el botón de administrar
+  final List<TipoMembresia> suscripcionesDisponibles; // <-- AGREGA ESTA LÍNEA
+
+  const RowTableClientsHomeWidget({
+    super.key,
+    required this.index,
+    required this.name,
+    required this.phoneNumber,
+    required this.lastSubscription,
+    required this.status,
+    required this.dateRange,
+    required this.sex,
+    this.onRowTap,
+    this.onManageTap,
+    required this.suscripcionesDisponibles, // <-- Y EN EL CONSTRUCTOR
+  });
 
   @override
-  State<ClientsScreen> createState() => _ClientsScreenState();
+  State<RowTableClientsHomeWidget> createState() =>
+      _RowTableClientsHomeWidgetState();
 }
 
-List<String> meses = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre'
-];
+void _showModalEditarCliente(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return const ModalEditarCliente();
+    },
+  );
+}
 
-bool hoverButtontodosLosClientes = false;
-bool hoverButtonSuscripccionesApuntoExpirar = false;
-bool hoverButtonNuevosClientes = false;
-int index = 0;
+class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
+  Color isPair(int index) {
+    if (index % 2 == 0) {
+      return const Color.fromARGB(255, 33, 33, 33);
+    } else {
+      return const Color.fromARGB(255, 54, 54, 54);
+    }
+  }
 
-class _ClientsScreenState extends State<ClientsScreen> {
-  String actualmonth = meses[DateTime.now().month - 1];
+  @override
+  void dispose() {
+    _mainFocusNode.dispose();
+    _buttonFocusNode.dispose();
+    super.dispose();
+  }
+
+  bool _isRowHovered = false;
+  bool _isButtonHovered = false;
+  final FocusNode _mainFocusNode = FocusNode();
+  final FocusNode _buttonFocusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        //boton para filtrar a los usuarios
-        Row(
-          children: [
-            SizedBox(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50),
-                highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: () {
-                  setState(() {
-                    index = 0;
-                    print("index: $index");
-                  });
-                },
-                onHover: (value) {
-                  setState(() {
-                    hoverButtontodosLosClientes = value;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: (index == 0 || hoverButtontodosLosClientes)
-                        ? Colors.orange
-                        : Colors.black,
-                    borderRadius: BorderRadius.circular(50),
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(color: isPair(widget.index)),
+      child: Row(
+        children: [
+          // Primera parte: InkWell para las 6 primeras columnas agrupadas
+          Expanded(
+            flex: 12, // Suma de los flex de las 6 primeras columnas (3+1+3+1+3+1)
+            child: InkWell(
+              onTap: () {
+                if (widget.onRowTap != null) {
+                  widget.onRowTap!(widget.index);
+                }
+                _showModalEditarCliente(context);
+
+                print("Clicked on row ${widget.index}");
+              },
+              onHover: (isHovering) {
+                setState(() {
+                  _isRowHovered = isHovering;
+                });
+              },
+              onFocusChange: (hasFocus) {
+                setState(() {
+                  _isRowHovered = hasFocus;
+                });
+              },
+              focusNode: _mainFocusNode,
+              hoverColor: const Color.fromARGB(40, 255, 255, 255),
+              splashColor: const Color.fromARGB(50, 255, 255, 255),
+              highlightColor: const Color.fromARGB(30, 255, 255, 255),
+              child: Row(
+                children: [
+                  // Columna 1: Nombre
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      height: 40,
+                      color: _isRowHovered
+                          ? Color.fromARGB(
+                              255,
+                              isPair(widget.index).red + 10,
+                              isPair(widget.index).green + 10,
+                              isPair(widget.index).blue + 10)
+                          : isPair(widget.index),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 2),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.name,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ),
-                  child: Text("Todos los clientes",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
+                  // Columna 2: Número de teléfono
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 40,
+                      color: _isRowHovered
+                          ? Color.fromARGB(
+                              255,
+                              isPair(widget.index).red + 10,
+                              isPair(widget.index).green + 10,
+                              isPair(widget.index).blue + 10)
+                          : isPair(widget.index),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.phoneNumber,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  // Columna 3: Última suscripción
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      height: 40,
+                      color: _isRowHovered
+                          ? Color.fromARGB(
+                              255,
+                              isPair(widget.index).red + 10,
+                              isPair(widget.index).green + 10,
+                              isPair(widget.index).blue + 10)
+                          : isPair(widget.index),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.lastSubscription,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  // Columna 4: Estado
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 40,
+                      color: _isRowHovered
+                          ? Color.fromARGB(
+                              255,
+                              isPair(widget.index).red + 10,
+                              isPair(widget.index).green + 10,
+                              isPair(widget.index).blue + 10)
+                          : isPair(widget.index),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.status,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  // Columna 5: Rango de fechas
+                  Expanded(
+                    flex: 3,
+                    child: Container(
+                      height: 40,
+                      color: _isRowHovered
+                          ? Color.fromARGB(
+                              255,
+                              isPair(widget.index).red + 10,
+                              isPair(widget.index).green + 10,
+                              isPair(widget.index).blue + 10)
+                          : isPair(widget.index),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.dateRange,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  // Columna 6: Sexo
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 40,
+                      color: _isRowHovered
+                          ? Color.fromARGB(
+                              255,
+                              isPair(widget.index).red + 10,
+                              isPair(widget.index).green + 10,
+                              isPair(widget.index).blue + 10)
+                          : isPair(widget.index),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.sex,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50),
-                highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: () {
-                  setState(() {
-                    index = 1;
-                    print("index: $index");
-                  });
-                },
-                onHover: (value) {
-                  setState(() {
-                    hoverButtonSuscripccionesApuntoExpirar = value;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  decoration: BoxDecoration(
-                    color:
-                        (index == 1 || hoverButtonSuscripccionesApuntoExpirar)
-                            ? Colors.orange
-                            : Colors.black,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Text("Suscripcciones a punto de expirar",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
-              ),
-            ),
-            SizedBox(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50),
-                highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: () {
-                  setState(() {
-                    index = 2;
-                    print("index: $index");
-                  });
-                },
-                onHover: (value) {
-                  setState(() {
-                    hoverButtonNuevosClientes = value;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: (index == 2 || hoverButtonNuevosClientes)
-                        ? Colors.orange
-                        : Colors.black,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Text("Nuevos clientes",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
-              ),
-            )
-          ],
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 800,
-              height: 50,
-              child: TextField(
-                style: const TextStyle(
-                    color: Colors.white), // Cambia el color del texto a blanco
-                decoration: InputDecoration(
-                  hintText: 'Buscar cliente por nombre o numero de telefono',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                        color: Color.fromARGB(255, 255, 255, 255), width: 8),
-                  ),
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                ),
-              ),
-            ),
-            Text(
-              "${DateTime.now().day} de $actualmonth del ${DateTime.now().year}",
-              style: const TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        HeaderTableClientsHome(),
-        SizedBox(
-          //coontenedor de la lista de clientes registrados
-          height: //maximo 450
-              MediaQuery.of(context).size.height - 300,
-          width: double.infinity,
-          child: ListView.builder(
-            itemCount: 60,
-            itemBuilder: (context, index) {
-              return RowTableClientsHomeWidget(
-                index: index,
-                name: "luis antonio martinez marroquin",
-                phoneNumber: "2292134420",
-                lastSubscription: "Suscripccion basica de un año",
-                status: "activo",
-                dateRange: "12/12/12 - 12/12/13",
-                sex: "H",
-              );
-            },
           ),
-        ),
-      ],
+          // Segunda parte: InkWell para el botón de administrar suscripción
+          Expanded(
+            flex: 2,
+            child: InkWell(
+              onTap: () {
+                if (widget.onManageTap != null) {
+                  widget.onManageTap!(widget.index);
+                }
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalAdministrarSuscripccion(
+                      suscripcionesDisponibles: widget.suscripcionesDisponibles,
+                      nombreUsuario: widget.name,
+                    );
+                  },
+                );
+                print("Manage subscription for ${widget.index}");
+              },
+              onHover: (isHovering) {
+                setState(() {
+                  _isButtonHovered = isHovering;
+                });
+              },
+              onFocusChange: (hasFocus) {
+                setState(() {
+                  _isButtonHovered = hasFocus;
+                });
+              },
+              focusNode: _buttonFocusNode,
+              focusColor: const Color.fromARGB(255, 0, 0, 0),
+              hoverColor: const Color.fromARGB(255, 0, 0, 0),
+              splashColor: const Color.fromARGB(255, 60, 60, 60),
+              child: Container(
+                height: 40,
+                alignment: Alignment.center,
+                color: _isButtonHovered
+                    ? const Color.fromARGB(255, 0, 0, 0)
+                    : isPair(widget.index),
+                child: const Text(
+                  'Administrar suscripción',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

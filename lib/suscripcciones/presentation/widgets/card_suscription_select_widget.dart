@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class CardSuscriptionSelectWidget extends StatefulWidget {
   final void Function(String id) selectSuscription;
-  final int index;
+  final TipoMembresia suscripcion;
+  final bool isSelected;
   const CardSuscriptionSelectWidget({
     super.key,
     required this.selectSuscription,
-    required this.index,
+    required this.suscripcion,
+    this.isSelected = false,
   });
 
   @override
@@ -16,8 +19,6 @@ class CardSuscriptionSelectWidget extends StatefulWidget {
 
 class _CardSuscriptionSelectWidgetState
     extends State<CardSuscriptionSelectWidget> {
-  final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
-  final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
   bool isHovering = false;
   final FocusNode _mainFocusNode = FocusNode();
 
@@ -25,6 +26,21 @@ class _CardSuscriptionSelectWidgetState
   void dispose() {
     _mainFocusNode.dispose();
     super.dispose();
+  }
+
+  String getDuracionTexto() {
+    final tiempoDuracion = widget.suscripcion.tiempoDuracion;
+    if (tiempoDuracion < 30) {
+      return "$tiempoDuracion días";
+    } else if (tiempoDuracion % 30 == 0 && tiempoDuracion < 365) {
+      int meses = (tiempoDuracion / 30).round();
+      return "$meses mes${meses > 1 ? 'es' : ''}";
+    } else if (tiempoDuracion % 365 == 0) {
+      int anios = (tiempoDuracion / 365).round();
+      return "$anios año${anios > 1 ? 's' : ''}";
+    } else {
+      return "$tiempoDuracion días";
+    }
   }
 
   @override
@@ -37,7 +53,7 @@ class _CardSuscriptionSelectWidgetState
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          widget.selectSuscription(widget.index.toString());
+          widget.selectSuscription(widget.suscripcion.id.toString());
         },
         onHover: (value) {
           setState(() {
@@ -56,11 +72,11 @@ class _CardSuscriptionSelectWidgetState
         highlightColor: const Color.fromARGB(40, 115, 115, 115),
         child: Ink(
           decoration: BoxDecoration(
-            color: isHovering ? hoverColor : baseColor,
+            color: (widget.isSelected || isHovering) ? hoverColor : baseColor,
             borderRadius: BorderRadius.circular(8),
-            border: isHovering
+            border: (widget.isSelected || isHovering)
                 ? Border.all(
-                    color: const Color.fromARGB(100, 115, 115, 115), width: 1.0)
+                    color: const Color.fromARGB(255, 255, 131, 55), width: 2.0)
                 : null,
             boxShadow: isHovering
                 ? [
@@ -78,15 +94,14 @@ class _CardSuscriptionSelectWidgetState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Texto
+                // Título de la suscripción
                 Text(
-                  'Selecciona la suscripción que quieres agregar al cliente',
+                  widget.suscripcion.titulo,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: const Color.fromRGBO(255, 255, 255, 1),
-                    fontSize: 18, // Texto más pequeño
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    // Sombra al texto cuando está en hover
                     shadows: isHovering
                         ? [
                             Shadow(
@@ -101,14 +116,26 @@ class _CardSuscriptionSelectWidgetState
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
-                // Botones de precio y duración
+                // Descripción
+                Text(
+                  widget.suscripcion.descripcion,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                // Precio y duración
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 55, 112, 255),
+                        color: const Color.fromARGB(255, 255, 152, 0),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: isHovering
                             ? [
@@ -124,9 +151,9 @@ class _CardSuscriptionSelectWidgetState
                         padding: const EdgeInsets.symmetric(
                             vertical: 4, horizontal: 8),
                         child: Text(
-                          'Precio: 299',
-                          style: TextStyle(
-                              color: colorTextoDark,
+                          'Precio: \$${widget.suscripcion.precio}',
+                          style: const TextStyle(
+                              color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w500),
                         ),
@@ -134,7 +161,7 @@ class _CardSuscriptionSelectWidgetState
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 55, 112, 255),
+                        color: const Color.fromARGB(255, 54, 162, 255),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: isHovering
                             ? [
@@ -146,12 +173,12 @@ class _CardSuscriptionSelectWidgetState
                               ]
                             : null,
                       ),
-                      child: const Padding(
+                      child: Padding(
                         padding:
-                            EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                            const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                         child: Text(
-                          'Duración: 1m',
-                          style: TextStyle(
+                          'Duración: ${getDuracionTexto()}',
+                          style: const TextStyle(
                               color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w500),

@@ -31,11 +31,11 @@ List<String> meses = [
   'Diciembre'
 ];
 
-void _showModalRegisterUser(BuildContext context) {
+void _showModalRegisterUser(BuildContext context, List<TipoMembresia> suscripciones) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return const ModalRegisterClientWidget();
+      return ModalRegisterClientWidget(suscripcionesDisponibles: suscripciones);
     },
   );
 }
@@ -97,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 status: "activo",
                 dateRange: "12/12/12 - 12/12/13",
                 sex: "H",
+                suscripcionesDisponibles: suscripcionController.suscripciones, // <-- AGREGA ESTA LÍNEA
               );
             },
           ),
@@ -111,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: 'REGISTRAR UN NUEVO USUARIO',
                 icon: Icons.person_add,
                 accion: () {
-                  _showModalRegisterUser(context);
+                  _showModalRegisterUser(context, suscripcionController.suscripciones);
                 },
               ),
               const SizedBox(width: 20),
@@ -243,6 +244,3 @@ class QuickActionButton extends StatelessWidget {
     );
   }
 }
-
-// Define esto en tu proyecto real
-class RowTableClientsHome {}

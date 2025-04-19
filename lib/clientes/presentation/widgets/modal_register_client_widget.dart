@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioController.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
 import 'package:managegym/shared/widgets/input_sexo_widget.dart';
 import 'package:managegym/shared/widgets/input_telefono_widget.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_select_widget.dart';
 
 class ModalRegisterClientWidget extends StatefulWidget {
-  const ModalRegisterClientWidget({super.key});
+  final List<TipoMembresia> suscripcionesDisponibles;
+  const ModalRegisterClientWidget({
+    super.key,
+    required this.suscripcionesDisponibles,
+  });
 
   @override
   State<ModalRegisterClientWidget> createState() =>
@@ -21,7 +26,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  //controllers para los textformfield
+  // Controllers para los textformfield
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
@@ -30,7 +35,11 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   String? _mesController;
   String? _anoController;
   String? _sexoController;
+
+  // Aquí guardamos los IDs de las suscripciones seleccionadas
   List<String> _suscripcionesSeleccionadas = [];
+  // Aquí guardamos la suscripción seleccionada (objeto completo)
+  TipoMembresia? _suscripcionSeleccionada;
 
   @override
   void dispose() {
@@ -42,34 +51,113 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     super.dispose();
   }
 
-  void seleccionarSuscripcion(String id) {
+  void seleccionarSuscripcion(String id, TipoMembresia suscripcion) {
     setState(() {
-      _suscripcionesSeleccionadas.add(id);
-      print('_suscripcionesSeleccionadas: $_suscripcionesSeleccionadas');
+      if (_suscripcionesSeleccionadas.contains(id.toString())) {
+        _suscripcionesSeleccionadas.remove(id.toString());
+        _suscripcionSeleccionada = null;
+      } else {
+        _suscripcionesSeleccionadas.clear();
+        _suscripcionesSeleccionadas.add(id.toString());
+        _suscripcionSeleccionada = suscripcion;
+      }
     });
   }
 
   void eliminarSuscripcion(String id) {
     setState(() {
-      _suscripcionesSeleccionadas.remove(id);
-      print('_suscripcionesSeleccionadas: $_suscripcionesSeleccionadas');
+      _suscripcionesSeleccionadas.remove(id.toString());
+      if (_suscripcionSeleccionada?.id.toString() == id.toString()) {
+        _suscripcionSeleccionada = null;
+      }
     });
-    print('Eliminar suscripcion: $id');
-    print('_suscripcionesSeleccionadas: $_suscripcionesSeleccionadas');
   }
 
-  void agregarNuevoCliente() {
-    //agregar nuevo cliente
+  Future<void> agregarNuevoCliente() async {
     if (_formKey.currentState!.validate()) {
-      print('Nombre: ${_nombreController.text}');
-      print('Apellidos: ${_apellidosController.text}');
-      print('Telefono: ${_telefonoController.text}');
-      print('Correo: ${_correoController.text}');
-      print('Sexo: $_sexoController');
-      print('Dia: ${_diaController.text}');
-      print('Mes: $_mesController');
-      print('Ano: $_anoController');
+      if (_suscripcionSeleccionada == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Selecciona una membresía')),
+        );
+        return;
+      }
+      try {
+        // Procesar la fecha de nacimiento
+        DateTime? fechaNacimiento;
+        if (_diaController.text.isNotEmpty &&
+            _mesController != null &&
+            _anoController != null) {
+          final mesNum = _mesAInt(_mesController!);
+          if (mesNum != null) {
+            fechaNacimiento = DateTime(
+              int.parse(_anoController!),
+              mesNum,
+              int.parse(_diaController.text),
+            );
+          }
+        }
+
+        // Mapear sexo a solo un caracter
+        final sexoDb = (_sexoController?.toLowerCase().startsWith("f") ?? false) ? "F" : "M";
+
+        // Aquí puedes generar el qr y la huella, por ahora pongo valores de ejemplo
+        String qr = "qr_generado_${DateTime.now().millisecondsSinceEpoch}";
+        String plantillaHuella = "huella_demo_${DateTime.now().millisecondsSinceEpoch}";
+
+        final idUsuario = await UsuarioController.crearUsuarioCompleto(
+          nombre: _nombreController.text,
+          apellidos: _apellidosController.text,
+          correo: _correoController.text,
+          telefono: _telefonoController.text,
+          fechaNacimiento: fechaNacimiento,
+          sexo: sexoDb, // <- solo "M" o "F"
+          qr: qr,
+          plantillaHuella: plantillaHuella,
+          idTipoMembresia: _suscripcionSeleccionada!.id,
+          precioMembresia: _suscripcionSeleccionada!.precio,
+          duracionMembresia: _suscripcionSeleccionada!.tiempoDuracion,
+          fechaInicioMembresia: DateTime.now(),
+          fechaFinMembresia: DateTime.now().add(
+            Duration(days: _suscripcionSeleccionada!.tiempoDuracion),
+          ),
+        );
+
+        if (idUsuario != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('¡Cliente registrado con éxito!')),
+          );
+          Navigator.of(context).pop();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error al registrar cliente')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
+  }
+
+  int? _mesAInt(String mes) {
+    const meses = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre"
+    ];
+    final index = meses.indexWhere((m) => m.toLowerCase() == mes.toLowerCase());
+    if (index >= 0) return index + 1;
+    return null;
   }
 
   @override
@@ -83,7 +171,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Registrar un nuevo cliente Cliente',
+              'Registrar un nuevo cliente',
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -226,7 +314,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   const Row(
                     children: [
                       Text(
-                        'Selecciona la suscripccion que quieres agregar al cliente',
+                        'Selecciona la suscripción que quieres agregar al cliente',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 21,
@@ -237,7 +325,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   const SizedBox(
                     height: 20,
                   ),
-                  //AQUI VA EL GRID DE LAS SUSCRIPCCIONES
+                  // AQUI VA EL GRID DE LAS SUSCRIPCCIONES
                   SizedBox(
                       width: double.infinity,
                       height: 200,
@@ -254,11 +342,13 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 10,
                           ),
-                          itemCount: 30,
+                          itemCount: widget.suscripcionesDisponibles.length,
                           itemBuilder: (context, index) {
+                            final suscripcion = widget.suscripcionesDisponibles[index];
                             return CardSuscriptionSelectWidget(
-                              index: index,
-                              selectSuscription: seleccionarSuscripcion,
+                              suscripcion: suscripcion,
+                              isSelected: _suscripcionesSeleccionadas.contains(suscripcion.id.toString()),
+                              selectSuscription: (id) => seleccionarSuscripcion(id, suscripcion),
                             );
                           },
                         ),
@@ -342,15 +432,18 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                       child: ListView.builder(
                           itemCount: _suscripcionesSeleccionadas.length,
                           itemBuilder: (context, index) {
+                            final idSuscripcion = _suscripcionesSeleccionadas[index];
+                            final suscripcion = widget.suscripcionesDisponibles
+                                .firstWhere((s) => s.id.toString() == idSuscripcion);
                             return RowSuscripccionSeleccionada(
                               index: index,
                               eliminarSuscripcion: eliminarSuscripcion,
+                              suscripcion: suscripcion,
                             );
                           })),
                   const SizedBox(
                     height: 20,
                   ),
-                
                   const SizedBox(
                     height: 22,
                   ),
@@ -358,12 +451,14 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
                         child: Container(
                           width: 200,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 75, 55),
+                            color: const Color.fromARGB(255, 255, 75, 55),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Center(
@@ -378,14 +473,12 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                         ),
                       ),
                       InkWell(
-                        onTap: () {
-                          agregarNuevoCliente();
-                        },
+                        onTap: agregarNuevoCliente,
                         child: Container(
                           width: 300,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 131, 55),
+                            color: const Color.fromARGB(255, 255, 131, 55),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Center(
@@ -457,8 +550,13 @@ class InputCorreoElectronicoWidget extends StatelessWidget {
 class RowSuscripccionSeleccionada extends StatefulWidget {
   final int index;
   final void Function(String id) eliminarSuscripcion;
-  const RowSuscripccionSeleccionada(
-      {super.key, required this.eliminarSuscripcion, required this.index});
+  final TipoMembresia suscripcion;
+  const RowSuscripccionSeleccionada({
+    super.key,
+    required this.eliminarSuscripcion,
+    required this.index,
+    required this.suscripcion,
+  });
 
   @override
   State<RowSuscripccionSeleccionada> createState() =>
@@ -469,7 +567,7 @@ class _RowSuscripccionSeleccionadaState
     extends State<RowSuscripccionSeleccionada> {
   bool isHovering = false;
   bool isFocused = false;
-  FocusNode _rowEliminarFocusNode = FocusNode();
+  final FocusNode _rowEliminarFocusNode = FocusNode();
 
   @override
   void dispose() {
@@ -495,11 +593,11 @@ class _RowSuscripccionSeleccionadaState
         direction: Axis.horizontal,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Expanded(
+          Expanded(
               flex: 3,
               child: Text(
-                'Suscripcion',
-                style: TextStyle(
+                widget.suscripcion.titulo,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                 ),
@@ -507,26 +605,26 @@ class _RowSuscripccionSeleccionadaState
           const Expanded(
               flex: 1,
               child: Text(
-                'Cantidad',
+                '1',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                 ),
               )),
-          const Expanded(
+          Expanded(
               flex: 1,
               child: Text(
-                'Precio unitario',
-                style: TextStyle(
+                "\$${widget.suscripcion.precio}",
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                 ),
               )),
-          const Expanded(
+          Expanded(
               flex: 2,
               child: Text(
-                'Total',
-                style: TextStyle(
+                "\$${widget.suscripcion.precio}",
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 15,
                 ),
@@ -535,8 +633,7 @@ class _RowSuscripccionSeleccionadaState
               flex: 1,
               child: InkWell(
                 onTap: () {
-                  widget.eliminarSuscripcion(widget.index.toString());
-                  print('Eliminar suscripcion: ${widget.index}');
+                  widget.eliminarSuscripcion(widget.suscripcion.id.toString());
                 },
                 onHover: (value) {
                   setState(() {
@@ -554,9 +651,7 @@ class _RowSuscripccionSeleccionadaState
                   style: TextStyle(
                       color: isHovering || isFocused
                           ? Colors.red
-                          : isFocused
-                              ? Colors.red
-                              : Colors.white,
+                          : Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
