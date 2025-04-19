@@ -35,6 +35,7 @@ class StoreScreen extends StatelessWidget {
               width: 800,
               height: 50,
               child: TextField(
+                onChanged: (value) => {},
                 style: const TextStyle(
                     color: Colors.white), // Cambia el color del texto a blanco
                 decoration: InputDecoration(

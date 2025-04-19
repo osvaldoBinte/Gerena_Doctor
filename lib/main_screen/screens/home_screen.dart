@@ -42,13 +42,6 @@ void _showModalRegisterUser(BuildContext context) {
 
 class _HomeScreenState extends State<HomeScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
-  double alturaTablaCliente = 450;
-  
-  void cambiarAlturaTablaCliente(double nuevaAltura) {
-    setState(() {
-      alturaTablaCliente = nuevaAltura;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,52 +165,45 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 20),
         // SUSCRIPCIONES LISTADO DINÁMICO
-Expanded(
-  child: FutureBuilder<List<TipoMembresia>>(
-    future: Agregarsuscrpcioncontroller.listarSuscripciones(),
-    builder: (context, snapshot) {
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      }
-      if (snapshot.hasError) {
-        return const Center(child: Text("Error al cargar suscripciones"));
-      }
-      final suscripciones = snapshot.data ?? [];
-      if (suscripciones.isEmpty) {
-        return const Center(child: Text("No hay suscripciones"));
-      }
-      // Puedes usar MouseRegion aquí
-      return MouseRegion(
-        onEnter: (_) {
-          // Aquí puedes manejar cuando el mouse entra al área
-          print('Mouse sobre el área de suscripciones');
-        },
-        onExit: (_) {
-          // Aquí puedes manejar cuando el mouse sale del área
-          print('Mouse fuera del área de suscripciones');
-        },
-        child: Scrollbar(
-          thumbVisibility: true,
-          child: SingleChildScrollView(
-            child: Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 20,
-              runSpacing: 20,
-              children: suscripciones
-                  .map((s) => CardSubscriptionWidget(
-                        titulo: s.titulo,
-                        descripcion: s.descripcion,
-                        precio: s.precio,
-                        tiempoDuracion: s.tiempoDuracion,
-                      ))
-                  .toList(),
-            ),
+        Expanded(
+          child: FutureBuilder<List<TipoMembresia>>(
+            future: Agregarsuscrpcioncontroller.listarSuscripciones(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return const Center(child: Text("Error al cargar suscripciones"));
+              }
+              final suscripciones = snapshot.data ?? [];
+              if (suscripciones.isEmpty) {
+                return const Center(child: Text("No hay suscripciones"));
+              }
+              // El ScrollController está declarado AQUÍ, dentro del builder
+              final ScrollController scrollController = ScrollController();
+              return Scrollbar(
+                thumbVisibility: true,
+                controller: scrollController,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: suscripciones
+                        .map((s) => CardSubscriptionWidget(
+                              titulo: s.titulo,
+                              descripcion: s.descripcion,
+                              precio: s.precio,
+                              tiempoDuracion: s.tiempoDuracion,
+                            ))
+                        .toList(),
+                  ),
+                ),
+              );
+            },
           ),
         ),
-      );
-    },
-  ),
-),
       ],
     );
   }
