@@ -11,6 +11,7 @@ class StoreScreen extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          
           children: [
             //botones de accion rapidas
             SizedBox(
@@ -159,7 +160,215 @@ class StoreScreen extends StatelessWidget {
             ],
           ),
         ),
+        Expanded(
+          child: ListView.builder(
+            itemCount:
+                20, // Cambia esto por la cantidad de productos que tengas
+            itemBuilder: (context, index) {
+              return ProductRowWidget(
+                image: null, // O tu widget de imagen
+                nombre: 'Producto $index',
+                categoria: 'Categoría $index',
+                precioUnitario: '\$${(index + 1) * 10}',
+                cantidadDisponible: '${(index + 1) * 5}',
+                codigoBarras: '00000$index',
+                disponible: index % 2 == 0 ? 'Sí' : 'No',
+                index: index,
+              );
+            },
+          ),
+        ),
       ],
+    );
+  }
+}
+
+
+
+class ProductRowWidget extends StatefulWidget {
+  final Widget? image;
+  final String nombre;
+  final String categoria;
+  final String precioUnitario;
+  final String cantidadDisponible;
+  final String codigoBarras;
+  final String disponible;
+  final int index;
+
+  const ProductRowWidget({
+    super.key,
+    this.image,
+    required this.nombre,
+    required this.categoria,
+    required this.precioUnitario,
+    required this.cantidadDisponible,
+    required this.codigoBarras,
+    required this.disponible,
+    required this.index,
+  });
+
+  @override
+  State<ProductRowWidget> createState() => _ProductRowWidgetState();
+}
+
+class _ProductRowWidgetState extends State<ProductRowWidget> {
+  bool isHovering = false;
+  bool isFocused = false;
+  final FocusNode _focusNode = FocusNode();
+
+  Color getRowColor() {
+    if (isHovering || isFocused) {
+      return const Color(0xFFFFA500);
+    }
+    return widget.index % 2 == 0
+        ? const Color.fromARGB(255, 33, 33, 33)
+        : const Color.fromARGB(255, 54, 54, 54);
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 100,
+      color: getRowColor(),
+      child: Row(
+        children: [
+          // InkWell envuelve desde la imagen hasta "Disponible"
+          Expanded(
+            flex: 19,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              focusNode: _focusNode,
+              onTap: () {
+                // Aquí abres tu modal
+              },
+              onHover: (hovering) {
+                setState(() {
+                  isHovering = hovering;
+                });
+              },
+              onFocusChange: (focus) {
+                setState(() {
+                  isFocused = focus;
+                });
+              },
+              child: Row(
+                children: [
+                  // Imagen o espacio vacío
+                  Expanded(
+                    flex: 2,
+                    child: widget.image ??
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[800],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.image,
+                              color: Colors.white54,
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                  ),
+                  // Nombre
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      widget.nombre,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Categoría
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      widget.categoria,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Precio unitario
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      widget.precioUnitario,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Cantidad disponible
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      widget.cantidadDisponible,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Código de barras
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      widget.codigoBarras,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Disponible
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      widget.disponible,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // IconButton final fuera del InkWell
+          Expanded(
+            flex: 1,
+            child: IconButton(
+              icon: const Icon(Icons.inventory, color: Colors.white, size: 28),
+              tooltip: 'Ver stock',
+              onPressed: () {
+                // Aquí abre tu modal de stock o realiza la acción deseada
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
