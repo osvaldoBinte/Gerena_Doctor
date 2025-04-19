@@ -35,7 +35,6 @@ class AgregarSuscripcionModel {
     required int tiempoDuracion,
   }) async {
     try {
-      print('Insertar tipo membresía: $titulo, $descripcion, $precio, $tiempoDuracion');
       final sql = Sql.named(
         "INSERT INTO tipomembresia (titulo, descripcion, precio, tiempoDuracion) "
         "VALUES (@titulo, @descripcion, @precio, @tiempoDuracion) "
@@ -50,7 +49,6 @@ class AgregarSuscripcionModel {
 
       if (results.isNotEmpty) {
         final row = results.first;
-        // results es List<List<dynamic>>
         final id = row[0] is int ? row[0] as int : int.tryParse(row[0].toString()) ?? 0;
         final t = row[1].toString();
         final d = row[2].toString();
@@ -91,5 +89,28 @@ class AgregarSuscripcionModel {
     }
   }
 
-
+  static Future<bool> actualizarTipoMembresia({
+    required int id,
+    required String titulo,
+    required String descripcion,
+    required double precio,
+    required int tiempoDuracion,
+  }) async {
+    try {
+      final sql = Sql.named(
+        "UPDATE tipomembresia SET titulo=@titulo, descripcion=@descripcion, precio=@precio, tiempoDuracion=@tiempoDuracion WHERE id=@id"
+      );
+      final result = await Database.conn.execute(sql, parameters: {
+        'id': id,
+        'titulo': titulo,
+        'descripcion': descripcion,
+        'precio': precio,
+        'tiempoDuracion': tiempoDuracion,
+      });
+      return result.affectedRows > 0;
+    } catch (e) {
+      print('Error al actualizar: $e');
+      return false;
+    }
+  }
 }

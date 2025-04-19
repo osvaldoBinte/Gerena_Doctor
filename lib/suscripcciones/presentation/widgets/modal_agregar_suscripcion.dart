@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
 class ModalAgregarSuscripccion extends StatefulWidget {
-  ModalAgregarSuscripccion({super.key});
+  const ModalAgregarSuscripccion({super.key});
 
   @override
   State<ModalAgregarSuscripccion> createState() => _ModalAgregarSuscripccionState();
@@ -19,7 +20,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
   final TextEditingController _precioController = TextEditingController();
   final TextEditingController _personalizadoController = TextEditingController();
 
-  // Opciones predefinidas: nombre para mostrar y días.
+  // Opciones predefinidas
   final List<Map<String, dynamic>> opcionesDuracion = [
     {'label': '1 Mes', 'dias': 30},
     {'label': '3 Meses', 'dias': 90},
@@ -44,53 +45,56 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
 
       int tiempoDuracion = 0;
       if (_duracionSeleccionada != 'Personalizado') {
-        // Busca la duración en la lista por el label seleccionado
         tiempoDuracion = opcionesDuracion
             .firstWhere((op) => op['label'] == _duracionSeleccionada)['dias'];
       } else {
         tiempoDuracion = int.tryParse(_personalizadoController.text.trim()) ?? 0;
       }
 
+      // Usa el controlador con GetX
+      final SuscripcionController suscripcionController = Get.find();
+
       try {
-        await Agregarsuscrpcioncontroller.agregarSuscripcion(
-          titulo,
-          descripcion,
-          precio,
-          tiempoDuracion,
+        await suscripcionController.agregarSuscripcion(
+          titulo: titulo,
+          descripcion: descripcion,
+          precio: precio,
+          tiempoDuracion: tiempoDuracion,
         );
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 40),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.check_circle, color: const Color.fromARGB(255, 206, 110, 21), size: 60),
-                const SizedBox(height: 16),
-                const Text(
-                  "Guardado",
-                  style: TextStyle(
-                    color: Colors.black87,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => Dialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 40),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, color: const Color.fromARGB(255, 206, 110, 21), size: 60),
+                  const SizedBox(height: 16),
+                  const Text(
+                    "Guardado",
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      await Future.delayed(const Duration(seconds: 1));
-      Navigator.of(context)
-        ..pop()
-        ..pop(); // Cierra el modal principal
+        await Future.delayed(const Duration(seconds: 1));
+        Navigator.of(context)
+          ..pop()
+          ..pop(); // Cierra el dialog de éxito y el modal principal
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al agregar: $e')),
@@ -103,7 +107,6 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: colorFondoDark,
-      // Ventana más grande
       content: SizedBox(
         height: 650,
         width: 900,
@@ -184,7 +187,6 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Dropdown y campo personalizado
               Row(
                 children: [
                   SizedBox(

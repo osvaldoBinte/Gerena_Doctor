@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
-import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,7 +30,6 @@ List<String> meses = [
   'Noviembre',
   'Diciembre'
 ];
-int? hoveringIndex;
 
 void _showModalRegisterUser(BuildContext context) {
   showDialog(
@@ -42,6 +42,9 @@ void _showModalRegisterUser(BuildContext context) {
 
 class _HomeScreenState extends State<HomeScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
+
+  // Inicia el controlador de GetX (una sola vez por pantalla)
+  final SuscripcionController suscripcionController = Get.put(SuscripcionController());
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return ModalAgregarSuscripccion();
+                        return const ModalAgregarSuscripccion();
                       });
                 },
               ),
@@ -164,45 +167,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        // SUSCRIPCIONES LISTADO DINÁMICO
+        // LISTADO DINÁMICO DE SUSCRIPCIONES CON GETX
         Expanded(
-          child: FutureBuilder<List<TipoMembresia>>(
-            future: Agregarsuscrpcioncontroller.listarSuscripciones(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return const Center(child: Text("Error al cargar suscripciones"));
-              }
-              final suscripciones = snapshot.data ?? [];
-              if (suscripciones.isEmpty) {
-                return const Center(child: Text("No hay suscripciones"));
-              }
-              // El ScrollController está declarado AQUÍ, dentro del builder
-              final ScrollController scrollController = ScrollController();
-              return Scrollbar(
-                thumbVisibility: true,
+          child: Obx(() {
+            if (suscripcionController.cargando.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final suscripciones = suscripcionController.suscripciones;
+            if (suscripciones.isEmpty) {
+              return const Center(child: Text("No hay suscripciones"));
+            }
+            final ScrollController scrollController = ScrollController();
+            return Scrollbar(
+              thumbVisibility: true,
+              controller: scrollController,
+              child: SingleChildScrollView(
                 controller: scrollController,
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 20,
-                    runSpacing: 20,
-                    children: suscripciones
-                        .map((s) => CardSubscriptionWidget(
-                              titulo: s.titulo,
-                              descripcion: s.descripcion,
-                              precio: s.precio,
-                              tiempoDuracion: s.tiempoDuracion,
-                            ))
-                        .toList(),
-                  ),
+                child: Wrap(
+                  alignment: WrapAlignment.start,
+                  spacing: 20,
+                  runSpacing: 20,
+                  children: suscripciones
+                      .map((s) => CardSubscriptionWidget(
+                            suscripcion: s,
+                          ))
+                      .toList(),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          }),
         ),
       ],
     );
@@ -224,7 +217,6 @@ class QuickActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Acción al hacer clic en el botón "Ver más"
         accion();
       },
       child: Container(
@@ -252,4 +244,5 @@ class QuickActionButton extends StatelessWidget {
   }
 }
 
+// Define esto en tu proyecto real
 class RowTableClientsHome {}
