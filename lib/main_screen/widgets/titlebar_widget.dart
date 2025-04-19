@@ -62,7 +62,6 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
           // Área arrastrable con logo
           Expanded(
             child: GestureDetector(
-              onPanStart: (_) => windowManager.startDragging(),
               child: const Padding(
                 padding: EdgeInsets.only(left: 16.0),
                 child: Text(
