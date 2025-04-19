@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:managegym/suscripcciones/connection/agregarSuscripcion/agregarSuscrpcionController.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
 class ModalAgregarSuscripccion extends StatefulWidget {
   ModalAgregarSuscripccion({super.key});

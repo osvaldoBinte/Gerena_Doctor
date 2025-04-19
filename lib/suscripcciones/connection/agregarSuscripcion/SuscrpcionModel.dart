@@ -70,4 +70,26 @@ class AgregarSuscripcionModel {
       return null;
     }
   }
+
+  static Future<List<TipoMembresia>> obtenerTodasLasSuscripciones() async {
+    try {
+      final results = await Database.conn.execute(
+        "SELECT id, titulo, descripcion, precio, tiempoDuracion FROM tipomembresia ORDER BY id DESC",
+      );
+      return results.map((row) {
+        return TipoMembresia(
+          id: row[0] is int ? row[0] as int : int.tryParse(row[0].toString()) ?? 0,
+          titulo: row[1].toString(),
+          descripcion: row[2].toString(),
+          precio: row[3] is double ? row[3] as double : double.tryParse(row[3].toString()) ?? 0.0,
+          tiempoDuracion: row[4] is int ? row[4] as int : int.tryParse(row[4].toString()) ?? 0,
+        );
+      }).toList();
+    } catch (e) {
+      print('Error al obtener las suscripciones: $e');
+      return [];
+    }
+  }
+
+
 }

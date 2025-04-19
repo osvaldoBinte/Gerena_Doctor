@@ -3,6 +3,8 @@ import 'package:managegym/clientes/presentation/widgets/header_table_clients_hom
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 
@@ -40,13 +42,6 @@ void _showModalRegisterUser(BuildContext context) {
 
 class _HomeScreenState extends State<HomeScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
-  final ScrollController _scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    _scrollController.dispose(); // Limpia el controlador al destruir el widget
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 50,
               child: TextField(
                 style: const TextStyle(
-                    color: Colors.white), // Cambia el color del texto a blanco
+                  color: Colors.white), // Cambia el color del texto a blanco
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
@@ -74,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Text(
-              "${DateTime.now().day} de ${actualmonth} del ${DateTime.now().year}",
+              "${DateTime.now().day} de $actualmonth del ${DateTime.now().year}",
               style: const TextStyle(
                   fontSize: 20,
                   color: Colors.white,
@@ -108,7 +103,6 @@ class _HomeScreenState extends State<HomeScreen> {
           width: double.infinity,
           child: Row(
             //botones de acceso rapido
-
             children: [
               QuickActionButton(
                 text: 'REGISTRAR UN NUEVO USUARIO',
@@ -170,36 +164,46 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
+        // SUSCRIPCIONES LISTADO DINÁMICO
         Expanded(
-          child: Container(
-            width: double.infinity, // Abarca todo el ancho disponible
-            height: double.infinity,
-            child: Scrollbar(
-              thumbVisibility: true,
-              controller:
-                  _scrollController, // Controlador para el desplazamiento
-              child: SingleChildScrollView(
-                controller:
-                    _scrollController, // se asigna el controlador del scrollbar
-                scrollDirection:
-                    Axis.vertical, // Habilita el desplazamiento vertical
-                child: const Wrap(
-                  spacing: 20, // Espaciado horizontal entre tarjetas
-                  runSpacing: 20, // Espaciado vertical entre filas
-                  children: [
-                    CardSubscriptionWidget(),
-                    CardSubscriptionWidget(),
-                    CardSubscriptionWidget(),
-                    CardSubscriptionWidget(),
-                    CardSubscriptionWidget(),
-                    CardSubscriptionWidget(),
-                    CardSubscriptionWidget(),
-                  ],
+          child: FutureBuilder<List<TipoMembresia>>(
+            future: Agregarsuscrpcioncontroller.listarSuscripciones(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return const Center(child: Text("Error al cargar suscripciones"));
+              }
+              final suscripciones = snapshot.data ?? [];
+              if (suscripciones.isEmpty) {
+                return const Center(child: Text("No hay suscripciones"));
+              }
+              // El ScrollController está declarado AQUÍ, dentro del builder
+              final ScrollController scrollController = ScrollController();
+              return Scrollbar(
+                thumbVisibility: true,
+                controller: scrollController,
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 20,
+                    runSpacing: 20,
+                    children: suscripciones
+                        .map((s) => CardSubscriptionWidget(
+                              titulo: s.titulo,
+                              descripcion: s.descripcion,
+                              precio: s.precio,
+                              tiempoDuracion: s.tiempoDuracion,
+                            ))
+                        .toList(),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
-        )
+        ),
       ],
     );
   }
