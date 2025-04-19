@@ -147,220 +147,233 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'EDITAR SUSCRIPCIÓN',
-                        style: TextStyle(
-                            color: colorTextoDark,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: 800,
-                    child: TextFormField(
-                      maxLength: 63,
-                      style: TextStyle(color: colorTextoDark),
-                      controller: _nombreController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Campo requerido';
-                        }
-                        if (value.length < 3) {
-                          return 'El nombre debe tener al menos 3 caracteres';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                        labelStyle:
-                            TextStyle(color: Colors.white, fontSize: 18),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: 800,
-                    child: TextFormField(
-                      maxLength: 200,
-                      maxLines: 2,
-                      style: TextStyle(color: colorTextoDark),
-                      controller: _descripccionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción',
-                        labelStyle:
-                            TextStyle(color: Colors.white, fontSize: 18),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 190,
-                        child: DropdownMenu<String>(
-                          initialSelection: tipoFecha,
-                          width: 400,
-                          onSelected: (value) {
-                            setState(() {
-                              tipoFecha = value!;
-                            });
-                          },
-                          dropdownMenuEntries: dropdownMenuEntries,
-                          label: const Text('Tipo de fecha',
-                              style: TextStyle(color: Colors.white)),
-                          textStyle: const TextStyle(color: Colors.white),
-                          inputDecorationTheme: const InputDecorationTheme(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                    flex: 10,
+                    child: Column(
+                      children: [
+                        Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'EDITAR SUSCRIPCIÓN',
+                                    style: TextStyle(
+                                        color: colorTextoDark,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 800,
+                                child: TextFormField(
+                                  maxLength: 63,
+                                  style: TextStyle(color: colorTextoDark),
+                                  controller: _nombreController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Campo requerido';
+                                    }
+                                    if (value.length < 3) {
+                                      return 'El nombre debe tener al menos 3 caracteres';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: const InputDecoration(
+                                    labelText: 'Nombre',
+                                    labelStyle: TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 800,
+                                child: TextFormField(
+                                  maxLength: 200,
+                                  maxLines: 2,
+                                  style: TextStyle(color: colorTextoDark),
+                                  controller: _descripccionController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Descripción',
+                                    labelStyle: TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 190,
+                                    child: DropdownMenu<String>(
+                                      initialSelection: tipoFecha,
+                                      width: 400,
+                                      onSelected: (value) {
+                                        setState(() {
+                                          tipoFecha = value!;
+                                        });
+                                      },
+                                      dropdownMenuEntries: dropdownMenuEntries,
+                                      label: const Text('Tipo de fecha',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      textStyle:
+                                          const TextStyle(color: Colors.white),
+                                      inputDecorationTheme:
+                                          const InputDecorationTheme(
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  SizedBox(
+                                    width: 200,
+                                    child: TextFormField(
+                                      style: TextStyle(color: colorTextoDark),
+                                      controller: _cantidadController,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Campo requerido';
+                                        }
+                                        if (double.tryParse(value) == null) {
+                                          return 'El valor debe ser un número';
+                                        }
+                                        if (double.parse(value) <= 0) {
+                                          return 'El valor debe ser mayor a 0';
+                                        }
+                                        return null;
+                                      },
+                                      decoration: const InputDecoration(
+                                        labelText: 'Cantidad',
+                                        labelStyle: TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 40),
+                              SizedBox(
+                                width: 410,
+                                child: TextFormField(
+                                  style: TextStyle(color: colorTextoDark),
+                                  controller: _precioController,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Campo requerido';
+                                    }
+                                    if (double.tryParse(value) == null) {
+                                      return 'El valor debe ser un número';
+                                    }
+                                    if (double.parse(value) <= 0) {
+                                      return 'El valor debe ser mayor a 0';
+                                    }
+                                    return null;
+                                  },
+                                  decoration: const InputDecoration(
+                                    labelText: 'Precio',
+                                    labelStyle: TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 60),
+                            ],
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 20),
-                      SizedBox(
-                        width: 200,
-                        child: TextFormField(
-                          style: TextStyle(color: colorTextoDark),
-                          controller: _cantidadController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Campo requerido';
-                            }
-                            if (double.tryParse(value) == null) {
-                              return 'El valor debe ser un número';
-                            }
-                            if (double.parse(value) <= 0) {
-                              return 'El valor debe ser mayor a 0';
-                            }
-                            return null;
+                      ],
+                    )),
+                Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        IconButton.filled(
+                          onPressed: () {
+                            eliminarSuscripcion();
                           },
-                          decoration: const InputDecoration(
-                            labelText: 'Cantidad',
-                            labelStyle:
-                                TextStyle(color: Colors.white, fontSize: 18),
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
+                          icon: Icon(Icons.delete_forever_outlined),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Color.fromARGB(
+                                255, 255, 75, 55), // Color de fondo
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  SizedBox(
-                    width: 410,
-                    child: TextFormField(
-                      style: TextStyle(color: colorTextoDark),
-                      controller: _precioController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Campo requerido';
-                        }
-                        if (double.tryParse(value) == null) {
-                          return 'El valor debe ser un número';
-                        }
-                        if (double.parse(value) <= 0) {
-                          return 'El valor debe ser mayor a 0';
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Precio',
-                        labelStyle:
-                            TextStyle(color: Colors.white, fontSize: 18),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 60),
-                ],
-              ),
+                        )
+                      ],
+                    )),
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
-                  child: Row(
-                    children: [
-                      InkWell(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          width: 200,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 75, 55),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'CANCELAR',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
+                InkWell(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 200,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 255, 75, 55),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'CANCELAR',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(width: 20),
-                      InkWell(
-                        onTap: () {
-                          eliminarSuscripcion();
-                        },
-                        child: Container(
-                          height: 50,
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 75, 55),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'ELIMINAR SUSCRIPCIÓN',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
+                const SizedBox(width: 20),
                 InkWell(
                   onTap: actualizarSuscripccion,
                   child: Container(
