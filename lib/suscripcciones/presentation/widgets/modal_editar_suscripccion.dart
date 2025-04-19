@@ -9,7 +9,8 @@ class ModalEditarSuscripccion extends StatefulWidget {
   const ModalEditarSuscripccion({super.key, required this.suscripcion});
 
   @override
-  State<ModalEditarSuscripccion> createState() => _ModalEditarSuscripccionState();
+  State<ModalEditarSuscripccion> createState() =>
+      _ModalEditarSuscripccionState();
 }
 
 class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
@@ -42,8 +43,10 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   void initState() {
     super.initState();
     _nombreController = TextEditingController(text: widget.suscripcion.titulo);
-    _descripccionController = TextEditingController(text: widget.suscripcion.descripcion);
-    _precioController = TextEditingController(text: widget.suscripcion.precio.toString());
+    _descripccionController =
+        TextEditingController(text: widget.suscripcion.descripcion);
+    _precioController =
+        TextEditingController(text: widget.suscripcion.precio.toString());
     _cantidadController = TextEditingController(
       text: widget.suscripcion.tiempoDuracion < 30
           ? widget.suscripcion.tiempoDuracion.toString()
@@ -103,7 +106,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
       backgroundColor: colorFondoDark,
       content: SizedBox(
         height: 585,
-        width: 1458,
+        width: 1200,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -126,7 +129,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 600,
+                    width: 800,
                     child: TextFormField(
                       maxLength: 63,
                       style: TextStyle(color: colorTextoDark),
@@ -269,38 +272,53 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      InkWell(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          width: 200,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 75, 55),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              'CANCELAR',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
+                      SizedBox(
+                        child: Row(
+                          children: [
+                            InkWell(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                width: 200,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 255, 75, 55),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'CANCELAR',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(width: 20),
+                            InkWell(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Container(
+                                width: 200,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 255, 75, 55),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'ELIMINAR',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      IconButton.filled(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.red)),
-                          onPressed: () {
-                            // Aquí puedes implementar lógica para eliminar la suscripción si lo deseas
-                          },
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                            size: 40,
-                          )),
                       InkWell(
                         onTap: actualizarSuscripccion,
                         child: Container(
