@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
@@ -15,28 +16,24 @@ void main() async {
   // Configurar un manejador de errores global
   FlutterError.onError = (FlutterErrorDetails details) {
     // Si el error está relacionado con teclas, solo lo registramos sin detener la app
-    if (details.exception.toString().contains('KeyDownEvent') || 
+    if (details.exception.toString().contains('KeyDownEvent') ||
         details.exception.toString().contains('hardware_keyboard')) {
-      // Solo registrar sin mostrar el error completo
       print('INFO: Se detectó un error de teclado que puede ignorarse en desarrollo');
       return;
     }
-    // Para otros errores, comportamiento normal
     FlutterError.presentError(details);
   };
-  
+
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Configura la orientación preferida
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-  
+
   await windowManager.ensureInitialized();
 
-  // Configuración de ventana
   WindowOptions windowOptions = const WindowOptions(
     center: true,
     title: "ManageGym",
@@ -46,9 +43,8 @@ void main() async {
     windowButtonVisibility: false,
   );
 
-  // Establecemos un tamaño inicial razonable
-  await windowManager.setSize(Size(1024, 768));
-  
+  await windowManager.setSize(const Size(1024, 768));
+
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
@@ -60,7 +56,7 @@ void main() async {
   } catch (e) {
     print('Error al conectar a la base de datos: $e');
   }
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -73,7 +69,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ManageGym',
       theme: ThemeData(
@@ -103,7 +99,6 @@ class _PantallaInicialState extends State<PantallaInicial> {
   @override
   void initState() {
     super.initState();
-    // Maximizar la ventana al entrar a esta pantalla
     _maximizeWindow();
   }
 
@@ -116,10 +111,8 @@ class _PantallaInicialState extends State<PantallaInicial> {
     HomeScreen(),
     StoreScreen(),
     // ClientsScreen(),
-    // Text('Statistics Screen',
-    //     style: TextStyle(color: Colors.white, fontSize: 24)),
-    // Text('Settings Screen',
-    //     style: TextStyle(color: Colors.white, fontSize: 24)),
+    // Text('Statistics Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    // Text('Settings Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
   ];
 
   void onItemTapped(int index) {

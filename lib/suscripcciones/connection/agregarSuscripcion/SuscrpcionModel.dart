@@ -113,4 +113,21 @@ class AgregarSuscripcionModel {
       return false;
     }
   }
+
+  static Future<bool> eliminarTipoMembresia({
+    required int id,
+  }) async {
+    try {
+      final sql = Sql.named(
+        "DELETE FROM tipomembresia WHERE id=@id"
+      );
+      final result = await Database.conn.execute(sql, parameters: {
+        'id': id,
+      });
+      return result.affectedRows > 0;
+    } catch (e) {
+      print('Error al eliminar: $e');
+      return false;
+    }
+  }
 }

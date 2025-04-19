@@ -57,4 +57,15 @@ class SuscripcionController extends GetxController {
     }
     return false;
   }
+
+  Future<bool> eliminarSuscripcion({
+    required int id,
+  }) async {
+    final ok = await AgregarSuscripcionModel.eliminarTipoMembresia(id: id);
+    if (ok) {
+      await cargarSuscripciones();
+      return true;
+    }
+    return false;
+  }
 }

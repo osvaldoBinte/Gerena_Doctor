@@ -97,6 +97,39 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
     }
   }
 
+  void eliminarSuscripcion() async {
+    final controller = Get.find<SuscripcionController>();
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colorFondoDark,
+        title: const Text("Eliminar suscripción", style: TextStyle(color: Colors.white)),
+        content: const Text("¿Estás seguro de eliminar esta suscripción?", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text("Cancelar", style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text("Eliminar", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      bool ok = await controller.eliminarSuscripcion(id: widget.suscripcion.id);
+      if (ok) {
+        Navigator.of(context).pop();
+        Get.snackbar('Eliminada', 'Suscripción eliminada correctamente',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      } else {
+        Get.snackbar('Error', 'No se pudo eliminar la suscripción',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -293,9 +326,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                           style: ButtonStyle(
                               backgroundColor:
                                   MaterialStateProperty.all(Colors.red)),
-                          onPressed: () {
-                            // Aquí puedes implementar lógica para eliminar la suscripción si lo deseas
-                          },
+                          onPressed: eliminarSuscripcion,
                           icon: const Icon(
                             Icons.delete,
                             color: Colors.white,
