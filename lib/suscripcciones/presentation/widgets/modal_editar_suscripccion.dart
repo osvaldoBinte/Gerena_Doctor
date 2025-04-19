@@ -9,7 +9,8 @@ class ModalEditarSuscripccion extends StatefulWidget {
   const ModalEditarSuscripccion({super.key, required this.suscripcion});
 
   @override
-  State<ModalEditarSuscripccion> createState() => _ModalEditarSuscripccionState();
+  State<ModalEditarSuscripccion> createState() =>
+      _ModalEditarSuscripccionState();
 }
 
 class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
@@ -42,8 +43,10 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   void initState() {
     super.initState();
     _nombreController = TextEditingController(text: widget.suscripcion.titulo);
-    _descripccionController = TextEditingController(text: widget.suscripcion.descripcion);
-    _precioController = TextEditingController(text: widget.suscripcion.precio.toString());
+    _descripccionController =
+        TextEditingController(text: widget.suscripcion.descripcion);
+    _precioController =
+        TextEditingController(text: widget.suscripcion.precio.toString());
     _cantidadController = TextEditingController(
       text: widget.suscripcion.tiempoDuracion < 30
           ? widget.suscripcion.tiempoDuracion.toString()
@@ -103,12 +106,15 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: colorFondoDark,
-        title: const Text("Eliminar suscripción", style: TextStyle(color: Colors.white)),
-        content: const Text("¿Estás seguro de eliminar esta suscripción?", style: TextStyle(color: Colors.white)),
+        title: const Text("Eliminar suscripción",
+            style: TextStyle(color: Colors.white)),
+        content: const Text("¿Estás seguro de eliminar esta suscripción?",
+            style: TextStyle(color: Colors.white)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text("Cancelar", style: TextStyle(color: Colors.white)),
+            child:
+                const Text("Cancelar", style: TextStyle(color: Colors.white)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -136,30 +142,31 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
       backgroundColor: colorFondoDark,
       content: SizedBox(
         height: 585,
-        width: 1458,
+        width: 1000,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'EDITAR SUSCRIPCIÓN',
-                  style: TextStyle(
-                      color: colorTextoDark,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
             Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'EDITAR SUSCRIPCIÓN',
+                        style: TextStyle(
+                            color: colorTextoDark,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
                   SizedBox(
-                    width: 600,
+                    width: 800,
                     child: TextFormField(
                       maxLength: 63,
                       style: TextStyle(color: colorTextoDark),
@@ -299,8 +306,14 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                     ),
                   ),
                   const SizedBox(height: 60),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  child: Row(
                     children: [
                       InkWell(
                         onTap: () => Navigator.of(context).pop(),
@@ -322,28 +335,21 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                           ),
                         ),
                       ),
-                      IconButton.filled(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.red)),
-                          onPressed: eliminarSuscripcion,
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                            size: 40,
-                          )),
+                      const SizedBox(width: 20),
                       InkWell(
-                        onTap: actualizarSuscripccion,
+                        onTap: () {
+                          eliminarSuscripcion();
+                        },
                         child: Container(
-                          width: 300,
                           height: 50,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 131, 55),
+                            color: const Color.fromARGB(255, 255, 75, 55),
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Center(
                             child: Text(
-                              'ACTUALIZAR',
+                              'ELIMINAR SUSCRIPCIÓN',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -351,12 +357,32 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                             ),
                           ),
                         ),
-                      )
+                      ),
                     ],
-                  )
-                ],
-              ),
-            ),
+                  ),
+                ),
+                InkWell(
+                  onTap: actualizarSuscripccion,
+                  child: Container(
+                    width: 300,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 255, 131, 55),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'ACTUALIZAR',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),
