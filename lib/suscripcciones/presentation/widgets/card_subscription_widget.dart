@@ -53,14 +53,17 @@ class CardSubscriptionWidget extends StatelessWidget {
             maxLines: 2,
           ),
           const SizedBox(height: 9),
-          Text(
-            suscripcion.descripcion,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
+          SizedBox(
+            height: 90,
+            child: Text(
+              suscripcion.descripcion,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 12),
           Row(
