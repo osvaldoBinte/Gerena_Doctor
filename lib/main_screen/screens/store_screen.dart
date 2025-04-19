@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/productos/presentation/widgets/filter_button.dart';
+import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
+import 'package:managegym/productos/presentation/widgets/modal_editar_producto.widget.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -11,7 +13,6 @@ class StoreScreen extends StatelessWidget {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          
           children: [
             //botones de accion rapidas
             SizedBox(
@@ -20,13 +21,23 @@ class StoreScreen extends StatelessWidget {
                   QuickActionButton(
                     text: 'AGREGAR UN NUEVO PRODUCTO',
                     icon: Icons.person_add,
-                    accion: () {},
+                    accion: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const ModalAgregarProducto();
+                        },
+                      );
+                    },
                   ),
                   const SizedBox(width: 20),
                   QuickActionButton(
                     text: 'REALIZAR UNA VENTA',
                     icon: Icons.person_add,
-                    accion: () {},
+                    accion: () {
+                      Navigator.pushNamed(
+                          context, '/venta'); // Navegar a la pantalla de venta
+                    },
                   ),
                 ],
               ),
@@ -184,8 +195,6 @@ class StoreScreen extends StatelessWidget {
   }
 }
 
-
-
 class ProductRowWidget extends StatefulWidget {
   final Widget? image;
   final String nombre;
@@ -219,7 +228,7 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
 
   Color getRowColor() {
     if (isHovering || isFocused) {
-      return const Color(0xFFFFA500);
+      return const Color.fromARGB(255, 255, 131, 55); // Color de selección
     }
     return widget.index % 2 == 0
         ? const Color.fromARGB(255, 33, 33, 33)
@@ -240,14 +249,22 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
       color: getRowColor(),
       child: Row(
         children: [
-          // InkWell envuelve desde la imagen hasta "Disponible"
+          // InkWell para toda la fila menos el icono
           Expanded(
-            flex: 19,
+            flex: 15, // Suma de los flex de los siguientes Expanded (2+3+3+2+2+3+1=16, puedes ajustar)
             child: InkWell(
-              borderRadius: BorderRadius.circular(12),
               focusNode: _focusNode,
+              borderRadius: BorderRadius.circular(0),
               onTap: () {
                 // Aquí abres tu modal
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalEditarProducto(
+                   
+                    );
+                  },
+                );
               },
               onHover: (hovering) {
                 setState(() {
@@ -266,7 +283,7 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 2,
                     child: widget.image ??
                         Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                          margin: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: Colors.grey[800],
                             borderRadius: BorderRadius.circular(12),

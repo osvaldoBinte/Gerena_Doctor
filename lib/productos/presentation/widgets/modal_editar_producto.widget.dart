@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
@@ -23,6 +25,7 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
   final TextEditingController stockInicialController = TextEditingController();
   final TextEditingController precioController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   // logica del dropdown para obtener la categoria
   String? _categoriaController;
   List<String> categorias = [
@@ -33,7 +36,7 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
     'Categoria 5'
   ];
 
-  //----------------------------LOGICA PARA OBTENER UNA IMAGEN
+  //LOGICA PARA OBTENER UNA IMAGEN
   bool isImageSelected = false;
   String? _selectedImagePath;
   String textoBotonImagen = 'AGREGAR IMAGEN';
@@ -64,29 +67,21 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
       });
     }
   }
-  //----------------------------LOGICA PARA OBTENER UNA IMAGEN
 
-
-  void editarProducto() {
+  void agregarProductos() {
     if (_formKey.currentState!.validate()) {
       print('Nombre: ${nombreProductoController.text}');
       print('Codigo de barras: ${codigoBarrasController.text}');
       print('Stock inicial: ${stockInicialController.text}');
       print('Precio: ${precioController.text}');
       print('Categoria: $_categoriaController');
-      print('Imagen: $_selectedImagePath');
     }
   }
 
-  //trae el registro del producto para poder hacer
-  /// nombreProductoController.text = 'nombre del producto';
-  /// codigoBarrasController.text = 'codigo de barras';
-  /// stockInicialController.text = 'stock inicial';
-  /// precioController.text = 'precio del producto';
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    // Inicializa los controladores si es necesario
   }
 
   @override
@@ -100,85 +95,152 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
+            // FORMULARIO EN UNA COLUMNA
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'AGREGAR PRODUCTO',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 255, 255, 255),
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InputNombreProductoWidget(
-                          colorTextoDark: colorTextoDark,
-                          nombreProductoController: nombreProductoController),
-                      const SizedBox(height: 20),
-                      InputCodigoDeBarrasProductoWidget(
-                          colorTextoDark: colorTextoDark,
-                          codigoBarrasController: codigoBarrasController),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          InputPrecioProductoWidget(
-                              colorTextoDark: colorTextoDark,
-                              precioController: precioController),
-                          const SizedBox(width: 20),
-                          InputStockInicialProductoWidget(
-                              colorTextoDark: colorTextoDark,
-                              stockInicialController: stockInicialController),
-                          SizedBox(width: 20),
-                          SizedBox(
-                            width: 200,
-                            child: DropdownMenu<String>(
-                              initialSelection: "",
-                              width: 400,
-                              onSelected: (value) {
-                                setState(() {
-                                  _categoriaController = value;
-                                });
-                              },
-                              dropdownMenuEntries: categorias
-                                  .map((categoria) => DropdownMenuEntry<String>(
-                                        value: categoria,
-                                        label: categoria,
-                                      ))
-                                  .toList(),
-                              label: const Text('Categoria',
-                                  style: TextStyle(color: Colors.white)),
-                              textStyle: const TextStyle(color: Colors.white),
-                              inputDecorationTheme: const InputDecorationTheme(
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
+                Expanded(
+                    flex: 12,
+                    child: Column(
+                      children: [
+                        Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'MODIFICAR PRODUCTO',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 255, 255, 255),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
+                              const SizedBox(height: 20),
+                              InputNombreProductoWidget(
+                                  colorTextoDark: colorTextoDark,
+                                  nombreProductoController:
+                                      nombreProductoController),
+                              const SizedBox(height: 20),
+                              InputCodigoDeBarrasProductoWidget(
+                                  colorTextoDark: colorTextoDark,
+                                  codigoBarrasController:
+                                      codigoBarrasController),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  InputPrecioProductoWidget(
+                                      colorTextoDark: colorTextoDark,
+                                      precioController: precioController),
+                                  const SizedBox(width: 20),
+                                  InputStockInicialProductoWidget(
+                                      colorTextoDark: colorTextoDark,
+                                      stockInicialController:
+                                          stockInicialController),
+                                  SizedBox(width: 20),
+                                  SizedBox(
+                                    width: 200,
+                                    child: DropdownMenu<String>(
+                                      initialSelection: "",
+                                      width: 400,
+                                      onSelected: (value) {
+                                        setState(() {
+                                          _categoriaController = value;
+                                        });
+                                      },
+                                      dropdownMenuEntries: categorias
+                                          .map((categoria) =>
+                                              DropdownMenuEntry<String>(
+                                                value: categoria,
+                                                label: categoria,
+                                              ))
+                                          .toList(),
+                                      label: const Text('Categoria',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      textStyle:
+                                          const TextStyle(color: Colors.white),
+                                      inputDecorationTheme:
+                                          const InputDecorationTheme(
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  //boton para agregar imagen
+                                  const SizedBox(width: 20),
+                                  InkWell(
+                                    onTap: selectImage,
+                                    child: Container(
+                                      width: 200,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(255, 255, 131, 55),
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          textoBotonImagen,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              // Agrega más campos según sea necesario
+                            ],
+                          ),
+                        ),
+                      ],
+                    )),
+                Expanded(
+                    flex: 1,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          IconButton.filled(
+                              onPressed: () {},
+                              icon: Icon(Icons.delete_forever_outlined),
+                              style: IconButton.styleFrom(
+                                backgroundColor: Color.fromARGB(
+                                    255, 255, 75, 55), // Color de fondo
+                              ),
                           )
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      // Agrega más campos según sea necesario
-                    ],
-                  ),
-                ),
+                        ])),
               ],
+            ),
+            Container(
+              width: 200,
+              height: 200,
+              child: isImageSelected
+                  ? Image.file(
+                      // Usar File de dart:io para mostrar la imagen seleccionada
+                      File(_selectedImagePath!),
+                      fit: BoxFit.cover,
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.add_a_photo, color: Colors.white),
+                      onPressed: selectImage,
+                    ),
             ),
             // BOTONES ABAJO
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InkWell(
-                  onTap: editarProducto,
+                  onTap: agregarProductos,
                   child: Container(
                     width: 350,
                     height: 50,
@@ -188,7 +250,7 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
                     ),
                     child: const Center(
                       child: Text(
-                        'GUARDAR NUEVO PRODUCTO',
+                        'ACTUALIZAR PRODUCTO',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,

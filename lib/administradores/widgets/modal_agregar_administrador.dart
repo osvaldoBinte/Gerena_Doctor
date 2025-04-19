@@ -73,7 +73,7 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
       contentPadding: EdgeInsets.all(20),
       backgroundColor: const Color.fromARGB(255, 40, 40, 40),
       content: Container(
-        width: 1400,
+        width: 1000,
         height: 600,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
