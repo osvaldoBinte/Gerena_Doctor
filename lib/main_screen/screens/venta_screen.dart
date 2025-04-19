@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/main_screen/widgets/row_producto_seleccionado.dart';
 import 'package:managegym/main_screen/widgets/title_bar_producto_seleccionado.dart';
+import 'package:managegym/ventas/widgets/row_cliente_venta.dart';
+import 'package:managegym/ventas/widgets/row_producto_venta.dart';
 
 class ScreenVenta extends StatefulWidget {
   const ScreenVenta({super.key});
@@ -13,6 +15,12 @@ class _ScreenVentaState extends State<ScreenVenta> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
   final Color colorFondoModalDark = const Color.fromARGB(2, 217, 217, 217);
+
+  //controladores de buscadores
+  final TextEditingController _buscadorProductoController =
+      TextEditingController();
+  final TextEditingController _buscadorClientController =
+      TextEditingController();
 
   //controladores
   final TextEditingController _pagoController = TextEditingController();
@@ -102,6 +110,10 @@ class _ScreenVentaState extends State<ScreenVenta> {
             width: 800,
             height: 50,
             child: TextField(
+              onChanged: (value) {
+                //aqui haces la busqueda de los productos
+              },
+              controller: _buscadorProductoController,
               style: const TextStyle(
                   color: Colors.white), // Cambia el color del texto a blanco
               decoration: InputDecoration(
@@ -119,8 +131,8 @@ class _ScreenVentaState extends State<ScreenVenta> {
           Container(
             width: double.infinity,
             height: 50,
-            color: Color.fromARGB(255, 40, 40, 40),
-            child: Row(
+            color: const Color.fromARGB(255, 40, 40, 40),
+            child: const Row(
               children: [
                 Expanded(
                   flex: 2,
@@ -154,8 +166,97 @@ class _ScreenVentaState extends State<ScreenVenta> {
                 ),
               ],
             ),
-          )
+          ),
+          SizedBox(
+              width: double.infinity,
+              height: 300,
+              child: ListView.builder(
+                itemCount: 12,
+                itemBuilder: (context, index) {
+                  return RowProductoVenta(
+                    nombre: "Nombre del producto",
+                    precio: "1000",
+                    stock: "10",
+                    colorTexto: colorTextoDark,
+                    index: index,
+                    onTap: (i) {
+                      print('Tocaste el producto $i');
+                    },
+                  );
+                },
+              )),
+          const SizedBox(height: 20),
           //*******BUSCAR PRODUCTOS*************************************************************
+          //*******BUSCAR USUARIO PARA SELECCIONARLO **********************************************
+          SizedBox(
+            width: 800,
+            height: 50,
+            child: TextField(
+              onChanged: (value) {
+                //aqui haces la busqueda de los productos
+              },
+              controller: _buscadorClientController,
+              style: const TextStyle(
+                  color: Colors.white), // Cambia el color del texto a blanco
+              decoration: InputDecoration(
+                hintText: 'Buscar cliente por numero de telefono',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                      color: Color.fromARGB(255, 255, 255, 255), width: 8),
+                ),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            height: 50,
+            color: const Color.fromARGB(255, 40, 40, 40),
+            child: const Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    "Nombre",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "Numero de telefono",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+              width: double.infinity,
+              height: 150,
+              child: ListView.builder(
+                itemCount: 12,
+                itemBuilder: (context, index) {
+                  return RowClienteVenta(
+                    nombre: "Juan Pérez",
+                    telefono: "2291234567",
+                    colorTexto: colorTextoDark,
+                    index: index,
+                    onTap: (i) {
+                      print('Tocaste el usuario $i');
+                    },
+                  );
+                },
+              )),
+          //*******BUSCAR USUARIO PARA SELECCIONARLO *******************************************************
         ],
       ),
     );
