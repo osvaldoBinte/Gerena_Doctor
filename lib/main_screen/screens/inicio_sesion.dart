@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/main_screen/connection/InicioSesion/inicioSesionController.dart';
 import 'package:window_manager/window_manager.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,6 +11,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with WindowListener {
   bool isMaximized = false;
+  final TextEditingController correoController = TextEditingController();
+  final TextEditingController contrasenaController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -25,6 +29,8 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
 
   @override
   void dispose() {
+    correoController.dispose();
+    contrasenaController.dispose();
     windowManager.removeListener(this);
     super.dispose();
   }
@@ -37,6 +43,32 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
   @override
   void onWindowUnmaximize() {
     setState(() => isMaximized = false);
+  }
+
+  Future<void> _login() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      // final admin = await InicioSesionController.login(
+      //   correoController.text.trim(),
+      //   contrasenaController.text,
+      // );
+      // Si el login es exitoso, navega a la pantalla principal
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      // Muestra el error al usuario
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -56,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
               fit: BoxFit.cover,
             ),
           ),
-          
+
           // Área arrastrable para mover la ventana (en la parte superior)
           Positioned(
             top: 0,
@@ -71,8 +103,8 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
               ),
             ),
           ),
-          
-          // Botones de control de ventana simples y directos
+
+          // Botones de control de ventana
           Positioned(
             top: 10,
             right: 10,
@@ -81,7 +113,6 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                 // Botón Minimizar
                 InkWell(
                   onTap: () {
-                    print("Minimizando ventana");
                     windowManager.minimize();
                   },
                   child: Container(
@@ -99,11 +130,9 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                   ),
                 ),
                 const SizedBox(width: 8),
-                
                 // Botón Maximizar/Restaurar
                 InkWell(
                   onTap: () async {
-                    print("Cambiando estado maximizado: $isMaximized");
                     if (isMaximized) {
                       await windowManager.unmaximize();
                     } else {
@@ -125,11 +154,9 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                   ),
                 ),
                 const SizedBox(width: 8),
-                
                 // Botón Cerrar
                 InkWell(
                   onTap: () {
-                    print("Cerrando ventana");
                     windowManager.close();
                   },
                   child: Container(
@@ -149,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
               ],
             ),
           ),
-          
+
           // Formulario de inicio de sesión
           Center(
             child: Container(
@@ -173,6 +200,7 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                   ),
                   const SizedBox(height: 35),
                   TextFormField(
+                    controller: correoController,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       labelText: 'Correo',
@@ -189,6 +217,7 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                   ),
                   const SizedBox(height: 35),
                   TextFormField(
+                    controller: contrasenaController,
                     obscureText: true,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
@@ -206,10 +235,7 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                   ),
                   const SizedBox(height: 35),
                   ElevatedButton(
-                    onPressed: () {
-                      // Navegar a la pantalla principal
-                      Navigator.pushReplacementNamed(context, '/home');
-                    },
+                    onPressed: isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shadowColor: Colors.transparent,
@@ -218,9 +244,18 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
                       ),
                       side: const BorderSide(color: Colors.white70, width: 2),
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: Text('Iniciar sesión', style: TextStyle(color: Colors.white)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text('Iniciar sesión', style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],

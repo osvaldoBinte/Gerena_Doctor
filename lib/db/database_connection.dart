@@ -42,12 +42,14 @@ class Database {
         )
         ''',
         
-        // Tabla administrador
+        // Tabla administrador - MODIFICADA para incluir correo y contraseña
         '''
         CREATE TABLE IF NOT EXISTS administrador (
           id SERIAL PRIMARY KEY,
           tipoAdmin VARCHAR(15) CHECK (tipoAdmin IN ('SuperAdmin', 'admin', 'secundario')) NOT NULL,
-          idUsuario INTEGER NOT NULL REFERENCES usuarios(id)
+          idUsuario INTEGER NOT NULL REFERENCES usuarios(id),
+          correo VARCHAR(150) UNIQUE NOT NULL,
+          contrasena VARCHAR(255) NOT NULL
         )
         ''',
         
@@ -268,6 +270,7 @@ class Database {
         
         // Índices
         'CREATE INDEX IF NOT EXISTS idx_usuarios_correo ON usuarios(correo)',
+        'CREATE INDEX IF NOT EXISTS idx_administrador_correo ON administrador(correo)',
         'CREATE INDEX IF NOT EXISTS idx_membresiaUsuario_idUsuario ON membresiaUsuario(idUsuario)',
         'CREATE INDEX IF NOT EXISTS idx_membresiaUsuario_status ON membresiaUsuario(statusMembresia)',
         'CREATE INDEX IF NOT EXISTS idx_actividadUsuario_idUsuario ON actividadUsuario(idUsuario)',
@@ -302,4 +305,6 @@ class Database {
     await conn.close();
     print('🔌 Conexión cerrada.');
   }
+
+  
 }

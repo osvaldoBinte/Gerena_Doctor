@@ -50,16 +50,14 @@ class _CardSuscriptionSelectWidgetState
           });
         },
         focusNode: _mainFocusNode,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         hoverColor: const Color.fromARGB(50, 255, 255, 255),
         splashColor: const Color.fromARGB(70, 115, 115, 115),
         highlightColor: const Color.fromARGB(40, 115, 115, 115),
         child: Ink(
-          width: 350,
-          height: 160,
           decoration: BoxDecoration(
             color: isHovering ? hoverColor : baseColor,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: isHovering
                 ? Border.all(
                     color: const Color.fromARGB(100, 115, 115, 115), width: 1.0)
@@ -75,91 +73,92 @@ class _CardSuscriptionSelectWidgetState
                 : null,
           ),
           child: Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
-                  child: Text(
-                    'Selecciona la suscripción que quieres agregar al cliente',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: const Color.fromRGBO(255, 255, 255, 1),
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      // Añadimos un efecto de sombra al texto cuando está en hover
-                      shadows: isHovering
-                          ? [
-                              Shadow(
-                                color: Colors.black.withOpacity(0.5),
-                                blurRadius: 2,
-                                offset: const Offset(0, 1),
-                              )
-                            ]
-                          : null,
-                    ),
+                // Texto
+                Text(
+                  'Selecciona la suscripción que quieres agregar al cliente',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontSize: 14, // Texto más pequeño
+                    fontWeight: FontWeight.bold,
+                    // Sombra al texto cuando está en hover
+                    shadows: isHovering
+                        ? [
+                            Shadow(
+                              color: Colors.black.withOpacity(0.5),
+                              blurRadius: 2,
+                              offset: const Offset(0, 1),
+                            )
+                          ]
+                        : null,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 55, 112, 255),
-                          borderRadius: BorderRadius.circular(10),
-                          // Añadimos un efecto de sombra cuando está en hover
-                          boxShadow: isHovering
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 1),
-                                  )
-                                ]
-                              : null,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 10),
-                          child: Text(
-                            'Precio: 299',
-                            style: TextStyle(
-                                color: colorTextoDark,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          ),
+                const SizedBox(height: 6),
+                // Botones de precio y duración
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 55, 112, 255),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: isHovering
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 8),
+                        child: Text(
+                          'Precio: 299',
+                          style: TextStyle(
+                              color: colorTextoDark,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 55, 112, 255),
-                          borderRadius: BorderRadius.circular(10),
-                          // Añadimos un efecto de sombra cuando está en hover
-                          boxShadow: isHovering
-                              ? [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 1),
-                                  )
-                                ]
-                              : null,
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 55, 112, 255),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: isHovering
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                )
+                              ]
+                            : null,
+                      ),
+                      child: const Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                        child: Text(
+                          'Duración: 1m',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
                         ),
-                        child: const Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          child: Text(
-                            'Duración: 1m',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 )
               ],
             ),
