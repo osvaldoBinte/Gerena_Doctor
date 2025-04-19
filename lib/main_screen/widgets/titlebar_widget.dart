@@ -24,7 +24,7 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
   @override
   void initState() {
     windowManager.addListener(this);
-    ();
+    _init();
     super.initState();
   }
 
@@ -49,82 +49,57 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
     setState(() => isMaximized = false);
   }
 
- @override
-Widget build(BuildContext context) {
-  return Container(
-    height: 55,
-    decoration: BoxDecoration(
-      color: Colors.grey[900],
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Área arrastrable con logo
-        Expanded(
-          child: GestureDetector(
-            onPanStart: (_) => windowManager.startDragging(),
-            child: const Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text(
-                'ManageGym',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 55,
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Área arrastrable con logo
+          Expanded(
+            child: GestureDetector(
+              onPanStart: (_) => windowManager.startDragging(),
+              child: const Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text(
+                  'ManageGym',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        // Botones de navegación
-        Row(
-          children: widget.customButtons,
-        ),
-        // Botones de ventana
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.minimize),
-              color: Colors.white,
-              onPressed: () => windowManager.minimize(),
-            ),
-            IconButton(
-              icon: Icon(
-                isMaximized ? Icons.fullscreen_exit : Icons.fullscreen,
+          // Botones de navegación
+          Row(
+            children: widget.customButtons,
+          ),
+          // Botones de ventana (minimizar y cerrar)
+          Row(
+            children: [
+              // Botón Minimizar
+              IconButton(
+                icon: const Icon(Icons.minimize),
+                color: Colors.white,
+                onPressed: () => windowManager.minimize(),
               ),
-              color: Colors.white,
-              onPressed: () {
-                if (isMaximized) {
-                  windowManager.unmaximize();
-                } else {
-                  windowManager.maximize();
-                }
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.close),
-              color: Colors.white,
-              onPressed: () => windowManager.close(),
-            ),
-            const SizedBox(width: 8), // Espacio al final
-          ],
-        ),
-      ],
-    ),
-  );
-}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+              // Botón Cerrar
+              IconButton(
+                icon: const Icon(Icons.close),
+                color: Colors.white,
+                onPressed: () => windowManager.close(),
+              ),
+              const SizedBox(width: 8), // Espacio al final
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+} 

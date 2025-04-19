@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
@@ -10,31 +11,54 @@ import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
+  // Configurar un manejador de errores global
+  FlutterError.onError = (FlutterErrorDetails details) {
+    // Si el error está relacionado con teclas, solo lo registramos sin detener la app
+    if (details.exception.toString().contains('KeyDownEvent') || 
+        details.exception.toString().contains('hardware_keyboard')) {
+      // Solo registrar sin mostrar el error completo
+      print('INFO: Se detectó un error de teclado que puede ignorarse en desarrollo');
+      return;
+    }
+    // Para otros errores, comportamiento normal
+    FlutterError.presentError(details);
+  };
+  
   WidgetsFlutterBinding.ensureInitialized();
-  // Must add this line.
+  
+  // Configura la orientación preferida
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
+  
   await windowManager.ensureInitialized();
 
+  // Configuración de ventana
   WindowOptions windowOptions = const WindowOptions(
     center: true,
     title: "ManageGym",
-    backgroundColor: const Color.fromARGB(100, 33, 33, 33),
+    backgroundColor: Color.fromARGB(100, 33, 33, 33),
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
-    size: Size(1600, 1300), // Establece un tamaño inicial, no solo mínimo
-    minimumSize: Size(1600, 1300), // Un valor más pequeño pero razonable
+    windowButtonVisibility: false,
   );
 
-  // Importante: primero configura el tamaño, luego muestra
-  await windowManager.setSize(Size(1600, 1300));
-
+  // Establecemos un tamaño inicial razonable
+  await windowManager.setSize(Size(1024, 768));
+  
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     await windowManager.show();
     await windowManager.focus();
-    await windowManager.maximize();
+    // No maximizamos aquí para que el login no inicie maximizado
   });
 
-  await Database.connect();
-
+  try {
+    await Database.connect();
+  } catch (e) {
+    print('Error al conectar a la base de datos: $e');
+  }
   runApp(MyApp());
 }
 
@@ -48,8 +72,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    // Construir los botones aquí, no como una constante estática
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ManageGym',
@@ -77,15 +99,26 @@ class PantallaInicial extends StatefulWidget {
 class _PantallaInicialState extends State<PantallaInicial> {
   int _selectedIndex = 1;
 
+  @override
+  void initState() {
+    super.initState();
+    // Maximizar la ventana al entrar a esta pantalla
+    _maximizeWindow();
+  }
+
+  Future<void> _maximizeWindow() async {
+    await windowManager.maximize();
+  }
+
   static const List<Widget> screens = <Widget>[
     AdministradoresScreen(),
     HomeScreen(),
-    Text('Store Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
-    ClientsScreen(),
-    Text('Statistics Screen',
-        style: TextStyle(color: Colors.white, fontSize: 24)),
-    Text('Settings Screen',
-        style: TextStyle(color: Colors.white, fontSize: 24)),
+    // Text('Store Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    // ClientsScreen(),
+    // Text('Statistics Screen',
+    //     style: TextStyle(color: Colors.white, fontSize: 24)),
+    // Text('Settings Screen',
+    //     style: TextStyle(color: Colors.white, fontSize: 24)),
   ];
 
   void onItemTapped(int index) {
@@ -127,7 +160,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
         active: _selectedIndex == 4,
         onPressed: onItemTapped,
       ),
-        CustomButtonHeader(
+      CustomButtonHeader(
         icon: Icons.settings_outlined,
         index: 5,
         active: _selectedIndex == 5,
