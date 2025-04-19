@@ -83,8 +83,8 @@ class _ModalAgregarProductoState extends State<ModalAgregarProducto> {
     return AlertDialog(
       backgroundColor: colorFondoDark,
       content: Container(
-        width: 1400,
-        height: 558,
+        width: 1300,
+        height: 600,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

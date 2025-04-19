@@ -84,151 +84,186 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
       contentPadding: EdgeInsets.all(20),
       backgroundColor: const Color.fromARGB(255, 40, 40, 40),
       content: Container(
-        width: 1400,
+        width: 1000,
         height: 600,
         child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Form(
-              key: _form,
-              child: Column(
+            Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "AGREGAR UN NUEVO ADMINISTRADOR",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      InputNombreWidget(
-                          colorTextoDark: colorTextoDark,
-                          nombreController: nombreController),
-                      const SizedBox(width: 20),
-                      InputApellidoWidget(
-                          colorTextoDark: colorTextoDark,
-                          apellidosController: apellidosController)
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      InputTelefonoWidget(
-                          colorTextoDark: colorTextoDark,
-                          telefonoController: telefonoController),
-                      const SizedBox(width: 20),
-                      InputCorreoElectronicoWidget(
-                          colorTextoDark: colorTextoDark,
-                          correoController: correoController)
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: 400,
-                    child: TextFormField(
-                      controller: passwordController,
-                      obscureText: true,
-                      style: TextStyle(color: colorTextoDark),
-                      decoration: const InputDecoration(
-                        labelText: 'Contraseña',
-                        labelStyle: TextStyle(color: Colors.white),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Campo requerido';
-                        }
-                        if (value.length < 6) {
-                          return 'Mínimo 6 caracteres';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Fecha de nacimiento",
-                    style: TextStyle(
-                      color: colorTextoDark,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      InputFechaNacimientoWidget(
-                        colorTextoDark: colorTextoDark,
-                        diaController: _diaController,
-                        mesController: _mesController,
-                        anoController: _anoController,
-                        onMesSelected: (value) {
-                          setState(() {
-                            _mesController = value;
-                          });
-                        },
-                        onAnoSelected: (value) {
-                          setState(() {
-                            _anoController = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 88),
-                      InputSexoWidget(
-                        sexoController: _sexoController,
-                        onSelected: (value) {
-                          setState(() {
-                            _sexoController = value;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 190,
-                        child: DropdownMenu<String>(
-                          initialSelection: _rolSeleccionado,
-                          width: 400,
-                          onSelected: (value) {
-                            setState(() {
-                              _rolSeleccionado = value;
-                            });
-                          },
-                          dropdownMenuEntries: roles
-                              .map((rol) => DropdownMenuEntry<String>(
-                                    value: rol,
-                                    label: rol,
-                                  ))
-                              .toList(),
-                          label: const Text('Selecciona un rol',
-                              style: TextStyle(color: Colors.white)),
-                          textStyle: const TextStyle(color: Colors.white),
-                          inputDecorationTheme: const InputDecorationTheme(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
+              children: [
+                Expanded(
+                    flex: 12,
+                    child: Column(
+                      children: [
+                        Form(
+                          key: _form,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "AGREGAR UN NUEVO ADMINISTRADOR",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  InputNombreWidget(
+                                      colorTextoDark: colorTextoDark,
+                                      nombreController: nombreController),
+                                  const SizedBox(width: 20),
+                                  InputApellidoWidget(
+                                      colorTextoDark: colorTextoDark,
+                                      apellidosController: apellidosController)
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  InputTelefonoWidget(
+                                      colorTextoDark: colorTextoDark,
+                                      telefonoController: telefonoController),
+                                  const SizedBox(width: 20),
+                                  InputCorreoElectronicoWidget(
+                                      colorTextoDark: colorTextoDark,
+                                      correoController: correoController)
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              SizedBox(
+                                width: 400,
+                                child: TextFormField(
+                                  controller: passwordController,
+                                  obscureText: true,
+                                  style: TextStyle(color: colorTextoDark),
+                                  decoration: const InputDecoration(
+                                    labelText: 'Contraseña',
+                                    labelStyle: TextStyle(color: Colors.white),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.white),
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Campo requerido';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'Mínimo 6 caracteres';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Text(
+                                "Fecha de nacimiento",
+                                style: TextStyle(
+                                  color: colorTextoDark,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  InputFechaNacimientoWidget(
+                                    colorTextoDark: colorTextoDark,
+                                    diaController: _diaController,
+                                    mesController: _mesController,
+                                    anoController: _anoController,
+                                    onMesSelected: (value) {
+                                      setState(() {
+                                        _mesController = value;
+                                      });
+                                    },
+                                    onAnoSelected: (value) {
+                                      setState(() {
+                                        _anoController = value;
+                                      });
+                                    },
+                                  ),
+                                  const SizedBox(width: 88),
+                                  InputSexoWidget(
+                                    sexoController: _sexoController,
+                                    onSelected: (value) {
+                                      setState(() {
+                                        _sexoController = value;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 190,
+                                    child: DropdownMenu<String>(
+                                      initialSelection: _rolSeleccionado,
+                                      width: 400,
+                                      onSelected: (value) {
+                                        setState(() {
+                                          _rolSeleccionado = value;
+                                        });
+                                      },
+                                      dropdownMenuEntries: roles
+                                          .map((rol) =>
+                                              DropdownMenuEntry<String>(
+                                                value: rol,
+                                                label: rol,
+                                              ))
+                                          .toList(),
+                                      label: const Text('Selecciona un rol',
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      textStyle:
+                                          const TextStyle(color: Colors.white),
+                                      inputDecorationTheme:
+                                          const InputDecorationTheme(
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    )),
+                Expanded(
+                    flex: 2,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        IconButton.filled(
+                          onPressed: () {},
+                          icon: Icon(Icons.delete_forever_outlined),
+                          style: IconButton.styleFrom(
+                            backgroundColor: Color.fromARGB(
+                                255, 255, 75, 55), // Color de fondo
+                          ),
+                        )
+                      ],
+                    ))
+              ],
             ),
             const SizedBox(height: 10),
             Row(
