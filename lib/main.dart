@@ -4,6 +4,7 @@ import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/main_screen/screens/inicio_sesion.dart';
+import 'package:managegym/main_screen/screens/store_screen.dart';
 import 'package:managegym/main_screen/screens/venta_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
@@ -113,7 +114,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
   static const List<Widget> screens = <Widget>[
     AdministradoresScreen(),
     HomeScreen(),
-    // Text('Store Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    StoreScreen(),
     // ClientsScreen(),
     // Text('Statistics Screen',
     //     style: TextStyle(color: Colors.white, fontSize: 24)),

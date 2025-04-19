@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/administradores/widgets/modal_agregar_administrador.dart';
+import 'package:managegym/administradores/widgets/modal_editar_administrador.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 
 class AdministradoresScreen extends StatelessWidget {
@@ -25,7 +26,11 @@ class AdministradoresScreen extends StatelessWidget {
               text: 'AGREGAR UN NUEVO ADMINISTRADOR',
               icon: Icons.add,
               accion: () {
-                showDialog(context: context, builder: (context) {return ModalAgregarAdministrador();});
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return ModalAgregarAdministrador();
+                    });
               },
             ),
           ],
@@ -97,7 +102,13 @@ class AdministradoresScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton.filled(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return ModalEditarAdministrador();
+                                        });
+                                  },
                                   style: ButtonStyle(
                                     backgroundColor: MaterialStateProperty.all(
                                       const Color.fromARGB(255, 255, 131, 55),
