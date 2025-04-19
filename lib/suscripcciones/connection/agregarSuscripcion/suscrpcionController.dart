@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:managegym/suscripcciones/connection/agregarSuscripcion/agregarSuscrpcionModel.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class Agregarsuscrpcioncontroller {
   static Future<TipoMembresia?> agregarSuscripcion(String titulo, String descripcion, double precio, int tiempoDuracion) async {
@@ -21,5 +21,9 @@ class Agregarsuscrpcioncontroller {
       throw Exception('No se pudo insertar la suscripción');
     }
     return tipoMembresia;
+  }
+
+  static Future<List<TipoMembresia>> listarSuscripciones() async {
+    return await AgregarSuscripcionModel.obtenerTodasLasSuscripciones();
   }
 }
