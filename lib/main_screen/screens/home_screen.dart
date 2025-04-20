@@ -118,7 +118,7 @@ Future<void> cargarUsuarios() async {
           child: usuariosCargando
               ? const Center(child: CircularProgressIndicator())
               : usuarios.isEmpty
-                  ? const Center(child: Text("No hay usuarios registrados"))
+                  ? const Center(child: Text("No hay usuarios registrados", style: TextStyle(color: Colors.white, fontSize: 18)))
                   : ListView.builder(
                       itemCount: usuarios.length,
                       itemBuilder: (context, index) {
@@ -211,7 +211,7 @@ Future<void> cargarUsuarios() async {
             }
             final suscripciones = suscripcionController.suscripciones;
             if (suscripciones.isEmpty) {
-              return const Center(child: Text("No hay suscripciones"));
+              return const Center(child: Text("No hay suscripciones" , style: TextStyle(color: Colors.white, fontSize: 18)));
             }
             final ScrollController scrollController = ScrollController();
             return Scrollbar(

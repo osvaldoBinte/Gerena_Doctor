@@ -36,8 +36,7 @@ class StoreScreen extends StatelessWidget {
                     text: 'REALIZAR UNA VENTA',
                     icon: Icons.person_add,
                     accion: () {
-                      Navigator.pushNamed(
-                          context, '/venta'); // Navegar a la pantalla de venta
+                  
                     },
                   ),
                 ],
