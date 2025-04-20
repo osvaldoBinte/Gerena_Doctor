@@ -84,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> with WindowListener {
               BlendMode.darken,
             ),
             child: Image.asset(
-              'assets/images/fondo-inicio-sesion.jpg',
+              'assets/images/fondo-inicio-sesion.jpeg',
               fit: BoxFit.cover,
             ),
           ),

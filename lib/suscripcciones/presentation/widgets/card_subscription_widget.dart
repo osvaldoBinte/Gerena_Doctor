@@ -54,7 +54,7 @@ class CardSubscriptionWidget extends StatelessWidget {
           ),
           const SizedBox(height: 9),
           SizedBox(
-            height: 90,
+            height: 70,
             child: Text(
               suscripcion.descripcion,
               style: const TextStyle(

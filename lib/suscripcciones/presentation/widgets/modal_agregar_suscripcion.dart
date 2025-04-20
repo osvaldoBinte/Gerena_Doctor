@@ -108,7 +108,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
     return AlertDialog(
       backgroundColor: colorFondoDark,
       content: SizedBox(
-        height: 650,
+        height: 550,
         width: 900,
         child: Form(
           key: _formKey,
@@ -195,7 +195,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                       value: _duracionSeleccionada,
                       decoration: const InputDecoration(
                         labelText: 'Duración',
-                        labelStyle: TextStyle(color: Colors.white, fontSize: 18),
+                        labelStyle: TextStyle(color: Colors.white, fontSize: 20), // Más grande
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
                         ),
@@ -204,11 +204,22 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                         ),
                       ),
                       dropdownColor: colorFondoDark,
-                      style: TextStyle(color: colorTextoDark),
+                      style: TextStyle(
+                        color: colorTextoDark,
+                        fontSize: 17, // Aumenta el tamaño aquí
+                        fontWeight: FontWeight.w500,
+                      ),
                       items: opcionesDuracion
                           .map((op) => DropdownMenuItem<String>(
                                 value: op['label'],
-                                child: Text(op['label'], style: TextStyle(color: colorTextoDark)),
+                                child: Text(
+                                  op['label'],
+                                  style: TextStyle(
+                                    color: colorTextoDark,
+                                    fontSize: 17, // Aumenta el tamaño aquí también
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
                               ))
                           .toList(),
                       onChanged: (value) {
@@ -253,7 +264,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
               ),
               const SizedBox(height: 50),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   InkWell(
                     onTap: () {

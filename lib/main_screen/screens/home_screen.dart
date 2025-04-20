@@ -154,7 +154,7 @@ Future<void> cargarUsuarios() async {
               const SizedBox(width: 20),
               QuickActionButton(
                 text: 'AGREGAR UNA NUEVA SUSCRIPCCION',
-                icon: Icons.person_add,
+                icon: Icons.notes_outlined,
                 accion: () {
                   showDialog(
                       context: context,
@@ -166,7 +166,7 @@ Future<void> cargarUsuarios() async {
               const SizedBox(width: 20),
               QuickActionButton(
                 text: 'AGREGAR UN NUEVO PRODUCTO',
-                icon: Icons.person_add,
+                icon: Icons.add,
                 accion: () {
                   showDialog(
                     context: context,
@@ -179,7 +179,7 @@ Future<void> cargarUsuarios() async {
               const SizedBox(width: 20),
               QuickActionButton(
                 text: 'REALIZAR UNA VENTA',
-                icon: Icons.person_add,
+                icon: Icons.shopping_cart,
                 accion: () {
                   Navigator.pushNamed(context, '/venta');
                 },

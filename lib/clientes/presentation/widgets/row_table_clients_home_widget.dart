@@ -267,10 +267,16 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 color: _isButtonHovered
                     ? const Color.fromARGB(255, 0, 0, 0)
                     : isPair(widget.index),
-                child: const Text(
-                  'Administrar suscripción',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
+                child: Row(
+                  children: [
+                    const Text(
+                      'Administrar suscripción',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 20),
+                    Icon(Icons.edit, color: Colors.white, size: 23,)
+                  ],
                 ),
               ),
             ),

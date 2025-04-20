@@ -18,7 +18,8 @@ void main() async {
     // Si el error está relacionado con teclas, solo lo registramos sin detener la app
     if (details.exception.toString().contains('KeyDownEvent') ||
         details.exception.toString().contains('hardware_keyboard')) {
-      print('INFO: Se detectó un error de teclado que puede ignorarse en desarrollo');
+      print(
+          'INFO: Se detectó un error de teclado que puede ignorarse en desarrollo');
       return;
     }
     FlutterError.presentError(details);
@@ -94,7 +95,7 @@ class PantallaInicial extends StatefulWidget {
 }
 
 class _PantallaInicialState extends State<PantallaInicial> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -107,12 +108,12 @@ class _PantallaInicialState extends State<PantallaInicial> {
   }
 
   static const List<Widget> screens = <Widget>[
-    AdministradoresScreen(),
     HomeScreen(),
     StoreScreen(),
-    // ClientsScreen(),
-    // Text('Statistics Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
-    // Text('Settings Screen', style: TextStyle(color: Colors.white, fontSize: 24)),
+    Text("Screen de Clientes"),
+    Text("Screen de estadisticas"),
+    Text(""),
+    AdministradoresScreen(),
   ];
 
   void onItemTapped(int index) {
@@ -125,39 +126,39 @@ class _PantallaInicialState extends State<PantallaInicial> {
   Widget build(BuildContext context) {
     List<CustomButtonHeader> customButtons = [
       CustomButtonHeader(
-        icon: Icons.badge_outlined,
+        icon: Icons.home,
         index: 0,
         active: _selectedIndex == 0,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
-        icon: Icons.home,
-        index: 1,
-        active: _selectedIndex == 1,
-        onPressed: onItemTapped,
-      ),
-      CustomButtonHeader(
         icon: Icons.storefront,
-        index: 2,
+        index: 1,
         active: _selectedIndex == 2,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.group_add_outlined,
-        index: 3,
+        index: 2,
         active: _selectedIndex == 3,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.bar_chart_rounded,
-        index: 4,
+        index: 3,
         active: _selectedIndex == 4,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.settings_outlined,
-        index: 5,
+        index: 4,
         active: _selectedIndex == 5,
+        onPressed: onItemTapped,
+      ),
+      CustomButtonHeader(
+        icon: Icons.badge_outlined,
+        index: 5,
+        active: _selectedIndex == 6,
         onPressed: onItemTapped,
       ),
     ];
