@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:window_manager/window_manager.dart';
+import 'dart:math';
 
 class TitlebarWidget extends StatefulWidget {
   final List<CustomButtonHeader> customButtons;
@@ -18,14 +19,22 @@ class TitlebarWidget extends StatefulWidget {
   State<TitlebarWidget> createState() => _TitlebarWidgetState();
 }
 
-class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
+class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener, SingleTickerProviderStateMixin {
   bool isMaximized = false;
+
+  // Animation for wave effect
+  late final AnimationController _waveController;
 
   @override
   void initState() {
     windowManager.addListener(this);
     _init();
     super.initState();
+
+    _waveController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat();
   }
 
   void _init() async {
@@ -36,6 +45,7 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
   @override
   void dispose() {
     windowManager.removeListener(this);
+    _waveController.dispose();
     super.dispose();
   }
 
@@ -59,18 +69,29 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Área arrastrable con logo
+          // Área arrastrable con logo y animación
           Expanded(
             child: GestureDetector(
-              child: const Padding(
-                padding: EdgeInsets.only(left: 16.0),
-                child: Text(
-                  'ManageGym',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: AnimatedBuilder(
+                  animation: _waveController,
+                  builder: (context, child) {
+                    return ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return _buildWaveGradient(bounds, _waveController.value);
+                      },
+                      child: const Text(
+                        'AESTHETIC GYM',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
@@ -101,4 +122,41 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener {
       ),
     );
   }
-} 
+
+  // Wave gradient builder
+  Shader _buildWaveGradient(Rect bounds, double animValue) {
+    // Crea un gradiente desplazado tipo ola
+    final List<Color> rainbowColors = [
+      Colors.pinkAccent,
+      Colors.orangeAccent,
+      Colors.yellowAccent,
+      Colors.greenAccent,
+      Colors.blueAccent,
+      Colors.purpleAccent,
+      Colors.pinkAccent,
+    ];
+
+    // Parámetros para el efecto de ola
+    double waveSpeed = animValue * 2 * pi;
+    List<double> stops = List.generate(
+      rainbowColors.length,
+      (i) => 0.1 + 0.8 * (i / (rainbowColors.length - 1)),
+    );
+
+    // La posición del gradiente se mueve "en ola"
+    return LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: List.generate(
+        rainbowColors.length,
+        (i) {
+          double wave = sin(waveSpeed + i * pi / 3) * 0.08;
+          return rainbowColors[i].withOpacity(0.9 + wave);
+        },
+      ),
+      stops: stops,
+      tileMode: TileMode.mirror,
+      transform: GradientRotation(animValue * 2 * pi),
+    ).createShader(bounds);
+  }
+}
