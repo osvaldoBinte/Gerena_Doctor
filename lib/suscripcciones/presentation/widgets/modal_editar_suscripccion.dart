@@ -101,38 +101,61 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   }
 
   void eliminarSuscripcion() async {
-    final controller = Get.find<SuscripcionController>();
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: colorFondoDark,
-        title: const Text("Eliminar suscripción",
-            style: TextStyle(color: Colors.white)),
-        content: const Text("¿Estás seguro de eliminar esta suscripción?",
-            style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child:
-                const Text("Cancelar", style: TextStyle(color: Colors.white)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text("Eliminar", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-    if (confirm == true) {
-      bool ok = await controller.eliminarSuscripcion(id: widget.suscripcion.id);
-      if (ok) {
-        Navigator.of(context).pop();
-        Get.snackbar('Eliminada', 'Suscripción eliminada correctamente',
-            backgroundColor: Colors.red, colorText: Colors.white);
-      } else {
-        Get.snackbar('Error', 'No se pudo eliminar la suscripción',
-            backgroundColor: Colors.red, colorText: Colors.white);
+    try {
+      final controller = Get.find<SuscripcionController>();
+      
+      // Primero verificamos si se puede eliminar
+      final verificacion = await controller.puedeEliminarSuscripcion(widget.suscripcion.id);
+      if (!verificacion['puede']) {
+        Get.snackbar(
+          'No se puede eliminar', 
+          verificacion['mensaje'],
+          backgroundColor: Colors.orange, 
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+        return;
       }
+      
+      // Si se puede eliminar, mostramos diálogo de confirmación
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: colorFondoDark,
+          title: const Text("Eliminar suscripción",
+              style: TextStyle(color: Colors.white)),
+          content: const Text("¿Estás seguro de eliminar esta suscripción?",
+              style: TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text("Cancelar", 
+                  style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text("Eliminar", 
+                  style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+      
+      if (confirm == true) {
+        bool ok = await controller.eliminarSuscripcion(id: widget.suscripcion.id);
+        if (ok) {
+          Navigator.of(context).pop();
+          Get.snackbar('Eliminada', 'Suscripción eliminada correctamente',
+              backgroundColor: Colors.red, colorText: Colors.white);
+        } else {
+          Get.snackbar('Error', 'No se pudo eliminar la suscripción',
+              backgroundColor: Colors.red, colorText: Colors.white);
+        }
+      }
+    } catch (e) {
+      print("Error en eliminarSuscripcion: $e");
+      Get.snackbar('Error', 'Error interno: $e',
+          backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
 
@@ -338,12 +361,12 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                       children: [
                         IconButton.filled(
                           onPressed: () {
+                            print("Botón eliminar presionado");
                             eliminarSuscripcion();
                           },
-                          icon: Icon(Icons.delete_forever_outlined),
+                          icon: const Icon(Icons.delete_forever_outlined),
                           style: IconButton.styleFrom(
-                            backgroundColor: Color.fromARGB(
-                                255, 255, 75, 55), // Color de fondo
+                            backgroundColor: const Color.fromARGB(255, 255, 75, 55),
                           ),
                         )
                       ],

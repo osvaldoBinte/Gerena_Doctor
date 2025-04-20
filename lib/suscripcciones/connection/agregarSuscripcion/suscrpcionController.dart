@@ -58,9 +58,26 @@ class SuscripcionController extends GetxController {
     return false;
   }
 
+  Future<Map<String, dynamic>> puedeEliminarSuscripcion(int id) async {
+    final tieneVentas = await AgregarSuscripcionModel.tieneVentasAsociadas(id);
+    if (tieneVentas) {
+      return {
+        'puede': false,
+        'mensaje': 'No se puede eliminar porque esta suscripción tiene ventas asociadas'
+      };
+    }
+    return {'puede': true, 'mensaje': ''};
+  }
+
   Future<bool> eliminarSuscripcion({
     required int id,
   }) async {
+    final verificacion = await puedeEliminarSuscripcion(id);
+    if (!verificacion['puede']) {
+      print('No se puede eliminar: ${verificacion['mensaje']}');
+      return false;
+    }
+    
     final ok = await AgregarSuscripcionModel.eliminarTipoMembresia(id: id);
     if (ok) {
       await cargarSuscripciones();

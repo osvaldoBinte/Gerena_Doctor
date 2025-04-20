@@ -113,7 +113,7 @@ Future<void> cargarUsuarios() async {
         const SizedBox(height: 20),
         const HeaderTableClientsHome(),
         SizedBox(
-          height: 450,
+          height: 360,
           width: double.infinity,
           child: usuariosCargando
               ? const Center(child: CircularProgressIndicator())

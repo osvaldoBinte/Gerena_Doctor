@@ -130,4 +130,24 @@ class AgregarSuscripcionModel {
       return false;
     }
   }
+  
+  static Future<bool> tieneVentasAsociadas(int id) async {
+    try {
+      final sql = Sql.named(
+        "SELECT COUNT(*) FROM ventamembresías WHERE idtipomembresia = @id"
+      );
+      final results = await Database.conn.execute(sql, parameters: {
+        'id': id,
+      });
+      
+      if (results.isNotEmpty) {
+        final count = results.first[0];
+        return (count is int ? count : int.tryParse(count.toString()) ?? 0) > 0;
+      }
+      return false;
+    } catch (e) {
+      print('Error al verificar ventas asociadas: $e');
+      return true; // Por seguridad, asumimos que tiene ventas si hay un error
+    }
+  }
 }
