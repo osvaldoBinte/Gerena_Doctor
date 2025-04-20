@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/productos/presentation/widgets/filter_button.dart';
 import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
+import 'package:managegym/productos/presentation/widgets/modal_agregar_stock.dart';
 import 'package:managegym/productos/presentation/widgets/modal_editar_producto.widget.dart';
 
 class StoreScreen extends StatelessWidget {
@@ -382,6 +383,12 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
               tooltip: 'Ver stock',
               onPressed: () {
                 // Aquí abre tu modal de stock o realiza la acción deseada
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalAgregarStock();
+                  },
+                );
               },
             ),
           ),
