@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioController.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
@@ -10,9 +11,11 @@ import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_s
 
 class ModalRegisterClientWidget extends StatefulWidget {
   final List<TipoMembresia> suscripcionesDisponibles;
+  final VoidCallback? onRegistroExitoso;
   const ModalRegisterClientWidget({
     super.key,
     required this.suscripcionesDisponibles,
+    this.onRegistroExitoso,
   });
 
   @override
@@ -38,6 +41,9 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
 
   List<String> _suscripcionesSeleccionadas = [];
   TipoMembresia? _suscripcionSeleccionada;
+
+  // GetX controller
+  final usuarioController = Get.put(UsuarioController());
 
   @override
   void dispose() {
@@ -106,7 +112,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
             Duration(days: _suscripcionSeleccionada!.tiempoDuracion));
         final fechaProximoPago = fechaFin;
 
-        final idUsuario = await UsuarioController.crearUsuarioCompleto(
+        final idUsuario = await usuarioController.crearUsuarioCompleto(
           nombre: _nombreController.text,
           apellidos: _apellidosController.text,
           correo: _correoController.text,
@@ -130,6 +136,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('¡Cliente registrado con éxito!')),
           );
+          widget.onRegistroExitoso?.call(); // Llama para refrescar la lista
           Navigator.of(context).pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

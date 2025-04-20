@@ -8,9 +8,19 @@ import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcio
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
-// IMPORTA tu modelo de usuario y base de datos:
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
 import 'package:managegym/db/database_connection.dart';
+
+class UsuarioExtraInfo {
+  final Usuario usuario;
+  final int diasRestantes;
+  final String ultimaMembresia;
+  UsuarioExtraInfo({
+    required this.usuario,
+    required this.diasRestantes,
+    required this.ultimaMembresia,
+  });
+}
 
 class HomeScreen extends StatefulWidget {
   final void Function(int) onChangeIndex;
@@ -36,11 +46,17 @@ List<String> meses = [
 ];
 
 void _showModalRegisterUser(
-    BuildContext context, List<TipoMembresia> suscripciones) {
+    BuildContext context,
+    List<TipoMembresia> suscripciones,
+    VoidCallback onRegistroExitoso,
+    ) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return ModalRegisterClientWidget(suscripcionesDisponibles: suscripciones);
+      return ModalRegisterClientWidget(
+        suscripcionesDisponibles: suscripciones,
+        onRegistroExitoso: onRegistroExitoso,
+      );
     },
   );
 }
@@ -50,33 +66,79 @@ class _HomeScreenState extends State<HomeScreen> {
   final SuscripcionController suscripcionController =
       Get.put(SuscripcionController());
 
-  // Estados para usuarios
-  List<Usuario> usuarios = [];
+  List<UsuarioExtraInfo> usuarios = [];
+  List<UsuarioExtraInfo> usuariosFiltrados = [];
   bool usuariosCargando = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     cargarUsuarios();
+    _searchController.addListener(_onSearchChanged);
   }
 
-Future<void> cargarUsuarios() async {
-  try {
-    final conn = Database.conn;
-    final lista = await UsuarioDB.obtenerUsuarios(conn: conn);
-    print('Usuarios obtenidos: ${lista.length}');
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> cargarUsuarios() async {
+    setState(() => usuariosCargando = true);
+    try {
+      final conn = Database.conn;
+      final lista = await UsuarioDB.obtenerUsuarios(conn: conn);
+      final usuariosInfo = <UsuarioExtraInfo>[];
+      for (final usuario in lista) {
+        final dias = await UsuarioDB.obtenerDiasMembresiaRestantes(
+          idUsuario: usuario.id,
+          conn: conn,
+        );
+        final titulo = await UsuarioDB.obtenerTituloUltimaMembresiaActiva(
+          idUsuario: usuario.id,
+          conn: conn,
+        );
+        usuariosInfo.add(UsuarioExtraInfo(
+          usuario: usuario,
+          diasRestantes: dias,
+          ultimaMembresia: titulo,
+        ));
+      }
+      setState(() {
+        usuarios = usuariosInfo;
+        _aplicarFiltro(); // aplica filtro después de cargar
+        usuariosCargando = false;
+      });
+    } catch (e) {
+      print('Error al cargar usuarios: $e');
+      setState(() {
+        usuarios = [];
+        usuariosFiltrados = [];
+        usuariosCargando = false;
+      });
+    }
+  }
+
+  void _onSearchChanged() {
     setState(() {
-      usuarios = lista;
-      usuariosCargando = false;
-    });
-  } catch (e) {
-    print('Error al cargar usuarios: $e');
-    setState(() {
-      usuarios = [];
-      usuariosCargando = false;
+      _aplicarFiltro();
     });
   }
-}
+
+  void _aplicarFiltro() {
+    String filtro = _searchController.text.toLowerCase();
+    if (filtro.isEmpty) {
+      usuariosFiltrados = List.from(usuarios);
+    } else {
+      usuariosFiltrados = usuarios.where((info) {
+        final usuario = info.usuario;
+        final nombreCompleto = "${usuario.nombre} ${usuario.apellidos}".toLowerCase();
+        return nombreCompleto.contains(filtro) || usuario.telefono.toLowerCase().contains(filtro);
+      }).toList();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -89,6 +151,7 @@ Future<void> cargarUsuarios() async {
               width: 800,
               height: 50,
               child: TextField(
+                controller: _searchController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
@@ -120,18 +183,19 @@ Future<void> cargarUsuarios() async {
               : usuarios.isEmpty
                   ? const Center(child: Text("No hay usuarios registrados", style: TextStyle(color: Colors.white, fontSize: 18)))
                   : ListView.builder(
-                      itemCount: usuarios.length,
+                      itemCount: usuariosFiltrados.length,
                       itemBuilder: (context, index) {
-                        final usuario = usuarios[index];
+                        final usuarioInfo = usuariosFiltrados[index];
+                        final usuario = usuarioInfo.usuario;
+                        final diasRestantes = usuarioInfo.diasRestantes;
+                        final ultimaMembresia = usuarioInfo.ultimaMembresia;
                         return RowTableClientsHomeWidget(
                           index: index,
                           name: "${usuario.nombre} ${usuario.apellidos}",
                           phoneNumber: usuario.telefono,
-                          lastSubscription: "No implementado", // Puedes mejorar esto
+                          lastSubscription: ultimaMembresia,
                           status: usuario.status ?? "activo",
-                          dateRange: usuario.fechaNacimiento != null
-                              ? "${usuario.fechaNacimiento!.day}/${usuario.fechaNacimiento!.month}/${usuario.fechaNacimiento!.year}"
-                              : "Sin fecha",
+                          dateRange: "$diasRestantes días",
                           sex: usuario.sexo,
                           suscripcionesDisponibles:
                               suscripcionController.suscripciones,
@@ -149,7 +213,10 @@ Future<void> cargarUsuarios() async {
                 icon: Icons.person_add,
                 accion: () {
                   _showModalRegisterUser(
-                      context, suscripcionController.suscripciones);
+                    context,
+                    suscripcionController.suscripciones,
+                    cargarUsuarios,
+                  );
                 },
               ),
               const SizedBox(width: 20),

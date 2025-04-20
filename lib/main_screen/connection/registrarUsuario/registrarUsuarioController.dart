@@ -1,9 +1,14 @@
+import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
 import 'package:managegym/db/database_connection.dart';
 
-class UsuarioController {
-  static Future<int?> crearUsuarioCompleto({
+class UsuarioController extends GetxController {
+  var cargando = false.obs;
+  var idUsuarioCreado = RxnInt();
+  var error = RxnString();
+
+  Future<int?> crearUsuarioCompleto({
     required String nombre,
     required String apellidos,
     required String correo,
@@ -22,8 +27,12 @@ class UsuarioController {
     String? numeroReferencia,
     DateTime? fechaProximoPago,
   }) async {
+    cargando.value = true;
+    error.value = null;
+    idUsuarioCreado.value = null;
     final conn = Database.conn;
     try {
+      // 1. Crear usuario
       final idUsuario = await UsuarioDB.crearUsuario(
         nombre: nombre,
         apellidos: apellidos,
@@ -34,8 +43,10 @@ class UsuarioController {
         conn: conn,
       );
       if (idUsuario == null) throw Exception('No se pudo crear el usuario');
+      idUsuarioCreado.value = idUsuario;
       debugPrint('Usuario creado con id: $idUsuario');
 
+      // 2. Crear métodos de acceso (Huella y QR)
       final idMetodoHuella = await UsuarioDB.crearMetodoAcceso(
         idUsuario: idUsuario,
         tipoAcceso: 'Huella',
@@ -48,6 +59,7 @@ class UsuarioController {
       );
       debugPrint('Método de acceso Huella id: $idMetodoHuella, QR id: $idMetodoQR');
 
+      // 3. Guardar QR
       if (idMetodoQR != null) {
         await UsuarioDB.crearCodigoQR(
           qr: qr,
@@ -58,6 +70,7 @@ class UsuarioController {
         debugPrint('QR guardado');
       }
 
+      // 4. Guardar huella
       if (idMetodoHuella != null) {
         await UsuarioDB.crearRegistroHuella(
           plantilla: plantillaHuella,
@@ -67,7 +80,7 @@ class UsuarioController {
         debugPrint('Huella guardada');
       }
 
-      // ATENCIÓN: nombre correcto de la tabla de venta membresías, usa todo minúscula y sin tildes.
+      // 5. Registrar venta de membresía
       final idVentaMembresia = await UsuarioDB.crearVentaMembresia(
         idTipoMembresia: idTipoMembresia,
         idUsuario: idUsuario,
@@ -78,6 +91,7 @@ class UsuarioController {
       debugPrint('Venta Membresía registrada: $idVentaMembresia');
 
       int? idMembresiaUsuario;
+      // 6. Registrar membresía activa
       if (idVentaMembresia != null) {
         idMembresiaUsuario = await UsuarioDB.crearMembresiaUsuario(
           idUsuario: idUsuario,
@@ -86,10 +100,10 @@ class UsuarioController {
           fin: fechaFinMembresia,
           conn: conn,
         );
-        debugPrint('Membresía activa creada');
+        debugPrint('Membresía activa creada: $idMembresiaUsuario');
       }
 
-      // Historial de pago
+      // 7. Registrar historial de pago si corresponde
       if (idMembresiaUsuario != null && montoPago != null && metodoPago != null) {
         final idPago = await UsuarioDB.crearHistorialPago(
           idMembresiaUsuario: idMembresiaUsuario,
@@ -104,8 +118,11 @@ class UsuarioController {
 
       return idUsuario;
     } catch (e) {
+      error.value = e.toString();
       debugPrint('Error en crearUsuarioCompleto: $e');
       return null;
+    } finally {
+      cargando.value = false;
     }
   }
 }
