@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 
 class InputApellidoWidget extends StatelessWidget {
@@ -16,7 +17,7 @@ class InputApellidoWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: _apellidosController,
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -27,14 +28,14 @@ class InputApellidoWidget extends StatelessWidget {
           }
           return null;
         },
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           labelText: 'Apellidos',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

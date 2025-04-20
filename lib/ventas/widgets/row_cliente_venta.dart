@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 
 class RowClienteVenta extends StatefulWidget {
@@ -27,12 +28,12 @@ class _RowClienteVentaState extends State<RowClienteVenta> {
 
   Color isPair(int index) {
     if (_isHovered || _isFocused) {
-      return const Color.fromARGB(255, 255, 131, 55); // Color de selección
+      return colores.colorHoverRow; // Color de selección
     }
     if (index % 2 == 0) {
-      return const Color.fromARGB(255, 40, 40, 40);
+      return colores.colorRowPar;
     } else {
-      return const Color.fromARGB(255, 50, 50, 50);
+      return colores.colorRowNoPar;
     }
   }
 
@@ -61,14 +62,14 @@ class _RowClienteVentaState extends State<RowClienteVenta> {
                 flex: 2,
                 child: Text(
                   widget.nombre,
-                  style: TextStyle(color: widget.colorTexto),
+                  style: TextStyle(color: colores.colorTexto),
                 ),
               ),
               Expanded(
                 flex: 1,
                 child: Text(
                   widget.telefono,
-                  style: TextStyle(color: widget.colorTexto),
+                  style: TextStyle(color: colores.colorTexto),
                 ),
               ),
             ],

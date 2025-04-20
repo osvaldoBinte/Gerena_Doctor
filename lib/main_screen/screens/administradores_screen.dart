@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/administradores/widgets/modal_agregar_administrador.dart';
 import 'package:managegym/administradores/widgets/modal_editar_administrador.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 
 class AdministradoresScreen extends StatelessWidget {
@@ -13,10 +14,10 @@ class AdministradoresScreen extends StatelessWidget {
         const SizedBox(height: 20),
         Row(
           children: [
-            const Text(
+             Text(
               "MIS ADMINISTRADORES",
               style: TextStyle(
-                color: Colors.white,
+                color: colores.colorTexto,
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
               ),
@@ -46,9 +47,9 @@ class AdministradoresScreen extends StatelessWidget {
                 children: List.generate(20, (index) {
                   return SizedBox(
                     width: 450,
-                    height: 300, // Altura fija
+                    height: 290, // Altura fija
                     child: Card(
-                      color: const Color.fromARGB(255, 40, 40, 40),
+                    color: const Color.fromARGB(193, 40, 40, 40),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -75,7 +76,7 @@ class AdministradoresScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 10),
                             const Text(
-                              "Correo",
+                              "Correo:",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,

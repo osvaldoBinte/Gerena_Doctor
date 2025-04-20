@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioController.dart';
+import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
@@ -24,8 +27,6 @@ class ModalRegisterClientWidget extends StatefulWidget {
 }
 
 class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
-  final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
-  final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -102,14 +103,17 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
         }
 
         // Mapear sexo a solo un caracter
-        final sexoDb = (_sexoController?.toLowerCase().startsWith("f") ?? false) ? "F" : "M";
+        final sexoDb = (_sexoController?.toLowerCase().startsWith("f") ?? false)
+            ? "F"
+            : "M";
 
         String qr = "qr_generado_${DateTime.now().millisecondsSinceEpoch}";
-        String plantillaHuella = "huella_demo_${DateTime.now().millisecondsSinceEpoch}";
+        String plantillaHuella =
+            "huella_demo_${DateTime.now().millisecondsSinceEpoch}";
 
         final fechaInicio = DateTime.now();
-        final fechaFin = fechaInicio.add(
-            Duration(days: _suscripcionSeleccionada!.tiempoDuracion));
+        final fechaFin = fechaInicio
+            .add(Duration(days: _suscripcionSeleccionada!.tiempoDuracion));
         final fechaProximoPago = fechaFin;
 
         final idUsuario = await usuarioController.crearUsuarioCompleto(
@@ -174,17 +178,17 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: SizedBox(
         height: 900,
         width: 1400,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+             Text(
               'Registrar un nuevo cliente',
               style: TextStyle(
-                  color: Colors.white,
+                  color: colores.colorTexto,
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
@@ -205,11 +209,10 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             Row(
                               children: [
                                 InputNombreWidget(
-                                    colorTextoDark: colorTextoDark,
                                     nombreController: _nombreController),
                                 const SizedBox(width: 20),
                                 InputApellidoWidget(
-                                    colorTextoDark: colorTextoDark,
+                                    colorTextoDark: colores.colorTexto,
                                     apellidosController: _apellidosController),
                               ],
                             ),
@@ -217,26 +220,25 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             Row(
                               children: [
                                 InputTelefonoWidget(
-                                    colorTextoDark: colorTextoDark,
                                     telefonoController: _telefonoController),
                                 const SizedBox(width: 20),
                                 InputCorreoElectronicoWidget(
-                                    colorTextoDark: colorTextoDark,
+                                    colorTextoDark: colores.colorTexto,
                                     correoController: _correoController),
                               ],
                             ),
                             const SizedBox(height: 20),
-                            const Text(
+                             Text(
                               'Fecha de nacimiento',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold),
                             ),
                             Row(
                               children: [
                                 InputFechaNacimientoWidget(
-                                  colorTextoDark: colorTextoDark,
+                                  colorTextoDark: colores.colorTexto,
                                   diaController: _diaController,
                                   mesController: _mesController,
                                   anoController: _anoController,
@@ -271,35 +273,37 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Total a pagar:',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 21,
                                   fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            const Text(
+                            Text(
                               'Paga con:',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 21,
                                   fontWeight: FontWeight.bold),
                             ),
                             SizedBox(
                               width: 400,
                               child: TextFormField(
-                                style: TextStyle(color: colorTextoDark),
-                                decoration: const InputDecoration(
-                                  labelStyle: TextStyle(color: Colors.white),
+                                style: TextStyle(color: colores.colorTexto),
+                                decoration: InputDecoration(
+                                  labelStyle:
+                                      TextStyle(color: colores.colorTexto),
                                   icon: Icon(
                                     Icons.attach_money,
-                                    color: Colors.white,
+                                    color: colores.colorTexto,
                                   ),
                                   focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        BorderSide(color: colores.colorTexto),
                                   ),
                                 ),
                               ),
@@ -307,10 +311,10 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             const SizedBox(
                               height: 20,
                             ),
-                            const Text(
+                            Text(
                               'Cambio:',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 21,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -322,12 +326,12 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   const SizedBox(
                     height: 30,
                   ),
-                  const Row(
+                  Row(
                     children: [
                       Text(
                         'Selecciona la suscripción que quieres agregar al cliente',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: colores.colorTexto,
                             fontSize: 21,
                             fontWeight: FontWeight.bold),
                       ),
@@ -355,11 +359,14 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                           ),
                           itemCount: widget.suscripcionesDisponibles.length,
                           itemBuilder: (context, index) {
-                            final suscripcion = widget.suscripcionesDisponibles[index];
+                            final suscripcion =
+                                widget.suscripcionesDisponibles[index];
                             return CardSuscriptionSelectWidget(
                               suscripcion: suscripcion,
-                              isSelected: _suscripcionesSeleccionadas.contains(suscripcion.id.toString()),
-                              selectSuscription: (id) => seleccionarSuscripcion(id, suscripcion),
+                              isSelected: _suscripcionesSeleccionadas
+                                  .contains(suscripcion.id.toString()),
+                              selectSuscription: (id) =>
+                                  seleccionarSuscripcion(id, suscripcion),
                             );
                           },
                         ),
@@ -367,12 +374,12 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   const SizedBox(
                     height: 20,
                   ),
-                  const Row(
+                  Row(
                     children: [
                       Text(
                         'Orden',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: colores.colorTexto,
                             fontSize: 21,
                             fontWeight: FontWeight.bold),
                       ),
@@ -381,10 +388,10 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   Container(
                     width: double.infinity,
                     height: 40,
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 40, 40, 40),
+                    decoration:  BoxDecoration(
+                      color: colors.colorCabezeraTabla,
                     ),
-                    child: const Flex(
+                    child:  Flex(
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -393,7 +400,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             child: Text(
                               'Suscripcion',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )),
@@ -402,7 +409,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             child: Text(
                               'Cantidad',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )),
@@ -411,7 +418,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             child: Text(
                               'Precio unitario',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )),
@@ -420,7 +427,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             child: Text(
                               'Total',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )),
@@ -429,7 +436,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             child: Text(
                               '',
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold),
                             )),
@@ -443,9 +450,11 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                       child: ListView.builder(
                           itemCount: _suscripcionesSeleccionadas.length,
                           itemBuilder: (context, index) {
-                            final idSuscripcion = _suscripcionesSeleccionadas[index];
+                            final idSuscripcion =
+                                _suscripcionesSeleccionadas[index];
                             final suscripcion = widget.suscripcionesDisponibles
-                                .firstWhere((s) => s.id.toString() == idSuscripcion);
+                                .firstWhere(
+                                    (s) => s.id.toString() == idSuscripcion);
                             return RowSuscripccionSeleccionada(
                               index: index,
                               eliminarSuscripcion: eliminarSuscripcion,
@@ -489,7 +498,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                           width: 300,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 131, 55),
+                            color: colores.colorAccionButtons,
                             borderRadius: BorderRadius.circular(50),
                           ),
                           child: const Center(
@@ -516,7 +525,9 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
 }
 
 class InputCorreoElectronicoWidget extends StatelessWidget {
-  const InputCorreoElectronicoWidget({
+  AdminColors colores = AdminColors();
+
+  InputCorreoElectronicoWidget({
     super.key,
     required this.colorTextoDark,
     required TextEditingController correoController,
@@ -530,7 +541,7 @@ class InputCorreoElectronicoWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: _correoController,
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
@@ -543,14 +554,14 @@ class InputCorreoElectronicoWidget extends StatelessWidget {
           }
           return null;
         },
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           labelText: 'Correo electronico',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),
@@ -579,7 +590,7 @@ class _RowSuscripccionSeleccionadaState
   bool isHovering = false;
   bool isFocused = false;
   final FocusNode _rowEliminarFocusNode = FocusNode();
-
+  AdminColors colores = AdminColors();
   @override
   void dispose() {
     _rowEliminarFocusNode.dispose();
@@ -596,9 +607,8 @@ class _RowSuscripccionSeleccionadaState
       width: double.infinity,
       height: 30,
       decoration: BoxDecoration(
-        color: isPair(widget.index)
-            ? const Color.fromARGB(255, 40, 40, 40)
-            : const Color.fromARGB(255, 23, 23, 23),
+        color:
+            isPair(widget.index) ? colores.colorRowPar : colores.colorRowNoPar,
       ),
       child: Flex(
         direction: Axis.horizontal,
@@ -608,17 +618,17 @@ class _RowSuscripccionSeleccionadaState
               flex: 3,
               child: Text(
                 widget.suscripcion.titulo,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: colores.colorTexto,
                   fontSize: 15,
                 ),
               )),
-          const Expanded(
+          Expanded(
               flex: 1,
               child: Text(
                 '1',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: colores.colorTexto,
                   fontSize: 15,
                 ),
               )),
@@ -626,8 +636,8 @@ class _RowSuscripccionSeleccionadaState
               flex: 1,
               child: Text(
                 "\$${widget.suscripcion.precio}",
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: colores.colorTexto,
                   fontSize: 15,
                 ),
               )),
@@ -635,8 +645,8 @@ class _RowSuscripccionSeleccionadaState
               flex: 2,
               child: Text(
                 "\$${widget.suscripcion.precio}",
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: colores.colorTexto,
                   fontSize: 15,
                 ),
               )),
@@ -660,9 +670,8 @@ class _RowSuscripccionSeleccionadaState
                 child: Text(
                   "ELIMINAR",
                   style: TextStyle(
-                      color: isHovering || isFocused
-                          ? Colors.red
-                          : Colors.white,
+                      color:
+                          isHovering || isFocused ? Colors.red : colores.colorTexto,
                       fontSize: 15,
                       fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,

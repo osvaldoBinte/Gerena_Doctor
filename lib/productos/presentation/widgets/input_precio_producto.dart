@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class InputPrecioProductoWidget extends StatelessWidget {
   const InputPrecioProductoWidget({
@@ -28,14 +29,14 @@ class InputPrecioProductoWidget extends StatelessWidget {
           return null;
         },
         keyboardType: TextInputType.number,
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           labelText: 'Precio del producto',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

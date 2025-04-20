@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
 class ModalAgregarSuscripccion extends StatefulWidget {
@@ -14,6 +16,7 @@ class ModalAgregarSuscripccion extends StatefulWidget {
 class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
+  AdminColors colors = AdminColors();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nombreController = TextEditingController();
@@ -110,12 +113,12 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: SizedBox(
         height: 550,
         width: 700,
         child: Column(
-mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Form(
               key: _formKey,
@@ -125,7 +128,7 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   Text(
                     'AGREGAR UNA NUEVA SUSCRIPCIÓN',
                     style: TextStyle(
-                      color: colorTextoDark,
+                      color: colores.colorTexto,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
@@ -134,7 +137,7 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   TextFormField(
                     controller: _nombreController,
                     maxLength: 63,
-                    style: TextStyle(color: colorTextoDark),
+                    style: TextStyle(color: colores.colorTexto),
                     validator: (value) {
                       if (value == null || value.isEmpty)
                         return 'Campo requerido';
@@ -142,14 +145,14 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         return 'El nombre debe tener al menos 3 caracteres';
                       return null;
                     },
-                    decoration: const InputDecoration(
+                    decoration:  InputDecoration(
                       labelText: 'Nombre de la Suscripción',
-                      labelStyle: TextStyle(color: Colors.white, fontSize: 18),
+                      labelStyle: TextStyle(color: colores.colorTexto, fontSize: 18),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colores.colorTexto),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -159,14 +162,15 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     maxLength: 200,
                     maxLines: 2,
                     style: TextStyle(color: colorTextoDark),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Descripción',
-                      labelStyle: TextStyle(color: Colors.white, fontSize: 18),
+                      labelStyle:
+                          TextStyle(color: colors.colorTexto, fontSize: 18),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colors.colorTexto),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colors.colorTexto),
                       ),
                     ),
                   ),
@@ -189,14 +193,15 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         return 'El valor debe ser mayor a 0';
                       return null;
                     },
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Precio',
-                      labelStyle: TextStyle(color: Colors.white, fontSize: 18),
+                      labelStyle:
+                          TextStyle(color: colors.colorTexto, fontSize: 18),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colors.colorTexto),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colors.colorTexto),
                       ),
                     ),
                   ),
@@ -207,21 +212,21 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         width: 250,
                         child: DropdownButtonFormField<String>(
                           value: _duracionSeleccionada,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Duración',
                             labelStyle: TextStyle(
-                                color: Colors.white,
+                                color: colors.colorTexto,
                                 fontSize: 20), // Más grande
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                              borderSide: BorderSide(color: colors.colorTexto),
                             ),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                              borderSide: BorderSide(color: colors.colorTexto),
                             ),
                           ),
-                          dropdownColor: colorFondoDark,
+                          dropdownColor: colors.colorFondo,
                           style: TextStyle(
-                            color: colorTextoDark,
+                            color: colors.colorTexto,
                             fontSize: 17, // Aumenta el tamaño aquí
                             fontWeight: FontWeight.w500,
                           ),
@@ -231,7 +236,7 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     child: Text(
                                       op['label'],
                                       style: TextStyle(
-                                        color: colorTextoDark,
+                                        color: colors.colorTexto,
                                         fontSize:
                                             17, // Aumenta el tamaño aquí también
                                         fontWeight: FontWeight.w400,
@@ -254,7 +259,7 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           width: 180,
                           child: TextFormField(
                             controller: _personalizadoController,
-                            style: TextStyle(color: colorTextoDark),
+                            style: TextStyle(color: colores.colorTexto),
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
@@ -270,15 +275,17 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 return 'Debe ser mayor a 0';
                               return null;
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: 'Días',
-                              labelStyle:
-                                  TextStyle(color: Colors.white, fontSize: 18),
+                              labelStyle: TextStyle(
+                                  color: colors.colorTexto, fontSize: 18),
                               enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide:
+                                    BorderSide(color: colores.colorTexto),
                               ),
                               focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
+                                borderSide:
+                                    BorderSide(color: colores.colorTexto),
                               ),
                             ),
                           ),
@@ -321,7 +328,7 @@ mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     width: 220,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 255, 131, 55),
+                      color: colores.colorAccionButtons,
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Center(

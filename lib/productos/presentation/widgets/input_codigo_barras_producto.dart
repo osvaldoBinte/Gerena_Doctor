@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class InputCodigoDeBarrasProductoWidget extends StatelessWidget {
   const InputCodigoDeBarrasProductoWidget({
@@ -20,14 +21,14 @@ class InputCodigoDeBarrasProductoWidget extends StatelessWidget {
         validator: (value) {
           return null;
         },
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           labelText: 'Codigo de barra',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

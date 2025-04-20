@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 
 
@@ -14,9 +15,9 @@ class RowProductoSeleccionado extends StatelessWidget {
 
   Color isPair(){
     if(int.parse(index) % 2 == 0){
-      return const Color.fromARGB(255, 40, 40, 40);
+      return colores.colorRowPar;
     }else{
-      return const Color.fromARGB(255, 33, 33, 33);
+      return colores.colorRowNoPar;
     }
   }
 
@@ -33,25 +34,25 @@ class RowProductoSeleccionado extends StatelessWidget {
               flex: 2,
               child: Text("Nombre",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 17))),
           Expanded(
               flex: 1,
               child: Text("Precio",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 17))),
           Expanded(
               flex: 1,
               child: Text("Cantidad",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 17))),
           Expanded(
               flex: 2,
               child: Text("Total",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 17))),
         ],
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 
 class InputNombreProductoWidget extends StatelessWidget {
   const InputNombreProductoWidget({
@@ -15,7 +17,7 @@ class InputNombreProductoWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: nombreProductoController,
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -26,14 +28,14 @@ class InputNombreProductoWidget extends StatelessWidget {
           }
           return null;
         },
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           labelText: 'Nombre del producto',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

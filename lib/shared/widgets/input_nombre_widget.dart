@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class InputNombreWidget extends StatelessWidget {
   const InputNombreWidget({
     super.key,
-    required this.colorTextoDark,
     required TextEditingController nombreController,
   }) : _nombreController = nombreController;
 
-  final Color colorTextoDark;
   final TextEditingController _nombreController;
 
   @override
@@ -15,7 +14,7 @@ class InputNombreWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: _nombreController,
         validator: (value) {
           if (value == null || value.isEmpty) {
@@ -26,14 +25,14 @@ class InputNombreWidget extends StatelessWidget {
           }
           return null;
         },
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           labelText: 'Nombre',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_select_widget.dart';
 
@@ -41,7 +42,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: SizedBox(
         height: 850,
         width: 1458,
@@ -53,7 +54,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                 Text(
                   'Administrar Suscripcción del usuario: ${widget.nombreUsuario}',
                   style: TextStyle(
-                      color: colorTextoDark,
+                      color: colores.colorTexto,
                       fontSize: 24,
                       fontWeight: FontWeight.bold),
                 ),
@@ -105,20 +106,20 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
             ),
             Row(
               children: [
-                const Text(
+                 Text(
                   'Total a pagar:',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 21,
                       fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(
                   width: 100,
                 ),
-                const Text(
+                 Text(
                   'Paga con:',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 21,
                       fontWeight: FontWeight.bold),
                 ),
@@ -126,14 +127,14 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                   width: 400,
                   child: TextFormField(
                     style: TextStyle(color: colorTextoDark),
-                    decoration: const InputDecoration(
-                      labelStyle: TextStyle(color: Colors.white),
+                    decoration:  InputDecoration(
+                      labelStyle: TextStyle(color: colores.colorTexto),
                       icon: Icon(
                         Icons.attach_money,
-                        color: Colors.white,
+                        color: colores.colorTexto,
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderSide: BorderSide(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -141,10 +142,10 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                 const SizedBox(
                   width: 100,
                 ),
-                const Text(
+                 Text(
                   'Cambio:',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 21,
                       fontWeight: FontWeight.bold),
                 ),
@@ -211,9 +212,9 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
   Widget RowTable(TipoMembresia suscripcion, int index) {
     Color isPair(int index) {
       if (index % 2 == 0) {
-        return const Color.fromARGB(255, 33, 33, 33);
+        return colores.colorRowPar;
       } else {
-        return const Color.fromARGB(255, 54, 54, 54);
+        return colores.colorRowNoPar;
       }
     }
 
@@ -227,28 +228,28 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
               child: Text(
                 suscripcion.titulo,
                 textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.white),
+                style:  TextStyle(color: colores.colorTexto),
               )),
-          const Expanded(
+           Expanded(
               flex: 1,
               child: Text(
                 '1',
                 textAlign: TextAlign.start,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: colores.colorTexto),
               )),
           Expanded(
               flex: 2,
               child: Text(
                 '${suscripcion.precio}',
                 textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.white),
+                style:  TextStyle(color: colores.colorTexto),
               )),
           Expanded(
               flex: 2,
               child: Text(
                 '${suscripcion.precio}',
                 textAlign: TextAlign.start,
-                style: const TextStyle(color: Colors.white),
+                style:  TextStyle(color: colores.colorTexto),
               )),
         ],
       ),
@@ -259,8 +260,8 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
     return Container(
       width: double.infinity,
       height: 40,
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 40, 40, 40),
+      decoration:  BoxDecoration(
+        color: colores.colorCabezeraTabla,
       ),
       child: Row(
         children: [
@@ -270,7 +271,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                 'Suscripción',
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    color: colorTextoDark,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 17),
               )),
@@ -280,7 +281,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                 'Cantidad',
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    color: colorTextoDark,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 17),
               )),
@@ -290,7 +291,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                 'Precio unitario',
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    color: colorTextoDark,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 17),
               )),
@@ -300,7 +301,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
                 'Total',
                 textAlign: TextAlign.start,
                 style: TextStyle(
-                    color: colorTextoDark,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 17),
               )),

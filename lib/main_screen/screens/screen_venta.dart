@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/main_screen/widgets/row_producto_seleccionado.dart';
 import 'package:managegym/main_screen/widgets/title_bar_producto_seleccionado.dart';
 import 'package:managegym/ventas/widgets/row_cliente_venta.dart';
@@ -28,7 +29,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colores.colorFondo,
       body: SafeArea(
         child: Row(
           children: [
@@ -46,7 +47,15 @@ class _ScreenVentaState extends State<ScreenVenta> {
                       // <-- Esto da el alto disponible
                       child: Container(
                         decoration: BoxDecoration(
-                          color: colorFondoDark,
+                          color: colores.colorFondoModal,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color.fromARGB(255, 0, 0, 0)
+                                  .withOpacity(0.2),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
                           borderRadius: BorderRadius.circular(24),
                         ),
                         width: double.infinity,
@@ -54,13 +63,13 @@ class _ScreenVentaState extends State<ScreenVenta> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Row(
+                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
                                   "PRODUCTOS SELECCIONADOS",
                                   style: TextStyle(
-                                    color: Color.fromARGB(255, 255, 255, 255),
+                                    color: colores.colorTexto,
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -113,8 +122,8 @@ class _ScreenVentaState extends State<ScreenVenta> {
                 //aqui haces la busqueda de los productos
               },
               controller: _buscadorProductoController,
-              style: const TextStyle(
-                  color: Colors.white), // Cambia el color del texto a blanco
+              style:  TextStyle(
+                  color: colores.colorTexto), // Cambia el color del texto a blanco
               decoration: InputDecoration(
                 hintText: 'Buscar producto por nombre o codigo de barra',
                 border: OutlineInputBorder(
@@ -130,15 +139,15 @@ class _ScreenVentaState extends State<ScreenVenta> {
           Container(
             width: double.infinity,
             height: 50,
-            color: const Color.fromARGB(255, 40, 40, 40),
-            child: const Row(
+            color: colores.colorCabezeraTabla,
+            child:  Row(
               children: [
                 Expanded(
                   flex: 2,
                   child: Text(
                     "Nombre",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: colores.colorTexto,
                         fontWeight: FontWeight.bold,
                         fontSize: 17),
                   ),
@@ -148,7 +157,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
                   child: Text(
                     "Precio",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: colores.colorTexto,
                         fontWeight: FontWeight.bold,
                         fontSize: 17),
                   ),
@@ -158,7 +167,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
                   child: Text(
                     "Stock",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: colores.colorTexto,
                         fontWeight: FontWeight.bold,
                         fontSize: 17),
                   ),
@@ -195,8 +204,8 @@ class _ScreenVentaState extends State<ScreenVenta> {
                 //aqui haces la busqueda de los productos
               },
               controller: _buscadorClientController,
-              style: const TextStyle(
-                  color: Colors.white), // Cambia el color del texto a blanco
+              style:  TextStyle(
+                  color: colores.colorTexto), // Cambia el color del texto a blanco
               decoration: InputDecoration(
                 hintText: 'Buscar cliente por numero de telefono',
                 border: OutlineInputBorder(
@@ -212,15 +221,15 @@ class _ScreenVentaState extends State<ScreenVenta> {
           Container(
             width: double.infinity,
             height: 50,
-            color: const Color.fromARGB(255, 40, 40, 40),
-            child: const Row(
+            color: colores.colorCabezeraTabla,
+            child:  Row(
               children: [
                 Expanded(
                   flex: 2,
                   child: Text(
                     "Nombre",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: colores.colorTexto,
                         fontWeight: FontWeight.bold,
                         fontSize: 17),
                   ),
@@ -230,7 +239,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
                   child: Text(
                     "Numero de telefono",
                     style: TextStyle(
-                        color: Colors.white,
+                        color: colores.colorTexto,
                         fontWeight: FontWeight.bold,
                         fontSize: 17),
                   ),
@@ -264,7 +273,14 @@ class _ScreenVentaState extends State<ScreenVenta> {
   Container ContainerRealizarVenta() {
     return Container(
       decoration: BoxDecoration(
-        color: colorFondoDark,
+        color: colores.colorFondoModal,
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
         borderRadius: BorderRadius.circular(24), // Puedes ajustar el valor
       ),
       width: double.infinity,
@@ -281,10 +297,10 @@ class _ScreenVentaState extends State<ScreenVenta> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                   Text(
                     "REALIZAR VENTA",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -294,17 +310,17 @@ class _ScreenVentaState extends State<ScreenVenta> {
               const SizedBox(height: 30),
               Text("Total a pagar: 1000",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   )),
               const SizedBox(height: 30),
               Row(
                 children: [
-                  const Text(
+                   Text(
                     "Paga con: ",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
@@ -313,7 +329,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
                   SizedBox(
                     width: 200,
                     child: TextFormField(
-                      style: TextStyle(color: colorTextoDark),
+                      style: TextStyle(color: colores.colorTexto),
                       controller: _pagoController,
                       validator: (value) {
                         //validar que sea un numero
@@ -326,15 +342,15 @@ class _ScreenVentaState extends State<ScreenVenta> {
                         return null;
                       },
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration:  InputDecoration(
                         labelText: 'Pesos',
                         labelStyle:
-                            TextStyle(color: Colors.white, fontSize: 20),
+                            TextStyle(color: colores.colorTexto, fontSize: 20),
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: colores.colorTexto),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: colores.colorTexto),
                         ),
                       ),
                     ),
@@ -342,10 +358,10 @@ class _ScreenVentaState extends State<ScreenVenta> {
                 ],
               ),
               const SizedBox(height: 30),
-              const Text(
+               Text(
                 "Cambio: 1000",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: colores.colorTexto,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),

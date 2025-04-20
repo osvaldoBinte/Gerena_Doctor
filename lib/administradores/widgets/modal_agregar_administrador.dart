@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
@@ -15,8 +16,7 @@ class ModalAgregarAdministrador extends StatefulWidget {
 }
 
 class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
-  final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
-
+  AdminColors colores = AdminColors();
   //controladores
   final GlobalKey _form = GlobalKey<FormState>();
 
@@ -71,7 +71,7 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: EdgeInsets.all(20),
-      backgroundColor: const Color.fromARGB(255, 40, 40, 40),
+      backgroundColor: colores.colorFondoModal,
       content: Container(
         width: 1000,
         height: 600,
@@ -84,10 +84,10 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                   Text(
                     "AGREGAR UN NUEVO ADMINISTRADOR",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colores.colorTexto,
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -96,11 +96,10 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                   Row(
                     children: [
                       InputNombreWidget(
-                          colorTextoDark: colorTextoDark,
                           nombreController: nombreController),
                       const SizedBox(width: 20),
                       InputApellidoWidget(
-                          colorTextoDark: colorTextoDark,
+                          colorTextoDark: colores.colorTexto,
                           apellidosController: apellidosController)
                     ],
                   ),
@@ -108,11 +107,10 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                   Row(
                     children: [
                       InputTelefonoWidget(
-                          colorTextoDark: colorTextoDark,
                           telefonoController: telefonoController),
                       const SizedBox(width: 20),
                       InputCorreoElectronicoWidget(
-                          colorTextoDark: colorTextoDark,
+                          colorTextoDark: colores.colorTexto,
                           correoController: correoController)
                     ],
                   ),
@@ -122,15 +120,15 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                     child: TextFormField(
                       controller: passwordController,
                       obscureText: true,
-                      style: TextStyle(color: colorTextoDark),
-                      decoration: const InputDecoration(
+                      style: TextStyle(color: colores.colorTexto),
+                      decoration: InputDecoration(
                         labelText: 'Contraseña',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: colores.colorTexto),
                         enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: colores.colorTexto),
                         ),
                         focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: colores.colorTexto),
                         ),
                       ),
                       validator: (value) {
@@ -148,7 +146,7 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                   Text(
                     "Fecha de nacimiento",
                     style: TextStyle(
-                      color: colorTextoDark,
+                      color: colores.colorTexto,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -156,7 +154,7 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                   Row(
                     children: [
                       InputFechaNacimientoWidget(
-                        colorTextoDark: colorTextoDark,
+                        colorTextoDark: colores.colorTexto,
                         diaController: _diaController,
                         mesController: _mesController,
                         anoController: _anoController,
@@ -201,15 +199,15 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                                     label: rol,
                                   ))
                               .toList(),
-                          label: const Text('Selecciona un rol',
-                              style: TextStyle(color: Colors.white)),
-                          textStyle: const TextStyle(color: Colors.white),
-                          inputDecorationTheme: const InputDecorationTheme(
+                          label:  Text('Selecciona un rol',
+                              style: TextStyle(color: colores.colorTexto)),
+                          textStyle:  TextStyle(color: colores.colorTexto),
+                          inputDecorationTheme:  InputDecorationTheme(
                             enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                              borderSide: BorderSide(color: colores.colorTexto),
                             ),
                             focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                              borderSide: BorderSide(color: colores.colorTexto),
                             ),
                           ),
                         ),
@@ -231,7 +229,7 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                     width: 320,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 255, 131, 55),
+                      color: colores.colorAccionButtons,
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Center(
@@ -254,11 +252,11 @@ class _ModalAgregarAdministradorState extends State<ModalAgregarAdministrador> {
                       color: Color.fromARGB(255, 255, 75, 55),
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: const Center(
+                    child:  Center(
                       child: Text(
                         'CANCELAR',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: colores.colorTexto,
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),

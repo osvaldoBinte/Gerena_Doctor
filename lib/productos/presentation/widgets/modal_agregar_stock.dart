@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class ModalAgregarStock extends StatelessWidget {
   ModalAgregarStock({super.key});
@@ -12,7 +13,7 @@ class ModalAgregarStock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: Container(
         width: 400,
         height: 400,
@@ -26,7 +27,7 @@ class ModalAgregarStock extends StatelessWidget {
                        Text(
               'AGREGAR STOCK',
               style: TextStyle(
-                color: colorTextoDark,
+                color: colores.colorTexto,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -36,14 +37,14 @@ class ModalAgregarStock extends StatelessWidget {
               'AQUI VA EL NOMBRE DEL PRODUCTO XDXDXDXD',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: colorTextoDark,
+                color: colores.colorTexto,
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 20),
             TextFormField(
-              style: TextStyle(color: colorTextoDark),
+              style: TextStyle(color: colores.colorTexto),
               controller: precioController,
               validator: (value) {
                 //validar que sea un numero
@@ -56,14 +57,14 @@ class ModalAgregarStock extends StatelessWidget {
                 return null;
               },
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
+              decoration:  InputDecoration(
                 labelText: 'Cantidad a agregar',
-                labelStyle: TextStyle(color: Colors.white),
+                labelStyle: TextStyle(color: colores.colorTexto),
                 enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(color: colores.colorTexto),
                 ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
+                  borderSide: BorderSide(color: colores.colorTexto),
                 ),
               ),
             ),

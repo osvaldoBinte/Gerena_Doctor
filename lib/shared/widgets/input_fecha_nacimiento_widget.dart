@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class InputFechaNacimientoWidget extends StatelessWidget {
   final Color colorTextoDark;
@@ -166,7 +167,7 @@ class InputFechaNacimientoWidget extends StatelessWidget {
         SizedBox(
           width: 120,
           child: TextFormField(
-            style: TextStyle(color: colorTextoDark),
+            style: TextStyle(color: colores.colorTexto),
             controller: diaController,
             keyboardType: TextInputType.number,
             validator: (value) {
@@ -181,14 +182,14 @@ class InputFechaNacimientoWidget extends StatelessWidget {
               }
               return null;
             },
-            decoration: const InputDecoration(
+            decoration:  InputDecoration(
               labelText: 'Día',
-              labelStyle: TextStyle(color: Colors.white),
+              labelStyle: TextStyle(color: colores.colorTexto),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+                borderSide: BorderSide(color: colores.colorTexto),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+                borderSide: BorderSide(color: colores.colorTexto),
               ),
             ),
           ),
@@ -206,14 +207,14 @@ class InputFechaNacimientoWidget extends StatelessWidget {
                       label: mes,
                     ))
                 .toList(),
-            label: const Text('Mes', style: TextStyle(color: Colors.white)),
-            textStyle: const TextStyle(color: Colors.white),
-            inputDecorationTheme: const InputDecorationTheme(
+            label:  Text('Mes', style: TextStyle(color: colores.colorTexto)),
+            textStyle:  TextStyle(color: colores.colorTexto),
+            inputDecorationTheme:  InputDecorationTheme(
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+                borderSide: BorderSide(color: colores.colorTexto),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+                borderSide: BorderSide(color: colores.colorTexto),
               ),
             ),
           ),
@@ -231,14 +232,14 @@ class InputFechaNacimientoWidget extends StatelessWidget {
                       label: ano,
                     ))
                 .toList(),
-            label: const Text('Año', style: TextStyle(color: Colors.white)),
-            textStyle: const TextStyle(color: Colors.white),
-            inputDecorationTheme: const InputDecorationTheme(
+            label:  Text('Año', style: TextStyle(color: colores.colorTexto)),
+            textStyle:  TextStyle(color: colores.colorTexto),
+            inputDecorationTheme:  InputDecorationTheme(
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+                borderSide: BorderSide(color: colores.colorTexto),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+                borderSide: BorderSide(color: colores.colorTexto),
               ),
             ),
           ),

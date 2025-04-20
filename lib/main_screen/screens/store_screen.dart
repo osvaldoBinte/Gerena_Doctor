@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/productos/presentation/widgets/filter_button.dart';
 import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
 import 'package:managegym/productos/presentation/widgets/modal_agregar_stock.dart';
 import 'package:managegym/productos/presentation/widgets/modal_editar_producto.widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 
 class StoreScreen extends StatelessWidget {
-  const StoreScreen({super.key});
+  StoreScreen({super.key});
+  AdminColors colores = AdminColors();
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +38,7 @@ class StoreScreen extends StatelessWidget {
                   QuickActionButton(
                     text: 'REALIZAR UNA VENTA',
                     icon: Icons.person_add,
-                    accion: () {
-                  
-                    },
+                    accion: () {},
                   ),
                 ],
               ),
@@ -47,14 +48,14 @@ class StoreScreen extends StatelessWidget {
               height: 50,
               child: TextField(
                 onChanged: (value) => {},
-                style: const TextStyle(
-                    color: Colors.white), // Cambia el color del texto a blanco
+                style:  TextStyle(
+                    color: colores.colorTexto), // Cambia el color del texto a blanco
                 decoration: InputDecoration(
                   hintText: 'Buscar Producto por nombre o codigo de barras',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                        color: Color.fromARGB(255, 255, 255, 255), width: 8),
+                    borderSide:  BorderSide(
+                        color: colores.colorTexto, width: 8),
                   ),
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 ),
@@ -85,8 +86,8 @@ class StoreScreen extends StatelessWidget {
         Container(
           width: double.infinity,
           height: 50,
-          color: const Color(0xFF181818),
-          child: const Row(
+          color: colores.colorCabezeraTabla,
+          child:  Row(
             children: [
               // Espacio para la imagen
               const Expanded(
@@ -94,72 +95,72 @@ class StoreScreen extends StatelessWidget {
                 child: SizedBox(),
               ),
               // Nombre
-              const Expanded(
+               Expanded(
                 flex: 3,
                 child: Text(
                   'Nombre',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
               ),
               // Categoría
-              const Expanded(
+               Expanded(
                 flex: 3,
                 child: Text(
                   'Categoría',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
               ),
               // Precio unitario
-              const Expanded(
+               Expanded(
                 flex: 2,
                 child: Text(
                   'Precio unitario',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
               ),
               // Cantidad disponible
-              const Expanded(
+               Expanded(
                 flex: 2,
                 child: Text(
                   'Cantidad disponible',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
               ),
               // Código de barras
-              const Expanded(
+               Expanded(
                 flex: 3,
                 child: Text(
                   'Código de barras',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
                 ),
               ),
               // Disponible
-              const Expanded(
+               Expanded(
                 flex: 1,
                 child: Text(
                   'Disponible',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: colores.colorTexto,
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
                   ),
@@ -228,11 +229,11 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
 
   Color getRowColor() {
     if (isHovering || isFocused) {
-      return const Color.fromARGB(255, 255, 131, 55); // Color de selección
+      return colores.colorHoverRow; // Color de selección
     }
     return widget.index % 2 == 0
-        ? const Color.fromARGB(255, 33, 33, 33)
-        : const Color.fromARGB(255, 54, 54, 54);
+        ? colores.colorRowPar
+        : colores.colorRowNoPar; // Color alternante
   }
 
   @override
@@ -251,7 +252,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
         children: [
           // InkWell para toda la fila menos el icono
           Expanded(
-            flex: 15, // Suma de los flex de los siguientes Expanded (2+3+3+2+2+3+1=16, puedes ajustar)
+            flex:
+                15, // Suma de los flex de los siguientes Expanded (2+3+3+2+2+3+1=16, puedes ajustar)
             child: InkWell(
               focusNode: _focusNode,
               borderRadius: BorderRadius.circular(0),
@@ -260,9 +262,7 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return ModalEditarProducto(
-                   
-                    );
+                    return ModalEditarProducto();
                   },
                 );
               },
@@ -302,8 +302,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 3,
                     child: Text(
                       widget.nombre,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style:  TextStyle(
+                        color: colores.colorTexto,
                         fontSize: 18,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -314,8 +314,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 3,
                     child: Text(
                       widget.categoria,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style:  TextStyle(
+                        color: colores.colorTexto,
                         fontSize: 18,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -326,8 +326,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 2,
                     child: Text(
                       widget.precioUnitario,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style:  TextStyle(
+                        color: colores.colorTexto,
                         fontSize: 20,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -338,8 +338,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 2,
                     child: Text(
                       widget.cantidadDisponible,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style:  TextStyle(
+                        color: colores.colorTexto,
                         fontSize: 18,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -350,8 +350,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 3,
                     child: Text(
                       widget.codigoBarras,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style:  TextStyle(
+                        color: colores.colorTexto,
                         fontSize: 18,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -362,8 +362,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                     flex: 1,
                     child: Text(
                       widget.disponible,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style:  TextStyle(
+                        color: colores.colorTexto,
                         fontSize: 18,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -378,14 +378,14 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
           Expanded(
             flex: 1,
             child: IconButton(
-              icon: const Icon(Icons.inventory, color: Colors.white, size: 28),
+              icon:  Icon(Icons.inventory, color: colores.colorTexto, size: 28),
               tooltip: 'Ver stock',
               onPressed: () {
                 // Aquí abre tu modal de stock o realiza la acción deseada
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return  ModalAgregarStock();
+                    return ModalAgregarStock();
                   },
                 );
               },

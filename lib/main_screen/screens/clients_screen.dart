@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
@@ -29,6 +30,8 @@ bool hoverButtontodosLosClientes = false;
 bool hoverButtonSuscripccionesApuntoExpirar = false;
 bool hoverButtonNuevosClientes = false;
 int index = 0;
+
+AdminColors colors = AdminColors();
 
 class _ClientsScreenState extends State<ClientsScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
@@ -155,8 +158,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
               width: 800,
               height: 50,
               child: TextField(
-                style: const TextStyle(
-                    color: Colors.white), // Cambia el color del texto a blanco
+                style:  TextStyle(
+                    color: colores.colorTexto), // Cambia el color del texto a blanco
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
@@ -170,9 +173,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
             ),
             Text(
               "${DateTime.now().day} de $actualmonth del ${DateTime.now().year}",
-              style: const TextStyle(
+              style:  TextStyle(
                   fontSize: 20,
-                  color: Colors.white,
+                  color: colores.colorTexto,
                   fontWeight: FontWeight.bold),
             ),
             const SizedBox(
@@ -180,7 +183,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
             ),
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         HeaderTableClientsHome(),

@@ -4,6 +4,7 @@ import 'package:managegym/clientes/presentation/widgets/header_table_clients_hom
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/productos/presentation/widgets/modal_agregar_producto.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
@@ -138,6 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }).toList();
     }
   }
+  AdminColors colores = AdminColors();
 
   @override
   Widget build(BuildContext context) {
@@ -152,13 +154,13 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 50,
               child: TextField(
                 controller: _searchController,
-                style: const TextStyle(color: Colors.white),
+                style:  TextStyle(color: colores.colorTexto),
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                        color: Color.fromARGB(255, 255, 255, 255), width: 8),
+                    borderSide:  BorderSide(
+                        color: colores.colorTexto, width: 8),
                   ),
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 ),
@@ -166,9 +168,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Text(
               "${DateTime.now().day} de $actualmonth del ${DateTime.now().year}",
-              style: const TextStyle(
+              style:  TextStyle(
                   fontSize: 20,
-                  color: Colors.white,
+                  color: colores.colorTexto,
                   fontWeight: FontWeight.bold),
             ),
           ],
@@ -181,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: usuariosCargando
               ? const Center(child: CircularProgressIndicator())
               : usuarios.isEmpty
-                  ? const Center(child: Text("No hay usuarios registrados", style: TextStyle(color: Colors.white, fontSize: 18)))
+                  ?  Center(child: Text("No hay usuarios registrados", style: TextStyle(color: colores.colorTexto, fontSize: 18)))
                   : ListView.builder(
                       itemCount: usuariosFiltrados.length,
                       itemBuilder: (context, index) {
@@ -257,12 +259,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        const Row(
+         Row(
           children: [
             Text(
               "MIS SUSCRIPCCIONES",
               style: TextStyle(
-                color: Colors.white,
+                color: colores.colorTexto,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -278,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             final suscripciones = suscripcionController.suscripciones;
             if (suscripciones.isEmpty) {
-              return const Center(child: Text("No hay suscripciones" , style: TextStyle(color: Colors.white, fontSize: 18)));
+              return  Center(child: Text("No hay suscripciones" , style: TextStyle(color: colores.colorTexto, fontSize: 18)));
             }
             final ScrollController scrollController = ScrollController();
             return Scrollbar(
@@ -325,7 +327,7 @@ class QuickActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 255, 131, 55),
+          color: colores.colorAccionButtons,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(

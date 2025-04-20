@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 
 class InputTelefonoWidget extends StatelessWidget {
   const InputTelefonoWidget({
     super.key,
-    required this.colorTextoDark,
     required TextEditingController telefonoController,
   }) : _telefonoController = telefonoController;
 
-  final Color colorTextoDark;
   final TextEditingController _telefonoController;
 
   @override
@@ -16,7 +15,7 @@ class InputTelefonoWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: _telefonoController,
         keyboardType: TextInputType.phone,
         validator: (value) {
@@ -28,14 +27,14 @@ class InputTelefonoWidget extends StatelessWidget {
           }
           return null;
         },
-        decoration: const InputDecoration(
+        decoration:  InputDecoration(
           labelText: 'Numero de telefono',
-          labelStyle: TextStyle(color: Colors.white),
+          labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

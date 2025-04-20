@@ -10,9 +10,13 @@ import 'package:managegym/main_screen/screens/store_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
+  // crea la instancia de los colores
+  AdminColors().setDarkTheme();
+
   // Configurar un manejador de errores global
   FlutterError.onError = (FlutterErrorDetails details) {
     // Si el error está relacionado con teclas, solo lo registramos sin detener la app
@@ -112,6 +116,22 @@ class _PantallaInicialState extends State<PantallaInicial> {
     });
   }
 
+  bool isDark = true;
+
+  void toggleTheme() {
+    setState(() {
+      isDark = !isDark;
+      if (isDark) {
+        AdminColors().setDarkTheme();
+      } else {
+        AdminColors().setLightTheme();
+      }
+    });
+    setState(() {
+      
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<CustomButtonHeader> customButtons = [
@@ -151,6 +171,12 @@ class _PantallaInicialState extends State<PantallaInicial> {
         active: _selectedIndex == 5,
         onPressed: onItemTapped,
       ),
+      CustomButtonHeader(
+        icon: isDark ? Icons.wb_sunny : Icons.nightlight_round,
+        index: 99, // Un índice que no choque con los demás
+        active: false,
+        onPressed: (_) => toggleTheme(),
+      ),
     ];
 
     final screens = [
@@ -163,7 +189,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
       ScreenVenta()
     ];
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colors.colorFondo,
       body: Column(
         children: [
           TitlebarWidget(

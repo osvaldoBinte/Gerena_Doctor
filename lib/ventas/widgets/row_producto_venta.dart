@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 
 
@@ -31,12 +32,12 @@ class _RowProductoVentaState extends State<RowProductoVenta> {
 
   Color isPair(int index) {
     if (_isHovered || _isFocused) {
-      return const Color.fromARGB(255, 255, 131, 55); // Color de selección
+      return colores.colorHoverRow; // Color de selección
     }
     if (index % 2 == 0) {
-      return const Color.fromARGB(255, 40, 40, 40);
+      return colores.colorRowPar; // Color de fila par
     } else {
-      return const Color.fromARGB(255, 50, 50, 50);
+      return colores.colorRowNoPar; // Color de fila impar
     }
   }
 
@@ -65,21 +66,21 @@ class _RowProductoVentaState extends State<RowProductoVenta> {
                 flex: 2,
                 child: Text(
                   widget.nombre,
-                  style: TextStyle(color: widget.colorTexto),
+                  style: TextStyle(color: colores.colorTexto),
                 ),
               ),
               Expanded(
                 flex: 1,
                 child: Text(
                   widget.precio,
-                  style: TextStyle(color: widget.colorTexto),
+                  style: TextStyle(color: colores.colorTexto),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                   widget.stock,
-                  style: TextStyle(color: widget.colorTexto),
+                  style: TextStyle(color: colores.colorTexto),
                 ),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
@@ -46,19 +47,19 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
     _nombreController.text = 'mario alfredo';
 
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: SizedBox(
         height: 935,
         width: 1458,
         child: Column(
           children: [
-            const Row(
+             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'INFORMACION DEL CLIENTE',
                   style: TextStyle(
-                      color: Color.fromARGB(255, 255, 255, 255),
+                      color: colores.colorTexto,
                       fontSize: 24,
                       fontWeight: FontWeight.bold),
                 ),
@@ -73,7 +74,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                   Row(
                     children: [
                       InputNombreWidget(
-                          colorTextoDark: colorTextoDark,
                           nombreController: _nombreController),
                       const SizedBox(width: 20),
                       InputApellidoWidget(
@@ -85,7 +85,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                   Row(
                     children: [
                       InputTelefonoWidget(
-                          colorTextoDark: colorTextoDark,
                           telefonoController: _telefonoController),
                       const SizedBox(width: 20),
                       InputCorreoElectronicoWidget(
@@ -102,10 +101,10 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                         });
                       }),
                   const SizedBox(height: 20),
-                  const Text(
+                   Text(
                     'Fecha de nacimiento',
                     style: TextStyle(
-                        color: Colors.white,
+                        color: colores.colorTexto,
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
                   ),
@@ -134,14 +133,14 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                       Text(
                         'Historial de suscripcciones',
                         style: TextStyle(
-                            color: colorTextoDark,
+                            color: colores.colorTexto,
                             fontSize: 24,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
                         'Fecha de inscripccion: 12/12/2023',
                         style: TextStyle(
-                          color: colorTextoDark,
+                          color: colores.colorTexto,
                           fontSize: 20,
                         ),
                       ),
@@ -152,7 +151,9 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                   Container(
                     width: double.infinity,
                     height: 300,
-                    child: ListView.builder(itemBuilder: (context, index) {}),
+                    child: ListView.builder(itemBuilder: (context, index) {
+                      
+                    }),
                   ),
                   const SizedBox(height: 60),
                   Row(
@@ -215,8 +216,8 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
     return Container(
       width: double.infinity,
       height: 40,
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 40, 40, 40),
+      decoration:  BoxDecoration(
+        color: colores.colorCabezeraTabla,
       ),
       child: Row(
         children: [
@@ -225,7 +226,7 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
             'Suscrpccion',
             textAlign: TextAlign.start,
             style: TextStyle(
-                color: colorTextoDark,
+                color: colores.colorTexto,
                 fontWeight: FontWeight.bold,
                 fontSize: 17),
           )),
@@ -234,7 +235,7 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
             'Fecha de ininicio de la suscrpccion',
             textAlign: TextAlign.start,
             style: TextStyle(
-                color: colorTextoDark,
+                color: colores.colorTexto,
                 fontWeight: FontWeight.bold,
                 fontSize: 17),
           )),
@@ -243,7 +244,7 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
             'Fecha de fin de la suscrpccion',
             textAlign: TextAlign.start,
             style: TextStyle(
-                color: colorTextoDark,
+                color: colores.colorTexto,
                 fontWeight: FontWeight.bold,
                 fontSize: 17),
           )),
@@ -252,7 +253,7 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
             'Estatus',
             textAlign: TextAlign.start,
             style: TextStyle(
-                color: colorTextoDark,
+                color: colores.colorTexto,
                 fontWeight: FontWeight.bold,
                 fontSize: 17),
           )),

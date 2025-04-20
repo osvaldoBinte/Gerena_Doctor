@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_nombre_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_precio_producto.dart';
@@ -87,7 +88,7 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: Container(
         width: 1400,
         height: 558,
@@ -108,11 +109,11 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                               Text(
                                 'MODIFICAR PRODUCTO',
                                 style: TextStyle(
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                  fontSize: 20,
+                                  color: colores.colorTexto,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -231,7 +232,7 @@ class _ModalEditarProductoState extends State<ModalEditarProducto> {
                       fit: BoxFit.cover,
                     )
                   : IconButton(
-                      icon: Icon(Icons.add_a_photo, color: Colors.white),
+                      icon: Icon(Icons.add_a_photo, color: colores.colorTexto),
                       onPressed: selectImage,
                     ),
             ),

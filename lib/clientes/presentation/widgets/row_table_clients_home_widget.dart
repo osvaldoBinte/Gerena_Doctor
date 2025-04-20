@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_editar_cliente_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class RowTableClientsHomeWidget extends StatefulWidget {
@@ -44,13 +45,14 @@ void _showModalEditarCliente(BuildContext context) {
   );
 }
 
+AdminColors colores = AdminColors();
 
 class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
   Color isPair(int index) {
     if (index % 2 == 0) {
-      return const Color.fromARGB(255, 33, 33, 33);
+      return colores.colorRowPar;
     } else {
-      return const Color.fromARGB(255, 54, 54, 54);
+      return colores.colorRowNoPar;
     }
   }
 
@@ -97,9 +99,6 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 });
               },
               focusNode: _mainFocusNode,
-              hoverColor: const Color.fromARGB(40, 255, 255, 255),
-              splashColor: const Color.fromARGB(50, 255, 255, 255),
-              highlightColor: const Color.fromARGB(30, 255, 255, 255),
               child: Row(
                 children: [
                   // Columna 1: Nombre
@@ -108,11 +107,7 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     child: Container(
                       height: 40,
                       color: _isRowHovered
-                          ? Color.fromARGB(
-                              255,
-                              isPair(widget.index).red + 10,
-                              isPair(widget.index).green + 10,
-                              isPair(widget.index).blue + 10)
+                          ? colores.colorHoverRow
                           : isPair(widget.index),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 2),
@@ -120,7 +115,7 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                       child: Text(
                         widget.name,
                         textAlign: TextAlign.start,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -130,17 +125,13 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     child: Container(
                       height: 40,
                       color: _isRowHovered
-                          ? Color.fromARGB(
-                              255,
-                              isPair(widget.index).red + 10,
-                              isPair(widget.index).green + 10,
-                              isPair(widget.index).blue + 10)
+                          ? colores.colorHoverRow
                           : isPair(widget.index),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.phoneNumber,
                         textAlign: TextAlign.start,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -150,17 +141,13 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     child: Container(
                       height: 40,
                       color: _isRowHovered
-                          ? Color.fromARGB(
-                              255,
-                              isPair(widget.index).red + 10,
-                              isPair(widget.index).green + 10,
-                              isPair(widget.index).blue + 10)
+                          ? colores.colorHoverRow
                           : isPair(widget.index),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.lastSubscription,
                         textAlign: TextAlign.start,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -170,17 +157,13 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     child: Container(
                       height: 40,
                       color: _isRowHovered
-                          ? Color.fromARGB(
-                              255,
-                              isPair(widget.index).red + 10,
-                              isPair(widget.index).green + 10,
-                              isPair(widget.index).blue + 10)
+                          ? colores.colorHoverRow
                           : isPair(widget.index),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.status,
                         textAlign: TextAlign.start,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -190,17 +173,13 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     child: Container(
                       height: 40,
                       color: _isRowHovered
-                          ? Color.fromARGB(
-                              255,
-                              isPair(widget.index).red + 10,
-                              isPair(widget.index).green + 10,
-                              isPair(widget.index).blue + 10)
+                          ? colores.colorHoverRow
                           : isPair(widget.index),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.dateRange,
                         textAlign: TextAlign.start,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -210,17 +189,13 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     child: Container(
                       height: 40,
                       color: _isRowHovered
-                          ? Color.fromARGB(
-                              255,
-                              isPair(widget.index).red + 10,
-                              isPair(widget.index).green + 10,
-                              isPair(widget.index).blue + 10)
+                          ? colores.colorHoverRow
                           : isPair(widget.index),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.sex,
                         textAlign: TextAlign.start,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: colores.colorTexto),
                       ),
                     ),
                   ),
@@ -258,26 +233,29 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 });
               },
               focusNode: _buttonFocusNode,
-              focusColor: const Color.fromARGB(255, 0, 0, 0),
-              hoverColor: const Color.fromARGB(255, 0, 0, 0),
-              splashColor: const Color.fromARGB(255, 60, 60, 60),
+             
               child: Container(
                 height: 40,
                 alignment: Alignment.center,
                 color: _isButtonHovered
-                    ? const Color.fromARGB(255, 0, 0, 0)
+                    ? colores.colorHoverRow
                     : isPair(widget.index),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'Administrar suscripción',
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                          color: colores.colorTexto,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(width: 20),
-                    Icon(Icons.edit, color: Colors.white, size: 23,)
+                    Icon(
+                      Icons.edit,
+                      color: colores.colorTexto,
+                      size: 23,
+                    )
                   ],
                 ),
               ),

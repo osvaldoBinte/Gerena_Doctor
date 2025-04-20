@@ -8,9 +8,9 @@ class Database {
       Endpoint(
         host: 'localhost',
         port: 5432,
-        database: 'gym',
+        database: 'managegym',
         username: 'postgres',
-        password: '13960',
+        password: '211099',
       ),
       settings: const ConnectionSettings(sslMode: SslMode.disable),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
@@ -82,7 +83,7 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: EdgeInsets.all(20),
-      backgroundColor: const Color.fromARGB(255, 40, 40, 40),
+      backgroundColor: colores.colorFondoModal,
       content: Container(
         width: 1000,
         height: 600,
@@ -102,10 +103,10 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                               Text(
                                 "AGREGAR UN NUEVO ADMINISTRADOR",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: colores.colorTexto,
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -114,11 +115,10 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
                               Row(
                                 children: [
                                   InputNombreWidget(
-                                      colorTextoDark: colorTextoDark,
                                       nombreController: nombreController),
                                   const SizedBox(width: 20),
                                   InputApellidoWidget(
-                                      colorTextoDark: colorTextoDark,
+                                      colorTextoDark: colores.colorTexto,
                                       apellidosController: apellidosController)
                                 ],
                               ),
@@ -126,11 +126,10 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
                               Row(
                                 children: [
                                   InputTelefonoWidget(
-                                      colorTextoDark: colorTextoDark,
                                       telefonoController: telefonoController),
                                   const SizedBox(width: 20),
                                   InputCorreoElectronicoWidget(
-                                      colorTextoDark: colorTextoDark,
+                                      colorTextoDark: colores.colorTexto,
                                       correoController: correoController)
                                 ],
                               ),
@@ -140,17 +139,17 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
                                 child: TextFormField(
                                   controller: passwordController,
                                   obscureText: true,
-                                  style: TextStyle(color: colorTextoDark),
-                                  decoration: const InputDecoration(
+                                  style: TextStyle(color: colores.colorTexto),
+                                  decoration:  InputDecoration(
                                     labelText: 'Contraseña',
-                                    labelStyle: TextStyle(color: Colors.white),
+                                    labelStyle: TextStyle(color: colores.colorTexto),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                     focusedBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                   ),
                                   validator: (value) {
@@ -168,7 +167,7 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
                               Text(
                                 "Fecha de nacimiento",
                                 style: TextStyle(
-                                  color: colorTextoDark,
+                                  color: colores.colorTexto,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -222,20 +221,20 @@ class _ModalEditarAdministradorState extends State<ModalEditarAdministrador> {
                                                 label: rol,
                                               ))
                                           .toList(),
-                                      label: const Text('Selecciona un rol',
+                                      label:  Text('Selecciona un rol',
                                           style:
-                                              TextStyle(color: Colors.white)),
+                                              TextStyle(color: colores.colorTexto)),
                                       textStyle:
-                                          const TextStyle(color: Colors.white),
+                                           TextStyle(color: colores.colorTexto),
                                       inputDecorationTheme:
-                                          const InputDecorationTheme(
+                                           InputDecorationTheme(
                                         enabledBorder: UnderlineInputBorder(
                                           borderSide:
-                                              BorderSide(color: Colors.white),
+                                              BorderSide(color: colores.colorTexto),
                                         ),
                                         focusedBorder: UnderlineInputBorder(
                                           borderSide:
-                                              BorderSide(color: Colors.white),
+                                              BorderSide(color: colores.colorTexto),
                                         ),
                                       ),
                                     ),

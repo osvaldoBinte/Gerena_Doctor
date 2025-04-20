@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_nombre_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_precio_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_stock_inicial_producto.dart.dart';
+import 'package:managegym/shared/admin_colors.dart';
 
 class ModalAgregarProducto extends StatefulWidget {
   const ModalAgregarProducto({super.key});
@@ -17,6 +19,7 @@ class ModalAgregarProducto extends StatefulWidget {
 class _ModalAgregarProductoState extends State<ModalAgregarProducto> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
+  AdminColors colors = AdminColors();
 
   //controladores
   final TextEditingController nombreProductoController =
@@ -81,7 +84,7 @@ class _ModalAgregarProductoState extends State<ModalAgregarProducto> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colors.colorFondoModal,
       content: Container(
         width: 1300,
         height: 600,
@@ -93,11 +96,11 @@ class _ModalAgregarProductoState extends State<ModalAgregarProducto> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                 Text(
                   'AGREGAR PRODUCTO',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 255, 255, 255),
-                    fontSize: 20,
+                    color: colors.colorTexto,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -141,15 +144,15 @@ class _ModalAgregarProductoState extends State<ModalAgregarProducto> {
                                         label: categoria,
                                       ))
                                   .toList(),
-                              label: const Text('Categoria',
-                                  style: TextStyle(color: Colors.white)),
-                              textStyle: const TextStyle(color: Colors.white),
-                              inputDecorationTheme: const InputDecorationTheme(
+                              label:  Text('Categoria',
+                                  style: TextStyle(color: colores.colorTexto)),
+                              textStyle:  TextStyle(color: colores.colorTexto),
+                              inputDecorationTheme:  InputDecorationTheme(
                                 enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
+                                  borderSide: BorderSide(color: colores.colorTexto),
                                 ),
                                 focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
+                                  borderSide: BorderSide(color: colores.colorTexto),
                                 ),
                               ),
                             ),
@@ -195,7 +198,7 @@ class _ModalAgregarProductoState extends State<ModalAgregarProducto> {
                       fit: BoxFit.cover,
                     )
                   : IconButton(
-                      icon: Icon(Icons.add_a_photo, color: Colors.white),
+                      icon: Icon(Icons.add_a_photo, color: colores.colorTexto),
                       onPressed: selectImage,
                     ),
             ),

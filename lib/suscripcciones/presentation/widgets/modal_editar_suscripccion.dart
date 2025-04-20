@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
@@ -162,7 +163,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colorFondoDark,
+      backgroundColor: colores.colorFondoModal,
       content: SizedBox(
         height: 585,
         width: 1000,
@@ -188,7 +189,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                   Text(
                                     'EDITAR SUSCRIPCIÓN',
                                     style: TextStyle(
-                                        color: colorTextoDark,
+                                        color: colores.colorTexto,
                                         fontSize: 24,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -199,7 +200,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                 width: 800,
                                 child: TextFormField(
                                   maxLength: 63,
-                                  style: TextStyle(color: colorTextoDark),
+                                  style: TextStyle(color: colores.colorTexto),
                                   controller: _nombreController,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -210,17 +211,17 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                     }
                                     return null;
                                   },
-                                  decoration: const InputDecoration(
+                                  decoration:  InputDecoration(
                                     labelText: 'Nombre',
                                     labelStyle: TextStyle(
-                                        color: Colors.white, fontSize: 18),
+                                        color: colores.colorTexto, fontSize: 20),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                     focusedBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                   ),
                                 ),
@@ -231,19 +232,19 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                 child: TextFormField(
                                   maxLength: 200,
                                   maxLines: 2,
-                                  style: TextStyle(color: colorTextoDark),
+                                  style: TextStyle(color: colores.colorTexto),
                                   controller: _descripccionController,
-                                  decoration: const InputDecoration(
+                                  decoration:  InputDecoration(
                                     labelText: 'Descripción',
                                     labelStyle: TextStyle(
-                                        color: Colors.white, fontSize: 18),
+                                        color: colores.colorTexto, fontSize: 20),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                     focusedBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                   ),
                                 ),
@@ -262,20 +263,20 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                         });
                                       },
                                       dropdownMenuEntries: dropdownMenuEntries,
-                                      label: const Text('Tipo de fecha',
+                                      label:  Text('Tipo de fecha',
                                           style:
-                                              TextStyle(color: Colors.white)),
+                                              TextStyle(color: colores.colorTexto)),
                                       textStyle:
-                                          const TextStyle(color: Colors.white),
+                                           TextStyle(color: colores.colorTexto),
                                       inputDecorationTheme:
-                                          const InputDecorationTheme(
+                                           InputDecorationTheme(
                                         enabledBorder: UnderlineInputBorder(
                                           borderSide:
-                                              BorderSide(color: Colors.white),
+                                              BorderSide(color: colores.colorTexto),
                                         ),
                                         focusedBorder: UnderlineInputBorder(
                                           borderSide:
-                                              BorderSide(color: Colors.white),
+                                              BorderSide(color: colores.colorTexto),
                                         ),
                                       ),
                                     ),
@@ -284,7 +285,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                   SizedBox(
                                     width: 200,
                                     child: TextFormField(
-                                      style: TextStyle(color: colorTextoDark),
+                                      style: TextStyle(color: colores.colorTexto),
                                       controller: _cantidadController,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -298,17 +299,17 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                         }
                                         return null;
                                       },
-                                      decoration: const InputDecoration(
+                                      decoration:  InputDecoration(
                                         labelText: 'Cantidad',
                                         labelStyle: TextStyle(
-                                            color: Colors.white, fontSize: 18),
+                                            color: colores.colorTexto, fontSize: 18),
                                         enabledBorder: UnderlineInputBorder(
                                           borderSide:
-                                              BorderSide(color: Colors.white),
+                                              BorderSide(color: colores.colorTexto),
                                         ),
                                         focusedBorder: UnderlineInputBorder(
                                           borderSide:
-                                              BorderSide(color: Colors.white),
+                                              BorderSide(color: colores.colorTexto),
                                         ),
                                       ),
                                     ),
@@ -319,7 +320,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                               SizedBox(
                                 width: 410,
                                 child: TextFormField(
-                                  style: TextStyle(color: colorTextoDark),
+                                  style: TextStyle(color: colores.colorTexto),
                                   controller: _precioController,
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
@@ -333,17 +334,17 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                     }
                                     return null;
                                   },
-                                  decoration: const InputDecoration(
+                                  decoration:  InputDecoration(
                                     labelText: 'Precio',
                                     labelStyle: TextStyle(
-                                        color: Colors.white, fontSize: 18),
+                                        color: colores.colorTexto, fontSize: 18),
                                     enabledBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                     focusedBorder: UnderlineInputBorder(
                                       borderSide:
-                                          BorderSide(color: Colors.white),
+                                          BorderSide(color: colores.colorTexto),
                                     ),
                                   ),
                                 ),

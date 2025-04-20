@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class CustomButtonHeader extends StatelessWidget {
   final IconData icon;
@@ -23,10 +24,10 @@ class CustomButtonHeader extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
         decoration: BoxDecoration(
-          color: active ? Colors.orange : Colors.black,
+          color: active ? Colors.orange : colores.colorBotonNavbar,
           borderRadius: BorderRadius.circular(50),
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: colores.colorTexto, size: 20),
       ),
     );
   }

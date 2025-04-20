@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class HeaderTableClientsHome extends StatelessWidget {
   const HeaderTableClientsHome({
@@ -9,8 +10,8 @@ class HeaderTableClientsHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          color:  Color.fromARGB(255, 40, 40, 40),
+        decoration:  BoxDecoration(
+          color:  colores.colorCabezeraTabla,
         ),
         child: Row(
           children: [
@@ -18,13 +19,12 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 3, // Ocupa 2 partes del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                child: const Text(
+                child:  Text(
                   'Nombre',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17),
+                      color: colores.colorTexto, fontWeight: FontWeight.bold, fontSize: 17),
                 ),
               ),
             ),
@@ -32,13 +32,12 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 1, // Ocupa 3 partes del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.all(2),
-                child: const Text(
+                child:  Text(
                   'No. telefono',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17),
+                      color: colores.colorTexto, fontWeight: FontWeight.bold, fontSize: 17),
                 ),
               ),
             ),
@@ -46,13 +45,12 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 3, // Ocupa 1 parte del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.all(2),
-                child: const Text(
+                child:  Text(
                   'Ultima suscripccion',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
                 ),
               ),
             ),
@@ -60,13 +58,12 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 1, // Ocupa 1 parte del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.all(2),
-                child: const Text(
+                child:  Text(
                   'Status',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
                 ),
               ),
             ),
@@ -74,13 +71,12 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 3, // Ocupa 1 parte del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.all(2),
-                child: const Text(
+                child:  Text(
                   'Rango de fecha',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
                 ),
               ),
             ),
@@ -88,13 +84,12 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 1, // Ocupa 1 parte del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.all(2),
-                child: const Text(
+                child:  Text(
                   'Sexo',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
                 ),  
               ),
             ),
@@ -102,7 +97,6 @@ class HeaderTableClientsHome extends StatelessWidget {
               flex: 2   , // Ocupa 1 parte del espacio
               child: Container(
                 height: 50,
-                color: const Color.fromARGB(255, 40, 40, 40),
                 padding: const EdgeInsets.all(2),
               ),
             ),

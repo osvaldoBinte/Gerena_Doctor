@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:math';
 
@@ -58,13 +59,14 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener, Si
   void onWindowUnmaximize() {
     setState(() => isMaximized = false);
   }
+  AdminColors colores = AdminColors();
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 55,
       decoration: BoxDecoration(
-        color: Colors.grey[900],
+        color: colores.colornavbar,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,13 +108,13 @@ class _TitlebarWidgetState extends State<TitlebarWidget> with WindowListener, Si
               // Botón Minimizar
               IconButton(
                 icon: const Icon(Icons.minimize),
-                color: Colors.white,
+                color: colores.colorTexto,
                 onPressed: () => windowManager.minimize(),
               ),
               // Botón Cerrar
               IconButton(
                 icon: const Icon(Icons.close),
-                color: Colors.white,
+                color: colores.colorTexto,
                 onPressed: () => windowManager.close(),
               ),
               const SizedBox(width: 8), // Espacio al final

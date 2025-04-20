@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 
 class InputSexoWidget extends StatelessWidget {
   final String? sexoController;
@@ -30,15 +31,15 @@ class InputSexoWidget extends StatelessWidget {
                 ))
             .toList(),
 
-        label: const Text('Sexo',
-            style: TextStyle(color: Colors.white)),
-        textStyle: const TextStyle(color: Colors.white),
-        inputDecorationTheme: const InputDecorationTheme(
+        label:  Text('Sexo',
+            style: TextStyle(color: colores.colorTexto)),
+        textStyle:  TextStyle(color: colores.colorTexto),
+        inputDecorationTheme:  InputDecorationTheme(
           enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: colores.colorTexto),
           ),
         ),
       ),

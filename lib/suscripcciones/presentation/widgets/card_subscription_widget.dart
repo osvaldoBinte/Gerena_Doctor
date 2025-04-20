@@ -29,7 +29,7 @@ class CardSubscriptionWidget extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(60, 40, 40, 40),
+        color: const Color.fromARGB(148, 40, 40, 40),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class CardSuscriptionSelectWidget extends StatefulWidget {
@@ -43,14 +44,14 @@ class _CardSuscriptionSelectWidgetState
     }
   }
 
+  AdminColors colors = AdminColors();
+
   @override
   Widget build(BuildContext context) {
     // Colores para mostrar el efecto hover
-    const baseColor = Color.fromARGB(255, 23, 23, 23);
     const hoverColor = Color.fromARGB(255, 40, 40, 40);
 
     return Material(
-      color: Colors.transparent,
       child: InkWell(
         onTap: () {
           widget.selectSuscription(widget.suscripcion.id.toString());
@@ -72,7 +73,8 @@ class _CardSuscriptionSelectWidgetState
         highlightColor: const Color.fromARGB(40, 115, 115, 115),
         child: Ink(
           decoration: BoxDecoration(
-            color: (widget.isSelected || isHovering) ? hoverColor : baseColor,
+            color: (widget.isSelected || isHovering) ? hoverColor :  Color.fromARGB(60, 40, 40, 40),
+
             borderRadius: BorderRadius.circular(8),
             border: (widget.isSelected || isHovering)
                 ? Border.all(
@@ -99,7 +101,7 @@ class _CardSuscriptionSelectWidgetState
                   widget.suscripcion.titulo,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    color: colors.colorTexto,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     shadows: isHovering
@@ -120,8 +122,8 @@ class _CardSuscriptionSelectWidgetState
                 Text(
                   widget.suscripcion.descripcion,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white70,
+                  style:  TextStyle(
+                    color: colors.colorTexto,
                     fontSize: 14,
                   ),
                   maxLines: 2,
@@ -135,7 +137,7 @@ class _CardSuscriptionSelectWidgetState
                     Container(
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 255, 152, 0),
+                        color: colors.colorAccionButtons,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: isHovering
                             ? [
@@ -152,8 +154,8 @@ class _CardSuscriptionSelectWidgetState
                             vertical: 4, horizontal: 8),
                         child: Text(
                           'Precio: \$${widget.suscripcion.precio}',
-                          style: const TextStyle(
-                              color: Colors.white,
+                          style:  TextStyle(
+                              color: colors.colorTexto,
                               fontSize: 15,
                               fontWeight: FontWeight.w500),
                         ),
@@ -178,8 +180,8 @@ class _CardSuscriptionSelectWidgetState
                             const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                         child: Text(
                           'Duración: ${getDuracionTexto()}',
-                          style: const TextStyle(
-                              color: Colors.white,
+                          style: TextStyle(
+                              color: colors.colorTexto,
                               fontSize: 15,
                               fontWeight: FontWeight.w500),
                         ),
