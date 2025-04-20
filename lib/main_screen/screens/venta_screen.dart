@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/main_screen/widgets/row_producto_seleccionado.dart';
 import 'package:managegym/main_screen/widgets/title_bar_producto_seleccionado.dart';
 import 'package:managegym/ventas/widgets/row_cliente_venta.dart';
 import 'package:managegym/ventas/widgets/row_producto_venta.dart';
 
 class ScreenVenta extends StatefulWidget {
-  const ScreenVenta({super.key});
 
   @override
   State<ScreenVenta> createState() => _ScreenVentaState();
@@ -406,3 +406,4 @@ class _ScreenVentaState extends State<ScreenVenta> {
     );
   }
 }
+

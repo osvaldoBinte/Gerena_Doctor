@@ -386,7 +386,7 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return ModalAgregarStock();
+                    return  ModalAgregarStock();
                   },
                 );
               },

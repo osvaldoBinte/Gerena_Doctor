@@ -268,6 +268,8 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                     ? const Color.fromARGB(255, 0, 0, 0)
                     : isPair(widget.index),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       'Administrar suscripción',

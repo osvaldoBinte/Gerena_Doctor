@@ -81,7 +81,6 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => const LoginScreen(),
         '/home': (context) => const PantallaInicial(),
-        '/venta': (context) => const ScreenVenta(),
       },
     );
   }
@@ -97,6 +96,12 @@ class PantallaInicial extends StatefulWidget {
 class _PantallaInicialState extends State<PantallaInicial> {
   int _selectedIndex = 0;
 
+  void goToVenta() {
+    setState(() {
+      _selectedIndex = 6 /* el índice de tu ScreenVenta en screensVentas */;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -110,7 +115,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
   static const List<Widget> screens = <Widget>[
     HomeScreen(),
     StoreScreen(),
-    Text("Screen de Clientes"),
+    ClientsScreen(),
     Text("Screen de estadisticas"),
     Text(""),
     AdministradoresScreen(),
@@ -134,31 +139,31 @@ class _PantallaInicialState extends State<PantallaInicial> {
       CustomButtonHeader(
         icon: Icons.storefront,
         index: 1,
-        active: _selectedIndex == 2,
+        active: _selectedIndex == 1,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.group_add_outlined,
         index: 2,
-        active: _selectedIndex == 3,
+        active: _selectedIndex == 2,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.bar_chart_rounded,
         index: 3,
-        active: _selectedIndex == 4,
+        active: _selectedIndex == 3,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.settings_outlined,
         index: 4,
-        active: _selectedIndex == 5,
+        active: _selectedIndex == 4,
         onPressed: onItemTapped,
       ),
       CustomButtonHeader(
         icon: Icons.badge_outlined,
         index: 5,
-        active: _selectedIndex == 6,
+        active: _selectedIndex == 5,
         onPressed: onItemTapped,
       ),
     ];
