@@ -8,6 +8,9 @@ import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcio
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
+// IMPORTA tu modelo de usuario y base de datos:
+import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
+import 'package:managegym/db/database_connection.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,7 +34,8 @@ List<String> meses = [
   'Diciembre'
 ];
 
-void _showModalRegisterUser(BuildContext context, List<TipoMembresia> suscripciones) {
+void _showModalRegisterUser(
+    BuildContext context, List<TipoMembresia> suscripciones) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -42,10 +46,36 @@ void _showModalRegisterUser(BuildContext context, List<TipoMembresia> suscripcio
 
 class _HomeScreenState extends State<HomeScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
+  final SuscripcionController suscripcionController =
+      Get.put(SuscripcionController());
 
-  // Inicia el controlador de GetX (una sola vez por pantalla)
-  final SuscripcionController suscripcionController = Get.put(SuscripcionController());
+  // Estados para usuarios
+  List<Usuario> usuarios = [];
+  bool usuariosCargando = true;
 
+  @override
+  void initState() {
+    super.initState();
+    cargarUsuarios();
+  }
+
+Future<void> cargarUsuarios() async {
+  try {
+    final conn = Database.conn;
+    final lista = await UsuarioDB.obtenerUsuarios(conn: conn);
+    print('Usuarios obtenidos: ${lista.length}');
+    setState(() {
+      usuarios = lista;
+      usuariosCargando = false;
+    });
+  } catch (e) {
+    print('Error al cargar usuarios: $e');
+    setState(() {
+      usuarios = [];
+      usuariosCargando = false;
+    });
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -58,8 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 800,
               height: 50,
               child: TextField(
-                style: const TextStyle(
-                  color: Colors.white), // Cambia el color del texto a blanco
+                style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
@@ -81,38 +110,45 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        const HeaderTableClientsHome(), //cabezera de la tabla
+        const HeaderTableClientsHome(),
         SizedBox(
-          //coontenedor de la lista de clientes registrados
           height: 450,
           width: double.infinity,
-          child: ListView.builder(
-            itemCount: 60,
-            itemBuilder: (context, index) {
-              return RowTableClientsHomeWidget(
-                index: index,
-                name: "luis antonio martinez marroquin",
-                phoneNumber: "2292134420",
-                lastSubscription: "Suscripccion basica de un año",
-                status: "activo",
-                dateRange: "12/12/12 - 12/12/13",
-                sex: "H",
-                suscripcionesDisponibles: suscripcionController.suscripciones, // <-- AGREGA ESTA LÍNEA
-              );
-            },
-          ),
+          child: usuariosCargando
+              ? const Center(child: CircularProgressIndicator())
+              : usuarios.isEmpty
+                  ? const Center(child: Text("No hay usuarios registrados"))
+                  : ListView.builder(
+                      itemCount: usuarios.length,
+                      itemBuilder: (context, index) {
+                        final usuario = usuarios[index];
+                        return RowTableClientsHomeWidget(
+                          index: index,
+                          name: "${usuario.nombre} ${usuario.apellidos}",
+                          phoneNumber: usuario.telefono,
+                          lastSubscription: "No implementado", // Puedes mejorar esto
+                          status: usuario.status ?? "activo",
+                          dateRange: usuario.fechaNacimiento != null
+                              ? "${usuario.fechaNacimiento!.day}/${usuario.fechaNacimiento!.month}/${usuario.fechaNacimiento!.year}"
+                              : "Sin fecha",
+                          sex: usuario.sexo,
+                          suscripcionesDisponibles:
+                              suscripcionController.suscripciones,
+                        );
+                      },
+                    ),
         ),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
           child: Row(
-            //botones de acceso rapido
             children: [
               QuickActionButton(
                 text: 'REGISTRAR UN NUEVO USUARIO',
                 icon: Icons.person_add,
                 accion: () {
-                  _showModalRegisterUser(context, suscripcionController.suscripciones);
+                  _showModalRegisterUser(
+                      context, suscripcionController.suscripciones);
                 },
               ),
               const SizedBox(width: 20),
@@ -145,8 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: 'REALIZAR UNA VENTA',
                 icon: Icons.person_add,
                 accion: () {
-                  Navigator.pushNamed(
-                      context, '/venta'); // Navegar a la pantalla de venta
+                  Navigator.pushNamed(context, '/venta');
                 },
               ),
               const SizedBox(width: 20),
@@ -168,7 +203,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        // LISTADO DINÁMICO DE SUSCRIPCIONES CON GETX
         Expanded(
           child: Obx(() {
             if (suscripcionController.cargando.value) {

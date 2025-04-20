@@ -24,15 +24,15 @@ class Usuario {
 
   factory Usuario.fromMap(Map<String, dynamic> map) => Usuario(
         id: map['id'] is String ? int.parse(map['id']) : map['id'],
-        nombre: map['nombre'],
-        apellidos: map['apellidos'],
-        correo: map['correo'],
-        telefono: map['telefono'],
+        nombre: map['nombre']?.toString() ?? '',
+        apellidos: map['apellidos']?.toString() ?? '',
+        correo: map['correo']?.toString() ?? '',
+        telefono: map['telefono']?.toString() ?? '',
         fechaNacimiento: map['fechanacimiento'] != null
-            ? DateTime.parse(map['fechanacimiento'])
+            ? DateTime.tryParse(map['fechanacimiento'].toString())
             : null,
-        sexo: map['sexo'],
-        status: map['status'],
+        sexo: map['sexo']?.toString() ?? '',
+        status: map['status']?.toString(),
       );
 }
 
@@ -188,46 +188,70 @@ class UsuarioDB {
       return null;
     }
   }
+
   static Future<int?> crearHistorialPago({
-  required int idMembresiaUsuario,
-  required double montoPago,
-  required String metodoPago,
-  String? numeroReferencia,
-  DateTime? fechaProximoPago,
-  required dynamic conn,
-}) async {
-  debugPrint('Creando historial de pago...');
-  debugPrint('ID Membresía Usuario: $idMembresiaUsuario');
-  debugPrint('Monto Pago: $montoPago');
-  debugPrint('Método Pago: $metodoPago');
-  debugPrint('Número Referencia: $numeroReferencia');
-  debugPrint('Fecha Próximo Pago: ${fechaProximoPago?.toIso8601String()}');
-    
-  try {
-    
-    final sql = Sql.named('''
-      INSERT INTO historialPagos (
-        idMembresiaUsuario, montoPago, metodoPago, estado, 
-        numeroReferencia, fechaProximoPago
-      ) VALUES (
-        @idMembresiaUsuario, @montoPago, @metodoPago, 'pagado', 
-        @numeroReferencia, @fechaProximoPago
-      ) RETURNING id;
-    ''');
-    final result = await conn.execute(sql, parameters: {
-      'idMembresiaUsuario': idMembresiaUsuario,
-      'montoPago': montoPago,
-      'metodoPago': metodoPago,
-      'numeroReferencia': numeroReferencia,
-      'fechaProximoPago': fechaProximoPago?.toIso8601String(),
-    });
-    if (result.isNotEmpty) {
-      print('Historial de pago creado ID: ${result.first[0]}');
-      return result.first[0] as int;
+    required int idMembresiaUsuario,
+    required double montoPago,
+    required String metodoPago,
+    String? numeroReferencia,
+    DateTime? fechaProximoPago,
+    required dynamic conn,
+  }) async {
+    debugPrint('Creando historial de pago...');
+    debugPrint('ID Membresía Usuario: $idMembresiaUsuario');
+    debugPrint('Monto Pago: $montoPago');
+    debugPrint('Método Pago: $metodoPago');
+    debugPrint('Número Referencia: $numeroReferencia');
+    debugPrint('Fecha Próximo Pago: ${fechaProximoPago?.toIso8601String()}');
+    try {
+      final sql = Sql.named('''
+        INSERT INTO historialPagos (
+          idMembresiaUsuario, montoPago, metodoPago, estado, 
+          numeroReferencia, fechaProximoPago
+        ) VALUES (
+          @idMembresiaUsuario, @montoPago, @metodoPago, 'pagado', 
+          @numeroReferencia, @fechaProximoPago
+        ) RETURNING id;
+      ''');
+      final result = await conn.execute(sql, parameters: {
+        'idMembresiaUsuario': idMembresiaUsuario,
+        'montoPago': montoPago,
+        'metodoPago': metodoPago,
+        'numeroReferencia': numeroReferencia,
+        'fechaProximoPago': fechaProximoPago?.toIso8601String(),
+      });
+      if (result.isNotEmpty) {
+        print('Historial de pago creado ID: ${result.first[0]}');
+        return result.first[0] as int;
+      }
+      return null;
+    } catch (e) {
+      print('Error al crear historial de pago: $e');
+      return null;
     }
-    return null;
-  } catch (e) {
-    print('Error al crear historial de pago: $e');
-    return null;
   }
-}}
+
+  static Future<List<Usuario>> obtenerUsuarios({required dynamic conn}) async {
+    try {
+      final result = await conn.execute(
+        'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios'
+      );
+      return result.map<Usuario>((row) {
+        // Los índices deben coincidir con el orden del SELECT arriba
+        return Usuario(
+          id: row[0],
+          nombre: row[1]?.toString() ?? '',
+          apellidos: row[2]?.toString() ?? '',
+          correo: row[3]?.toString() ?? '',
+          telefono: row[4]?.toString() ?? '',
+          fechaNacimiento: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+          sexo: row[6]?.toString() ?? '',
+          status: row[7]?.toString(),
+        );
+      }).toList();
+    } catch (e) {
+      print('Error al obtener usuarios: $e');
+      return [];
+    }
+  }
+}
