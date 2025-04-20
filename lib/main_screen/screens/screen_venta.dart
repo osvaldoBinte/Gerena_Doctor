@@ -378,7 +378,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/home');
                 },
                 child: Container(
                   width: 200,
