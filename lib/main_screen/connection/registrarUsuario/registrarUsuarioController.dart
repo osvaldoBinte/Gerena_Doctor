@@ -17,6 +17,10 @@ class UsuarioController {
     required int duracionMembresia,
     required DateTime fechaInicioMembresia,
     required DateTime fechaFinMembresia,
+    double? montoPago,
+    String? metodoPago,
+    String? numeroReferencia,
+    DateTime? fechaProximoPago,
   }) async {
     final conn = Database.conn;
     try {
@@ -63,6 +67,7 @@ class UsuarioController {
         debugPrint('Huella guardada');
       }
 
+      // ATENCIÓN: nombre correcto de la tabla de venta membresías, usa todo minúscula y sin tildes.
       final idVentaMembresia = await UsuarioDB.crearVentaMembresia(
         idTipoMembresia: idTipoMembresia,
         idUsuario: idUsuario,
@@ -72,8 +77,9 @@ class UsuarioController {
       );
       debugPrint('Venta Membresía registrada: $idVentaMembresia');
 
+      int? idMembresiaUsuario;
       if (idVentaMembresia != null) {
-        await UsuarioDB.crearMembresiaUsuario(
+        idMembresiaUsuario = await UsuarioDB.crearMembresiaUsuario(
           idUsuario: idUsuario,
           idVentaMembresia: idVentaMembresia,
           inicio: fechaInicioMembresia,
@@ -81,6 +87,19 @@ class UsuarioController {
           conn: conn,
         );
         debugPrint('Membresía activa creada');
+      }
+
+      // Historial de pago
+      if (idMembresiaUsuario != null && montoPago != null && metodoPago != null) {
+        final idPago = await UsuarioDB.crearHistorialPago(
+          idMembresiaUsuario: idMembresiaUsuario,
+          montoPago: montoPago,
+          metodoPago: metodoPago,
+          numeroReferencia: numeroReferencia,
+          fechaProximoPago: fechaProximoPago,
+          conn: conn,
+        );
+        debugPrint('Historial de pago creado: $idPago');
       }
 
       return idUsuario;

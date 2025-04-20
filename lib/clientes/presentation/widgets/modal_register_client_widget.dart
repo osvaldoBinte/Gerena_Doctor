@@ -36,9 +36,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   String? _anoController;
   String? _sexoController;
 
-  // Aquí guardamos los IDs de las suscripciones seleccionadas
   List<String> _suscripcionesSeleccionadas = [];
-  // Aquí guardamos la suscripción seleccionada (objeto completo)
   TipoMembresia? _suscripcionSeleccionada;
 
   @override
@@ -100,9 +98,13 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
         // Mapear sexo a solo un caracter
         final sexoDb = (_sexoController?.toLowerCase().startsWith("f") ?? false) ? "F" : "M";
 
-        // Aquí puedes generar el qr y la huella, por ahora pongo valores de ejemplo
         String qr = "qr_generado_${DateTime.now().millisecondsSinceEpoch}";
         String plantillaHuella = "huella_demo_${DateTime.now().millisecondsSinceEpoch}";
+
+        final fechaInicio = DateTime.now();
+        final fechaFin = fechaInicio.add(
+            Duration(days: _suscripcionSeleccionada!.tiempoDuracion));
+        final fechaProximoPago = fechaFin;
 
         final idUsuario = await UsuarioController.crearUsuarioCompleto(
           nombre: _nombreController.text,
@@ -110,16 +112,18 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           correo: _correoController.text,
           telefono: _telefonoController.text,
           fechaNacimiento: fechaNacimiento,
-          sexo: sexoDb, // <- solo "M" o "F"
+          sexo: sexoDb,
           qr: qr,
           plantillaHuella: plantillaHuella,
           idTipoMembresia: _suscripcionSeleccionada!.id,
           precioMembresia: _suscripcionSeleccionada!.precio,
           duracionMembresia: _suscripcionSeleccionada!.tiempoDuracion,
-          fechaInicioMembresia: DateTime.now(),
-          fechaFinMembresia: DateTime.now().add(
-            Duration(days: _suscripcionSeleccionada!.tiempoDuracion),
-          ),
+          fechaInicioMembresia: fechaInicio,
+          fechaFinMembresia: fechaFin,
+          montoPago: _suscripcionSeleccionada!.precio,
+          metodoPago: "Efectivo",
+          numeroReferencia: "25", // SIEMPRE manda "25"
+          fechaProximoPago: fechaProximoPago,
         );
 
         if (idUsuario != null) {

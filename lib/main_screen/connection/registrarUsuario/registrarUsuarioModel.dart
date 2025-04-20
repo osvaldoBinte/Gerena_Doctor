@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:postgres/postgres.dart';
 
 class Usuario {
@@ -145,7 +146,7 @@ class UsuarioDB {
   }) async {
     try {
       final sql = Sql.named('''
-        INSERT INTO "ventaMembresías" (idTipoMembresia, idUsuario, precio, duracion)
+        INSERT INTO "ventamembresías" (idTipoMembresia, idUsuario, precio, duracion)
         VALUES (@idTipoMembresia, @idUsuario, @precio, @duracion)
         RETURNING id;
       ''');
@@ -162,7 +163,7 @@ class UsuarioDB {
     }
   }
 
-  static Future<void> crearMembresiaUsuario({
+  static Future<int?> crearMembresiaUsuario({
     required int idUsuario,
     required int idVentaMembresia,
     required DateTime inicio,
@@ -173,15 +174,60 @@ class UsuarioDB {
       final sql = Sql.named('''
         INSERT INTO membresiaUsuario (idUsuario, id_ventaMembresia, fechaInicio, fechaFin)
         VALUES (@idUsuario, @idVentaMembresia, @fechaInicio, @fechaFin)
+        RETURNING id;
       ''');
-      await conn.execute(sql, parameters: {
+      final result = await conn.execute(sql, parameters: {
         'idUsuario': idUsuario,
         'idVentaMembresia': idVentaMembresia,
         'fechaInicio': inicio.toIso8601String(),
         'fechaFin': fin.toIso8601String(),
       });
+      return result.isNotEmpty ? result.first[0] as int : null;
     } catch (e) {
       print('Error al crear membresía usuario: $e');
+      return null;
     }
   }
-}
+  static Future<int?> crearHistorialPago({
+  required int idMembresiaUsuario,
+  required double montoPago,
+  required String metodoPago,
+  String? numeroReferencia,
+  DateTime? fechaProximoPago,
+  required dynamic conn,
+}) async {
+  debugPrint('Creando historial de pago...');
+  debugPrint('ID Membresía Usuario: $idMembresiaUsuario');
+  debugPrint('Monto Pago: $montoPago');
+  debugPrint('Método Pago: $metodoPago');
+  debugPrint('Número Referencia: $numeroReferencia');
+  debugPrint('Fecha Próximo Pago: ${fechaProximoPago?.toIso8601String()}');
+    
+  try {
+    
+    final sql = Sql.named('''
+      INSERT INTO historialPagos (
+        idMembresiaUsuario, montoPago, metodoPago, estado, 
+        numeroReferencia, fechaProximoPago
+      ) VALUES (
+        @idMembresiaUsuario, @montoPago, @metodoPago, 'pagado', 
+        @numeroReferencia, @fechaProximoPago
+      ) RETURNING id;
+    ''');
+    final result = await conn.execute(sql, parameters: {
+      'idMembresiaUsuario': idMembresiaUsuario,
+      'montoPago': montoPago,
+      'metodoPago': metodoPago,
+      'numeroReferencia': numeroReferencia,
+      'fechaProximoPago': fechaProximoPago?.toIso8601String(),
+    });
+    if (result.isNotEmpty) {
+      print('Historial de pago creado ID: ${result.first[0]}');
+      return result.first[0] as int;
+    }
+    return null;
+  } catch (e) {
+    print('Error al crear historial de pago: $e');
+    return null;
+  }
+}}
