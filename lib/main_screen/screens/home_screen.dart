@@ -13,7 +13,8 @@ import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuar
 import 'package:managegym/db/database_connection.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final void Function(int) onChangeIndex;
+  const HomeScreen({super.key, required this.onChangeIndex});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -181,7 +182,7 @@ Future<void> cargarUsuarios() async {
                 text: 'REALIZAR UNA VENTA',
                 icon: Icons.shopping_cart,
                 accion: () {
-                  Navigator.pushNamed(context, '/venta');
+                  widget.onChangeIndex(6);
                 },
               ),
               const SizedBox(width: 20),

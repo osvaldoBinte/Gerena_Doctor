@@ -5,8 +5,8 @@ import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/main_screen/screens/inicio_sesion.dart';
+import 'package:managegym/main_screen/screens/screen_venta.dart';
 import 'package:managegym/main_screen/screens/store_screen.dart';
-import 'package:managegym/main_screen/screens/venta_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
@@ -96,12 +96,6 @@ class PantallaInicial extends StatefulWidget {
 class _PantallaInicialState extends State<PantallaInicial> {
   int _selectedIndex = 0;
 
-  void goToVenta() {
-    setState(() {
-      _selectedIndex = 6 /* el índice de tu ScreenVenta en screensVentas */;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -111,15 +105,6 @@ class _PantallaInicialState extends State<PantallaInicial> {
   Future<void> _maximizeWindow() async {
     await windowManager.maximize();
   }
-
-  static const List<Widget> screens = <Widget>[
-    HomeScreen(),
-    StoreScreen(),
-    ClientsScreen(),
-    Text("Screen de estadisticas"),
-    Text(""),
-    AdministradoresScreen(),
-  ];
 
   void onItemTapped(int index) {
     setState(() {
@@ -166,6 +151,16 @@ class _PantallaInicialState extends State<PantallaInicial> {
         active: _selectedIndex == 5,
         onPressed: onItemTapped,
       ),
+    ];
+
+    final screens = [
+      HomeScreen(onChangeIndex: onItemTapped),
+      StoreScreen(),
+      ClientsScreen(),
+      Text("Screen de estadisticas"),
+      Text(""),
+      AdministradoresScreen(),
+      ScreenVenta()
     ];
     return Scaffold(
       backgroundColor: Colors.black,

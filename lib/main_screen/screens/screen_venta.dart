@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/main_screen/widgets/row_producto_seleccionado.dart';
 import 'package:managegym/main_screen/widgets/title_bar_producto_seleccionado.dart';
 import 'package:managegym/ventas/widgets/row_cliente_venta.dart';
 import 'package:managegym/ventas/widgets/row_producto_venta.dart';
 
 class ScreenVenta extends StatefulWidget {
+  const ScreenVenta({super.key});
 
   @override
   State<ScreenVenta> createState() => _ScreenVentaState();
@@ -28,6 +28,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Row(
           children: [
@@ -38,7 +39,6 @@ class _ScreenVentaState extends State<ScreenVenta> {
             //segunda columna
             Expanded(
               child: Container(
-                color: colorFondoDark,
                 padding: const EdgeInsets.all(5.0),
                 child: Column(
                   children: [
@@ -46,7 +46,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
                       // <-- Esto da el alto disponible
                       child: Container(
                         decoration: BoxDecoration(
-                          color: colorFondoModalDark,
+                          color: colorFondoDark,
                           borderRadius: BorderRadius.circular(24),
                         ),
                         width: double.infinity,
@@ -98,7 +98,6 @@ class _ScreenVentaState extends State<ScreenVenta> {
 
   Container ContenedorIzquierdo() {
     return Container(
-      color: colorFondoDark,
       padding: const EdgeInsets.all(5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -265,7 +264,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
   Container ContainerRealizarVenta() {
     return Container(
       decoration: BoxDecoration(
-        color: colorFondoModalDark,
+        color: colorFondoDark,
         borderRadius: BorderRadius.circular(24), // Puedes ajustar el valor
       ),
       width: double.infinity,
@@ -406,4 +405,3 @@ class _ScreenVentaState extends State<ScreenVenta> {
     );
   }
 }
-
