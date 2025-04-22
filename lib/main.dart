@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/main_screen/screens/dasboard_screen.dart';
 import 'package:managegym/main_screen/screens/inicio_sesion.dart';
 import 'package:managegym/main_screen/screens/screen_venta.dart';
 import 'package:managegym/main_screen/screens/store_screen.dart';
@@ -183,7 +184,7 @@ class _PantallaInicialState extends State<PantallaInicial> {
       HomeScreen(onChangeIndex: onItemTapped),
       StoreScreen(),
       ClientsScreen(),
-      Text("Screen de estadisticas"),
+      DashboardScreen(),
       Text(""),
       AdministradoresScreen(),
       ScreenVenta()
