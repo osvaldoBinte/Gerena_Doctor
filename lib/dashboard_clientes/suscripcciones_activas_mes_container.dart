@@ -81,7 +81,7 @@ class _SuscripccionesActivasMesContainerState extends State<SuscripccionesActiva
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10),
-      width: 350,
+      width: 320,
       height: double.infinity,
       decoration: BoxDecoration(
         color: widget.colorFondoModal,

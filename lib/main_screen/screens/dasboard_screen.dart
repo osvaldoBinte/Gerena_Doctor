@@ -1,8 +1,10 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/dashboard_clientes/clientes_divididos_por_sexo_container.dart';
 import 'package:managegym/dashboard_clientes/mes_top_productos_vendidos_container.dart';
 import 'package:managegym/dashboard_clientes/nuevos_miembros_mes_container.dart';
+import 'package:managegym/dashboard_clientes/rango_de_fechas_usuario_container.dart';
 import 'package:managegym/dashboard_clientes/suscripcciones_activas_mes_container.dart';
 import 'package:managegym/dashboard_clientes/ventas_por_ano_container.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
@@ -89,6 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  bool showProductos = true;
+  bool showSuscripciones = true;
+
   @override
   void initState() {
     super.initState();
@@ -117,188 +122,257 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(
                 width: 20,
               ),
-              Expanded(
-                  child: Column(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 300,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SuscripccionesActivasMesContainer(
-                          cantidadTotal: 10,
-                          cantidadM: 5,
-                          cantidadF: 5,
-                          anos: anos,
-                          meses: meses,
-                          colorFondoModal: colors.colorFondoModal,
-                          colorTexto: colors.colorTexto,
-                        ),
-                        NuevosMiembrosMesContainer(
-                          cantidadTotal: 10,
-                          cantidadM: 5,
-                          cantidadF: 5,
-                          anos: anos,
-                          meses: meses,
-                          colorFondoModal: colors.colorFondoModal,
-                          colorTexto: colors.colorTexto,
-                        ),
-                        ClientesDivididosPorSexo(
-                          cantidadTotal: 10,
-                          cantidadM: 5,
-                          cantidadF: 5,
-                          colorFondoModal: colors.colorFondoModal,
-                          colorTexto: colors.colorTexto,
-                        )
-                      ],
-                    ),
+              RangoDeFechasUsuariosContainer(anos: anos, meses: meses)
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "Ventas",
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 20),
+              // Botón Productos
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    showProductos = !showProductos;
+                  });
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: showProductos
+                        ? colores.colorAccionButtons
+                        : colores.colorFondoModal,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(height: 20),
-                  Container(
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: colors.colorFondoModal,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text("RANGO DE EDADES",
-                            style: TextStyle(
-                                color: colors.colorTexto,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 5),
-                        Expanded(
-                          
-                          child: Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Row(
-                              children: [
-                                Expanded(child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("ACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                   Text("INACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                            Row(
-                                              children: [
-                                                Text("0 - 16",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                              ],
-                                            )
-                                  ],
-                                )),
-                                // 
-                                Expanded(child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("ACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                   Text("INACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                            Row(
-                                              children: [
-                                                Text("17 - 28",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                              ],
-                                            )
-                                  ],
-                                )),
-                                //
-                                 Expanded(child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("ACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                   Text("INACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                            Row(
-                                              children: [
-                                                Text("28 - 38",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                              ],
-                                            )
-                                  ],
-                                )),
-                                //
-                                 Expanded(child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("ACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                   Text("INACTIVOS: 12",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                            Row(
-                                              children: [
-                                                Text("MAYORES DE 39",
-                                        style: TextStyle(
-                                            color: colors.colorTexto,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w400)),
-                                              ],
-                                            )
-                                  ],
-                                )),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ))
+                  child: Text(
+                    "Productos",
+                    style: TextStyle(
+                        color: colores.colorTexto, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+              // Botón Suscripciones
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    showSuscripciones = !showSuscripciones;
+                  });
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: showSuscripciones
+                        ? colores.colorAccionButtons
+                        : colores.colorFondoModal,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    "Suscripciones",
+                    style: TextStyle(
+                        color: colores.colorTexto, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 20),
+              // Leyenda
+              Container(
+                width: 18,
+                height: 18,
+                color: Colors.blue,
+                margin: const EdgeInsets.only(right: 6),
+              ),
+              Text(
+                "Suscripciones",
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(width: 20),
+              Container(
+                width: 18,
+                height: 18,
+                color: Colors.amber,
+                margin: const EdgeInsets.only(right: 6),
+              ),
+              Text(
+                "Productos",
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(
+            children: [
+              Expanded(
+                  child: SizedBox(
+                height: 600, // o el alto que desees
+                child: LineChartExample(
+                  showProductos: showProductos,
+                  showSuscripciones: showSuscripciones,
+                ),
+              )),
             ],
           )
         ],
+      ),
+    );
+  }
+}
+
+class LineChartExample extends StatelessWidget {
+  final bool showProductos;
+  final bool showSuscripciones;
+
+  LineChartExample({
+    this.showProductos = true,
+    this.showSuscripciones = true,
+    Key? key,
+  }) : super(key: key);
+
+  final List<Map<String, dynamic>> data = [
+    {'mes': 'Enero', 'producto': 900, 'suscripcion': 9876},
+    {'mes': 'Febrero', 'producto': 800, 'suscripcion': 7000},
+    {'mes': 'Marzo', 'producto': 500, 'suscripcion': 8971},
+    {'mes': 'Abril', 'producto': 400, 'suscripcion': 4000},
+    {'mes': 'Mayo', 'producto': 100, 'suscripcion': 4302},
+    {'mes': 'Junio', 'producto': 789, 'suscripcion': 2224},
+    {'mes': 'Julio', 'producto': 400, 'suscripcion': 4305},
+    {'mes': 'Agosto', 'producto': 450, 'suscripcion': 2006},
+    {'mes': 'Septiembre', 'producto': 580, 'suscripcion': 3407},
+    {'mes': 'Octubre', 'producto': 520, 'suscripcion': 2408},
+    {'mes': 'Noviembre', 'producto': 921, 'suscripcion': 6009},
+    {'mes': 'Diciembre', 'producto': 600, 'suscripcion': 7505},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    List<LineChartBarData> lines = [];
+    List<FlSpot> productoSpots = [];
+    List<FlSpot> suscripcionSpots = [];
+
+    for (int i = 0; i < data.length; i++) {
+      productoSpots.add(FlSpot(i.toDouble(), data[i]['producto'].toDouble()));
+      suscripcionSpots
+          .add(FlSpot(i.toDouble(), data[i]['suscripcion'].toDouble()));
+    }
+if (showProductos) {
+  lines.add(
+    LineChartBarData(
+      spots: productoSpots,
+      isCurved: true,
+      color: Colors.amber,
+      barWidth: 4,
+      dotData: FlDotData(
+        show: true,
+        getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+          radius: 10, // <-- Cambia el tamaño aquí (por ejemplo, 7)
+          color: Colors.amber,
+        ),
+      ),
+    ),
+  );
+}
+if (showSuscripciones) {
+  lines.add(
+    LineChartBarData(
+      spots: suscripcionSpots,
+      isCurved: true,
+      color: Colors.blue,
+      barWidth: 4,
+      dotData: FlDotData(
+        show: true,
+        getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+          radius: 10, // <-- Cambia el tamaño aquí (por ejemplo, 7)
+          color: Colors.blue,
+        ),
+      ),
+    ),
+  );
+}
+
+    return LineChart(
+      LineChartData(
+        lineBarsData: lines,
+        backgroundColor: colores.colorFondoModal,
+        minX: -0.1,
+         maxX: data.length - 0.7, // <-- agrega espacio después de Diciembre
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                final index = value.toInt();
+                // Solo muestra el label si el valor es exactamente igual al índice y está en rango
+                if (value == index.toDouble() && index >= 0 && index < data.length) {
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    space: 4.0,
+                    child: Text(
+                      data[index]['mes'],
+                      style: TextStyle(
+                        color: colores.colorTexto,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+              interval: 1,
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                return SideTitleWidget(
+                  axisSide: meta.axisSide,
+                  space: 4.0,
+                  child: Text(
+                    value.toInt().toString(),
+                    style: TextStyle(
+                      color: colores.colorTexto,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        gridData: FlGridData(show: false),
+        borderData: FlBorderData(show: true),
       ),
     );
   }
