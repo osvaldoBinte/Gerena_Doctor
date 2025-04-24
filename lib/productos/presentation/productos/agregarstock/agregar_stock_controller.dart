@@ -131,7 +131,7 @@ class AgregarStockController extends GetxController {
         }
         
         // Actualizar el stock en la base de datos
-        final bool exito = await ProductoDB.actualizarStock(
+        final bool exito = await ProductoDB.establecerStock(
           id: idProducto.value,
           cantidad: cantidad,
           conn: Database.conn

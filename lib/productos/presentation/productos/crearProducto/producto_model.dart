@@ -161,7 +161,28 @@ class ProductoDB {
       return false;
     }
   }
+static Future<bool> establecerStock({
+  required int id,
+  required int cantidad,
+  required dynamic conn,
+}) async {
+  try {
+    final sql = Sql.named('''
+      UPDATE producto 
+      SET stock = @cantidad
+      WHERE id = @id
+    ''');
 
+    await conn.execute(sql, parameters: {
+      'id': id,
+      'cantidad': cantidad,
+    });
+    return true;
+  } catch (e) {
+    print('Error al establecer stock: $e');
+    return false;
+  }
+}
   static Future<Producto?> obtenerProductoPorId({
     required int id,
     required dynamic conn,

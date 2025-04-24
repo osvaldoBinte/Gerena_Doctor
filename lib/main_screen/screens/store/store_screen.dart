@@ -317,19 +317,19 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
               borderRadius: BorderRadius.circular(0),
               onTap: () {
                 // Aquí abres tu modal de edición
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return ModalEditarProducto(
-                      producto: widget.producto?.id,
-                    );
-                  },
-                ).then((value) {
-                  // Recargar productos después de editar
-                  if (value == true) {
-                    Get.find<StoreController>().loadProductos();
-                  }
-                });
+               showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return ModalEditarProducto(
+      producto: widget.producto,  // Pasar el objeto Producto completo
+    );
+  },
+).then((value) {
+  // Recargar productos después de editar
+  if (value == true) {
+    Get.find<StoreController>().loadProductos();
+  }
+});
               },
               onHover: (hovering) {
                 setState(() {
