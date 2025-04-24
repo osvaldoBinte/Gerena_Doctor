@@ -204,7 +204,7 @@ class EditarProductoController extends GetxController {
           descripcion: "", // Puedes agregar un campo para descripción si lo necesitas
           precioVenta: precio,
           stock: stock,
-          idCategoria: idCategoria,
+          idCategoria: null,
           idCodigoBarras: null, // Implementa la lógica para código de barras si es necesario
           conn: Database.conn,
         );
