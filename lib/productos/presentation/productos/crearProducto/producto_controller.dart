@@ -89,15 +89,16 @@ class ProductoController extends GetxController {
         int? idCategoria = categorias.indexOf(categoriaSeleccionada.value!) + 1;
         
         // Crear producto en la base de datos
-        final int? idProducto = await ProductoDB.crearProducto(
-          titulo: nombreProductoController.text,
-          descripcion: '', // Puedes agregar un campo para descripción si lo necesitas
-          precioVenta: precio,
-          stock: stock,
-          idCategoria: idCategoria,
-          idCodigoBarras: 1, // Implementa la lógica para código de barras si es necesario
-          conn: Database.conn,
-        );
+        // Modificar en el controlador
+final int? idProducto = await ProductoDB.crearProducto(
+  titulo: nombreProductoController.text,
+  descripcion: '',
+  precioVenta: precio,
+  stock: stock,
+  idCategoria: null, // Usar null en lugar del índice de la lista
+  idCodigoBarras: null, // También null aquí
+  conn: Database.conn,
+);
         
         if (idProducto != null) {
           // Si se guardó el producto correctamente
