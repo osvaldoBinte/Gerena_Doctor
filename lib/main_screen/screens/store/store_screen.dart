@@ -320,7 +320,9 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return ModalEditarProducto();
+                    return ModalEditarProducto(
+                      producto: widget.producto?.id,
+                    );
                   },
                 ).then((value) {
                   // Recargar productos después de editar
@@ -449,13 +451,20 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                   onPressed: () {
                     // Abre el modal de agregar stock
                     showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return ModalAgregarStock(
-                         
-                        );
-                      },
-                    );
+  context: context,
+  builder: (BuildContext context) {
+    return ModalAgregarStock(
+      idProducto: widget.producto?.id,
+      nombreProducto: widget.nombre,
+      producto: widget.producto,
+      onStockUpdated: (cantidad) {
+        if (widget.onUpdateStock != null) {
+          widget.onUpdateStock!(cantidad);
+        }
+      },
+    );
+  },
+);
                   },
                 ),
               ],
