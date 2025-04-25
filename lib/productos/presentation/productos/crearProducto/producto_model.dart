@@ -10,7 +10,7 @@ class Producto {
   final DateTime? fechaRegistro;
   final int? idCategoria;
   final int? idCodigoBarras;
-  final String? imagenProducto;
+  final String? imagenProducto; // Ahora almacenará Base64 o ruta de archivo
 
   Producto({
     required this.id,
@@ -45,7 +45,7 @@ class Producto {
                 ? int.parse(map['idcodigobarras'])
                 : map['idcodigobarras'])
             : null,
-        imagenProducto: map['imagenproducto']?.toString(),
+        imagenProducto: map['imagenproducto']?.toString(), // Base64 o ruta
       );
 }
 
@@ -57,7 +57,7 @@ class ProductoDB {
     required int stock,
     int? idCategoria,
     int? idCodigoBarras,
-    String? imagenProducto, // <--- AGREGA ESTE PARAM
+    String? imagenProducto, // Ahora será Base64
     required dynamic conn,
   }) async {
     try {
@@ -76,7 +76,7 @@ class ProductoDB {
         'stock': stock,
         'idCategoria': idCategoria,
         'idCodigoBarras': idCodigoBarras,
-        'imagenProducto': imagenProducto, // <--- Y AQUÍ
+        'imagenProducto': imagenProducto, // Ahora Base64
       });
 
       if (result.isNotEmpty) {
@@ -98,6 +98,7 @@ class ProductoDB {
     int? stock,
     int? idCategoria,
     int? idCodigoBarras,
+    String? imagenProducto, // Añadido para actualizar imagen
     required dynamic conn,
   }) async {
     try {
@@ -129,6 +130,10 @@ class ProductoDB {
         updateFields.add('idCodigoBarras = @idCodigoBarras');
         parameters['idCodigoBarras'] = idCodigoBarras;
       }
+      if (imagenProducto != null) {
+        updateFields.add('imagenProducto = @imagenProducto');
+        parameters['imagenProducto'] = imagenProducto;
+      }
 
       // Si no hay campos para actualizar, retornamos sin hacer cambios
       if (updateFields.isEmpty) {
@@ -149,28 +154,6 @@ class ProductoDB {
     }
   }
 
-  // static Future<bool> actualizarStock({
-  //   required int id,
-  //   required int cantidad,
-  //   required dynamic conn,
-  // }) async {
-  //   try {
-  //     final sql = Sql.named('''
-  //       UPDATE producto
-  //       SET stock = stock + @cantidad
-  //       WHERE id = @id
-  //     ''');
-
-  //     await conn.execute(sql, parameters: {
-  //       'id': id,
-  //       'cantidad': cantidad,
-  //     });
-  //     return true;
-  //   } catch (e) {
-  //     print('Error al actualizar stock: $e');
-  //     return false;
-  //   }
-  // }
   static Future<bool> establecerStock({
     required int id,
     required int cantidad,
@@ -225,7 +208,7 @@ static Future<Producto?> obtenerProductoPorId({
         idCodigoBarras: row[7] != null
             ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
             : null,
-        imagenProducto: row[8]?.toString(), // <--- AGREGA ESTA LÍNEA
+        imagenProducto: row[8]?.toString(), // Base64 o ruta
       );
     }
     return null;
@@ -289,7 +272,7 @@ static Future<List<Producto>> obtenerProductos({
         idCodigoBarras: row[7] != null
             ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
             : null,
-        imagenProducto: row[8]?.toString(), // <--- AGREGA ESTA LÍNEA
+        imagenProducto: row[8]?.toString(), // Base64 o ruta
       );
     }).toList();
   } catch (e) {
@@ -334,7 +317,7 @@ static Future<List<Producto>> buscarProductos({
         idCodigoBarras: row[7] != null
             ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
             : null,
-        imagenProducto: row[8]?.toString(), // <--- AGREGA ESTA LÍNEA
+        imagenProducto: row[8]?.toString(), // Base64 o ruta
       );
     }).toList();
   } catch (e) {

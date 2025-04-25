@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:managegym/main_screen/ImagenUtils.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/main_screen/screens/store/store_controller.dart';
 import 'package:managegym/productos/presentation/productos/filter/filter_button.dart';
@@ -13,13 +15,93 @@ class StoreScreen extends StatelessWidget {
   StoreScreen({Key? key}) : super(key: key);
 
   final AdminColors colores = AdminColors();
+
+  // Instanciar el controlador de tienda
   final StoreController storeController = Get.put(StoreController());
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // ... (Todo igual hasta la tabla)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Botones de acción rápida
+            SizedBox(
+              child: Row(
+                children: [
+                  QuickActionButton(
+                    text: 'AGREGAR UN NUEVO PRODUCTO',
+                    icon: Icons.add_box_outlined,
+                    accion: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return ModalAgregarProducto();
+                        },
+                      ).then((_) {
+                        // Recargar productos después de cerrar el modal
+                        storeController.loadProductos();
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  QuickActionButton(
+                    text: 'REALIZAR UNA VENTA',
+                    icon: Icons.point_of_sale,
+                    accion: () {
+                      // Lógica para realizar una venta
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Campo de búsqueda
+            SizedBox(
+              width: 800,
+              height: 50,
+              child: TextField(
+                controller: storeController.searchController,
+                onChanged: (value) => storeController.searchProductos(value),
+                style: TextStyle(color: colores.colorTexto),
+                decoration: InputDecoration(
+                  hintText: 'Buscar Producto por nombre o código de barras',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: colores.colorTexto, width: 8),
+                  ),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        // Botones para filtrar
+        Row(
+          children: [
+            // Botón para ordenar por nombre
+            Obx(() => FilterButton(
+                  text:
+                      'Ordenar por nombre ${storeController.activeSort.value == 'name' ? (storeController.sortByNameAsc.value ? '↑' : '↓') : ''}',
+                  onChanged: (isAscending) {
+                    storeController.sortByName();
+                  },
+                  isActive: storeController.activeSort.value == 'name',
+                )),
+            const SizedBox(width: 10),
+            // Botón para ordenar por precio
+            Obx(() => FilterButton(
+                  text:
+                      'Ordenar por precio ${storeController.activeSort.value == 'price' ? (storeController.sortByPriceAsc.value ? '↑' : '↓') : ''}',
+                  onChanged: (isAscending) {
+                    storeController.sortByPrice();
+                  },
+                  isActive: storeController.activeSort.value == 'price',
+                )),
+          ],
+        ),
+        const SizedBox(height: 20),
         // Cabecera de la tabla
         Container(
           width: double.infinity,
@@ -27,9 +109,10 @@ class StoreScreen extends StatelessWidget {
           color: colores.colorCabezeraTabla,
           child: Row(
             children: [
-              const Expanded(
-                flex: 2,
-                child: SizedBox(),
+              // Espacio para la imagen
+              Container(
+                height: 110,
+                width: 110,
               ),
               Expanded(
                 flex: 3,
@@ -133,44 +216,31 @@ class StoreScreen extends StatelessWidget {
                 itemCount: storeController.filteredProductos.length,
                 itemBuilder: (context, index) {
                   final producto = storeController.filteredProductos[index];
+
+                  // Verifica si el producto tiene stock disponible
                   final bool disponible = producto.stock > 0;
 
                   return ProductRowWidget(
                     producto: producto,
-                    image: (producto.imagenProducto != null && producto.imagenProducto!.isNotEmpty)
-                        ? Container(
-                            margin: const EdgeInsets.all(12),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 8,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Image.file(
-                                  File(producto.imagenProducto!),
-                                  fit: BoxFit.cover,
-                                  width: 70,
-                                  height: 70,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Container(
-                                        width: 70,
-                                        height: 70,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[300],
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                        child: const Icon(Icons.broken_image, color: Colors.white54, size: 40),
-                                      ),
-                                ),
-                              ),
-                            ),
-                          )
+image: (producto.imagenProducto != null && producto.imagenProducto!.isNotEmpty)
+    ? Container(
+        margin: const EdgeInsets.all(12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: _buildProductImage(producto.imagenProducto!),
+          ),
+        ),
+      )
                         : Container(
                             margin: const EdgeInsets.all(12),
                             width: 70,
@@ -195,14 +265,18 @@ class StoreScreen extends StatelessWidget {
                             ),
                           ),
                     nombre: producto.titulo,
-                    categoria: 'Categoría', // Aquí puedes poner el nombre real si lo obtienes
-                    precioUnitario: '\$${producto.precioVenta.toStringAsFixed(2)}',
+                    categoria:
+                        'Categoría', // Necesitarías obtener el nombre de la categoría
+                    precioUnitario:
+                        '\$${producto.precioVenta.toStringAsFixed(2)}',
                     cantidadDisponible: '${producto.stock}',
-                    codigoBarras: producto.idCodigoBarras?.toString() ?? 'N/A',
+                    codigoBarras:
+                        'N/A', // Reemplazar con el código de barras real si lo tienes
                     disponible: disponible ? 'Sí' : 'No',
                     index: index,
                     onDelete: () => storeController.deleteProducto(producto.id),
-                    onUpdateStock: (cantidad) => storeController.updateStock(producto.id, cantidad),
+                    onUpdateStock: (cantidad) =>
+                        storeController.updateStock(producto.id, cantidad),
                   );
                 },
               ),
@@ -210,6 +284,31 @@ class StoreScreen extends StatelessWidget {
           }),
         ),
       ],
+    );
+  }
+}
+
+Widget _buildProductImage(String base64img) {
+  try {
+    return Image.memory(
+      base64Decode(base64img),
+      fit: BoxFit.cover,
+      width: 70,
+      height: 70,
+      errorBuilder: (context, error, stackTrace) => Container(
+        width: 70,
+        height: 70,
+        color: Colors.grey[300],
+        child: const Icon(Icons.broken_image, color: Colors.white54, size: 40),
+      ),
+    );
+  } catch (e) {
+    // Si hay un error al decodificar, muestra un placeholder
+    return Container(
+      width: 70,
+      height: 70,
+      color: Colors.grey[300],
+      child: const Icon(Icons.broken_image, color: Colors.white54, size: 40),
     );
   }
 }
@@ -223,7 +322,8 @@ class ProductRowWidget extends StatefulWidget {
   final String codigoBarras;
   final String disponible;
   final int index;
-  final dynamic producto; // El producto completo para pasarlo al modal de edición
+  final dynamic
+      producto; // El producto completo para pasarlo al modal de edición
   final VoidCallback? onDelete;
   final Function(int)? onUpdateStock;
 
@@ -386,7 +486,8 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.inventory, color: colores.colorTexto, size: 28),
+                  icon: Icon(Icons.inventory,
+                      color: colores.colorTexto, size: 28),
                   tooltip: 'Agregar stock',
                   onPressed: () {
                     showDialog(
