@@ -139,28 +139,28 @@ class ProductoDB {
     }
   }
 
-  static Future<bool> actualizarStock({
-    required int id,
-    required int cantidad,
-    required dynamic conn,
-  }) async {
-    try {
-      final sql = Sql.named('''
-        UPDATE producto 
-        SET stock = stock + @cantidad
-        WHERE id = @id
-      ''');
+  // static Future<bool> actualizarStock({
+  //   required int id,
+  //   required int cantidad,
+  //   required dynamic conn,
+  // }) async {
+  //   try {
+  //     final sql = Sql.named('''
+  //       UPDATE producto 
+  //       SET stock = stock + @cantidad
+  //       WHERE id = @id
+  //     ''');
 
-      await conn.execute(sql, parameters: {
-        'id': id,
-        'cantidad': cantidad,
-      });
-      return true;
-    } catch (e) {
-      print('Error al actualizar stock: $e');
-      return false;
-    }
-  }
+  //     await conn.execute(sql, parameters: {
+  //       'id': id,
+  //       'cantidad': cantidad,
+  //     });
+  //     return true;
+  //   } catch (e) {
+  //     print('Error al actualizar stock: $e');
+  //     return false;
+  //   }
+  // }
 static Future<bool> establecerStock({
   required int id,
   required int cantidad,

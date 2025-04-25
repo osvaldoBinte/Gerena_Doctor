@@ -166,7 +166,7 @@ class StoreController extends GetxController {
   Future<void> updateStock(int idProducto, int cantidad) async {
     try {
       // Actualiza el stock en la base de datos
-      final success = await ProductoDB.actualizarStock(
+      final success = await ProductoDB.establecerStock(
         id: idProducto,
         cantidad: cantidad,
         conn: Database.conn,

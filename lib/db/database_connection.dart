@@ -3,17 +3,17 @@ import 'package:postgres/postgres.dart';
 class Database {
   static late final Connection conn;
 
-  static Future<void> connect() async {
-    conn = await Connection.open(
-      Endpoint(
-        host: 'localhost',
-        port: 5432,
-        database: 'managegym',
-        username: 'postgres',
-        password: '211099',
-      ),
-      settings: const ConnectionSettings(sslMode: SslMode.disable),
-    );
+  static Future<void> connect()  async {
+conn = await Connection.open(
+  Endpoint(
+    host: 'localhost',
+    port: 5432,
+    database: 'gym',
+    username: 'postgres',
+    password: '13960',
+  ),
+  settings: const ConnectionSettings(sslMode: SslMode.disable),
+);
     print('✅ Conexión establecida con PostgreSQL.');
     await _crearTablasSiNoExisten();
   }
@@ -170,16 +170,17 @@ class Database {
         
         // Tabla producto
         '''
-        CREATE TABLE IF NOT EXISTS producto (
-          id SERIAL PRIMARY KEY,
-          titulo VARCHAR(100) NOT NULL,
-          descripcion TEXT,
-          precioVenta DECIMAL(10,2) NOT NULL,
-          stock INTEGER NOT NULL DEFAULT 0,
-          fechaRegistro DATE NOT NULL DEFAULT CURRENT_DATE,
-          idCategoria INTEGER REFERENCES categorias(id),
-          idCodigoBarras INTEGER REFERENCES codigoBarras(id)
-        )
+          CREATE TABLE IF NOT EXISTS producto (
+            id SERIAL PRIMARY KEY,
+            titulo VARCHAR(100) NOT NULL,
+            descripcion TEXT,
+            precioVenta DECIMAL(10,2) NOT NULL,
+            stock INTEGER NOT NULL DEFAULT 0,
+            fechaRegistro DATE NOT NULL DEFAULT CURRENT_DATE,
+            idCategoria INTEGER REFERENCES categorias(id),
+            idCodigoBarras INTEGER REFERENCES codigoBarras(id),
+            imagenProducto VARCHAR(255)
+          )
         ''',
         
         // Tabla ventaProductos
