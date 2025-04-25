@@ -10,6 +10,7 @@ class Producto {
   final DateTime? fechaRegistro;
   final int? idCategoria;
   final int? idCodigoBarras;
+  final String? imagenProducto;
 
   Producto({
     required this.id,
@@ -20,26 +21,32 @@ class Producto {
     this.fechaRegistro,
     this.idCategoria,
     this.idCodigoBarras,
+    this.imagenProducto,
   });
 
   factory Producto.fromMap(Map<String, dynamic> map) => Producto(
-    id: map['id'] is String ? int.parse(map['id']) : map['id'],
-    titulo: map['titulo']?.toString() ?? '',
-    descripcion: map['descripcion']?.toString(),
-    precioVenta: map['precioventa'] is String 
-        ? double.parse(map['precioventa']) 
-        : (map['precioventa'] as num).toDouble(),
-    stock: map['stock'] is String ? int.parse(map['stock']) : map['stock'],
-    fechaRegistro: map['fecharegistro'] != null
-        ? DateTime.tryParse(map['fecharegistro'].toString())
-        : null,
-    idCategoria: map['idcategoria'] != null 
-        ? (map['idcategoria'] is String ? int.parse(map['idcategoria']) : map['idcategoria'])
-        : null,
-    idCodigoBarras: map['idcodigobarras'] != null 
-        ? (map['idcodigobarras'] is String ? int.parse(map['idcodigobarras']) : map['idcodigobarras'])
-        : null,
-  );
+        id: map['id'] is String ? int.parse(map['id']) : map['id'],
+        titulo: map['titulo']?.toString() ?? '',
+        descripcion: map['descripcion']?.toString(),
+        precioVenta: map['precioventa'] is String
+            ? double.parse(map['precioventa'])
+            : (map['precioventa'] as num).toDouble(),
+        stock: map['stock'] is String ? int.parse(map['stock']) : map['stock'],
+        fechaRegistro: map['fecharegistro'] != null
+            ? DateTime.tryParse(map['fecharegistro'].toString())
+            : null,
+        idCategoria: map['idcategoria'] != null
+            ? (map['idcategoria'] is String
+                ? int.parse(map['idcategoria'])
+                : map['idcategoria'])
+            : null,
+        idCodigoBarras: map['idcodigobarras'] != null
+            ? (map['idcodigobarras'] is String
+                ? int.parse(map['idcodigobarras'])
+                : map['idcodigobarras'])
+            : null,
+        imagenProducto: map['imagenproducto']?.toString(),
+      );
 }
 
 class ProductoDB {
@@ -50,14 +57,15 @@ class ProductoDB {
     required int stock,
     int? idCategoria,
     int? idCodigoBarras,
+    String? imagenProducto, // <--- AGREGA ESTE PARAM
     required dynamic conn,
   }) async {
     try {
       final sql = Sql.named('''
         INSERT INTO producto (
-          titulo, descripcion, precioVenta, stock, idCategoria, idCodigoBarras
+          titulo, descripcion, precioVenta, stock, idCategoria, idCodigoBarras, imagenProducto
         ) VALUES (
-          @titulo, @descripcion, @precioVenta, @stock, @idCategoria, @idCodigoBarras
+          @titulo, @descripcion, @precioVenta, @stock, @idCategoria, @idCodigoBarras, @imagenProducto
         ) RETURNING id;
       ''');
 
@@ -68,6 +76,7 @@ class ProductoDB {
         'stock': stock,
         'idCategoria': idCategoria,
         'idCodigoBarras': idCodigoBarras,
+        'imagenProducto': imagenProducto, // <--- Y AQUÍ
       });
 
       if (result.isNotEmpty) {
@@ -79,6 +88,7 @@ class ProductoDB {
       return null;
     }
   }
+
 
   static Future<bool> editarProducto({
     required int id,
@@ -146,7 +156,7 @@ class ProductoDB {
   // }) async {
   //   try {
   //     final sql = Sql.named('''
-  //       UPDATE producto 
+  //       UPDATE producto
   //       SET stock = stock + @cantidad
   //       WHERE id = @id
   //     ''');
@@ -161,152 +171,177 @@ class ProductoDB {
   //     return false;
   //   }
   // }
-static Future<bool> establecerStock({
-  required int id,
-  required int cantidad,
-  required dynamic conn,
-}) async {
-  try {
-    final sql = Sql.named('''
+  static Future<bool> establecerStock({
+    required int id,
+    required int cantidad,
+    required dynamic conn,
+  }) async {
+    try {
+      final sql = Sql.named('''
       UPDATE producto 
       SET stock = @cantidad
       WHERE id = @id
     ''');
 
-    await conn.execute(sql, parameters: {
-      'id': id,
-      'cantidad': cantidad,
-    });
-    return true;
+      await conn.execute(sql, parameters: {
+        'id': id,
+        'cantidad': cantidad,
+      });
+      return true;
+    } catch (e) {
+      print('Error al establecer stock: $e');
+      return false;
+    }
+  }
+
+static Future<Producto?> obtenerProductoPorId({
+  required int id,
+  required dynamic conn,
+}) async {
+  try {
+    final sql = Sql.named('''
+      SELECT id, titulo, descripcion, precioVenta, stock, 
+             fechaRegistro, idCategoria, idCodigoBarras, imagenProducto
+      FROM producto
+      WHERE id = @id
+    ''');
+
+    final result = await conn.execute(sql, parameters: {'id': id});
+    if (result.isNotEmpty) {
+      final row = result.first;
+      return Producto(
+        id: row[0],
+        titulo: row[1]?.toString() ?? '',
+        descripcion: row[2]?.toString(),
+        precioVenta: row[3] is num
+            ? (row[3] as num).toDouble()
+            : double.parse(row[3].toString()),
+        stock: row[4] is int ? row[4] : int.parse(row[4].toString()),
+        fechaRegistro:
+            row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+        idCategoria: row[6] != null
+            ? (row[6] is int ? row[6] : int.parse(row[6].toString()))
+            : null,
+        idCodigoBarras: row[7] != null
+            ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
+            : null,
+        imagenProducto: row[8]?.toString(), // <--- AGREGA ESTA LÍNEA
+      );
+    }
+    return null;
   } catch (e) {
-    print('Error al establecer stock: $e');
-    return false;
+    print('Error al obtener producto por ID: $e');
+    return null;
   }
 }
-  static Future<Producto?> obtenerProductoPorId({
-    required int id,
-    required dynamic conn,
-  }) async {
-    try {
-      final sql = Sql.named('''
-        SELECT id, titulo, descripcion, precioVenta, stock, 
-               fechaRegistro, idCategoria, idCodigoBarras
-        FROM producto
-        WHERE id = @id
-      ''');
 
-      final result = await conn.execute(sql, parameters: {'id': id});
-      if (result.isNotEmpty) {
-        final row = result.first;
-        return Producto(
-          id: row[0],
-          titulo: row[1]?.toString() ?? '',
-          descripcion: row[2]?.toString(),
-          precioVenta: row[3] is num ? (row[3] as num).toDouble() : double.parse(row[3].toString()),
-          stock: row[4] is int ? row[4] : int.parse(row[4].toString()),
-          fechaRegistro: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
-          idCategoria: row[6] != null ? (row[6] is int ? row[6] : int.parse(row[6].toString())) : null,
-          idCodigoBarras: row[7] != null ? (row[7] is int ? row[7] : int.parse(row[7].toString())) : null,
-        );
-      }
-      return null;
-    } catch (e) {
-      print('Error al obtener producto por ID: $e');
-      return null;
+static Future<List<Producto>> obtenerProductos({
+  required dynamic conn,
+  int? limit,
+  int? offset,
+  String? orderBy,
+  bool ascendente = true,
+  int? filtroCategoria,
+}) async {
+  try {
+    var whereClause =
+        filtroCategoria != null ? 'WHERE idCategoria = @filtroCategoria' : '';
+    var orderClause = orderBy != null
+        ? 'ORDER BY $orderBy ${ascendente ? 'ASC' : 'DESC'}'
+        : 'ORDER BY id ASC';
+    var limitClause = limit != null ? 'LIMIT $limit' : '';
+    var offsetClause = offset != null ? 'OFFSET $offset' : '';
+
+    final sql = '''
+      SELECT id, titulo, descripcion, precioVenta, stock, 
+             fechaRegistro, idCategoria, idCodigoBarras, imagenProducto
+      FROM producto
+      $whereClause
+      $orderClause
+      $limitClause
+      $offsetClause
+    ''';
+
+    var parameters = <String, dynamic>{};
+    if (filtroCategoria != null) {
+      parameters['filtroCategoria'] = filtroCategoria;
     }
-  }
 
-  static Future<List<Producto>> obtenerProductos({
-    required dynamic conn,
-    int? limit,
-    int? offset,
-    String? orderBy,
-    bool ascendente = true,
-    int? filtroCategoria,
-  }) async {
-    try {
-      // Construir la consulta con filtros opcionales
-      var whereClause = filtroCategoria != null ? 'WHERE idCategoria = @filtroCategoria' : '';
-      var orderClause = orderBy != null 
-          ? 'ORDER BY $orderBy ${ascendente ? 'ASC' : 'DESC'}'
-          : 'ORDER BY id ASC';
-      var limitClause = limit != null ? 'LIMIT $limit' : '';
-      var offsetClause = offset != null ? 'OFFSET $offset' : '';
-      
-      final sql = '''
-        SELECT id, titulo, descripcion, precioVenta, stock, 
-               fechaRegistro, idCategoria, idCodigoBarras
-        FROM producto
-        $whereClause
-        $orderClause
-        $limitClause
-        $offsetClause
-      ''';
+    final result = await conn.execute(
+      Sql.named(sql),
+      parameters: parameters,
+    );
 
-      var parameters = <String, dynamic>{};
-      if (filtroCategoria != null) {
-        parameters['filtroCategoria'] = filtroCategoria;
-      }
-
-      final result = await conn.execute(
-        Sql.named(sql),
-        parameters: parameters,
+    return result.map<Producto>((row) {
+      return Producto(
+        id: row[0],
+        titulo: row[1]?.toString() ?? '',
+        descripcion: row[2]?.toString(),
+        precioVenta: row[3] is num
+            ? (row[3] as num).toDouble()
+            : double.parse(row[3].toString()),
+        stock: row[4] is int ? row[4] : int.parse(row[4].toString()),
+        fechaRegistro:
+            row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+        idCategoria: row[6] != null
+            ? (row[6] is int ? row[6] : int.parse(row[6].toString()))
+            : null,
+        idCodigoBarras: row[7] != null
+            ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
+            : null,
+        imagenProducto: row[8]?.toString(), // <--- AGREGA ESTA LÍNEA
       );
-      
-      return result.map<Producto>((row) {
-        return Producto(
-          id: row[0],
-          titulo: row[1]?.toString() ?? '',
-          descripcion: row[2]?.toString(),
-          precioVenta: row[3] is num ? (row[3] as num).toDouble() : double.parse(row[3].toString()),
-          stock: row[4] is int ? row[4] : int.parse(row[4].toString()),
-          fechaRegistro: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
-          idCategoria: row[6] != null ? (row[6] is int ? row[6] : int.parse(row[6].toString())) : null,
-          idCodigoBarras: row[7] != null ? (row[7] is int ? row[7] : int.parse(row[7].toString())) : null,
-        );
-      }).toList();
-    } catch (e) {
-      print('Error al obtener productos: $e');
-      return [];
-    }
+    }).toList();
+  } catch (e) {
+    print('Error al obtener productos: $e');
+    return [];
   }
+}
 
-  static Future<List<Producto>> buscarProductos({
-    required String termino,
-    required dynamic conn,
-  }) async {
-    try {
-      final sql = Sql.named('''
-        SELECT id, titulo, descripcion, precioVenta, stock, 
-               fechaRegistro, idCategoria, idCodigoBarras
-        FROM producto
-        WHERE 
-          titulo ILIKE @termino OR
-          descripcion ILIKE @termino
-        ORDER BY titulo ASC
-      ''');
+static Future<List<Producto>> buscarProductos({
+  required String termino,
+  required dynamic conn,
+}) async {
+  try {
+    final sql = Sql.named('''
+      SELECT id, titulo, descripcion, precioVenta, stock, 
+             fechaRegistro, idCategoria, idCodigoBarras, imagenProducto
+      FROM producto
+      WHERE 
+        titulo ILIKE @termino OR
+        descripcion ILIKE @termino
+      ORDER BY titulo ASC
+    ''');
 
-      final result = await conn.execute(sql, parameters: {
-        'termino': '%$termino%',
-      });
-      
-      return result.map<Producto>((row) {
-        return Producto(
-          id: row[0],
-          titulo: row[1]?.toString() ?? '',
-          descripcion: row[2]?.toString(),
-          precioVenta: row[3] is num ? (row[3] as num).toDouble() : double.parse(row[3].toString()),
-          stock: row[4] is int ? row[4] : int.parse(row[4].toString()),
-          fechaRegistro: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
-          idCategoria: row[6] != null ? (row[6] is int ? row[6] : int.parse(row[6].toString())) : null,
-          idCodigoBarras: row[7] != null ? (row[7] is int ? row[7] : int.parse(row[7].toString())) : null,
-        );
-      }).toList();
-    } catch (e) {
-      print('Error al buscar productos: $e');
-      return [];
-    }
+    final result = await conn.execute(sql, parameters: {
+      'termino': '%$termino%',
+    });
+
+    return result.map<Producto>((row) {
+      return Producto(
+        id: row[0],
+        titulo: row[1]?.toString() ?? '',
+        descripcion: row[2]?.toString(),
+        precioVenta: row[3] is num
+            ? (row[3] as num).toDouble()
+            : double.parse(row[3].toString()),
+        stock: row[4] is int ? row[4] : int.parse(row[4].toString()),
+        fechaRegistro:
+            row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+        idCategoria: row[6] != null
+            ? (row[6] is int ? row[6] : int.parse(row[6].toString()))
+            : null,
+        idCodigoBarras: row[7] != null
+            ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
+            : null,
+        imagenProducto: row[8]?.toString(), // <--- AGREGA ESTA LÍNEA
+      );
+    }).toList();
+  } catch (e) {
+    print('Error al buscar productos: $e');
+    return [];
   }
+}
 
   static Future<bool> eliminarProducto({
     required int id,

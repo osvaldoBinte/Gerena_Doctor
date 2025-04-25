@@ -43,6 +43,8 @@ dependencies:
   shared_preferences: ^2.5.3
   get: ^4.7.2
   fl_chart: ^0.68.0
+  dotted_border: ^2.1.0
+  path_provider: ^2.1.5
 
 
 dev_dependencies:

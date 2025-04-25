@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:file_selector/file_selector.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/producto_controller.dart';
@@ -13,10 +13,7 @@ class ModalAgregarProducto extends StatelessWidget {
   ModalAgregarProducto({Key? key}) : super(key: key);
 
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
-  final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
   final AdminColors colors = AdminColors();
-
-  // Usando GetX, instanciamos el controlador
   final ProductoController productoController = Get.put(ProductoController());
 
   @override
@@ -24,121 +21,148 @@ class ModalAgregarProducto extends StatelessWidget {
     return AlertDialog(
       backgroundColor: colors.colorFondoModal,
       content: Container(
-        width: 1300,
-        height: 600,
+        width: 900,
+        height: 500,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // FORMULARIO EN UNA COLUMNA
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AGREGAR PRODUCTO',
-                  style: TextStyle(
-                    color: colors.colorTexto,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Form(
-                  key: productoController.formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InputNombreProductoWidget(
-                          colorTextoDark: colorTextoDark,
-                          nombreProductoController: productoController.nombreProductoController),
-                      const SizedBox(height: 20),
-                      InputCodigoDeBarrasProductoWidget(
-                          colorTextoDark: colorTextoDark,
-                          codigoBarrasController: productoController.codigoBarrasController),
-                      const SizedBox(height: 20),
-                      Row(
+            Text(
+              'AGREGAR PRODUCTO',
+              style: TextStyle(
+                color: colors.colorTexto,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Columna izquierda: Inputs
+                  Expanded(
+                    flex: 2,
+                    child: Form(
+                      key: productoController.formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InputPrecioProductoWidget(
-                              colorTextoDark: colorTextoDark,
-                              precioController: productoController.precioController),
-                          const SizedBox(width: 20),
-                          InputStockInicialProductoWidget(
-                              colorTextoDark: colorTextoDark,
-                              stockInicialController: productoController.stockInicialController),
-                          SizedBox(width: 20),
-                          // DropdownMenu usando Obx para reactividad
-                          SizedBox(
-                            width: 200,
-                            child: Obx(() => DropdownMenu<String>(
-                                  initialSelection: productoController.categoriaSeleccionada.value,
-                                  width: 400,
-                                  onSelected: (value) {
-                                    productoController.cambiarCategoria(value);
-                                  },
-                                  dropdownMenuEntries: productoController.categorias
-                                      .map((categoria) => DropdownMenuEntry<String>(
-                                            value: categoria,
-                                            label: categoria,
-                                          ))
-                                      .toList(),
-                                  label: Text('Categoría',
-                                      style: TextStyle(color: colors.colorTexto)),
-                                  textStyle: TextStyle(color: colors.colorTexto),
-                                  inputDecorationTheme: InputDecorationTheme(
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(color: colors.colorTexto),
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(color: colors.colorTexto),
-                                    ),
-                                  ),
-                                )),
+                          InputNombreProductoWidget(
+                            colorTextoDark: colorTextoDark,
+                            nombreProductoController: productoController.nombreProductoController,
                           ),
-                          // Botón para agregar imagen con Obx para reactividad
-                          const SizedBox(width: 20),
-                          InkWell(
-                            onTap: productoController.selectImage,
-                            child: Container(
-                              width: 200,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 255, 131, 55),
-                                borderRadius: BorderRadius.circular(50),
+                          const SizedBox(height: 15),
+                          InputCodigoDeBarrasProductoWidget(
+                            colorTextoDark: colorTextoDark,
+                            codigoBarrasController: productoController.codigoBarrasController,
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: InputPrecioProductoWidget(
+                                  colorTextoDark: colorTextoDark,
+                                  precioController: productoController.precioController,
+                                ),
                               ),
-                              child: Center(
-                                child: Obx(() => Text(
-                                      productoController.textoBotonImagen.value,
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    )),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: InputStockInicialProductoWidget(
+                                  colorTextoDark: colorTextoDark,
+                                  stockInicialController: productoController.stockInicialController,
+                                ),
                               ),
-                            ),
-                          )
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          Obx(() => DropdownMenu<String>(
+                                initialSelection: productoController.categoriaSeleccionada.value,
+                                width: 400,
+                                onSelected: (value) {
+                                  productoController.cambiarCategoria(value);
+                                },
+                                dropdownMenuEntries: productoController.categorias
+                                    .map((categoria) => DropdownMenuEntry<String>(
+                                          value: categoria,
+                                          label: categoria,
+                                        ))
+                                    .toList(),
+                                label: Text('Categoría',
+                                    style: TextStyle(color: colors.colorTexto)),
+                                textStyle: TextStyle(color: colors.colorTexto),
+                                inputDecorationTheme: InputDecorationTheme(
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: colors.colorTexto),
+                                  ),
+                                  focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: colors.colorTexto),
+                                  ),
+                                ),
+                              )),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 30),
+                  // Columna derecha: Imagen (solo preview y tap para seleccionar)
+                  Expanded(
+                    flex: 1,
+                    child: Center(
+                      child: Obx(() {
+                        final bool hasImage = productoController.isImageSelected.value;
+                        return DottedBorder(
+                          borderType: BorderType.RRect,
+                          radius: Radius.circular(16),
+                          dashPattern: [8, 4],
+                          color: Colors.orange,
+                          strokeWidth: 2,
+                          child: InkWell(
+                            onTap: productoController.selectImage,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: 180,
+                              height: 180,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                color: hasImage ? Colors.transparent : Colors.orange.withOpacity(0.06),
+                              ),
+                              child: hasImage
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.file(
+                                        File(productoController.selectedImagePath.value!),
+                                        fit: BoxFit.cover,
+                                        width: 180,
+                                        height: 180,
+                                      ),
+                                    )
+                                  : Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.add_a_photo, color: Colors.orange, size: 60),
+                                        SizedBox(height: 10),
+                                        Text(
+                                          "Click para seleccionar\nuna imagen",
+                                          style: TextStyle(
+                                            color: Colors.orange,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            // Vista previa de la imagen con Obx para reactividad
-            Container(
-              width: 200,
-              height: 200,
-              child: Obx(() => productoController.isImageSelected.value
-                  ? Image.file(
-                      File(productoController.selectedImagePath.value!),
-                      fit: BoxFit.cover,
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.add_a_photo, color: colors.colorTexto),
-                      onPressed: productoController.selectImage,
-                    )),
-            ),
-            // BOTONES ABAJO
+            const SizedBox(height: 20),
+            // Botones abajo
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -146,8 +170,9 @@ class ModalAgregarProducto extends StatelessWidget {
                       onTap: productoController.isLoading.value
                           ? null
                           : productoController.guardarProducto,
+                      borderRadius: BorderRadius.circular(50),
                       child: Container(
-                        width: 350,
+                        width: 300,
                         height: 50,
                         decoration: BoxDecoration(
                           color: productoController.isLoading.value
@@ -162,7 +187,7 @@ class ModalAgregarProducto extends StatelessWidget {
                                   'GUARDAR NUEVO PRODUCTO',
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
                         ),
@@ -172,8 +197,9 @@ class ModalAgregarProducto extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                   },
+                  borderRadius: BorderRadius.circular(50),
                   child: Container(
-                    width: 200,
+                    width: 150,
                     height: 50,
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 255, 75, 55),
@@ -184,14 +210,14 @@ class ModalAgregarProducto extends StatelessWidget {
                         'CANCELAR',
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
