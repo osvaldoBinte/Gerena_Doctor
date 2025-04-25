@@ -10,12 +10,12 @@ import 'package:managegym/shared/admin_colors.dart';
 
 class StoreScreen extends StatelessWidget {
   StoreScreen({Key? key}) : super(key: key);
-  
+
   final AdminColors colores = AdminColors();
-  
+
   // Instanciar el controlador de tienda
   final StoreController storeController = Get.put(StoreController());
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -79,25 +79,23 @@ class StoreScreen extends StatelessWidget {
           children: [
             // Botón para ordenar por nombre
             Obx(() => FilterButton(
-              text: 'Ordenar por nombre ${storeController.activeSort.value == 'name' 
-                ? (storeController.sortByNameAsc.value ? '↑' : '↓') 
-                : ''}',
-              onChanged: (isAscending) {
-                storeController.sortByName();
-              },
-              isActive: storeController.activeSort.value == 'name',
-            )),
+                  text:
+                      'Ordenar por nombre ${storeController.activeSort.value == 'name' ? (storeController.sortByNameAsc.value ? '↑' : '↓') : ''}',
+                  onChanged: (isAscending) {
+                    storeController.sortByName();
+                  },
+                  isActive: storeController.activeSort.value == 'name',
+                )),
             const SizedBox(width: 10),
             // Botón para ordenar por precio
             Obx(() => FilterButton(
-              text: 'Ordenar por precio ${storeController.activeSort.value == 'price' 
-                ? (storeController.sortByPriceAsc.value ? '↑' : '↓') 
-                : ''}',
-              onChanged: (isAscending) {
-                storeController.sortByPrice();
-              },
-              isActive: storeController.activeSort.value == 'price',
-            )),
+                  text:
+                      'Ordenar por precio ${storeController.activeSort.value == 'price' ? (storeController.sortByPriceAsc.value ? '↑' : '↓') : ''}',
+                  onChanged: (isAscending) {
+                    storeController.sortByPrice();
+                  },
+                  isActive: storeController.activeSort.value == 'price',
+                )),
           ],
         ),
         const SizedBox(height: 20),
@@ -109,9 +107,9 @@ class StoreScreen extends StatelessWidget {
           child: Row(
             children: [
               // Espacio para la imagen
-              const Expanded(
-                flex: 2,
-                child: SizedBox(),
+              Container(
+                height: 110,
+                width: 110,
               ),
               // Nombre
               Expanded(
@@ -202,7 +200,7 @@ class StoreScreen extends StatelessWidget {
                 ),
               );
             }
-            
+
             if (storeController.filteredProductos.isEmpty) {
               return Center(
                 child: Text(
@@ -214,29 +212,33 @@ class StoreScreen extends StatelessWidget {
                 ),
               );
             }
-            
+
             return RefreshIndicator(
               onRefresh: storeController.refreshProductos,
               child: ListView.builder(
                 itemCount: storeController.filteredProductos.length,
                 itemBuilder: (context, index) {
                   final producto = storeController.filteredProductos[index];
-                  
+
                   // Verifica si el producto tiene stock disponible
                   final bool disponible = producto.stock > 0;
-                  
+
                   return ProductRowWidget(
                     producto: producto,
                     image: null, // O tu widget de imagen
                     nombre: producto.titulo,
-                    categoria: 'Categoría', // Necesitarías obtener el nombre de la categoría
-                    precioUnitario: '\$${producto.precioVenta.toStringAsFixed(2)}',
+                    categoria:
+                        'Categoría', // Necesitarías obtener el nombre de la categoría
+                    precioUnitario:
+                        '\$${producto.precioVenta.toStringAsFixed(2)}',
                     cantidadDisponible: '${producto.stock}',
-                    codigoBarras: 'N/A', // Reemplazar con el código de barras real si lo tienes
+                    codigoBarras:
+                        'N/A', // Reemplazar con el código de barras real si lo tienes
                     disponible: disponible ? 'Sí' : 'No',
                     index: index,
                     onDelete: () => storeController.deleteProducto(producto.id),
-                    onUpdateStock: (cantidad) => storeController.updateStock(producto.id, cantidad),
+                    onUpdateStock: (cantidad) =>
+                        storeController.updateStock(producto.id, cantidad),
                   );
                 },
               ),
@@ -257,7 +259,8 @@ class ProductRowWidget extends StatefulWidget {
   final String codigoBarras;
   final String disponible;
   final int index;
-  final dynamic producto; // El producto completo para pasarlo al modal de edición
+  final dynamic
+      producto; // El producto completo para pasarlo al modal de edición
   final VoidCallback? onDelete;
   final Function(int)? onUpdateStock;
 
@@ -317,19 +320,20 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
               borderRadius: BorderRadius.circular(0),
               onTap: () {
                 // Aquí abres tu modal de edición
-               showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return ModalEditarProducto(
-      producto: widget.producto,  // Pasar el objeto Producto completo
-    );
-  },
-).then((value) {
-  // Recargar productos después de editar
-  if (value == true) {
-    Get.find<StoreController>().loadProductos();
-  }
-});
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return ModalEditarProducto(
+                      producto:
+                          widget.producto, // Pasar el objeto Producto completo
+                    );
+                  },
+                ).then((value) {
+                  // Recargar productos después de editar
+                  if (value == true) {
+                    Get.find<StoreController>().loadProductos();
+                  }
+                });
               },
               onHover: (hovering) {
                 setState(() {
@@ -344,8 +348,9 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
               child: Row(
                 children: [
                   // Imagen o espacio vacío
-                  Expanded(
-                    flex: 2,
+                  Container(
+                    height: 110,
+                    width: 110,
                     child: widget.image ??
                         Container(
                           margin: const EdgeInsets.all(12),
@@ -446,25 +451,26 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.inventory, color: colores.colorTexto, size: 28),
+                  icon: Icon(Icons.inventory,
+                      color: colores.colorTexto, size: 28),
                   tooltip: 'Agregar stock',
                   onPressed: () {
                     // Abre el modal de agregar stock
                     showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return ModalAgregarStock(
-      idProducto: widget.producto?.id,
-      nombreProducto: widget.nombre,
-      producto: widget.producto,
-      onStockUpdated: (cantidad) {
-        if (widget.onUpdateStock != null) {
-          widget.onUpdateStock!(cantidad);
-        }
-      },
-    );
-  },
-);
+                      context: context,
+                      builder: (BuildContext context) {
+                        return ModalAgregarStock(
+                          idProducto: widget.producto?.id,
+                          nombreProducto: widget.nombre,
+                          producto: widget.producto,
+                          onStockUpdated: (cantidad) {
+                            if (widget.onUpdateStock != null) {
+                              widget.onUpdateStock!(cantidad);
+                            }
+                          },
+                        );
+                      },
+                    );
                   },
                 ),
               ],
