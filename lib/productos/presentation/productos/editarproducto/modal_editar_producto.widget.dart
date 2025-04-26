@@ -66,24 +66,20 @@ class ModalEditarProducto extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 20),
                                 InputNombreProductoWidget(
-                                  colorTextoDark: colorTextoDark,
                                   nombreProductoController: controller.nombreProductoController
                                 ),
                                 const SizedBox(height: 20),
                                 InputCodigoDeBarrasProductoWidget(
-                                  colorTextoDark: colorTextoDark,
                                   codigoBarrasController: controller.codigoBarrasController
                                 ),
                                 const SizedBox(height: 20),
                                 Row(
                                   children: [
                                     InputPrecioProductoWidget(
-                                      colorTextoDark: colorTextoDark,
                                       precioController: controller.precioController
                                     ),
                                     const SizedBox(width: 20),
                                     InputStockInicialProductoWidget(
-                                      colorTextoDark: colorTextoDark,
                                       stockInicialController: controller.stockInicialController
                                     ),
                                     SizedBox(width: 20),

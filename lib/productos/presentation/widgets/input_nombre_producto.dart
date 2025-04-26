@@ -5,11 +5,9 @@ import 'package:managegym/shared/admin_colors.dart';
 class InputNombreProductoWidget extends StatelessWidget {
   const InputNombreProductoWidget({
     super.key,
-    required this.colorTextoDark,
     required this.nombreProductoController,
   });
 
-  final Color colorTextoDark;
   final TextEditingController nombreProductoController;
 
   @override
@@ -28,7 +26,7 @@ class InputNombreProductoWidget extends StatelessWidget {
           }
           return null;
         },
-        decoration:  InputDecoration(
+        decoration: InputDecoration(
           labelText: 'Nombre del producto',
           labelStyle: TextStyle(color: colores.colorTexto),
           enabledBorder: UnderlineInputBorder(

@@ -12,7 +12,6 @@ import 'package:managegym/shared/admin_colors.dart';
 class ModalAgregarProducto extends StatelessWidget {
   ModalAgregarProducto({Key? key}) : super(key: key);
 
-  final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final AdminColors colors = AdminColors();
   final ProductoController productoController = Get.put(ProductoController());
 
@@ -48,12 +47,10 @@ class ModalAgregarProducto extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           InputNombreProductoWidget(
-                            colorTextoDark: colorTextoDark,
                             nombreProductoController: productoController.nombreProductoController,
                           ),
                           const SizedBox(height: 15),
                           InputCodigoDeBarrasProductoWidget(
-                            colorTextoDark: colorTextoDark,
                             codigoBarrasController: productoController.codigoBarrasController,
                           ),
                           const SizedBox(height: 15),
@@ -61,14 +58,12 @@ class ModalAgregarProducto extends StatelessWidget {
                             children: [
                               Expanded(
                                 child: InputPrecioProductoWidget(
-                                  colorTextoDark: colorTextoDark,
                                   precioController: productoController.precioController,
                                 ),
                               ),
                               const SizedBox(width: 15),
                               Expanded(
                                 child: InputStockInicialProductoWidget(
-                                  colorTextoDark: colorTextoDark,
                                   stockInicialController: productoController.stockInicialController,
                                 ),
                               ),
@@ -195,6 +190,7 @@ class ModalAgregarProducto extends StatelessWidget {
                     )),
                 InkWell(
                   onTap: () {
+                    productoController.limpiarCampos();
                     Navigator.of(context).pop();
                   },
                   borderRadius: BorderRadius.circular(50),

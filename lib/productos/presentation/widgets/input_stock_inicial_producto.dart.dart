@@ -4,11 +4,9 @@ import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_w
 class InputStockInicialProductoWidget extends StatelessWidget {
   const InputStockInicialProductoWidget({
     super.key,
-    required this.colorTextoDark,
     required this.stockInicialController,
   });
 
-  final Color colorTextoDark;
   final TextEditingController stockInicialController;
 
   @override
@@ -16,7 +14,7 @@ class InputStockInicialProductoWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: stockInicialController,
         validator: (value) {
           //validar que sea un numero

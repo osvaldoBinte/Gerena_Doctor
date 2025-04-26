@@ -222,25 +222,27 @@ class StoreScreen extends StatelessWidget {
 
                   return ProductRowWidget(
                     producto: producto,
-image: (producto.imagenProducto != null && producto.imagenProducto!.isNotEmpty)
-    ? Container(
-        margin: const EdgeInsets.all(12),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: _buildProductImage(producto.imagenProducto!),
-          ),
-        ),
-      )
+                    image: (producto.imagenProducto != null &&
+                            producto.imagenProducto!.isNotEmpty)
+                        ? Container(
+                            margin: const EdgeInsets.all(12),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: _buildProductImage(
+                                    producto.imagenProducto!),
+                              ),
+                            ),
+                          )
                         : Container(
                             margin: const EdgeInsets.all(12),
                             width: 70,

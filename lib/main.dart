@@ -119,16 +119,16 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
   bool isDark = true;
 
-void toggleTheme() {
-  setState(() {
-    isDark = !isDark;
-    if (isDark) {
-      AdminColors().setDarkTheme();
-    } else {
-      AdminColors().setLightTheme();
-    }
-  });
-}
+  void toggleTheme() {
+    setState(() {
+      isDark = !isDark;
+      if (isDark) {
+        AdminColors().setDarkTheme();
+      } else {
+        AdminColors().setLightTheme();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

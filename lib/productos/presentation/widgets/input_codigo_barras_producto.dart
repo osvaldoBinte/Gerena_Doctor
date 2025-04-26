@@ -4,11 +4,9 @@ import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_w
 class InputCodigoDeBarrasProductoWidget extends StatelessWidget {
   const InputCodigoDeBarrasProductoWidget({
     super.key,
-    required this.colorTextoDark,
     required this.codigoBarrasController,
   });
 
-  final Color colorTextoDark;
   final TextEditingController codigoBarrasController;
 
   @override
@@ -16,7 +14,7 @@ class InputCodigoDeBarrasProductoWidget extends StatelessWidget {
     return SizedBox(
       width: 400,
       child: TextFormField(
-        style: TextStyle(color: colorTextoDark),
+        style: TextStyle(color: colores.colorTexto),
         controller: codigoBarrasController,
         validator: (value) {
           return null;
