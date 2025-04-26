@@ -1,14 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:managegym/main_screen/ImagenUtils.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/main_screen/screens/store/store_controller.dart';
+import 'package:managegym/main_screen/widgets/modal_categorias.dart';
 import 'package:managegym/productos/presentation/productos/filter/filter_button.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/modal_agregar_producto.dart';
 import 'package:managegym/productos/presentation/productos/agregarstock/modal_agregar_stock.dart';
-import 'package:managegym/productos/presentation/productos/editarproducto/modal_editar_producto.widget.dart';
 import 'package:managegym/shared/admin_colors.dart';
 
 class StoreScreen extends StatelessWidget {
@@ -32,9 +30,10 @@ class StoreScreen extends StatelessWidget {
                 children: [
                   QuickActionButton(
                     text: 'AGREGAR UN NUEVO PRODUCTO',
-                    icon: Icons.add_box_outlined,
+                    icon: Icons.add,
                     accion: () {
                       showDialog(
+                        barrierDismissible: false,
                         context: context,
                         builder: (BuildContext context) {
                           return ModalAgregarProducto();
@@ -51,6 +50,21 @@ class StoreScreen extends StatelessWidget {
                     icon: Icons.point_of_sale,
                     accion: () {
                       // Lógica para realizar una venta
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  QuickActionButton(
+                    text: 'AGREGAR UN NUEVO PRODUCTO',
+                    icon: Icons.add,
+                    accion: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return ModalCategorias();
+                        },
+                      ).then((_) {
+                        
+                      });
                     },
                   ),
                 ],
@@ -412,7 +426,9 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
       child: Row(
         children: [
           // Imagen
-          Expanded(flex: 2, child: widget.image ?? const SizedBox()),
+          SizedBox(
+              height: 110, width: 110, child: widget.image ?? const SizedBox()),
+
           // Nombre
           Expanded(
             flex: 3,

@@ -47,37 +47,44 @@ class ModalAgregarProducto extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           InputNombreProductoWidget(
-                            nombreProductoController: productoController.nombreProductoController,
+                            nombreProductoController:
+                                productoController.nombreProductoController,
                           ),
                           const SizedBox(height: 15),
                           InputCodigoDeBarrasProductoWidget(
-                            codigoBarrasController: productoController.codigoBarrasController,
+                            codigoBarrasController:
+                                productoController.codigoBarrasController,
                           ),
                           const SizedBox(height: 15),
                           Row(
                             children: [
                               Expanded(
                                 child: InputPrecioProductoWidget(
-                                  precioController: productoController.precioController,
+                                  precioController:
+                                      productoController.precioController,
                                 ),
                               ),
                               const SizedBox(width: 15),
                               Expanded(
                                 child: InputStockInicialProductoWidget(
-                                  stockInicialController: productoController.stockInicialController,
+                                  stockInicialController:
+                                      productoController.stockInicialController,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 15),
                           Obx(() => DropdownMenu<String>(
-                                initialSelection: productoController.categoriaSeleccionada.value,
+                                initialSelection: productoController
+                                    .categoriaSeleccionada.value,
                                 width: 400,
                                 onSelected: (value) {
                                   productoController.cambiarCategoria(value);
                                 },
-                                dropdownMenuEntries: productoController.categorias
-                                    .map((categoria) => DropdownMenuEntry<String>(
+                                dropdownMenuEntries: productoController
+                                    .categorias
+                                    .map((categoria) =>
+                                        DropdownMenuEntry<String>(
                                           value: categoria,
                                           label: categoria,
                                         ))
@@ -87,10 +94,12 @@ class ModalAgregarProducto extends StatelessWidget {
                                 textStyle: TextStyle(color: colors.colorTexto),
                                 inputDecorationTheme: InputDecorationTheme(
                                   enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: colors.colorTexto),
+                                    borderSide:
+                                        BorderSide(color: colors.colorTexto),
                                   ),
                                   focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: colors.colorTexto),
+                                    borderSide:
+                                        BorderSide(color: colors.colorTexto),
                                   ),
                                 ),
                               )),
@@ -104,7 +113,8 @@ class ModalAgregarProducto extends StatelessWidget {
                     flex: 1,
                     child: Center(
                       child: Obx(() {
-                        final bool hasImage = productoController.isImageSelected.value;
+                        final bool hasImage =
+                            productoController.isImageSelected.value;
                         return DottedBorder(
                           borderType: BorderType.RRect,
                           radius: Radius.circular(16),
@@ -119,22 +129,27 @@ class ModalAgregarProducto extends StatelessWidget {
                               height: 180,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
-                                color: hasImage ? Colors.transparent : Colors.orange.withOpacity(0.06),
+                                color: hasImage
+                                    ? Colors.transparent
+                                    : Colors.orange.withOpacity(0.06),
                               ),
                               child: hasImage
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: Image.file(
-                                        File(productoController.selectedImagePath.value!),
+                                        File(productoController
+                                            .selectedImagePath.value!),
                                         fit: BoxFit.cover,
                                         width: 180,
                                         height: 180,
                                       ),
                                     )
                                   : Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.add_a_photo, color: Colors.orange, size: 60),
+                                        Icon(Icons.add_a_photo,
+                                            color: Colors.orange, size: 60),
                                         SizedBox(height: 10),
                                         Text(
                                           "Click para seleccionar\nuna imagen",
