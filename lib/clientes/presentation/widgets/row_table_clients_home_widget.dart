@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_editar_cliente_widget.dart';
+import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
 import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
@@ -14,8 +15,10 @@ class RowTableClientsHomeWidget extends StatefulWidget {
   final String sex;
   final Function(int index)? onRowTap;
   final Function(int index)? onManageTap;
+  final List<TipoMembresia> suscripcionesDisponibles;
 
-  final List<TipoMembresia> suscripcionesDisponibles; // <-- AGREGA ESTA LÍNEA
+  // Agregar el usuario si lo tienes, o los campos necesarios para construirlo
+  // final Usuario cliente;
 
   const RowTableClientsHomeWidget({
     super.key,
@@ -28,21 +31,13 @@ class RowTableClientsHomeWidget extends StatefulWidget {
     required this.sex,
     this.onRowTap,
     this.onManageTap,
-    required this.suscripcionesDisponibles, // <-- Y EN EL CONSTRUCTOR
+    required this.suscripcionesDisponibles,
+    // required this.cliente,
   });
 
   @override
   State<RowTableClientsHomeWidget> createState() =>
       _RowTableClientsHomeWidgetState();
-}
-
-void _showModalEditarCliente(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return const ModalEditarCliente();
-    },
-  );
 }
 
 AdminColors colores = AdminColors();
@@ -68,6 +63,26 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
   final FocusNode _mainFocusNode = FocusNode();
   final FocusNode _buttonFocusNode = FocusNode();
 
+  void _showModalEditarCliente(BuildContext context) {
+    // Construye el modelo Usuario con los datos que tengas en la fila
+    final usuario = Usuario(
+      id: widget.index, // O el ID real de tu usuario
+      nombre: widget.name,
+      apellidos: '', // Si tienes apellidos, pásalos aquí
+      correo: '',    // Si tienes correo, pásalo aquí
+      telefono: widget.phoneNumber,
+      fechaNacimiento: null, // Si tienes la fecha, pásala aquí
+      sexo: widget.sex,
+      status: widget.status,
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ModalEditarCliente(cliente: usuario);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -77,15 +92,13 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
         children: [
           // Primera parte: InkWell para las 6 primeras columnas agrupadas
           Expanded(
-            flex:
-                12, // Suma de los flex de las 6 primeras columnas (3+1+3+1+3+1)
+            flex: 12,
             child: InkWell(
               onTap: () {
                 if (widget.onRowTap != null) {
                   widget.onRowTap!(widget.index);
                 }
                 _showModalEditarCliente(context);
-
                 print("Clicked on row ${widget.index}");
               },
               onHover: (isHovering) {
@@ -233,7 +246,6 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 });
               },
               focusNode: _buttonFocusNode,
-             
               child: Container(
                 height: 40,
                 alignment: Alignment.center,

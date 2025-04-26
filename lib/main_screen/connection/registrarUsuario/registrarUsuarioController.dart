@@ -8,6 +8,32 @@ class UsuarioController extends GetxController {
   var idUsuarioCreado = RxnInt();
   var error = RxnString();
 
+  /// Obtiene un usuario actualizado de la base de datos por su ID
+  Future<Usuario?> obtenerUsuarioPorId(int id) async {
+    final conn = Database.conn;
+    try {
+      print('[UsuarioController] Llamando a UsuarioDB.obtenerUsuarioPorId con id: $id');
+      final usuario = await UsuarioDB.obtenerUsuarioPorId(id: id, conn: conn);
+      if (usuario == null) {
+        print('[UsuarioController] Usuario no encontrado');
+      } else {
+        print('[UsuarioController] Usuario obtenido:');
+        print('Nombre: ${usuario.nombre}');
+        print('Apellidos: ${usuario.apellidos}');
+        print('Correo: ${usuario.correo}');
+        print('Teléfono: ${usuario.telefono}');
+        print('FechaNacimiento: ${usuario.fechaNacimiento}');
+        print('Sexo: ${usuario.sexo}');
+      }
+      return usuario;
+    } catch (e) {
+      debugPrint('Error al obtener usuario por id: $e');
+      error.value = 'No se pudo obtener el usuario';
+      return null;
+    }
+  }
+
+  /// Crea un usuario completo, junto con sus métodos de acceso, membresía y pago.
   Future<int?> crearUsuarioCompleto({
     required String nombre,
     required String apellidos,
@@ -104,7 +130,9 @@ class UsuarioController extends GetxController {
       }
 
       // 7. Registrar historial de pago si corresponde
-      if (idMembresiaUsuario != null && montoPago != null && metodoPago != null) {
+      if (idMembresiaUsuario != null &&
+          montoPago != null &&
+          metodoPago != null) {
         final idPago = await UsuarioDB.crearHistorialPago(
           idMembresiaUsuario: idMembresiaUsuario,
           montoPago: montoPago,

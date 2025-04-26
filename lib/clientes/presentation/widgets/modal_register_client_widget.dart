@@ -5,9 +5,7 @@ import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuar
 import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
-import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
-import 'package:managegym/shared/widgets/input_sexo_widget.dart';
 import 'package:managegym/shared/widgets/input_telefono_widget.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_select_widget.dart';
@@ -30,16 +28,15 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Controllers para los textformfield
   final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _apellidosController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _diaController = TextEditingController();
   final TextEditingController _pagaConController = TextEditingController();
-  String? _mesController;
-  String? _anoController;
-  String? _sexoController;
+  final TextEditingController _mesController = TextEditingController();
+  final TextEditingController _anoController = TextEditingController();
+  String? _sexoController = 'M'; // Valor predeterminado
 
   List<String> _suscripcionesSeleccionadas = [];
   TipoMembresia? _suscripcionSeleccionada;
@@ -47,7 +44,6 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   double _totalAPagar = 0.0;
   double _cambio = 0.0;
 
-  // GetX controller
   final usuarioController = Get.put(UsuarioController());
 
   @override
@@ -58,6 +54,8 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     _correoController.dispose();
     _diaController.dispose();
     _pagaConController.dispose();
+    _mesController.dispose();
+    _anoController.dispose();
     super.dispose();
   }
 
@@ -118,25 +116,23 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
         return;
       }
       try {
-        // Procesar la fecha de nacimiento
         DateTime? fechaNacimiento;
-        if (_diaController.text.isNotEmpty &&
-            _mesController != null &&
-            _anoController != null) {
-          final mesNum = _mesAInt(_mesController!);
-          if (mesNum != null) {
-            fechaNacimiento = DateTime(
-              int.parse(_anoController!),
-              mesNum,
-              int.parse(_diaController.text),
-            );
+        try {
+          // Usar directamente los valores numéricos de día, mes y año
+          final dia = int.parse(_diaController.text);
+          final mes = int.parse(_mesController.text);
+          final ano = int.parse(_anoController.text);
+          
+          // Validar que la fecha sea válida
+          if (dia > 0 && dia <= 31 && mes > 0 && mes <= 12 && ano >= 1900) {
+            fechaNacimiento = DateTime(ano, mes, dia);
           }
+        } catch (e) {
+          print('Error al parsear la fecha: $e');
         }
 
-        // Mapear sexo a solo un caracter
-        final sexoDb = (_sexoController?.toLowerCase().startsWith("f") ?? false)
-            ? "F"
-            : "M";
+        // Usar el valor del sexo directamente (ahora es 'M' o 'F')
+        final sexoDb = _sexoController ?? 'M';
 
         String qr = "qr_generado_${DateTime.now().millisecondsSinceEpoch}";
         String plantillaHuella =
@@ -163,7 +159,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           fechaFinMembresia: fechaFin,
           montoPago: _suscripcionSeleccionada!.precio,
           metodoPago: "Efectivo",
-          numeroReferencia: "25", // SIEMPRE manda "25"
+          numeroReferencia: "25",
           fechaProximoPago: fechaProximoPago,
         );
 
@@ -171,7 +167,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('¡Cliente registrado con éxito!')),
           );
-          widget.onRegistroExitoso?.call(); // Llama para refrescar la lista
+          widget.onRegistroExitoso?.call();
           Navigator.of(context).pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -186,7 +182,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     }
   }
 
-  int? _mesAInt(String mes) {
+  String _mesIntATexto(int mes) {
     const meses = [
       "Enero",
       "Febrero",
@@ -201,9 +197,10 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
       "Noviembre",
       "Diciembre"
     ];
-    final index = meses.indexWhere((m) => m.toLowerCase() == mes.toLowerCase());
-    if (index >= 0) return index + 1;
-    return null;
+    if (mes >= 1 && mes <= 12) {
+      return meses[mes - 1];
+    }
+    return "";
   }
 
   @override
@@ -232,7 +229,6 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                 children: [
                   Row(
                     children: [
-                      // Columna izquierda (80%)
                       Expanded(
                         flex: 6,
                         child: Column(
@@ -269,30 +265,164 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             ),
                             Row(
                               children: [
-                                InputFechaNacimientoWidget(
-                                  colorTextoDark: colores.colorTexto,
-                                  diaController: _diaController,
-                                  mesController: _mesController,
-                                  anoController: _anoController,
-                                  onMesSelected: (value) {
-                                    setState(() {
-                                      _mesController = value;
-                                    });
-                                  },
-                                  onAnoSelected: (value) {
-                                    setState(() {
-                                      _anoController = value;
-                                    });
-                                  },
+                                // Día
+                                SizedBox(
+                                  width: 100,
+                                  child: TextFormField(
+                                    style: TextStyle(color: colores.colorTexto),
+                                    controller: _diaController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: 'Día',
+                                      labelStyle: TextStyle(color: colores.colorTexto),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Requerido';
+                                      }
+                                      final day = int.tryParse(value);
+                                      if (day == null || day < 1 || day > 31) {
+                                        return 'Inválido';
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
+                                
+                                Text(
+                                  '-',
+                                  style: TextStyle(
+                                    color: colores.colorTexto,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                                
+                                // Mes - Dropdown para selección de meses
+                                SizedBox(
+                                  width: 150,
+                                  child: DropdownButtonFormField<int>(
+                                    value: int.tryParse(_mesController.text) ?? 1,
+                                    style: TextStyle(color: colores.colorTexto),
+                                    dropdownColor: colores.colorFondoModal,
+                                    decoration: InputDecoration(
+                                      labelText: 'Mes',
+                                      labelStyle: TextStyle(color: colores.colorTexto),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                    ),
+                                    items: [
+                                      DropdownMenuItem(value: 1, child: Text('Enero', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 2, child: Text('Febrero', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 3, child: Text('Marzo', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 4, child: Text('Abril', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 5, child: Text('Mayo', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 6, child: Text('Junio', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 7, child: Text('Julio', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 8, child: Text('Agosto', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 9, child: Text('Septiembre', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 10, child: Text('Octubre', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 11, child: Text('Noviembre', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 12, child: Text('Diciembre', style: TextStyle(color: colores.colorTexto))),
+                                    ],
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          _mesController.text = value.toString();
+                                        });
+                                      }
+                                    },
+                                    validator: (value) {
+                                      if (value == null) return 'Requerido';
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                
+                                Text(
+                                  '-',
+                                  style: TextStyle(
+                                    color: colores.colorTexto,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                                
+                                // Año
+                                SizedBox(
+                                  width: 100,
+                                  child: TextFormField(
+                                    style: TextStyle(color: colores.colorTexto),
+                                    controller: _anoController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText: 'Año',
+                                      labelStyle: TextStyle(color: colores.colorTexto),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Requerido';
+                                      }
+                                      final year = int.tryParse(value);
+                                      if (year == null || year < 1900 || year > DateTime.now().year) {
+                                        return 'Inválido';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                
                                 const SizedBox(width: 88),
-                                InputSexoWidget(
-                                  sexoController: _sexoController,
-                                  onSelected: (value) {
-                                    setState(() {
-                                      _sexoController = value;
-                                    });
-                                  },
+                                
+                                // Sexo - Dropdown para selección
+                                SizedBox(
+                                  width: 150,
+                                  child: DropdownButtonFormField<String>(
+                                    value: _sexoController ?? 'M',
+                                    style: TextStyle(color: colores.colorTexto),
+                                    dropdownColor: colores.colorFondoModal,
+                                    decoration: InputDecoration(
+                                      labelText: 'Sexo',
+                                      labelStyle: TextStyle(color: colores.colorTexto),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: colores.colorTexto),
+                                      ),
+                                    ),
+                                    items: [
+                                      DropdownMenuItem(value: 'M', child: Text('Masculino', style: TextStyle(color: colores.colorTexto))),
+                                      DropdownMenuItem(value: 'F', child: Text('Femenino', style: TextStyle(color: colores.colorTexto))),
+                                    ],
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        setState(() {
+                                          _sexoController = value;
+                                        });
+                                      }
+                                    },
+                                    validator: (value) {
+                                      if (value == null) return 'Requerido';
+                                      return null;
+                                    },
+                                  ),
                                 ),
                               ],
                             ),
@@ -312,9 +442,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                                   fontSize: 21,
                                   fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(
-                              height: 20,
-                            ),
+                            const SizedBox(height: 20),
                             Text(
                               'Paga con:',
                               style: TextStyle(
@@ -327,10 +455,10 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                               child: TextFormField(
                                 controller: _pagaConController,
                                 style: TextStyle(color: colores.colorTexto),
-                                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                keyboardType:
+                                    TextInputType.numberWithOptions(decimal: true),
                                 decoration: InputDecoration(
-                                  labelStyle:
-                                      TextStyle(color: colores.colorTexto),
+                                  labelStyle: TextStyle(color: colores.colorTexto),
                                   icon: Icon(
                                     Icons.attach_money,
                                     color: colores.colorTexto,
@@ -343,10 +471,8 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                                 onChanged: (_) => calcularCambio(),
                               ),
                             ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            if (_pagaConController.text.isNotEmpty) // <-- Solo muestra si hay texto
+                            const SizedBox(height: 20),
+                            if (_pagaConController.text.isNotEmpty)
                               Text(
                                 'Cambio: \$${_cambio.toStringAsFixed(2)}',
                                 style: TextStyle(
@@ -359,9 +485,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 30,
-                  ),
+                  const SizedBox(height: 30),
                   Row(
                     children: [
                       Text(
@@ -373,10 +497,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  // AQUI VA EL GRID DE LAS SUSCRIPCCIONES
+                  const SizedBox(height: 20),
                   SizedBox(
                       width: double.infinity,
                       height: 200,
@@ -407,9 +528,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                           },
                         ),
                       )),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Text(
@@ -424,10 +543,10 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                   Container(
                     width: double.infinity,
                     height: 40,
-                    decoration:  BoxDecoration(
+                    decoration: BoxDecoration(
                       color: colores.colorCabezeraTabla,
                     ),
-                    child:  Flex(
+                    child: Flex(
                       direction: Axis.horizontal,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -479,7 +598,6 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                       ],
                     ),
                   ),
-                  //AQUI VAN LAS ROWS DE LAS SUSCRIPCCIONES SELECCIONADAS
                   SizedBox(
                       width: double.infinity,
                       height: 110,
@@ -497,12 +615,8 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                               suscripcion: suscripcion,
                             );
                           })),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const SizedBox(
-                    height: 22,
-                  ),
+                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -627,6 +741,7 @@ class _RowSuscripccionSeleccionadaState
   bool isFocused = false;
   final FocusNode _rowEliminarFocusNode = FocusNode();
   AdminColors colores = AdminColors();
+
   @override
   void dispose() {
     _rowEliminarFocusNode.dispose();
@@ -671,7 +786,7 @@ class _RowSuscripccionSeleccionadaState
           Expanded(
               flex: 1,
               child: Text(
-                "\$${widget.suscripcion.precio}",
+                "\${widget.suscripcion.precio}",
                 style: TextStyle(
                   color: colores.colorTexto,
                   fontSize: 15,
@@ -680,7 +795,7 @@ class _RowSuscripccionSeleccionadaState
           Expanded(
               flex: 2,
               child: Text(
-                "\$${widget.suscripcion.precio}",
+                "\${widget.suscripcion.precio}",
                 style: TextStyle(
                   color: colores.colorTexto,
                   fontSize: 15,

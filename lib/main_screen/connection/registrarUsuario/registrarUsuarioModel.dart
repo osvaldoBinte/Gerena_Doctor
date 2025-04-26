@@ -22,18 +22,23 @@ class Usuario {
     this.status,
   });
 
-  factory Usuario.fromMap(Map<String, dynamic> map) => Usuario(
-    id: map['id'] is String ? int.parse(map['id']) : map['id'],
+factory Usuario.fromMap(Map<String, dynamic> map) {
+  print('[Usuario.fromMap] Mapeando datos: $map');
+  return Usuario(
+    id: map['id'] is int ? map['id'] : int.parse(map['id'].toString()),
     nombre: map['nombre']?.toString() ?? '',
     apellidos: map['apellidos']?.toString() ?? '',
     correo: map['correo']?.toString() ?? '',
     telefono: map['telefono']?.toString() ?? '',
     fechaNacimiento: map['fechanacimiento'] != null
-        ? DateTime.tryParse(map['fechanacimiento'].toString())
+        ? (map['fechanacimiento'] is DateTime 
+            ? map['fechanacimiento'] 
+            : DateTime.parse(map['fechanacimiento'].toString()))
         : null,
     sexo: map['sexo']?.toString() ?? '',
-    status: map['status']?.toString(),
+    status: map['status']?.toString() ?? '',
   );
+}
 }
 
 class UsuarioDB {
@@ -72,8 +77,8 @@ class UsuarioDB {
       print('Error al crear usuario: $e');
       return null;
     }
-
   }
+
   static Future<String> obtenerTituloUltimaMembresiaActiva({
     required int idUsuario,
     required dynamic conn,
@@ -88,7 +93,8 @@ class UsuarioDB {
         ORDER BY mu.fechafin DESC
         LIMIT 1
       ''');
-      final result = await conn.execute(sql, parameters: {'idUsuario': idUsuario});
+      final result =
+          await conn.execute(sql, parameters: {'idUsuario': idUsuario});
       if (result.isNotEmpty && result.first[0] != null) {
         return result.first[0].toString();
       }
@@ -188,34 +194,35 @@ class UsuarioDB {
     }
   }
 
-static Future<int?> crearMembresiaUsuario({
-  required int idUsuario,
-  required int idVentaMembresia,
-  required DateTime inicio,
-  required DateTime fin,
-  required dynamic conn,
-}) async {
-  try {
-    print('Insertando en membresiaUsuario...');
-    print('idUsuario: $idUsuario, id_ventaMembresia: $idVentaMembresia, fechaInicio: $inicio, fechaFin: $fin');
-    final sql = Sql.named('''
+  static Future<int?> crearMembresiaUsuario({
+    required int idUsuario,
+    required int idVentaMembresia,
+    required DateTime inicio,
+    required DateTime fin,
+    required dynamic conn,
+  }) async {
+    try {
+      print('Insertando en membresiaUsuario...');
+      print(
+          'idUsuario: $idUsuario, id_ventaMembresia: $idVentaMembresia, fechaInicio: $inicio, fechaFin: $fin');
+      final sql = Sql.named('''
       INSERT INTO membresiausuario (idUsuario, id_ventaMembresia, fechaInicio, fechaFin)
       VALUES (@idUsuario, @idVentaMembresia, @fechaInicio, @fechaFin)
       RETURNING id;
     ''');
-    final result = await conn.execute(sql, parameters: {
-      'idUsuario': idUsuario,
-      'idVentaMembresia': idVentaMembresia,
-      'fechaInicio': inicio.toIso8601String(),
-      'fechaFin': fin.toIso8601String(),
-    });
-    print('RESULTADO INSERT membresiaUsuario: $result');
-    return result.isNotEmpty ? result.first[0] as int : null;
-  } catch (e) {
-    print('Error al crear membresía usuario: $e');
-    return null;
+      final result = await conn.execute(sql, parameters: {
+        'idUsuario': idUsuario,
+        'idVentaMembresia': idVentaMembresia,
+        'fechaInicio': inicio.toIso8601String(),
+        'fechaFin': fin.toIso8601String(),
+      });
+      print('RESULTADO INSERT membresiaUsuario: $result');
+      return result.isNotEmpty ? result.first[0] as int : null;
+    } catch (e) {
+      print('Error al crear membresía usuario: $e');
+      return null;
+    }
   }
-}
 
   static Future<int?> crearHistorialPago({
     required int idMembresiaUsuario,
@@ -262,8 +269,7 @@ static Future<int?> crearMembresiaUsuario({
   static Future<List<Usuario>> obtenerUsuarios({required dynamic conn}) async {
     try {
       final result = await conn.execute(
-          'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios'
-      );
+          'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios');
       return result.map<Usuario>((row) {
         // Los índices deben coincidir con el orden del SELECT arriba
         return Usuario(
@@ -272,7 +278,8 @@ static Future<int?> crearMembresiaUsuario({
           apellidos: row[2]?.toString() ?? '',
           correo: row[3]?.toString() ?? '',
           telefono: row[4]?.toString() ?? '',
-          fechaNacimiento: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+          fechaNacimiento:
+              row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
           sexo: row[6]?.toString() ?? '',
           status: row[7]?.toString(),
         );
@@ -282,15 +289,64 @@ static Future<int?> crearMembresiaUsuario({
       return [];
     }
   }
-
-static Future<int> obtenerDiasMembresiaRestantes({
-  required int idUsuario,
+static Future<Usuario?> obtenerUsuarioPorId({
+  required int id,
   required dynamic conn,
 }) async {
+  print('[UsuarioDB] Obteniendo usuario ID: $id');
   try {
-    debugPrint('Obteniendo días restantes de membresía...');
-    debugPrint('ID Usuario: $idUsuario');
-    final sql = Sql.named('''
+    // Imprimir la consulta SQL exacta
+    final sql = 'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios WHERE id = $id';
+    print('[UsuarioDB] Ejecutando consulta: $sql');
+    
+    final result = await conn.execute(
+      'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios WHERE id = @id',
+      parameters: {'id': id},
+    );
+    
+    print('[UsuarioDB] Resultado raw: $result');
+    
+    if (result.isNotEmpty) {
+      final row = result.first;
+      print('[UsuarioDB] Columnas individuales:');
+      for (var i = 0; i < row.length; i++) {
+        print('Columna $i: ${row[i]}');
+      }
+      
+      // Crear usuario con valores explícitos
+      final usuario = Usuario(
+        id: row[0],
+        nombre: row[1]?.toString() ?? '',
+        apellidos: row[2]?.toString() ?? '',
+        correo: row[3]?.toString() ?? '',
+        telefono: row[4]?.toString() ?? '',
+        fechaNacimiento: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+        sexo: row[6]?.toString() ?? '',
+        status: row[7]?.toString(),
+      );
+      
+      print('[UsuarioDB] Usuario creado:');
+      print('Usuario.nombre: "${usuario.nombre}"');
+      print('Usuario.apellidos: "${usuario.apellidos}"');
+      print('Usuario.correo: "${usuario.correo}"');
+      
+      return usuario;
+    }
+    return null;
+  } catch (e) {
+    print('Error al obtener usuario por id: $e');
+    return null;
+  }
+}
+
+  static Future<int> obtenerDiasMembresiaRestantes({
+    required int idUsuario,
+    required dynamic conn,
+  }) async {
+    try {
+      debugPrint('Obteniendo días restantes de membresía...');
+      debugPrint('ID Usuario: $idUsuario');
+      final sql = Sql.named('''
       SELECT fechaFin
       FROM membresiaUsuario
       WHERE idUsuario = @idUsuario
@@ -298,30 +354,32 @@ static Future<int> obtenerDiasMembresiaRestantes({
       ORDER BY fechaFin DESC
       LIMIT 1
     ''');
-    final result = await conn.execute(
-      sql,
-      parameters: {'idUsuario': idUsuario},
-    );
-    if (result.isNotEmpty && result.first[0] != null) {
-      final dynamic rawFechaFin = result.first[0];
-      late DateTime fechaFin;
-      if (rawFechaFin is DateTime) {
-        fechaFin = rawFechaFin;
-      } else if (rawFechaFin is String) {
-        fechaFin = DateTime.parse(rawFechaFin);
-      } else {
-        fechaFin = DateTime.tryParse(rawFechaFin.toString()) ?? DateTime.now();
+      final result = await conn.execute(
+        sql,
+        parameters: {'idUsuario': idUsuario},
+      );
+      if (result.isNotEmpty && result.first[0] != null) {
+        final dynamic rawFechaFin = result.first[0];
+        late DateTime fechaFin;
+        if (rawFechaFin is DateTime) {
+          fechaFin = rawFechaFin;
+        } else if (rawFechaFin is String) {
+          fechaFin = DateTime.parse(rawFechaFin);
+        } else {
+          fechaFin =
+              DateTime.tryParse(rawFechaFin.toString()) ?? DateTime.now();
+        }
+        final hoy = DateTime.now();
+        debugPrint('fechaFin: $fechaFin, hoy: $hoy');
+        final dias =
+            fechaFin.difference(DateTime(hoy.year, hoy.month, hoy.day)).inDays;
+        debugPrint('Días calculados: $dias');
+        return dias > 0 ? dias : 0;
       }
-      final hoy = DateTime.now();
-      debugPrint('fechaFin: $fechaFin, hoy: $hoy');
-      final dias = fechaFin.difference(DateTime(hoy.year, hoy.month, hoy.day)).inDays;
-      debugPrint('Días calculados: $dias');
-      return dias > 0 ? dias : 0;
+      return 0;
+    } catch (e) {
+      print('Error al obtener días restantes de membresía: $e');
+      return 0;
     }
-    return 0;
-  } catch (e) {
-    print('Error al obtener días restantes de membresía: $e');
-    return 0;
   }
-}
 }
