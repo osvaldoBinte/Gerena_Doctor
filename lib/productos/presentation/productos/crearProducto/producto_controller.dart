@@ -4,12 +4,11 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:managegym/db/database_connection.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/producto_model.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 
 class ProductoController extends GetxController {
-  // Controladores para los campos de texto y otras propiedades se mantienen igual
+  // Controladores para los campos de texto
   final nombreProductoController = TextEditingController();
   final codigoBarrasController = TextEditingController();
   final stockInicialController = TextEditingController();
@@ -19,18 +18,26 @@ class ProductoController extends GetxController {
 
   final isImageSelected = false.obs;
   final selectedImagePath = Rx<String?>(null);
-  
+
+  // Categoría seleccionada y lista dinámica de categorías
   final categoriaSeleccionada = Rx<String?>(null);
-  final List<String> categorias = [
-    'Categoria 1',
-    'Categoria 2',
-    'Categoria 3',
-    'Categoria 4',
-    'Categoria 5'
-  ];
-  
+  final categorias = <String>[].obs;
+
   final formKey = GlobalKey<FormState>();
   final isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Cargar categorías reales del controlador global de categorías
+    if (Get.isRegistered<CategoriaController>()) {
+      final categoriaController = Get.find<CategoriaController>();
+      categorias.assignAll(categoriaController.categorias.map((c) => c.titulo));
+      if (categorias.isNotEmpty && categoriaSeleccionada.value == null) {
+        categoriaSeleccionada.value = categorias.first;
+      }
+    }
+  }
 
   Future<void> selectImage() async {
     XTypeGroup typeGroup = XTypeGroup(
@@ -42,65 +49,76 @@ class ProductoController extends GetxController {
 
     if (file == null) return;
 
-    // Simplemente guarda la ruta temporal para la vista previa
+    // Guarda la ruta temporal para la vista previa
     selectedImagePath.value = file.path;
     isImageSelected.value = true;
-
     print('Imagen seleccionada: ${file.path}');
   }
 
-  // Método para guardar un nuevo producto - MODIFICADO para usar Base64
-Future<void> guardarProducto() async {
-  if (formKey.currentState!.validate()) {
-    try {
-      isLoading.value = true;
+  // Método para guardar un nuevo producto usando Base64
+  Future<void> guardarProducto() async {
+    if (formKey.currentState!.validate()) {
+      try {
+        isLoading.value = true;
 
-      // Validación adicional para la categoría
-      if (categoriaSeleccionada.value == null) {
-        Get.snackbar('Error', 'Por favor selecciona una categoría',
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.BOTTOM);
-        isLoading.value = false;
-        return;
-      }
+        // Validación adicional para la categoría
+        if (categoriaSeleccionada.value == null) {
+          Get.snackbar('Error', 'Por favor selecciona una categoría',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM);
+          isLoading.value = false;
+          return;
+        }
 
-      // Convertir el precio y stock a los tipos correctos
-      final double precio = double.tryParse(precioController.text) ?? 0.0;
-      final int stock = int.tryParse(stockInicialController.text) ?? 0;
+        // Convertir el precio y stock a los tipos correctos
+        final double precio = double.tryParse(precioController.text) ?? 0.0;
+        final int stock = int.tryParse(stockInicialController.text) ?? 0;
 
-      // Obtener ID de categoría
-      int? idCategoria = categorias.indexOf(categoriaSeleccionada.value!) + 1;
+        // Obtener ID de categoría usando el nombre seleccionado (firstWhereOrNull de GetX)
+        int? idCategoria;
+        if (Get.isRegistered<CategoriaController>()) {
+          final categoriaController = Get.find<CategoriaController>();
+          final categoriaObjeto = categoriaController.categorias
+              .firstWhereOrNull((cat) => cat.titulo == categoriaSeleccionada.value);
+          if (categoriaObjeto != null) {
+            idCategoria = categoriaObjeto.id;
+          }
+        }
 
-      // Variable para almacenar la imagen en Base64
-      String? imagenBase64;
-      
-      // Convertir la imagen a Base64 si hay una imagen seleccionada
-      if (isImageSelected.value && selectedImagePath.value != null) {
-        // Crear un objeto File desde la ruta
-        File imageFile = File(selectedImagePath.value!);
-        
-        // Convertir la imagen a Base64
-        List<int> imageBytes = await imageFile.readAsBytes();
-        imagenBase64 = base64Encode(imageBytes);
-        
-        print('Imagen convertida a Base64');
-      }
+        if (idCategoria == null) {
+          Get.snackbar('Error', 'No se encontró la categoría seleccionada',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM);
+          isLoading.value = false;
+          return;
+        }
 
-      // Crear producto en la base de datos
-      final int? idProducto = await ProductoDB.crearProducto(
-        titulo: nombreProductoController.text,
-        descripcion: descripcionController.text,
-        precioVenta: precio,
-        stock: stock,
-        idCategoria: idCategoria,
-        idCodigoBarras: int.tryParse(idCodigoBarras.text),
-        imagenProducto: imagenBase64, // Usar Base64 en lugar de ruta
-        conn: Database.conn,
-      );
+        // Variable para almacenar la imagen en Base64
+        String? imagenBase64;
+
+        // Convertir la imagen a Base64 si hay una imagen seleccionada
+        if (isImageSelected.value && selectedImagePath.value != null) {
+          File imageFile = File(selectedImagePath.value!);
+          List<int> imageBytes = await imageFile.readAsBytes();
+          imagenBase64 = base64Encode(imageBytes);
+          print('Imagen convertida a Base64');
+        }
+
+        // Crear producto en la base de datos
+        final int? idProducto = await ProductoDB.crearProducto(
+          titulo: nombreProductoController.text,
+          descripcion: descripcionController.text,
+          precioVenta: precio,
+          stock: stock,
+          idCategoria: idCategoria,
+          idCodigoBarras: int.tryParse(idCodigoBarras.text),
+          imagenProducto: imagenBase64,
+          conn: Database.conn,
+        );
 
         if (idProducto != null) {
-          // Si se guardó el producto correctamente
           Get.back(); // Cerrar el modal
 
           Get.snackbar('Éxito', 'Producto guardado correctamente',
@@ -108,7 +126,6 @@ Future<void> guardarProducto() async {
               colorText: Colors.white,
               snackPosition: SnackPosition.BOTTOM);
 
-          // Limpiar los campos
           limpiarCampos();
         } else {
           Get.snackbar('Error', 'No se pudo guardar el producto',
@@ -128,7 +145,6 @@ Future<void> guardarProducto() async {
     }
   }
 
-  // El resto del código permanece igual
   void limpiarCampos() {
     nombreProductoController.clear();
     codigoBarrasController.clear();
@@ -136,7 +152,7 @@ Future<void> guardarProducto() async {
     precioController.clear();
     descripcionController.clear();
     idCodigoBarras.clear();
-    categoriaSeleccionada.value = null;
+    categoriaSeleccionada.value = categorias.isNotEmpty ? categorias.first : null;
     selectedImagePath.value = null;
     isImageSelected.value = false;
   }

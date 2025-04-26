@@ -50,45 +50,44 @@ class Producto {
 }
 
 class ProductoDB {
-  static Future<int?> crearProducto({
-    required String titulo,
-    String? descripcion,
-    required double precioVenta,
-    required int stock,
-    int? idCategoria,
-    int? idCodigoBarras,
-    String? imagenProducto, // Ahora será Base64
-    required dynamic conn,
-  }) async {
-    try {
-      final sql = Sql.named('''
-        INSERT INTO producto (
-          titulo, descripcion, precioVenta, stock, idCategoria, idCodigoBarras, imagenProducto
-        ) VALUES (
-          @titulo, @descripcion, @precioVenta, @stock, @idCategoria, @idCodigoBarras, @imagenProducto
-        ) RETURNING id;
-      ''');
+static Future<int?> crearProducto({
+  required String titulo,
+  String? descripcion,
+  required double precioVenta,
+  required int stock,
+  required int idCategoria, // <-- Ahora obligatorio y requerido
+  int? idCodigoBarras,
+  String? imagenProducto, // Ahora será Base64
+  required dynamic conn,
+}) async {
+  try {
+    final sql = Sql.named('''
+      INSERT INTO producto (
+        titulo, descripcion, precioVenta, stock, idCategoria, idCodigoBarras, imagenProducto
+      ) VALUES (
+        @titulo, @descripcion, @precioVenta, @stock, @idCategoria, @idCodigoBarras, @imagenProducto
+      ) RETURNING id;
+    ''');
 
-      final result = await conn.execute(sql, parameters: {
-        'titulo': titulo,
-        'descripcion': descripcion,
-        'precioVenta': precioVenta,
-        'stock': stock,
-        'idCategoria': idCategoria,
-        'idCodigoBarras': idCodigoBarras,
-        'imagenProducto': imagenProducto, // Ahora Base64
-      });
+    final result = await conn.execute(sql, parameters: {
+      'titulo': titulo,
+      'descripcion': descripcion,
+      'precioVenta': precioVenta,
+      'stock': stock,
+      'idCategoria': idCategoria, // <-- Guardas el id aquí
+      'idCodigoBarras': idCodigoBarras,
+      'imagenProducto': imagenProducto,
+    });
 
-      if (result.isNotEmpty) {
-        return result.first[0] as int;
-      }
-      return null;
-    } catch (e) {
-      print('Error al crear producto: $e');
-      return null;
+    if (result.isNotEmpty) {
+      return result.first[0] as int;
     }
+    return null;
+  } catch (e) {
+    print('Error al crear producto: $e');
+    return null;
   }
-
+}
 
   static Future<bool> editarProducto({
     required int id,

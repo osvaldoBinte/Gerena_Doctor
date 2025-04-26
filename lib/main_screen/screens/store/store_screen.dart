@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/main_screen/screens/store/store_controller.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
 import 'package:managegym/main_screen/widgets/modal_categorias.dart';
 import 'package:managegym/productos/presentation/productos/filter/filter_button.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/modal_agregar_producto.dart';
@@ -53,20 +54,22 @@ class StoreScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(width: 20),
-                  QuickActionButton(
-                    text: 'AGREGAR UN NUEVO PRODUCTO',
-                    icon: Icons.add,
-                    accion: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return ModalCategorias();
-                        },
-                      ).then((_) {
-                        
-                      });
-                    },
-                  ),
+                QuickActionButton(
+                  text: 'AGREGAR CATEGORIAS',
+                  icon: Icons.add,
+                  accion: () {
+                    // Registrar el controlador si no está registrado
+                    if (!Get.isRegistered<CategoriaController>()) {
+                      Get.put(CategoriaController());
+                    }
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return ModalCategorias();
+                      },
+                    );
+                  },
+                ),
                 ],
               ),
             ),

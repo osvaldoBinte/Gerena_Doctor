@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/producto_controller.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_nombre_producto.dart';
@@ -17,6 +18,21 @@ class ModalAgregarProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final CategoriaController categoriaController =
+        Get.isRegistered<CategoriaController>()
+            ? Get.find<CategoriaController>()
+            : Get.put(CategoriaController());
+
+    if (categoriaController.categorias.isEmpty) {
+      categoriaController.cargarCategorias().then((_) {
+        productoController.categorias.assignAll(categoriaController.titulosCategorias);
+        productoController.categoriaSeleccionada.value = null;
+      });
+    } else {
+      productoController.categorias.assignAll(categoriaController.titulosCategorias);
+      productoController.categoriaSeleccionada.value = null;
+    }
+
     return AlertDialog(
       backgroundColor: colors.colorFondoModal,
       content: Container(
@@ -47,62 +63,71 @@ class ModalAgregarProducto extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           InputNombreProductoWidget(
-                            nombreProductoController:
-                                productoController.nombreProductoController,
+                            nombreProductoController: productoController.nombreProductoController,
                           ),
                           const SizedBox(height: 15),
                           InputCodigoDeBarrasProductoWidget(
-                            codigoBarrasController:
-                                productoController.codigoBarrasController,
+                            codigoBarrasController: productoController.codigoBarrasController,
                           ),
                           const SizedBox(height: 15),
                           Row(
                             children: [
                               Expanded(
                                 child: InputPrecioProductoWidget(
-                                  precioController:
-                                      productoController.precioController,
+                                  precioController: productoController.precioController,
                                 ),
                               ),
                               const SizedBox(width: 15),
                               Expanded(
                                 child: InputStockInicialProductoWidget(
-                                  stockInicialController:
-                                      productoController.stockInicialController,
+                                  stockInicialController: productoController.stockInicialController,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 15),
-                          Obx(() => DropdownMenu<String>(
-                                initialSelection: productoController
-                                    .categoriaSeleccionada.value,
-                                width: 400,
-                                onSelected: (value) {
-                                  productoController.cambiarCategoria(value);
-                                },
-                                dropdownMenuEntries: productoController
-                                    .categorias
-                                    .map((categoria) =>
-                                        DropdownMenuEntry<String>(
-                                          value: categoria,
-                                          label: categoria,
-                                        ))
-                                    .toList(),
-                                label: Text('Categoría',
-                                    style: TextStyle(color: colors.colorTexto)),
-                                textStyle: TextStyle(color: colors.colorTexto),
-                                inputDecorationTheme: InputDecorationTheme(
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: colors.colorTexto),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: colors.colorTexto),
-                                  ),
+                          Obx(() {
+                            if (productoController.categorias.isEmpty) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  'No hay categorías disponibles',
+                                  style: TextStyle(color: Colors.red),
                                 ),
-                              )),
+                              );
+                            }
+                            return DropdownButtonFormField<String>(
+                              value: productoController.categoriaSeleccionada.value,
+                              items: productoController.categorias
+                                  .map((categoria) => DropdownMenuItem<String>(
+                                        value: categoria,
+                                        child: Text(
+                                          categoria,
+                                          style: TextStyle(color: colors.colorTexto),
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                productoController.cambiarCategoria(value);
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Categoría',
+                                labelStyle: TextStyle(color: colors.colorTexto),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: colors.colorTexto),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: colors.colorTexto),
+                                ),
+                                // Elimina hintText/hintStyle y usa `hint`:
+                              ),
+                              dropdownColor: colors.colorFondoModal,
+                              hint: Text(
+                                "Seleccionar categoría",
+                                style: TextStyle(color: Colors.white), // <-- BLANCO AQUÍ, FUNCIONA SIEMPRE
+                              ),
+                            );
+                          }),
                         ],
                       ),
                     ),
@@ -113,8 +138,7 @@ class ModalAgregarProducto extends StatelessWidget {
                     flex: 1,
                     child: Center(
                       child: Obx(() {
-                        final bool hasImage =
-                            productoController.isImageSelected.value;
+                        final bool hasImage = productoController.isImageSelected.value;
                         return DottedBorder(
                           borderType: BorderType.RRect,
                           radius: Radius.circular(16),
@@ -137,16 +161,14 @@ class ModalAgregarProducto extends StatelessWidget {
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
                                       child: Image.file(
-                                        File(productoController
-                                            .selectedImagePath.value!),
+                                        File(productoController.selectedImagePath.value!),
                                         fit: BoxFit.cover,
                                         width: 180,
                                         height: 180,
                                       ),
                                     )
                                   : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Icon(Icons.add_a_photo,
                                             color: Colors.orange, size: 60),
