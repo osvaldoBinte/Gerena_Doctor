@@ -1,79 +1,54 @@
 import 'package:managegym/db/database_connection.dart';
 import 'package:postgres/postgres.dart';
 
-class TIpoMembresia {
+class Categoria {
   final int id;
   final String titulo;
-  final String descripcion;
-  final double precio;
-  final int tiempoDuracion; // en horas
 
-  TIpoMembresia({
-    required this.id,
-    required this.titulo,
-    required this.descripcion,
-    required this.precio,
-    required this.tiempoDuracion,
-  });
+  Categoria({required this.id, required this.titulo});
 
-  factory TIpoMembresia.fromRow(List<dynamic> row) {
-    return TIpoMembresia(
-      id: row[0] is int ? row[0] : int.tryParse(row[0].toString()) ?? 0,
-      titulo: row[1].toString(),
-      descripcion: row[2].toString(),
-      precio: row[3] is double ? row[3] : double.tryParse(row[3].toString()) ?? 0.0,
-      tiempoDuracion: row[4] is int ? row[4] : int.tryParse(row[4].toString()) ?? 0,
-    );
-  }
+  factory Categoria.fromRow(List<dynamic> row) => Categoria(
+        id: row[0] is int ? row[0] : int.tryParse(row[0].toString()) ?? 0,
+        titulo: row[1].toString(),
+      );
 }
 
-class TIpoMembresiaModel {
-  static Future<List<TIpoMembresia>> obtenerTodasLasCategorias() async {
+class CategoriaModel {
+  static Future<List<Categoria>> obtenerTodasLasCategorias() async {
     try {
       final results = await Database.conn.execute(
-        "SELECT id, titulo, descripcion, precio, tiempoDuracion FROM tipomembresia ORDER BY id DESC"
+        Sql.named("SELECT id, titulo FROM categorias ORDER BY id DESC"),
       );
-      return results.map((row) => TIpoMembresia.fromRow(row)).toList();
+      return results.map((row) => Categoria.fromRow(row)).toList();
     } catch (e) {
       print("Error al obtener las categorias: $e");
       return [];
     }
   }
 
-  static Future<TIpoMembresia?> insertarTipoMembresia({
-    required String titulo,
-    required String descripcion,
-    required double precio,
-    required int tiempoDuracion,
-  }) async {
+  static Future<Categoria?> insertarCategoria({required String titulo}) async {
     try {
-      final sql = Sql.named("""
-        INSERT INTO tipomembresia (titulo, descripcion, precio, tiempoDuracion)
-        VALUES (@titulo, @descripcion, @precio, @tiempoDuracion)
-        RETURNING id, titulo, descripcion, precio, tiempoDuracion
-      """);
-      final results = await Database.conn.execute(sql, parameters: {
-        'titulo': titulo,
-        'descripcion': descripcion,
-        'precio': precio,
-        'tiempoDuracion': tiempoDuracion,
-      });
-
+      final results = await Database.conn.execute(
+        Sql.named("INSERT INTO categorias (titulo) VALUES (@titulo) RETURNING id, titulo"),
+        parameters: {'titulo': titulo},
+      );
       if (results.isNotEmpty) {
-        return TIpoMembresia.fromRow(results.first);
+        return Categoria.fromRow(results.first);
       }
       return null;
     } catch (e) {
-      print("Error en insertarTipoMembresia: $e");
+      print("Error en insertarCategoria: $e");
       return null;
     }
   }
 
-  static Future<bool> eliminarTipoMembresia(int id) async {
+  static Future<bool> eliminarCategoria(int id) async {
     try {
-      final sql = Sql.named("DELETE FROM tipomembresia WHERE id=@id");
-      final result = await Database.conn.execute(sql, parameters: {'id': id});
-      return result.affectedRows > 0;
+      await Database.conn.execute(
+        Sql.named("DELETE FROM categorias WHERE id=@id"),
+        parameters: {'id': id},
+      );
+      return true;
     } catch (e) {
       print("Error al eliminar la categoria: $e");
       return false;

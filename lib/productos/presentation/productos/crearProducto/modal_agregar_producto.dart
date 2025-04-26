@@ -3,12 +3,13 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
-import 'package:managegym/productos/presentation/productos/crearProducto/producto_controller.dart';
+import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_controller.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_nombre_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_precio_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_stock_inicial_producto.dart.dart';
 import 'package:managegym/shared/admin_colors.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaModel.dart';
 
 class ModalAgregarProducto extends StatelessWidget {
   ModalAgregarProducto({Key? key}) : super(key: key);
@@ -18,19 +19,24 @@ class ModalAgregarProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TIpoMembresiaController categoriaController =
-        Get.isRegistered<TIpoMembresiaController>()
-            ? Get.find<TIpoMembresiaController>()
-            : Get.put(TIpoMembresiaController());
+    final CategoriaController categoriaController =
+        Get.isRegistered<CategoriaController>()
+            ? Get.find<CategoriaController>()
+            : Get.put(CategoriaController());
 
+    // Cargar categorías si es necesario
     if (categoriaController.categorias.isEmpty) {
       categoriaController.cargarCategorias().then((_) {
-        productoController.categorias.assignAll(categoriaController.titulosCategorias);
-        productoController.categoriaSeleccionada.value = null;
+        productoController.categorias.assignAll(categoriaController.categorias);
+        productoController.categoriaSeleccionada.value = productoController.categorias.isNotEmpty
+            ? productoController.categorias.first
+            : null;
       });
     } else {
-      productoController.categorias.assignAll(categoriaController.titulosCategorias);
-      productoController.categoriaSeleccionada.value = null;
+      productoController.categorias.assignAll(categoriaController.categorias);
+      productoController.categoriaSeleccionada.value = productoController.categorias.isNotEmpty
+          ? productoController.categorias.first
+          : null;
     }
 
     return AlertDialog(
@@ -96,13 +102,13 @@ class ModalAgregarProducto extends StatelessWidget {
                                 ),
                               );
                             }
-                            return DropdownButtonFormField<String>(
+                            return DropdownButtonFormField<Categoria>(
                               value: productoController.categoriaSeleccionada.value,
                               items: productoController.categorias
-                                  .map((categoria) => DropdownMenuItem<String>(
+                                  .map((categoria) => DropdownMenuItem<Categoria>(
                                         value: categoria,
                                         child: Text(
-                                          categoria,
+                                          categoria.titulo,
                                           style: TextStyle(color: colors.colorTexto),
                                         ),
                                       ))
@@ -119,12 +125,11 @@ class ModalAgregarProducto extends StatelessWidget {
                                 focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(color: colors.colorTexto),
                                 ),
-                                // Elimina hintText/hintStyle y usa `hint`:
                               ),
                               dropdownColor: colors.colorFondoModal,
                               hint: Text(
                                 "Seleccionar categoría",
-                                style: TextStyle(color: Colors.white), // <-- BLANCO AQUÍ, FUNCIONA SIEMPRE
+                                style: TextStyle(color: Colors.white),
                               ),
                             );
                           }),
@@ -133,7 +138,7 @@ class ModalAgregarProducto extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 30),
-                  // Columna derecha: Imagen (solo preview y tap para seleccionar)
+                  // Columna derecha: Imagen
                   Expanded(
                     flex: 1,
                     child: Center(
@@ -201,7 +206,16 @@ class ModalAgregarProducto extends StatelessWidget {
                 Obx(() => InkWell(
                       onTap: productoController.isLoading.value
                           ? null
-                          : productoController.guardarProducto,
+                          : () {
+                              // ----- GUARDAR PRODUCTO -----
+                              final categoria = productoController.categoriaSeleccionada.value;
+                              if (categoria == null) {
+                                Get.snackbar('Error', 'Selecciona una categoría');
+                                return;
+                              }
+                              // Aquí debes pasar categoria.id al insertar producto
+                              productoController.guardarProducto();
+                            },
                       borderRadius: BorderRadius.circular(50),
                       child: Container(
                         width: 300,

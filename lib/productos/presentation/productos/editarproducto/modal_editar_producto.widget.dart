@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:managegym/productos/presentation/productos/crearProducto/producto_model.dart';
+import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_model.dart';
 import 'package:managegym/productos/presentation/productos/editarproducto/editar_producto_controller.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
 import 'package:managegym/productos/presentation/widgets/input_nombre_producto.dart';

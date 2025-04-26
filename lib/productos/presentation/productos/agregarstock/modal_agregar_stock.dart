@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:managegym/productos/presentation/productos/crearProducto/producto_model.dart';
+import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_model.dart';
 import 'package:managegym/productos/presentation/productos/agregarstock/agregar_stock_controller.dart';
 import 'package:managegym/shared/admin_colors.dart';
 

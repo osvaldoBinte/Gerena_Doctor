@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:managegym/db/database_connection.dart';
-import 'package:managegym/productos/presentation/productos/crearProducto/producto_model.dart';
+import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_model.dart';
 
 class EditarProductoController extends GetxController {
   // Controladores para los campos de texto

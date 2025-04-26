@@ -2,13 +2,9 @@ import 'package:get/get.dart';
 import 'categoriaModel.dart';
 
 class CategoriaController extends GetxController {
-  // Lista de categorías (observable)
   var categorias = <Categoria>[].obs;
-
-  // Estado de carga (observable)
   var cargando = false.obs;
 
-  // Getter para títulos de las categorías
   List<String> get titulosCategorias => categorias.map((c) => c.titulo).toList();
 
   @override
@@ -17,14 +13,12 @@ class CategoriaController extends GetxController {
     cargarCategorias();
   }
 
-  // Cargar todas las categorías desde la base de datos
   Future<void> cargarCategorias() async {
     cargando.value = true;
     categorias.value = await CategoriaModel.obtenerTodasLasCategorias();
     cargando.value = false;
   }
 
-  // Agregar nueva categoría
   Future<bool> agregarCategoria({required String titulo}) async {
     final cat = await CategoriaModel.insertarCategoria(titulo: titulo);
     if (cat != null) {
@@ -34,7 +28,6 @@ class CategoriaController extends GetxController {
     return false;
   }
 
-  // Eliminar categoría por ID
   Future<bool> eliminarCategoria(int id) async {
     final ok = await CategoriaModel.eliminarCategoria(id);
     if (ok) {

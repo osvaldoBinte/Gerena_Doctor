@@ -17,6 +17,8 @@ class StoreScreen extends StatelessWidget {
 
   // Instanciar el controlador de tienda
   final StoreController storeController = Get.put(StoreController());
+  // Instanciar el controlador de categorías (si no está registrado)
+  final CategoriaController categoriaController = Get.put(CategoriaController());
 
   @override
   Widget build(BuildContext context) {
@@ -54,22 +56,18 @@ class StoreScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(width: 20),
-                QuickActionButton(
-                  text: 'AGREGAR CATEGORIAS',
-                  icon: Icons.add,
-                  accion: () {
-                    // Registrar el controlador si no está registrado
-                    if (!Get.isRegistered<TIpoMembresiaController>()) {
-                      Get.put(TIpoMembresiaController());
-                    }
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return ModalCategorias();
-                      },
-                    );
-                  },
-                ),
+                  QuickActionButton(
+                    text: 'AGREGAR CATEGORIAS',
+                    icon: Icons.add,
+                    accion: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return ModalCategorias();
+                        },
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -237,6 +235,11 @@ class StoreScreen extends StatelessWidget {
                   // Verifica si el producto tiene stock disponible
                   final bool disponible = producto.stock > 0;
 
+                  // Buscar el nombre de la categoría usando el idCategoria del producto
+                  final categoriaNombre = categoriaController.categorias
+                      .firstWhereOrNull((cat) => cat.id == producto.idCategoria)
+                      ?.titulo ?? 'Sin categoría';
+
                   return ProductRowWidget(
                     producto: producto,
                     image: (producto.imagenProducto != null &&
@@ -284,13 +287,12 @@ class StoreScreen extends StatelessWidget {
                             ),
                           ),
                     nombre: producto.titulo,
-                    categoria:
-                        'Categoría', // Necesitarías obtener el nombre de la categoría
+                    categoria: categoriaNombre,
                     precioUnitario:
                         '\$${producto.precioVenta.toStringAsFixed(2)}',
                     cantidadDisponible: '${producto.stock}',
                     codigoBarras:
-                        'N/A', // Reemplazar con el código de barras real si lo tienes
+                        producto.codigoBarras ?? 'N/A', // Usa el código real si lo tienes
                     disponible: disponible ? 'Sí' : 'No',
                     index: index,
                     onDelete: () => storeController.deleteProducto(producto.id),

@@ -4,35 +4,37 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:managegym/db/database_connection.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaModel.dart';
 import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
-import 'package:managegym/productos/presentation/productos/crearProducto/producto_model.dart';
+import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_model.dart';
 
 class ProductoController extends GetxController {
-  // Controladores para los campos de texto
   final nombreProductoController = TextEditingController();
   final codigoBarrasController = TextEditingController();
   final stockInicialController = TextEditingController();
   final precioController = TextEditingController();
   final descripcionController = TextEditingController();
-  final idCodigoBarras = TextEditingController();
 
   final isImageSelected = false.obs;
   final selectedImagePath = Rx<String?>(null);
 
-  // Categoría seleccionada y lista dinámica de categorías
-  final categoriaSeleccionada = Rx<String?>(null);
-  final categorias = <String>[].obs;
+  final categoriaSeleccionada = Rx<Categoria?>(null);
+  final categorias = <Categoria>[].obs; // Lista de objetos Categoria
 
   final formKey = GlobalKey<FormState>();
   final isLoading = false.obs;
 
+  void cambiarCategoria(Categoria? categoria) {
+    categoriaSeleccionada.value = categoria;
+  }
+
   @override
   void onInit() {
     super.onInit();
-    // Cargar categorías reales del controlador global de categorías
-    if (Get.isRegistered<TIpoMembresiaController>()) {
-      final categoriaController = Get.find<TIpoMembresiaController>();
-      categorias.assignAll(categoriaController.categorias.map((c) => c.titulo));
+    // Usa el controlador REAL de categorías
+    if (Get.isRegistered<CategoriaController>()) {
+      final categoriaController = Get.find<CategoriaController>();
+      categorias.assignAll(categoriaController.categorias);
       if (categorias.isNotEmpty && categoriaSeleccionada.value == null) {
         categoriaSeleccionada.value = categorias.first;
       }
@@ -75,16 +77,8 @@ class ProductoController extends GetxController {
         final double precio = double.tryParse(precioController.text) ?? 0.0;
         final int stock = int.tryParse(stockInicialController.text) ?? 0;
 
-        // Obtener ID de categoría usando el nombre seleccionado (firstWhereOrNull de GetX)
-        int? idCategoria;
-        if (Get.isRegistered<TIpoMembresiaController>()) {
-          final categoriaController = Get.find<TIpoMembresiaController>();
-          final categoriaObjeto = categoriaController.categorias
-              .firstWhereOrNull((cat) => cat.titulo == categoriaSeleccionada.value);
-          if (categoriaObjeto != null) {
-            idCategoria = categoriaObjeto.id;
-          }
-        }
+        // ---- Aquí ya puedes obtener el id directamente ----
+        final int? idCategoria = categoriaSeleccionada.value?.id;
 
         if (idCategoria == null) {
           Get.snackbar('Error', 'No se encontró la categoría seleccionada',
@@ -106,14 +100,29 @@ class ProductoController extends GetxController {
           print('Imagen convertida a Base64');
         }
 
-        // Crear producto en la base de datos
+        // 1. Insertar el código de barras en la tabla codigoBarras y obtener su id
+        final int? idCodigoBarras = await ProductoDB.insertarCodigoBarras(
+          codigoBarras: codigoBarrasController.text,
+          conn: Database.conn,
+        );
+
+        if (idCodigoBarras == null) {
+          Get.snackbar('Error', 'No se pudo guardar el código de barras',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM);
+          isLoading.value = false;
+          return;
+        }
+
+        // 2. Crear producto en la base de datos usando el idCodigoBarras generado
         final int? idProducto = await ProductoDB.crearProducto(
           titulo: nombreProductoController.text,
           descripcion: descripcionController.text,
           precioVenta: precio,
           stock: stock,
           idCategoria: idCategoria,
-          idCodigoBarras: int.tryParse(idCodigoBarras.text),
+          idCodigoBarras: idCodigoBarras,
           imagenProducto: imagenBase64,
           conn: Database.conn,
         );
@@ -151,14 +160,9 @@ class ProductoController extends GetxController {
     stockInicialController.clear();
     precioController.clear();
     descripcionController.clear();
-    idCodigoBarras.clear();
     categoriaSeleccionada.value = categorias.isNotEmpty ? categorias.first : null;
     selectedImagePath.value = null;
     isImageSelected.value = false;
-  }
-
-  void cambiarCategoria(String? categoria) {
-    categoriaSeleccionada.value = categoria;
   }
 
   @override
@@ -168,7 +172,6 @@ class ProductoController extends GetxController {
     stockInicialController.dispose();
     precioController.dispose();
     descripcionController.dispose();
-    idCodigoBarras.dispose();
     super.onClose();
   }
 }

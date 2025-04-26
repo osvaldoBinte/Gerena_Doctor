@@ -112,7 +112,7 @@ conn = await Connection.open(
         '''
         CREATE TABLE IF NOT EXISTS categorias (
           id SERIAL PRIMARY KEY,
-          titulo VARCHAR(100) NOT NULL,
+          titulo VARCHAR(100) NOT NULL
         )
         ''',
         
@@ -174,7 +174,7 @@ conn = await Connection.open(
             fechaRegistro DATE NOT NULL DEFAULT CURRENT_DATE,
             idCategoria INTEGER REFERENCES categorias(id),
             idCodigoBarras INTEGER REFERENCES codigoBarras(id),
-            imagenProducto VARCHAR(255)
+            imagenProducto TEXT
           )
         ''',
         
