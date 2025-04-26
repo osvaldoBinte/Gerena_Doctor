@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:managegym/main_screen/widgets/connection/categoriaModel.dart';
 
-class CategoriaController extends GetxController {
-  var categorias = <Categoria>[].obs;
+class TIpoMembresiaController extends GetxController {
+  var categorias = <TIpoMembresia>[].obs;
   var cargando = false.obs;
 
   @override
@@ -13,7 +13,7 @@ class CategoriaController extends GetxController {
 
   Future<void> cargarCategorias() async {
     cargando.value = true;
-    final lista = await CategoriaModel.obtenerTodasLasCategorias();
+    final lista = await TIpoMembresiaModel.obtenerTodasLasCategorias();
     categorias.assignAll(lista);
     cargando.value = false;
   }
@@ -27,7 +27,7 @@ class CategoriaController extends GetxController {
     required double precio,
     required int tiempoDuracion,
   }) async {
-    final nueva = await CategoriaModel.insertarTipoMembresia(
+    final nueva = await TIpoMembresiaModel.insertarTipoMembresia(
       titulo: titulo,
       descripcion: descripcion,
       precio: precio,
@@ -41,7 +41,7 @@ class CategoriaController extends GetxController {
   }
 
   Future<bool> eliminarCategoria(int id) async {
-    final eliminado = await CategoriaModel.eliminarTipoMembresia(id);
+    final eliminado = await TIpoMembresiaModel.eliminarTipoMembresia(id);
     if (eliminado) {
       await cargarCategorias();
       return true;

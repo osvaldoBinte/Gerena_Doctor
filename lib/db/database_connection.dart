@@ -113,11 +113,6 @@ conn = await Connection.open(
         CREATE TABLE IF NOT EXISTS categorias (
           id SERIAL PRIMARY KEY,
           titulo VARCHAR(100) NOT NULL,
-          descripcion TEXT,
-          imagenCategoria VARCHAR(255),
-          estadoCategoria VARCHAR(10) CHECK (estadoCategoria IN ('activa', 'inactiva')) DEFAULT 'activa',
-          ordenVisualizacion INTEGER DEFAULT 0,
-          idCategoriaPadre INTEGER REFERENCES categorias(id)
         )
         ''',
         

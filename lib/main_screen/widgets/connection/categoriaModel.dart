@@ -1,14 +1,14 @@
 import 'package:managegym/db/database_connection.dart';
 import 'package:postgres/postgres.dart';
 
-class Categoria {
+class TIpoMembresia {
   final int id;
   final String titulo;
   final String descripcion;
   final double precio;
   final int tiempoDuracion; // en horas
 
-  Categoria({
+  TIpoMembresia({
     required this.id,
     required this.titulo,
     required this.descripcion,
@@ -16,8 +16,8 @@ class Categoria {
     required this.tiempoDuracion,
   });
 
-  factory Categoria.fromRow(List<dynamic> row) {
-    return Categoria(
+  factory TIpoMembresia.fromRow(List<dynamic> row) {
+    return TIpoMembresia(
       id: row[0] is int ? row[0] : int.tryParse(row[0].toString()) ?? 0,
       titulo: row[1].toString(),
       descripcion: row[2].toString(),
@@ -27,20 +27,20 @@ class Categoria {
   }
 }
 
-class CategoriaModel {
-  static Future<List<Categoria>> obtenerTodasLasCategorias() async {
+class TIpoMembresiaModel {
+  static Future<List<TIpoMembresia>> obtenerTodasLasCategorias() async {
     try {
       final results = await Database.conn.execute(
         "SELECT id, titulo, descripcion, precio, tiempoDuracion FROM tipomembresia ORDER BY id DESC"
       );
-      return results.map((row) => Categoria.fromRow(row)).toList();
+      return results.map((row) => TIpoMembresia.fromRow(row)).toList();
     } catch (e) {
       print("Error al obtener las categorias: $e");
       return [];
     }
   }
 
-  static Future<Categoria?> insertarTipoMembresia({
+  static Future<TIpoMembresia?> insertarTipoMembresia({
     required String titulo,
     required String descripcion,
     required double precio,
@@ -60,7 +60,7 @@ class CategoriaModel {
       });
 
       if (results.isNotEmpty) {
-        return Categoria.fromRow(results.first);
+        return TIpoMembresia.fromRow(results.first);
       }
       return null;
     } catch (e) {

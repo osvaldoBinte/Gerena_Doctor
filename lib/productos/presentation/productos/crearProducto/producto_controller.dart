@@ -30,8 +30,8 @@ class ProductoController extends GetxController {
   void onInit() {
     super.onInit();
     // Cargar categorías reales del controlador global de categorías
-    if (Get.isRegistered<CategoriaController>()) {
-      final categoriaController = Get.find<CategoriaController>();
+    if (Get.isRegistered<TIpoMembresiaController>()) {
+      final categoriaController = Get.find<TIpoMembresiaController>();
       categorias.assignAll(categoriaController.categorias.map((c) => c.titulo));
       if (categorias.isNotEmpty && categoriaSeleccionada.value == null) {
         categoriaSeleccionada.value = categorias.first;
@@ -77,8 +77,8 @@ class ProductoController extends GetxController {
 
         // Obtener ID de categoría usando el nombre seleccionado (firstWhereOrNull de GetX)
         int? idCategoria;
-        if (Get.isRegistered<CategoriaController>()) {
-          final categoriaController = Get.find<CategoriaController>();
+        if (Get.isRegistered<TIpoMembresiaController>()) {
+          final categoriaController = Get.find<TIpoMembresiaController>();
           final categoriaObjeto = categoriaController.categorias
               .firstWhereOrNull((cat) => cat.titulo == categoriaSeleccionada.value);
           if (categoriaObjeto != null) {

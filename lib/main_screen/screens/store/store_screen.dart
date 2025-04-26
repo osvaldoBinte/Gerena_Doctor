@@ -59,8 +59,8 @@ class StoreScreen extends StatelessWidget {
                   icon: Icons.add,
                   accion: () {
                     // Registrar el controlador si no está registrado
-                    if (!Get.isRegistered<CategoriaController>()) {
-                      Get.put(CategoriaController());
+                    if (!Get.isRegistered<TIpoMembresiaController>()) {
+                      Get.put(TIpoMembresiaController());
                     }
                     showDialog(
                       context: context,

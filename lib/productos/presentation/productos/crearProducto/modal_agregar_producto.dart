@@ -18,10 +18,10 @@ class ModalAgregarProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CategoriaController categoriaController =
-        Get.isRegistered<CategoriaController>()
-            ? Get.find<CategoriaController>()
-            : Get.put(CategoriaController());
+    final TIpoMembresiaController categoriaController =
+        Get.isRegistered<TIpoMembresiaController>()
+            ? Get.find<TIpoMembresiaController>()
+            : Get.put(TIpoMembresiaController());
 
     if (categoriaController.categorias.isEmpty) {
       categoriaController.cargarCategorias().then((_) {
