@@ -36,12 +36,16 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _diaController = TextEditingController();
+  final TextEditingController _pagaConController = TextEditingController();
   String? _mesController;
   String? _anoController;
   String? _sexoController;
 
   List<String> _suscripcionesSeleccionadas = [];
   TipoMembresia? _suscripcionSeleccionada;
+
+  double _totalAPagar = 0.0;
+  double _cambio = 0.0;
 
   // GetX controller
   final usuarioController = Get.put(UsuarioController());
@@ -53,6 +57,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     _telefonoController.dispose();
     _correoController.dispose();
     _diaController.dispose();
+    _pagaConController.dispose();
     super.dispose();
   }
 
@@ -66,6 +71,8 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
         _suscripcionesSeleccionadas.add(id.toString());
         _suscripcionSeleccionada = suscripcion;
       }
+      calcularTotalAPagar();
+      calcularCambio();
     });
   }
 
@@ -75,6 +82,30 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
       if (_suscripcionSeleccionada?.id.toString() == id.toString()) {
         _suscripcionSeleccionada = null;
       }
+      calcularTotalAPagar();
+      calcularCambio();
+    });
+  }
+
+  void calcularTotalAPagar() {
+    double total = 0.0;
+    for (final id in _suscripcionesSeleccionadas) {
+      try {
+        final suscripcion = widget.suscripcionesDisponibles.firstWhere(
+          (s) => s.id.toString() == id,
+        );
+        total += suscripcion.precio is double
+            ? suscripcion.precio
+            : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
+      } catch (_) {}
+    }
+    _totalAPagar = total;
+  }
+
+  void calcularCambio() {
+    double pagaCon = double.tryParse(_pagaConController.text) ?? 0.0;
+    setState(() {
+      _cambio = _pagaConController.text.isEmpty ? 0.0 : pagaCon - _totalAPagar;
     });
   }
 
@@ -177,6 +208,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
 
   @override
   Widget build(BuildContext context) {
+    AdminColors colores = AdminColors();
     return AlertDialog(
       backgroundColor: colores.colorFondoModal,
       content: SizedBox(
@@ -185,7 +217,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
+            Text(
               'Registrar un nuevo cliente',
               style: TextStyle(
                   color: colores.colorTexto,
@@ -228,7 +260,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                               ],
                             ),
                             const SizedBox(height: 20),
-                             Text(
+                            Text(
                               'Fecha de nacimiento',
                               style: TextStyle(
                                   color: colores.colorTexto,
@@ -274,7 +306,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Total a pagar:',
+                              'Total a pagar: \$${_totalAPagar.toStringAsFixed(2)}',
                               style: TextStyle(
                                   color: colores.colorTexto,
                                   fontSize: 21,
@@ -293,7 +325,9 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                             SizedBox(
                               width: 400,
                               child: TextFormField(
+                                controller: _pagaConController,
                                 style: TextStyle(color: colores.colorTexto),
+                                keyboardType: TextInputType.numberWithOptions(decimal: true),
                                 decoration: InputDecoration(
                                   labelStyle:
                                       TextStyle(color: colores.colorTexto),
@@ -306,18 +340,20 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                                         BorderSide(color: colores.colorTexto),
                                   ),
                                 ),
+                                onChanged: (_) => calcularCambio(),
                               ),
                             ),
                             const SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              'Cambio:',
-                              style: TextStyle(
-                                  color: colores.colorTexto,
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                            if (_pagaConController.text.isNotEmpty) // <-- Solo muestra si hay texto
+                              Text(
+                                'Cambio: \$${_cambio.toStringAsFixed(2)}',
+                                style: TextStyle(
+                                    color: colores.colorTexto,
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.bold),
+                              ),
                           ],
                         ),
                       ),
@@ -389,7 +425,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                     width: double.infinity,
                     height: 40,
                     decoration:  BoxDecoration(
-                      color: colors.colorCabezeraTabla,
+                      color: colores.colorCabezeraTabla,
                     ),
                     child:  Flex(
                       direction: Axis.horizontal,

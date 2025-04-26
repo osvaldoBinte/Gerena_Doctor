@@ -22,6 +22,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
   final ScrollController _scrollController = ScrollController();
 
   List<String> _suscripcionesSeleccionadas = [];
+  double _totalAPagar = 0.0;
 
   void seleccionarSuscripcion(String id) {
     setState(() {
@@ -30,12 +31,33 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
       } else {
         _suscripcionesSeleccionadas.add(id.toString());
       }
+      calcularTotalAPagar();
     });
   }
 
   void eliminarSuscripcion(String id) {
     setState(() {
       _suscripcionesSeleccionadas.remove(id.toString());
+      calcularTotalAPagar();
+    });
+  }
+
+  void calcularTotalAPagar() {
+    double total = 0.0;
+    for (final id in _suscripcionesSeleccionadas) {
+      try {
+        final suscripcion = widget.suscripcionesDisponibles.firstWhere(
+          (s) => s.id.toString() == id,
+        );
+        total += suscripcion.precio is double
+            ? suscripcion.precio
+            : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
+      } catch (_) {
+        // Si no la encuentra, simplemente ignora
+      }
+    }
+    setState(() {
+      _totalAPagar = total;
     });
   }
 
@@ -107,7 +129,7 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
             Row(
               children: [
                  Text(
-                  'Total a pagar:',
+                  'Total a pagar: \$${_totalAPagar.toStringAsFixed(2)}',
                   style: TextStyle(
                       color: colores.colorTexto,
                       fontSize: 21,
