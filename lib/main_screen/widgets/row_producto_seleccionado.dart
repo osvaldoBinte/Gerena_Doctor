@@ -31,29 +31,32 @@ class RowProductoSeleccionado extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-              flex: 2,
+              flex: 4,
               child: Text("Nombre",
                   style: TextStyle(
                       color: colores.colorTexto,
                       fontSize: 17))),
           Expanded(
-              flex: 1,
+              flex: 2,
               child: Text("Precio",
                   style: TextStyle(
                       color: colores.colorTexto,
                       fontSize: 17))),
           Expanded(
-              flex: 1,
+              flex: 2,
               child: Text("Cantidad",
                   style: TextStyle(
                       color: colores.colorTexto,
                       fontSize: 17))),
           Expanded(
-              flex: 2,
+              flex: 3,
               child: Text("Total",
                   style: TextStyle(
                       color: colores.colorTexto,
                       fontSize: 17))),
+           Expanded(flex: 2, child: IconButton(onPressed: (){
+            print("Eliminar producto seleccionado $index");
+           }, icon: Icon(Icons.delete_forever, color: colores.colorTexto,))),
         ],
       ),
     );

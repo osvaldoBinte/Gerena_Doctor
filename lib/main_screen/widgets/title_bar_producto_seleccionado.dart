@@ -18,26 +18,27 @@ class TitleBarProductos extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(flex: 2, child: Text("Nombre", 
+          Expanded(flex: 4, child: Text("Nombre", 
               style: TextStyle(
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold,
                   fontSize: 17))),
-          Expanded(flex: 1, child: Text("Precio", 
+          Expanded(flex: 2, child: Text("Precio", 
               style: TextStyle(
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold,
                   fontSize: 17))),
-          Expanded(flex: 1, child: Text("Cantidad", 
+          Expanded(flex: 2, child: Text("Cantidad", 
               style: TextStyle(
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold,
                   fontSize: 17))),
-          Expanded(flex: 2, child: Text("Total" ,
+          Expanded(flex: 3, child: Text("Total" ,
               style: TextStyle(
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold,
                   fontSize: 17))),
+          const Expanded(flex: 2, child: SizedBox.shrink()),
         ],
       ),
     );

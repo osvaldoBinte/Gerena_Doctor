@@ -113,10 +113,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
         children: [
           ContainerRealizarVenta(),
           const SizedBox(height: 20),
-          //********BUSCAR PRODIUCTOS******************************************************************
-          // Expanded(child: Column(
-          //   children: [],
-          // ))
+        
          Expanded(child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
