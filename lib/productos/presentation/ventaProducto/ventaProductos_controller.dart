@@ -433,7 +433,7 @@ void _limpiarFormulario() {
   // buscadorClienteController.clear(); // ❌ comenta o elimina esta línea
   //productosEncontrados.clear();
   idClienteSeleccionado.value = null;
-  nombreClienteSeleccionado.value = '';
+ // nombreClienteSeleccionado.value = '';
   totalVenta.value = 0.0;
   pagoCon.value = 0.0;
   cambio.value = 0.0;
