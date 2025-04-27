@@ -11,6 +11,7 @@ import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
 import 'package:managegym/db/database_connection.dart';
+import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 
 class UsuarioExtraInfo {
   final Usuario usuario;
@@ -149,10 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (context) {
         // Puedes modificar nombreUsuario y idUsuario si tienes un contexto específico
-        return ModalAdministrarSuscripccion(
-          suscripcionesDisponibles: suscripcionController.suscripciones,
-          nombreUsuario: '', // O el nombre del usuario si aplica
-          idUsuario: 0,      // O el id del usuario si aplica
+        return const ModalAgregarSuscripccion(
+          
         );
       },
     );
