@@ -107,79 +107,70 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
     });
   }
 
-  Future<void> agregarNuevoCliente() async {
-    if (_formKey.currentState!.validate()) {
-      if (_suscripcionSeleccionada == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Selecciona una membresía')),
-        );
-        return;
-      }
+Future<void> agregarNuevoCliente() async {
+  if (_formKey.currentState!.validate()) {
+    if (_suscripcionSeleccionada == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una membresía')),
+      );
+      return;
+    }
+    try {
+      DateTime? fechaNacimiento;
       try {
-        DateTime? fechaNacimiento;
-        try {
-          // Usar directamente los valores numéricos de día, mes y año
-          final dia = int.parse(_diaController.text);
-          final mes = int.parse(_mesController.text);
-          final ano = int.parse(_anoController.text);
-          // Validar que la fecha sea válida
-          if (dia > 0 && dia <= 31 && mes > 0 && mes <= 12 && ano >= 1900) {
-            fechaNacimiento = DateTime(ano, mes, dia);
-          }
-        } catch (e) {
-          print('Error al parsear la fecha: $e');
-        }
-
-        // Usar el valor del sexo directamente (ahora es 'M' o 'F')
-        final sexoDb = _sexoController ?? 'M';
-
-        String qr = "qr_generado_${DateTime.now().millisecondsSinceEpoch}";
-        String plantillaHuella =
-            "huella_demo_${DateTime.now().millisecondsSinceEpoch}";
-
-        final fechaInicio = DateTime.now();
-        final fechaFin = fechaInicio
-            .add(Duration(days: _suscripcionSeleccionada!.duracion));
-        final fechaProximoPago = fechaFin;
-
-        final idUsuario = await usuarioController.crearUsuarioCompleto(
-          nombre: _nombreController.text,
-          apellidos: _apellidosController.text,
-          correo: _correoController.text,
-          telefono: _telefonoController.text,
-          fechaNacimiento: fechaNacimiento,
-          sexo: sexoDb,
-          qr: qr,
-          plantillaHuella: plantillaHuella,
-          idTipoMembresia: _suscripcionSeleccionada!.id,
-          precioMembresia: _suscripcionSeleccionada!.precio,
-          duracionMembresia: _suscripcionSeleccionada!.duracion,
-          fechaInicioMembresia: fechaInicio,
-          fechaFinMembresia: fechaFin,
-          montoPago: _suscripcionSeleccionada!.precio,
-          metodoPago: "Efectivo",
-          numeroReferencia: "25",
-          fechaProximoPago: fechaProximoPago,
-        );
-
-        if (idUsuario != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('¡Cliente registrado con éxito!')),
-          );
-          widget.onRegistroExitoso?.call();
-          Navigator.of(context).pop();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error al registrar cliente')),
-          );
+        final dia = int.parse(_diaController.text);
+        final mes = int.parse(_mesController.text);
+        final ano = int.parse(_anoController.text);
+        if (dia > 0 && dia <= 31 && mes > 0 && mes <= 12 && ano >= 1900) {
+          fechaNacimiento = DateTime(ano, mes, dia);
         }
       } catch (e) {
+        print('Error al parsear la fecha: $e');
+      }
+
+      final sexoDb = _sexoController ?? 'M';
+
+      String qr = "qr_generado_${DateTime.now().millisecondsSinceEpoch}";
+      String plantillaHuella =
+          "huella_demo_${DateTime.now().millisecondsSinceEpoch}";
+
+      // Ya NO necesitas calcular fechas aquí, la membresía encadenada lo hace automáticamente
+      final idUsuario = await usuarioController.crearUsuarioCompleto(
+        nombre: _nombreController.text,
+        apellidos: _apellidosController.text,
+        correo: _correoController.text,
+        telefono: _telefonoController.text,
+        fechaNacimiento: fechaNacimiento,
+        sexo: sexoDb,
+        qr: qr,
+        plantillaHuella: plantillaHuella,
+        idTipoMembresia: _suscripcionSeleccionada!.id,
+        precioMembresia: _suscripcionSeleccionada!.precio,
+        duracionMembresia: _suscripcionSeleccionada!.duracion,
+        montoPago: _suscripcionSeleccionada!.precio,
+        metodoPago: "Efectivo",
+        numeroReferencia: "25",
+        fechaProximoPago: null, // La puedes dejar en null si tu backend calcula el próximo pago
+      );
+
+      if (idUsuario != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          const SnackBar(content: Text('¡Cliente registrado con éxito!')),
+        );
+        widget.onRegistroExitoso?.call();
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al registrar cliente')),
         );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
+}
 
   String _mesIntATexto(int mes) {
     const meses = [

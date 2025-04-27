@@ -73,24 +73,22 @@ class UsuarioController extends GetxController {
     }
   }
 
-  /// Crea la membresía activa para el usuario.
-  Future<int?> crearMembresiaUsuario({
+  /// Crea la membresía encadenada para el usuario (la nueva inicia cuando termina la última).
+  Future<int?> crearMembresiaUsuarioEncadenada({
     required int idUsuario,
     required int idVentaMembresia,
-    required DateTime inicio,
-    required DateTime fin,
+    required int duracionDias,
   }) async {
     try {
       final conn = Database.conn;
-      return await UsuarioDB.crearMembresiaUsuario(
+      return await UsuarioDB.crearMembresiaUsuarioEncadenada(
         idUsuario: idUsuario,
         idVentaMembresia: idVentaMembresia,
-        inicio: inicio,
-        fin: fin,
+        duracionDias: duracionDias,
         conn: conn,
       );
     } catch (e) {
-      debugPrint('Error en crearMembresiaUsuario: $e');
+      debugPrint('Error en crearMembresiaUsuarioEncadenada: $e');
       error.value = 'No se pudo crear la membresía del usuario';
       return null;
     }
@@ -134,8 +132,6 @@ class UsuarioController extends GetxController {
     required int idTipoMembresia,
     required double precioMembresia,
     required int duracionMembresia,
-    required DateTime fechaInicioMembresia,
-    required DateTime fechaFinMembresia,
     double? montoPago,
     String? metodoPago,
     String? numeroReferencia,
@@ -205,16 +201,15 @@ class UsuarioController extends GetxController {
       debugPrint('Venta Membresía registrada: $idVentaMembresia');
 
       int? idMembresiaUsuario;
-      // 6. Registrar membresía activa
+      // 6. Registrar membresía encadenada
       if (idVentaMembresia != null) {
-        idMembresiaUsuario = await UsuarioDB.crearMembresiaUsuario(
+        idMembresiaUsuario = await UsuarioDB.crearMembresiaUsuarioEncadenada(
           idUsuario: idUsuario,
           idVentaMembresia: idVentaMembresia,
-          inicio: fechaInicioMembresia,
-          fin: fechaFinMembresia,
+          duracionDias: duracionMembresia,
           conn: conn,
         );
-        debugPrint('Membresía activa creada: $idMembresiaUsuario');
+        debugPrint('Membresía encadenada creada: $idMembresiaUsuario');
       }
 
       // 7. Registrar historial de pago si corresponde

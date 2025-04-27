@@ -110,10 +110,6 @@ class _ModalAdministrarSuscripccionState
         (s) => s.id.toString() == idSus,
       );
 
-      final DateTime hoy = DateTime.now();
-      // Suponemos duración en meses (ajusta según tu modelo)
-      final DateTime fin = hoy.add(Duration(days: suscripcion.duracion * 30));
-
       // 1. Crear venta de membresía
       final idVenta = await usuarioController.crearVentaMembresia(
         idTipoMembresia: suscripcion.id,
@@ -122,13 +118,12 @@ class _ModalAdministrarSuscripccionState
         duracion: suscripcion.duracion,
       );
 
-      // 2. Crear membresía activa
+      // 2. Crear membresía encadenada (¡modificado!)
       if (idVenta != null) {
-        final idMembresia = await usuarioController.crearMembresiaUsuario(
+        final idMembresia = await usuarioController.crearMembresiaUsuarioEncadenada(
           idUsuario: widget.idUsuario,
           idVentaMembresia: idVenta,
-          inicio: hoy,
-          fin: fin,
+          duracionDias: suscripcion.duracion,
         );
 
         // 3. Crear historial de pago
@@ -421,3 +416,5 @@ class _ModalAdministrarSuscripccionState
     );
   }
 }
+
+final AdminColors colores = AdminColors();

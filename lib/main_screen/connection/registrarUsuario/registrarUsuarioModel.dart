@@ -194,32 +194,61 @@ class UsuarioDB {
     }
   }
 
-  static Future<int?> crearMembresiaUsuario({
+  static Future<DateTime> obtenerUltimaFechaFinMembresia({
     required int idUsuario,
-    required int idVentaMembresia,
-    required DateTime inicio,
-    required DateTime fin,
     required dynamic conn,
   }) async {
     try {
-      print('Insertando en membresiaUsuario...');
-      print(
-          'idUsuario: $idUsuario, id_ventaMembresia: $idVentaMembresia, fechaInicio: $inicio, fechaFin: $fin');
       final sql = Sql.named('''
-      INSERT INTO membresiausuario (idUsuario, id_ventaMembresia, fechaInicio, fechaFin)
-      VALUES (@idUsuario, @idVentaMembresia, @fechaInicio, @fechaFin)
-      RETURNING id;
-    ''');
+        SELECT MAX(fechaFin)
+        FROM membresiaUsuario
+        WHERE idUsuario = @idUsuario
+      ''');
+      final result = await conn.execute(sql, parameters: {'idUsuario': idUsuario});
+      if (result.isNotEmpty && result.first[0] != null) {
+        return (result.first[0] is DateTime)
+            ? result.first[0]
+            : DateTime.parse(result.first[0].toString());
+      }
+      return DateTime.now();
+    } catch (e) {
+      print('Error al obtener la última fecha de fin de membresía: $e');
+      return DateTime.now();
+    }
+  }
+
+  static Future<int?> crearMembresiaUsuarioEncadenada({
+    required int idUsuario,
+    required int idVentaMembresia,
+    required int duracionDias,
+    required dynamic conn,
+  }) async {
+    try {
+      // Buscar la última fecha fin de membresía (actual o futura)
+      final ultimaFechaFin = await obtenerUltimaFechaFinMembresia(
+        idUsuario: idUsuario,
+        conn: conn,
+      );
+      final now = DateTime.now();
+      final fechaInicio = ultimaFechaFin.isAfter(now)
+          ? ultimaFechaFin.add(Duration(days: 1))
+          : now;
+      final fechaFin = fechaInicio.add(Duration(days: duracionDias));
+      final sql = Sql.named('''
+        INSERT INTO membresiausuario (idUsuario, id_ventaMembresia, fechaInicio, fechaFin)
+        VALUES (@idUsuario, @idVentaMembresia, @fechaInicio, @fechaFin)
+        RETURNING id;
+      ''');
       final result = await conn.execute(sql, parameters: {
         'idUsuario': idUsuario,
         'idVentaMembresia': idVentaMembresia,
-        'fechaInicio': inicio.toIso8601String(),
-        'fechaFin': fin.toIso8601String(),
+        'fechaInicio': fechaInicio.toIso8601String(),
+        'fechaFin': fechaFin.toIso8601String(),
       });
-      print('RESULTADO INSERT membresiaUsuario: $result');
+      print('RESULTADO INSERT membresiaUsuario encadenada: $result');
       return result.isNotEmpty ? result.first[0] as int : null;
     } catch (e) {
-      print('Error al crear membresía usuario: $e');
+      print('Error al crear membresía usuario encadenada: $e');
       return null;
     }
   }
@@ -337,50 +366,51 @@ class UsuarioDB {
     }
   }
 
-static Future<List<Map<String, dynamic>>> obtenerHistorialPagosUsuario({
-  required int idUsuario,
-  required dynamic conn,
-}) async {
-  try {
-    final sql = Sql.named('''
-      SELECT 
-        tm.titulo,
-        hp.fechaPago,
-        hp.montoPago,
-        hp.metodoPago,
-        hp.estado,
-        hp.numeroReferencia,
-        hp.fechaProximoPago,
-        mu.fechaInicio,
-        mu.fechaFin,
-        mu.statusMembresia
-      FROM historialPagos hp
-      JOIN membresiaUsuario mu ON hp.idMembresiaUsuario = mu.id
-      JOIN ventaMembresías vm ON mu.id_ventaMembresia = vm.id
-      JOIN tipoMembresia tm ON vm.idTipoMembresia = tm.id
-      WHERE mu.idUsuario = @idUsuario
-      ORDER BY hp.fechaPago DESC
-    ''');
-    final result = await conn.execute(sql, parameters: {'idUsuario': idUsuario});
-    // Asegúrate que esto devuelve List<Map<String, dynamic>>
-    return result.map<Map<String, dynamic>>((row) => {
-      'titulo': row[0],
-      'fechaPago': row[1],
-      'montoPago': row[2],
-      'metodoPago': row[3],
-      'estado': row[4],
-      'numeroReferencia': row[5],
-      'fechaProximoPago': row[6],
-      'fechaInicioMembresia': row[7],
-      'fechaFinMembresia': row[8],
-      'statusMembresia': row[9],
-    }).toList();
-  } catch (e) {
-    print('Error al obtener historial de pagos del usuario: $e');
-    return [];
+  static Future<List<Map<String, dynamic>>> obtenerHistorialPagosUsuario({
+    required int idUsuario,
+    required dynamic conn,
+  }) async {
+    try {
+      final sql = Sql.named('''
+        SELECT 
+          tm.titulo,
+          hp.fechaPago,
+          hp.montoPago,
+          hp.metodoPago,
+          hp.estado,
+          hp.numeroReferencia,
+          hp.fechaProximoPago,
+          mu.fechaInicio,
+          mu.fechaFin,
+          mu.statusMembresia
+        FROM historialPagos hp
+        JOIN membresiaUsuario mu ON hp.idMembresiaUsuario = mu.id
+        JOIN ventaMembresías vm ON mu.id_ventaMembresia = vm.id
+        JOIN tipoMembresia tm ON vm.idTipoMembresia = tm.id
+        WHERE mu.idUsuario = @idUsuario
+        ORDER BY hp.fechaPago DESC
+      ''');
+      final result = await conn.execute(sql, parameters: {'idUsuario': idUsuario});
+      // Asegúrate que esto devuelve List<Map<String, dynamic>>
+      return result.map<Map<String, dynamic>>((row) => {
+        'titulo': row[0],
+        'fechaPago': row[1],
+        'montoPago': row[2],
+        'metodoPago': row[3],
+        'estado': row[4],
+        'numeroReferencia': row[5],
+        'fechaProximoPago': row[6],
+        'fechaInicioMembresia': row[7],
+        'fechaFinMembresia': row[8],
+        'statusMembresia': row[9],
+      }).toList();
+    } catch (e) {
+      print('Error al obtener historial de pagos del usuario: $e');
+      return [];
+    }
   }
-}
 
+  /// Ahora toma la fechaFin más lejana (no solo la activa) para sumar días pendientes de cualquier membresía futura.
   static Future<int> obtenerDiasMembresiaRestantes({
     required int idUsuario,
     required dynamic conn,
@@ -389,13 +419,10 @@ static Future<List<Map<String, dynamic>>> obtenerHistorialPagosUsuario({
       debugPrint('Obteniendo días restantes de membresía...');
       debugPrint('ID Usuario: $idUsuario');
       final sql = Sql.named('''
-      SELECT fechaFin
+      SELECT MAX(fechaFin)
       FROM membresiaUsuario
       WHERE idUsuario = @idUsuario
-        AND statusMembresia = 'Activa'
-      ORDER BY fechaFin DESC
-      LIMIT 1
-    ''');
+      ''');
       final result = await conn.execute(
         sql,
         parameters: {'idUsuario': idUsuario},
