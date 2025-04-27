@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert'; // <-- Necesario para Base64
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
@@ -16,6 +17,7 @@ class EditarProductoController extends GetxController {
   final isImageSelected = false.obs;
   final selectedImagePath = Rx<String?>(null);
   final textoBotonImagen = 'AGREGAR IMAGEN'.obs;
+  final imagenBase64 = Rx<String?>(null); // <-- AGREGADO para imagen base64
 
   // Estado observable para la categoría
   final categoriaSeleccionada = Rx<String?>(null);
@@ -44,7 +46,6 @@ class EditarProductoController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-
     // Si se recibe un producto, inicializa los campos
     if (Get.arguments != null && Get.arguments is Producto) {
       initializeProducto(Get.arguments);
@@ -58,47 +59,35 @@ class EditarProductoController extends GetxController {
 
     // Inicializar controladores de texto
     nombreProductoController.text = productoParaEditar.titulo;
-
-    // Aquí podrías agregar lógica para establecer el código de barras si lo tienes en tu modelo
-    // codigoBarrasController.text = productoParaEditar.codigoBarras ?? '';
-
+    codigoBarrasController.text = productoParaEditar.codigoBarras ?? '';
     stockInicialController.text = productoParaEditar.stock.toString();
     precioController.text = productoParaEditar.precioVenta.toStringAsFixed(2);
 
     // Establecer la categoría seleccionada
     if (productoParaEditar.idCategoria != null) {
-      // Aquí deberías obtener el nombre de la categoría basado en su ID
-      // Por ahora, establecemos un valor temporal
-      categoriaSeleccionada.value =
-          'Categoria ${productoParaEditar.idCategoria}';
+      categoriaSeleccionada.value = 'Categoria ${productoParaEditar.idCategoria}';
     }
 
-    // Si el producto tiene una imagen, actualizamos el estado
-    // Esto dependería de cómo almacenas las rutas de las imágenes
-    // Si tienes un campo para la ruta de la imagen en tu modelo, podrías hacer:
-    // if (productoParaEditar.imagePath != null && productoParaEditar.imagePath!.isNotEmpty) {
-    //   selectedImagePath.value = productoParaEditar.imagePath;
-    //   isImageSelected.value = true;
-    //   textoBotonImagen.value = 'CAMBIAR IMAGEN';
-    // }
+    // Asignar la imagen base64 original (si existe)
+    imagenBase64.value = productoParaEditar.imagenProducto;
+
+    // Resetear selección de imagen nueva
+    selectedImagePath.value = null;
+    isImageSelected.value = false;
+    textoBotonImagen.value = 'AGREGAR IMAGEN';
   }
 
   // Método para obtener el producto desde la base de datos
   Future<void> loadProductById(int id) async {
     try {
       isLoading.value = true;
-
-      // Verificar conexión a la base de datos
       try {
         Database.conn;
       } catch (e) {
         await Database.connect();
       }
-
-      // Obtener el producto de la base de datos
       final productoDb =
           await ProductoDB.obtenerProductoPorId(id: id, conn: Database.conn);
-
       if (productoDb != null) {
         initializeProducto(productoDb);
       } else {
@@ -124,33 +113,21 @@ class EditarProductoController extends GetxController {
       label: 'images',
       extensions: <String>['jpg', 'png'],
     );
-
     final XFile? file =
         await openFile(acceptedTypeGroups: <XTypeGroup>[typeGroup]);
+    if (file == null) return;
 
-    if (file == null) {
-      // Operación cancelada por el usuario
-      return;
-    }
-
-    final String fileName = file.name;
-    final String filePath = file.path;
-
-    selectedImagePath.value = filePath;
+    selectedImagePath.value = file.path;
     textoBotonImagen.value = 'CAMBIAR IMAGEN';
     isImageSelected.value = true;
-
-    print('Nombre del archivo: $fileName');
-    print('Ruta del archivo: $filePath');
   }
 
-  // Método para actualizar un producto
+  // Método para actualizar un producto (incluye imagen original o nueva)
   Future<bool> actualizarProducto() async {
     if (formKey.currentState!.validate()) {
       try {
         isLoading.value = true;
 
-        // Validación adicional para la categoría
         if (categoriaSeleccionada.value == null) {
           Get.snackbar('Error', 'Por favor selecciona una categoría',
               backgroundColor: Colors.red,
@@ -159,8 +136,6 @@ class EditarProductoController extends GetxController {
           isLoading.value = false;
           return false;
         }
-
-        // Obtener ID de producto
         if (idProducto.value <= 0) {
           Get.snackbar('Error', 'ID de producto no válido',
               backgroundColor: Colors.red,
@@ -170,13 +145,10 @@ class EditarProductoController extends GetxController {
           return false;
         }
 
-        // Convertir el precio y stock a los tipos correctos
         final double precio = double.tryParse(precioController.text) ?? 0.0;
         final int stock = int.tryParse(stockInicialController.text) ?? 0;
 
         // Obtener ID de categoría basado en la selección
-        // En un caso real, tendríamos que buscar el ID de la categoría
-        // basado en el nombre seleccionado
         int? idCategoria;
         if (categoriaSeleccionada.value != null) {
           final index = categorias.indexOf(categoriaSeleccionada.value!);
@@ -185,17 +157,23 @@ class EditarProductoController extends GetxController {
           }
         }
 
-        // Actualizar producto en la base de datos
+        // Si seleccionó nueva imagen, conviértela a base64; si no, usa la original
+        String? finalBase64;
+        if (isImageSelected.value && selectedImagePath.value != null) {
+          finalBase64 = base64Encode(await File(selectedImagePath.value!).readAsBytes());
+        } else {
+          finalBase64 = imagenBase64.value;
+        }
+
         final bool exito = await ProductoDB.editarProducto(
           id: idProducto.value,
           titulo: nombreProductoController.text,
-          descripcion:
-              "", // Puedes agregar un campo para descripción si lo necesitas
+          descripcion: "",
           precioVenta: precio,
           stock: stock,
-          idCategoria: null,
-          idCodigoBarras:
-              null, // Implementa la lógica para código de barras si es necesario
+          idCategoria: idCategoria,
+          idCodigoBarras: null,
+          imagenProducto: finalBase64,
           conn: Database.conn,
         );
 
@@ -204,10 +182,6 @@ class EditarProductoController extends GetxController {
               backgroundColor: Colors.green,
               colorText: Colors.white,
               snackPosition: SnackPosition.BOTTOM);
-
-          // Actualizar la imagen si es necesario
-          // (esto dependería de tu modelo y de cómo manejas el almacenamiento de imágenes)
-
           return true;
         } else {
           Get.snackbar('Error', 'No se pudo actualizar el producto',
@@ -234,7 +208,6 @@ class EditarProductoController extends GetxController {
   Future<bool> eliminarProducto() async {
     try {
       isLoading.value = true;
-
       if (idProducto.value <= 0) {
         Get.snackbar('Error', 'ID de producto no válido',
             backgroundColor: Colors.red,
@@ -242,8 +215,6 @@ class EditarProductoController extends GetxController {
             snackPosition: SnackPosition.BOTTOM);
         return false;
       }
-
-      // Mostrar diálogo de confirmación
       final bool confirmar = await Get.dialog(
             AlertDialog(
               title: Text('Confirmar eliminación'),
@@ -262,18 +233,14 @@ class EditarProductoController extends GetxController {
             ),
           ) ??
           false;
-
       if (!confirmar) {
         isLoading.value = false;
         return false;
       }
-
-      // Eliminar producto
       final bool exito = await ProductoDB.eliminarProducto(
         id: idProducto.value,
         conn: Database.conn,
       );
-
       if (exito) {
         Get.snackbar('Éxito', 'Producto eliminado correctamente',
             backgroundColor: Colors.green,
@@ -304,7 +271,6 @@ class EditarProductoController extends GetxController {
     categoriaSeleccionada.value = categoria;
   }
 
-  // Asegúrate de liberar los controladores cuando se destruya el controlador
   @override
   void onClose() {
     nombreProductoController.dispose();

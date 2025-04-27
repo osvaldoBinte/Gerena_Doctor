@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert'; // <-- necesario para base64
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,10 +15,7 @@ class ModalEditarProducto extends StatelessWidget {
   final Producto? producto;
   
   ModalEditarProducto({Key? key, this.producto}) : super(key: key) {
-    // Inicializar el controlador
     final controller = Get.put(EditarProductoController());
-    
-    // Si se proporciona un producto, inicializar los campos
     if (producto != null) {
       controller.initializeProducto(producto!);
     }
@@ -29,9 +27,7 @@ class ModalEditarProducto extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    // Obtener el controlador
     final EditarProductoController controller = Get.find<EditarProductoController>();
-    
     return AlertDialog(
       backgroundColor: colores.colorFondoModal,
       content: Container(
@@ -165,19 +161,49 @@ class ModalEditarProducto extends StatelessWidget {
                   ],
                 ),
                 // Vista previa de la imagen
-                Container(
-                  width: 200,
-                  height: 200,
-                  child: controller.isImageSelected.value
-                    ? Image.file(
+                Obx(() {
+                  if (controller.isImageSelected.value && controller.selectedImagePath.value != null) {
+                    // Imagen NUEVA seleccionada
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      child: Image.file(
                         File(controller.selectedImagePath.value!),
                         fit: BoxFit.cover,
-                      )
-                    : IconButton(
+                      ),
+                    );
+                  } else if (controller.imagenBase64.value != null && controller.imagenBase64.value!.isNotEmpty) {
+                    // Imagen ORIGINAL en base64
+                    try {
+                      return Container(
+                        width: 200,
+                        height: 200,
+                        child: Image.memory(
+                          base64Decode(controller.imagenBase64.value!),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.broken_image, size: 80, color: Colors.white30),
+                        ),
+                      );
+                    } catch (e) {
+                      return Container(
+                        width: 200,
+                        height: 200,
+                        child: Icon(Icons.broken_image, size: 80, color: Colors.white30),
+                      );
+                    }
+                  } else {
+                    // Sin imagen, placeholder
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      child: IconButton(
                         icon: Icon(Icons.add_a_photo, color: colores.colorTexto),
                         onPressed: controller.selectImage,
                       ),
-                ),
+                    );
+                  }
+                }),
                 // BOTONES ABAJO
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
