@@ -431,7 +431,7 @@ void _limpiarFormulario() {
   pagoController.clear();
   // buscadorProductoController.clear(); // ❌ comenta o elimina esta línea
   // buscadorClienteController.clear(); // ❌ comenta o elimina esta línea
-  productosEncontrados.clear();
+  //productosEncontrados.clear();
   idClienteSeleccionado.value = null;
   nombreClienteSeleccionado.value = '';
   totalVenta.value = 0.0;
