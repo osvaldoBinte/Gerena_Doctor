@@ -6,7 +6,7 @@ import 'package:managegym/main_screen/screens/administradores_screen.dart';
 import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/main_screen/screens/dasboard_screen.dart';
 import 'package:managegym/main_screen/screens/inicio_sesion.dart';
-import 'package:managegym/main_screen/screens/screen_venta.dart';
+import 'package:managegym/productos/presentation/ventaProducto/screen_venta.dart';
 import 'package:managegym/main_screen/screens/store/store_screen.dart';
 import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
