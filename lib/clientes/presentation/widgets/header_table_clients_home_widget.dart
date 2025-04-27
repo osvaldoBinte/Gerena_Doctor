@@ -10,91 +10,103 @@ class HeaderTableClientsHome extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: double.infinity,
-        decoration:  BoxDecoration(
-          color:  colores.colorCabezeraTabla,
+        decoration: BoxDecoration(
+          color: colores.colorCabezeraTabla,
         ),
         child: Row(
           children: [
             Expanded(
-              flex: 3, // Ocupa 2 partes del espacio
+              flex: 3,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                child:  Text(
+                child: Text(
                   'Nombre',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: colores.colorTexto, fontWeight: FontWeight.bold, fontSize: 17),
+                      color: colores.colorTexto,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ),
             Expanded(
-              flex: 1, // Ocupa 3 partes del espacio
+              flex: 1,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.all(2),
-                child:  Text(
+                child: Text(
                   'No. telefono',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: colores.colorTexto, fontWeight: FontWeight.bold, fontSize: 17),
+                      color: colores.colorTexto,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ),
             Expanded(
-              flex: 3, // Ocupa 1 parte del espacio
+              flex: 3,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.all(2),
-                child:  Text(
+                child: Text(
                   'Ultima suscripccion',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ),
             Expanded(
-              flex: 1, // Ocupa 1 parte del espacio
+              flex: 1,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.all(2),
-                child:  Text(
+                child: Text(
                   'Status',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ),
             Expanded(
-              flex: 3, // Ocupa 1 parte del espacio
+              flex: 3,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.all(2),
-                child:  Text(
-                  'Rango de fecha',
+                child: Text(
+                  'Dias restantes',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
+                      color: colores.colorTexto,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
                 ),
               ),
             ),
             Expanded(
-              flex: 1, // Ocupa 1 parte del espacio
+              flex: 1,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.all(2),
-                child:  Text(
+                child: Text(
                   'Sexo',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                      color: colores.colorTexto, fontWeight: FontWeight.bold , fontSize: 17),
-                ),  
+                      color: colores.colorTexto,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17),
+                ),
               ),
             ),
-             Expanded(
-              flex: 2   , // Ocupa 1 parte del espacio
+            Expanded(
+              flex: 2,
               child: Container(
                 height: 50,
                 padding: const EdgeInsets.all(2),

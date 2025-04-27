@@ -718,7 +718,6 @@ class InputCorreoElectronicoWidget extends StatelessWidget {
     );
   }
 }
-
 class RowSuscripccionSeleccionada extends StatefulWidget {
   final int index;
   final void Function(String id) eliminarSuscripcion;
@@ -752,8 +751,28 @@ class _RowSuscripccionSeleccionadaState
     return index % 2 == 0;
   }
 
+  // Método para formatear el precio correctamente
+  String formatPrice(dynamic precio) {
+    if (precio == null) return "0.00";
+    
+    double numericPrice;
+    if (precio is double) {
+      numericPrice = precio;
+    } else if (precio is int) {
+      numericPrice = precio.toDouble();
+    } else {
+      // Intenta convertir de string a double
+      numericPrice = double.tryParse(precio.toString()) ?? 0.0;
+    }
+    
+    return numericPrice.toStringAsFixed(2);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Obtener el precio formateado
+    final precioFormateado = formatPrice(widget.suscripcion.precio);
+    
     return Container(
       width: double.infinity,
       height: 30,
@@ -786,7 +805,7 @@ class _RowSuscripccionSeleccionadaState
           Expanded(
               flex: 1,
               child: Text(
-                "\${widget.suscripcion.precio}",
+                "\$$precioFormateado",
                 style: TextStyle(
                   color: colores.colorTexto,
                   fontSize: 15,
@@ -795,7 +814,7 @@ class _RowSuscripccionSeleccionadaState
           Expanded(
               flex: 2,
               child: Text(
-                "\${widget.suscripcion.precio}",
+                "\$$precioFormateado",
                 style: TextStyle(
                   color: colores.colorTexto,
                   fontSize: 15,
