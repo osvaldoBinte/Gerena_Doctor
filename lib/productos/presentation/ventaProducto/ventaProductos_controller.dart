@@ -292,11 +292,18 @@ Future<void> cargarTodosLosProductos() async {
     _calcularCambio();
   }
   
-  void _calcularCambio() {
+void _calcularCambio() {
+  // Si el campo está vacío, asignar 0 tanto al pago como al cambio
+  if (pagoController.text.isEmpty) {
+    pagoCon.value = 0.0;
+    cambio.value = 0.0;  // Ahora mostrará 0.00 en lugar de valor negativo
+  } else {
+    // Si hay un valor, calcularlo normalmente
     final pago = double.tryParse(pagoController.text) ?? 0.0;
     pagoCon.value = pago;
     cambio.value = pago - totalVenta.value;
   }
+}
   
   // PROCESAR VENTA
   
@@ -419,19 +426,19 @@ Future<void> cargarTodosLosProductos() async {
     }
   }
   
-  void _limpiarFormulario() {
-    productosCarrito.clear();
-    pagoController.clear();
-    buscadorProductoController.clear();
-    buscadorClienteController.clear();
-    productosEncontrados.clear();
-    idClienteSeleccionado.value = null;
-    nombreClienteSeleccionado.value = '';
-    totalVenta.value = 0.0;
-    pagoCon.value = 0.0;
-    cambio.value = 0.0;
-  }
-  
+void _limpiarFormulario() {
+  productosCarrito.clear();
+  pagoController.clear();
+  // buscadorProductoController.clear(); // ❌ comenta o elimina esta línea
+  // buscadorClienteController.clear(); // ❌ comenta o elimina esta línea
+  productosEncontrados.clear();
+  idClienteSeleccionado.value = null;
+  nombreClienteSeleccionado.value = '';
+  totalVenta.value = 0.0;
+  pagoCon.value = 0.0;
+  cambio.value = 0.0;
+}
+
   // Función para cancelar la venta actual
   void cancelarVenta() {
     // Mostrar diálogo de confirmación

@@ -14,7 +14,7 @@ class ScreenVenta extends StatelessWidget {
   final Color colorFondoModalDark = const Color.fromARGB(2, 217, 217, 217);
   final AdminColors colores = AdminColors();
 
-  // Instanciar el controlador
+  // Instanciar el controladorC
   final VentaProductosController ventaController = Get.put(VentaProductosController());
 
   @override
