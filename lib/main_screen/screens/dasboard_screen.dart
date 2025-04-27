@@ -232,7 +232,7 @@ class LineChartExample extends StatelessWidget {
       lines.add(
         LineChartBarData(
           spots: productoSpots,
-          isCurved: true,
+          isCurved: false,
           color: Colors.amber,
           barWidth: 4,
           dotData: FlDotData(
@@ -249,7 +249,7 @@ class LineChartExample extends StatelessWidget {
       lines.add(
         LineChartBarData(
           spots: suscripcionSpots,
-          isCurved: true,
+          isCurved: false,
           color: Colors.blue,
           barWidth: 4,
           dotData: FlDotData(
@@ -321,8 +321,8 @@ class LineChartExample extends StatelessWidget {
             sideTitles: SideTitles(showTitles: false),
           ),
         ),
-        gridData: FlGridData(show: false),
-        borderData: FlBorderData(show: true),
+        gridData: FlGridData(show: true),
+        borderData: FlBorderData(show: false),
       ),
     );
   }

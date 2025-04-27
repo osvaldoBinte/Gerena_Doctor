@@ -250,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(width: 20),
               QuickActionButton(
                 text: 'REALIZAR UNA VENTA',
-                icon: Icons.shopping_cart,
+                icon: Icons.point_of_sale,
                 accion: () {
                   widget.onChangeIndex(4);
                 },
