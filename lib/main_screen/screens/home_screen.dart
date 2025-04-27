@@ -252,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: 'REALIZAR UNA VENTA',
                 icon: Icons.shopping_cart,
                 accion: () {
-                  widget.onChangeIndex(6);
+                  widget.onChangeIndex(4);
                 },
               ),
               const SizedBox(width: 20),

@@ -5,20 +5,23 @@ import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/main_screen/screens/store/store_controller.dart';
 import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
 import 'package:managegym/main_screen/widgets/modal_categorias.dart';
+import 'package:managegym/productos/presentation/productos/editarproducto/modal_editar_producto.widget.dart';
 import 'package:managegym/productos/presentation/productos/filter/filter_button.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/modal_agregar_producto.dart';
 import 'package:managegym/productos/presentation/productos/agregarstock/modal_agregar_stock.dart';
 import 'package:managegym/shared/admin_colors.dart';
 
 class StoreScreen extends StatelessWidget {
-  StoreScreen({Key? key}) : super(key: key);
+  final void Function(int) onChangeIndex;
+  StoreScreen({Key? key, required this.onChangeIndex}) : super(key: key);
 
   final AdminColors colores = AdminColors();
 
   // Instanciar el controlador de tienda
   final StoreController storeController = Get.put(StoreController());
   // Instanciar el controlador de categorías (si no está registrado)
-  final CategoriaController categoriaController = Get.put(CategoriaController());
+  final CategoriaController categoriaController =
+      Get.put(CategoriaController());
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +56,7 @@ class StoreScreen extends StatelessWidget {
                     icon: Icons.point_of_sale,
                     accion: () {
                       // Lógica para realizar una venta
+                      onChangeIndex(4); 
                     },
                   ),
                   const SizedBox(width: 20),
@@ -237,8 +241,10 @@ class StoreScreen extends StatelessWidget {
 
                   // Buscar el nombre de la categoría usando el idCategoria del producto
                   final categoriaNombre = categoriaController.categorias
-                      .firstWhereOrNull((cat) => cat.id == producto.idCategoria)
-                      ?.titulo ?? 'Sin categoría';
+                          .firstWhereOrNull(
+                              (cat) => cat.id == producto.idCategoria)
+                          ?.titulo ??
+                      'Sin categoría';
 
                   return ProductRowWidget(
                     producto: producto,
@@ -268,20 +274,13 @@ class StoreScreen extends StatelessWidget {
                             width: 70,
                             height: 70,
                             decoration: BoxDecoration(
-                              color: Colors.white10,
+                              color: const Color.fromARGB(78, 206, 206, 206),
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Icon(
                                 Icons.image,
-                                color: Colors.orange,
+                                color: colores.colorTexto,
                                 size: 40,
                               ),
                             ),
@@ -291,8 +290,8 @@ class StoreScreen extends StatelessWidget {
                     precioUnitario:
                         '\$${producto.precioVenta.toStringAsFixed(2)}',
                     cantidadDisponible: '${producto.stock}',
-                    codigoBarras:
-                        producto.codigoBarras ?? 'N/A', // Usa el código real si lo tienes
+                    codigoBarras: producto.codigoBarras ??
+                        'N/A', // Usa el código real si lo tienes
                     disponible: disponible ? 'Sí' : 'No',
                     index: index,
                     onDelete: () => storeController.deleteProducto(producto.id),
@@ -410,134 +409,144 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      width: double.infinity,
-      height: 100,
-      decoration: BoxDecoration(
-        color: getRowColor(),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: isHovering
-            ? [
-                BoxShadow(
-                  color: Colors.orange.withOpacity(0.12),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ]
-            : [],
-      ),
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
-      child: Row(
-        children: [
-          // Imagen
-          SizedBox(
-              height: 110, width: 110, child: widget.image ?? const SizedBox()),
+    return InkWell(
+      onTap: () {
+        print('Fila seleccionada: ${widget.nombre}');
+        showDialog(context: context, builder: (context){
+          return ModalEditarProducto(
+            producto: widget.producto,
+          );
+        });
+      },
+      onHover: (hovering) {
+        setState(() {
+          isHovering = hovering;
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        height: 100,
+        decoration: BoxDecoration(
+          color: isHovering
+              ? colores.colorAccionButtons // <-- Color al hacer hover/click
+              : (widget.index % 2 == 0
+                  ? colores.colorRowPar
+                  : colores.colorRowNoPar),
+        ),
+        child: Row(
+          children: [
+            // Imagen
+            SizedBox(
+                height: 110,
+                width: 110,
+                child: widget.image ?? const SizedBox()),
 
-          // Nombre
-          Expanded(
-            flex: 3,
-            child: Text(
-              widget.nombre,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Categoría
-          Expanded(
-            flex: 3,
-            child: Text(
-              widget.categoria,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Precio unitario
-          Expanded(
-            flex: 2,
-            child: Text(
-              widget.precioUnitario,
-              style: const TextStyle(
-                color: Color(0xFFFFA726),
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Cantidad disponible
-          Expanded(
-            flex: 2,
-            child: Text(
-              widget.cantidadDisponible,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Código de barras
-          Expanded(
-            flex: 3,
-            child: Text(
-              widget.codigoBarras,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          // Disponible
-          Expanded(
-            flex: 1,
-            child: Center(child: buildDisponibleBadge()),
-          ),
-          // IconButton para gestionar stock y eliminar producto
-          Expanded(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.inventory, color: colores.colorTexto, size: 28),
-                  tooltip: 'Agregar stock',
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return ModalAgregarStock(
-                          idProducto: widget.producto?.id,
-                          nombreProducto: widget.nombre,
-                          producto: widget.producto,
-                          onStockUpdated: (cantidad) {
-                            if (widget.onUpdateStock != null) {
-                              widget.onUpdateStock!(cantidad);
-                            }
-                          },
-                        );
-                      },
-                    );
-                  },
+            // Nombre
+            Expanded(
+              flex: 3,
+              child: Text(
+                widget.nombre,
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.redAccent, size: 28),
-                  tooltip: 'Eliminar producto',
-                  onPressed: widget.onDelete,
-                ),
-              ],
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-        ],
+            // Categoría
+            Expanded(
+              flex: 3,
+              child: Text(
+                widget.categoria,
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 16,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Precio unitario
+            Expanded(
+              flex: 2,
+              child: Text(
+                widget.precioUnitario,
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Cantidad disponible
+            Expanded(
+              flex: 2,
+              child: Text(
+                widget.cantidadDisponible,
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Código de barras
+            Expanded(
+              flex: 3,
+              child: Text(
+                widget.codigoBarras,
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 16,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            // Disponible
+            Expanded(
+              flex: 1,
+              child: Center(child: buildDisponibleBadge()),
+            ),
+            // IconButton para gestionar stock y eliminar producto
+            Expanded(
+              flex: 1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.inventory,
+                        color: colores.colorTexto, size: 28),
+                    tooltip: 'Agregar stock',
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return ModalAgregarStock(
+                            idProducto: widget.producto?.id,
+                            nombreProducto: widget.nombre,
+                            producto: widget.producto,
+                            onStockUpdated: (cantidad) {
+                              if (widget.onUpdateStock != null) {
+                                widget.onUpdateStock!(cantidad);
+                              }
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.redAccent, size: 28),
+                    tooltip: 'Eliminar producto',
+                    onPressed: widget.onDelete,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

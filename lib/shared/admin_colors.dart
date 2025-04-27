@@ -7,6 +7,8 @@ class AdminColors with ChangeNotifier {
 
   AdminColors._internal();
 
+  bool isDarkMode = true;
+
   // Colores actuales
   late Color colorFondo;
   late Color colornavbar;
@@ -20,7 +22,10 @@ class AdminColors with ChangeNotifier {
   late Color colorBotonNavbar;
   late Color colorHoverRow;
 
+  late Color colorSubsCardBackground;
+
   void setDarkTheme() {
+    isDarkMode = true;
     colorFondo = const Color.fromARGB(255, 33, 33, 33);
     colornavbar = const Color.fromARGB(255, 19, 19, 19);
     colorTexto = Colors.white;
@@ -30,12 +35,16 @@ class AdminColors with ChangeNotifier {
     colorFondoModal = const Color.fromARGB(255, 40, 40, 40);
     colorAccionButtons = const Color.fromARGB(255, 255, 131, 55);
     colorCancelar = const Color(0xFFFF4B37);
-    colorBotonNavbar =  Colors.black;
+    colorBotonNavbar = Colors.black;
     colorHoverRow = const Color.fromARGB(255, 255, 131, 55);
+
+    // colores para las card de suscripcciones dentro de la ventana de agregar suscripcion
+    colorSubsCardBackground = const Color.fromARGB(255, 33, 33, 33);
     notifyListeners();
   }
 
   void setLightTheme() {
+    isDarkMode = false;
     colorFondo = Colors.white;
     colorTexto = Colors.black;
     colornavbar = const Color(0xFFF5F5F5);
@@ -43,10 +52,12 @@ class AdminColors with ChangeNotifier {
     colorRowPar = const Color(0xFFF0F0F0);
     colorRowNoPar = const Color(0xFFFFFFFF);
     colorFondoModal = const Color(0xFFF8F8F8);
-     colorAccionButtons = const Color.fromARGB(255, 255, 131, 55);
+    colorAccionButtons = const Color.fromARGB(255, 255, 131, 55);
     colorCancelar = Colors.red;
-    colorBotonNavbar =  const Color.fromARGB(255, 255, 255, 255);
+    colorBotonNavbar = const Color.fromARGB(255, 255, 255, 255);
     colorHoverRow = const Color.fromARGB(255, 255, 131, 55);
+
+    colorSubsCardBackground = Colors.white;
     notifyListeners();
   }
 }

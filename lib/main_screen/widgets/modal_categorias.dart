@@ -27,8 +27,8 @@ class _ModalCategoriasState extends State<ModalCategorias> {
     return AlertDialog(
       backgroundColor: colores.colorFondoModal,
       content: SizedBox(
-        width: 600,
-        height: 350,
+        width: 800,
+        height: 450,
         child: Row(
           children: [
             // Sección para ver categorías existentes
@@ -235,7 +235,7 @@ class _ModalCategoriasState extends State<ModalCategorias> {
                           style: TextStyle(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
+                          backgroundColor: colores.colorAccionButtons,
                           minimumSize: const Size(double.infinity, 48),
                         ),
                         onPressed: () async {

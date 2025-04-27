@@ -165,18 +165,18 @@ class _PantallaInicialState extends State<PantallaInicial> {
         active: _selectedIndex == 3,
         onPressed: onItemTapped,
       ),
-      CustomButtonHeader(
-        icon: Icons.settings_outlined,
-        index: 4,
-        active: _selectedIndex == 4,
-        onPressed: onItemTapped,
-      ),
-      CustomButtonHeader(
-        icon: Icons.badge_outlined,
-        index: 5,
-        active: _selectedIndex == 5,
-        onPressed: onItemTapped,
-      ),
+      // CustomButtonHeader(
+      //   icon: Icons.settings_outlined,
+      //   index: 4,
+      //   active: _selectedIndex == 4,
+      //   onPressed: onItemTapped,
+      // ),
+      // CustomButtonHeader(
+      //   icon: Icons.badge_outlined,
+      //   index: 5,
+      //   active: _selectedIndex == 5,
+      //   onPressed: onItemTapped,
+      // ),
       CustomButtonHeader(
         icon: isDark ? Icons.wb_sunny : Icons.nightlight_round,
         index: 99, // Un índice que no choque con los demás
@@ -187,11 +187,11 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
     final screens = [
       HomeScreen(onChangeIndex: onItemTapped),
-      StoreScreen(),
+      StoreScreen(onChangeIndex: onItemTapped),
       ClientsScreen(),
       DashboardScreen(),
-      Text(""),
-      AdministradoresScreen(),
+      // Text(""),
+      // AdministradoresScreen(),
       ScreenVenta()
     ];
 

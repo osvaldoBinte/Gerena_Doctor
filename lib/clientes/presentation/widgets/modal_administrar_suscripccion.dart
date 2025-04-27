@@ -177,10 +177,10 @@ class _ModalAdministrarSuscripccionState
                     scrollDirection: Axis.vertical,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
+                      crossAxisCount: 4,
                       childAspectRatio: 1.9,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5,
                     ),
                     itemCount: widget.suscripcionesDisponibles.length,
                     itemBuilder: (context, index) {
@@ -232,7 +232,7 @@ class _ModalAdministrarSuscripccionState
                   width: 400,
                   child: TextFormField(
                     controller: _pagaConController,
-                    style: TextStyle(color: colorTextoDark),
+                    style: TextStyle(color: colores.colorTexto),
                     keyboardType: TextInputType.numberWithOptions(decimal: true),
                     decoration:  InputDecoration(
                       labelStyle: TextStyle(color: colores.colorTexto),
@@ -259,9 +259,7 @@ class _ModalAdministrarSuscripccionState
                 ),
               ],
             ),
-            const SizedBox(
-              height: 40,
-            ),
+           const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

@@ -285,15 +285,7 @@ Future<void> agregarNuevoCliente() async {
                                   ),
                                 ),
                                 
-                                Text(
-                                  '-',
-                                  style: TextStyle(
-                                    color: colores.colorTexto,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold
-                                  ),
-                                ),
-                                
+                                const SizedBox(width: 20),
                                 // Mes - Dropdown para selección de meses
                                 SizedBox(
                                   width: 150,
@@ -334,14 +326,7 @@ Future<void> agregarNuevoCliente() async {
                                   ),
                                 ),
                                 
-                                Text(
-                                  '-',
-                                  style: TextStyle(
-                                    color: colores.colorTexto,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold
-                                  ),
-                                ),
+                                const SizedBox(width: 20),
                                 
                                 // Año
                                 SizedBox(
@@ -494,10 +479,10 @@ Future<void> agregarNuevoCliente() async {
                           scrollDirection: Axis.vertical,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            childAspectRatio: 2.6,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
+                            crossAxisCount: 4,
+                            childAspectRatio: 1.9,
+                            crossAxisSpacing: 5,
+                            mainAxisSpacing: 5,
                           ),
                           itemCount: widget.suscripcionesDisponibles.length,
                           itemBuilder: (context, index) {
@@ -600,7 +585,6 @@ Future<void> agregarNuevoCliente() async {
                               suscripcion: suscripcion,
                             );
                           })),
-                  const SizedBox(height: 20),
                   const SizedBox(height: 22),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

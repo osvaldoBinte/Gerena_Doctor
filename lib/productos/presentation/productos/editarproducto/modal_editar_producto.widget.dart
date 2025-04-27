@@ -35,7 +35,7 @@ class ModalEditarProducto extends StatelessWidget {
     return AlertDialog(
       backgroundColor: colores.colorFondoModal,
       content: Container(
-        width: 1400,
+        width: 1390,
         height: 558,
         child: Obx(() => controller.isLoading.value
           ? Center(child: CircularProgressIndicator(color: Colors.white))

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
 import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
@@ -160,7 +161,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                     controller: _descripcionController,
                     maxLength: 200,
                     maxLines: 2,
-                    style: TextStyle(color: colorTextoDark),
+                    style: TextStyle(color: colores.colorTexto),
                     decoration: InputDecoration(
                       labelText: 'Descripción',
                       labelStyle:
@@ -176,7 +177,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _precioController,
-                    style: TextStyle(color: colorTextoDark),
+                    style: TextStyle(color: colores.colorTexto),
                     keyboardType:
                         TextInputType.numberWithOptions(decimal: true),
                     inputFormatters: [
