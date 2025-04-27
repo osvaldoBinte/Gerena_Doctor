@@ -50,23 +50,51 @@ class VentaProductosController extends GetxController {
   final pagoCon = 0.0.obs;
   final cambio = 0.0.obs;
   
-  @override
-  void onInit() {
-    super.onInit();
-    
-    // Inicializar la conexión a la base de datos si es necesario
-    try {
-      initializeDB();
-    } catch (e) {
-      print("Error inicializando DB: $e");
-    }
-    
-    // Configurar listener para el campo de pago
-    pagoController.addListener(_calcularCambio);
-    
-    // Configurar listener para actualizar total cuando cambie el carrito
-    ever(productosCarrito, (_) => _calcularTotal());
+ @override
+void onInit() {
+  super.onInit();
+  
+  // Inicializar la conexión a la base de datos si es necesario
+  try {
+    initializeDB().then((_) {
+      // Cargar todos los productos al inicio
+      cargarTodosLosProductos();
+    });
+  } catch (e) {
+    print("Error inicializando DB: $e");
   }
+  
+  // Configurar listener para el campo de pago
+  pagoController.addListener(_calcularCambio);
+  
+  // Configurar listener para actualizar total cuando cambie el carrito
+  ever(productosCarrito, (_) => _calcularTotal());
+}
+
+// Método para cargar todos los productos
+Future<void> cargarTodosLosProductos() async {
+  try {
+    isSearchingProducts.value = true;
+    
+    // Obtener todos los productos
+    final productos = await ProductoDB.obtenerProductos(
+      conn: Database.conn,
+    );
+    
+    productosEncontrados.value = productos;
+    
+    if (productos.isEmpty) {
+      print('No hay productos registrados en la base de datos');
+    } else {
+      print('Se cargaron ${productos.length} productos');
+    }
+  } catch (e) {
+    print('Error al cargar productos: $e');
+   
+  } finally {
+    isSearchingProducts.value = false;
+  }
+}
   
   Future<void> initializeDB() async {
     try {
@@ -93,40 +121,43 @@ class VentaProductosController extends GetxController {
   // BÚSQUEDA DE PRODUCTOS
   
   Future<void> buscarProductos(String termino) async {
-    if (termino.isEmpty) {
-      productosEncontrados.clear();
-      return;
-    }
+  try {
+    isSearchingProducts.value = true;
     
-    try {
-      isSearchingProducts.value = true;
+    if (termino.isEmpty) {
+      // Si no hay término de búsqueda, cargar todos los productos
+      final productos = await ProductoDB.obtenerProductos(
+        conn: Database.conn,
+      );
       
-      // Buscar productos en la base de datos
+      productosEncontrados.value = productos;
+    } else {
+      // Buscar productos con el término
       final productos = await ProductoDB.buscarProductos(
         termino: termino,
         conn: Database.conn,
       );
       
       productosEncontrados.value = productos;
-      
-      // Mensaje si no se encuentran productos
-      if (productos.isEmpty) {
-        print('No se encontraron productos con el término: $termino');
-      }
-    } catch (e) {
-      print('Error al buscar productos: $e');
-      Get.snackbar(
-        'Error',
-        'No se pudieron buscar los productos: $e',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    } finally {
-      isSearchingProducts.value = false;
     }
+    
+    // Mensaje si no se encuentran productos
+    if (productosEncontrados.isEmpty) {
+      print('No se encontraron productos');
+    }
+  } catch (e) {
+    print('Error al buscar productos: $e');
+    Get.snackbar(
+      'Error',
+      'No se pudieron buscar los productos: $e',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  } finally {
+    isSearchingProducts.value = false;
   }
-  
+}
   // MANEJO DEL CARRITO
   
   // Método original
@@ -342,10 +373,10 @@ class VentaProductosController extends GetxController {
           // 2. Actualizar stock del producto
           final nuevoStock = producto.stock - cantidad;
           final stockActualizado = await ProductoDB.asignarStock(
-            id: producto.id,
-            cantidad: nuevoStock,
-            conn: Database.conn,
-          );
+  id: producto.id,
+  cantidad: nuevoStock,
+  conn: Database.conn,
+);
           
           if (!stockActualizado) {
             throw Exception('Error al actualizar el stock del producto ${producto.titulo}');
