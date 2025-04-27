@@ -6,6 +6,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:managegym/db/database_connection.dart';
 import 'package:managegym/main_screen/widgets/connection/categoriaModel.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_model.dart';
+import 'package:managegym/productos/presentation/ventaProducto/ventaProductos_controller.dart';
 
 class EditarProductoController extends GetxController {
   final nombreProductoController = TextEditingController();
@@ -27,6 +28,7 @@ class EditarProductoController extends GetxController {
   int? idProducto;
   int? idCodigoBarras;
   String? codigoBarrasOriginal;
+  final VentaProductosController ventaController = Get.put(VentaProductosController());
 
   void cargarCategoriasYSeleccionar(List<Categoria> cats) {
     categorias.assignAll(cats);
@@ -142,9 +144,18 @@ class EditarProductoController extends GetxController {
         if (exito) {
           Get.snackbar('Éxito', 'Producto actualizado correctamente',
               backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+
           // Actualiza el estado interno
           idCodigoBarras = nuevoIdCodigoBarras;
           codigoBarrasOriginal = codigoIngresado;
+          try {
+    ventaController.initializeDB().then((_) {
+      // Cargar todos los productos al inicio
+      ventaController.cargarTodosLosProductos();
+    });
+  } catch (e) {
+    print("Error inicializando DB: $e");
+  }
           return true;
         } else {
           Get.snackbar('Error', 'No se pudo actualizar el producto',

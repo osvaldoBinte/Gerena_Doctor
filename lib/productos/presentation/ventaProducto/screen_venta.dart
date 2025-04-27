@@ -92,9 +92,10 @@ class ScreenVenta extends StatelessWidget {
                                       index: index.toString(),
                                       nombre: productoVenta.producto.titulo,
                                       precio: productoVenta.producto.precioVenta.toStringAsFixed(2),
-                                      cantidad: productoVenta.cantidad.toString(),
+                                      cantidadRx: productoVenta.cantidad,
+
                                       onRemove: () => ventaController.eliminarDelCarrito(index),
-                                      onChangeQuantity: (newQuantity) => ventaController.cambiarCantidadProducto(index, int.parse(newQuantity)),
+                                      onChangeQuantity: (newQuantity) => ventaController.cambiarCantidadProducto(index, newQuantity),
 
                                     );
                                   },

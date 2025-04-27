@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:managegym/shared/admin_colors.dart';
 
 class RowProductoSeleccionado extends StatelessWidget {
   final String nombre;
   final String precio;
-  final String cantidad;
+  final RxInt? cantidadRx;
   final String index;
   final VoidCallback? onRemove;
-  final Function(String)? onChangeQuantity;
+  final Function(int)? onChangeQuantity;
   
   const RowProductoSeleccionado({
     Key? key, 
     required this.nombre, 
     required this.precio, 
-    required this.cantidad, 
+    required this.cantidadRx, 
     required this.index,
     this.onRemove,
     this.onChangeQuantity,
@@ -27,14 +28,10 @@ class RowProductoSeleccionado extends StatelessWidget {
         : colores.colorRowNoPar;
   }
 
-  // Calcula el subtotal
-  double get subtotal {
-    return double.parse(precio) * int.parse(cantidad);
-  }
-
   @override
   Widget build(BuildContext context) {
     final AdminColors colores = AdminColors();
+    final double precioDouble = double.parse(precio);
     
     return Container(
       width: double.infinity,
@@ -79,10 +76,10 @@ class RowProductoSeleccionado extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
                   onPressed: () {
-                    if (onChangeQuantity != null) {
-                      int newQuantity = int.parse(cantidad) - 1;
+                    if (cantidadRx != null && onChangeQuantity != null) {
+                      int newQuantity = cantidadRx!.value - 1;
                       if (newQuantity > 0) {
-                        onChangeQuantity!(newQuantity.toString());
+                        onChangeQuantity!(newQuantity);
                       } else if (onRemove != null) {
                         onRemove!();
                       }
@@ -90,22 +87,22 @@ class RowProductoSeleccionado extends StatelessWidget {
                   },
                 ),
                 SizedBox(width: 8),
-                Text(
-                  cantidad,
+                Obx(() => Text(
+                  cantidadRx?.value.toString() ?? "0",
                   style: TextStyle(
                     color: colores.colorTexto,
                     fontSize: 17
                   ),
-                ),
+                )),
                 SizedBox(width: 8),
                 IconButton(
                   icon: Icon(Icons.add, color: colores.colorTexto, size: 16),
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
                   onPressed: () {
-                    if (onChangeQuantity != null) {
-                      int newQuantity = int.parse(cantidad) + 1;
-                      onChangeQuantity!(newQuantity.toString());
+                    if (cantidadRx != null && onChangeQuantity != null) {
+                      int newQuantity = cantidadRx!.value + 1;
+                      onChangeQuantity!(newQuantity);
                     }
                   },
                 ),
@@ -116,14 +113,17 @@ class RowProductoSeleccionado extends StatelessWidget {
           // Subtotal
           Expanded(
             flex: 3,
-            child: Text(
-              '\$${subtotal.toStringAsFixed(2)}',
-              style: TextStyle(
-                color: colores.colorTexto,
-                fontSize: 17
-              ),
-              overflow: TextOverflow.ellipsis,
-            )
+            child: Obx(() {
+              double subtotal = precioDouble * (cantidadRx?.value ?? 0);
+              return Text(
+                '\$${subtotal.toStringAsFixed(2)}',
+                style: TextStyle(
+                  color: colores.colorTexto,
+                  fontSize: 17
+                ),
+                overflow: TextOverflow.ellipsis,
+              );
+            })
           ),
           
           // Botón eliminar

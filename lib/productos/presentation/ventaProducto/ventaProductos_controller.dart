@@ -222,40 +222,41 @@ Future<void> cargarTodosLosProductos() async {
     agregarAlCarrito(producto);
   }
   
-  void cambiarCantidadProducto(int index, int nuevaCantidad) {
-    if (index < 0 || index >= productosCarrito.length) return;
-    
-    final productoCarrito = productosCarrito[index];
-    final stockDisponible = productoCarrito.producto.stock;
-    
-    if (nuevaCantidad <= 0) {
-      // Remover producto si la cantidad es 0 o menor
-      productosCarrito.removeAt(index);
-      Get.snackbar(
-        'Producto eliminado',
-        'Se eliminó ${productoCarrito.producto.titulo} del carrito',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        duration: Duration(seconds: 1),
-      );
-      return;
-    }
-    
-    if (nuevaCantidad > stockDisponible) {
-      nuevaCantidad = stockDisponible;
-      Get.snackbar(
-        'Stock limitado',
-        'Solo hay $stockDisponible unidades disponibles',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-    
-    productoCarrito.cantidad.value = nuevaCantidad;
-    _calcularTotal();
+ void cambiarCantidadProducto(int index, int nuevaCantidad) {
+  if (index < 0 || index >= productosCarrito.length) return;
+  
+  final productoCarrito = productosCarrito[index];
+  final stockDisponible = productoCarrito.producto.stock;
+  
+  if (nuevaCantidad <= 0) {
+    // Remover producto si la cantidad es 0 o menor
+    productosCarrito.removeAt(index);
+    Get.snackbar(
+      'Producto eliminado',
+      'Se eliminó ${productoCarrito.producto.titulo} del carrito',
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: Duration(seconds: 1),
+    );
+    return;
   }
+  
+  if (nuevaCantidad > stockDisponible) {
+    nuevaCantidad = stockDisponible;
+    Get.snackbar(
+      'Stock limitado',
+      'Solo hay $stockDisponible unidades disponibles',
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  }
+  
+  // Actualizar cantidad
+  productoCarrito.cantidad.value = nuevaCantidad;
+  _calcularTotal();
+}
   
   void eliminarDelCarrito(int index) {
     if (index >= 0 && index < productosCarrito.length) {
