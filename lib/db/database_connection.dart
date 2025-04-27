@@ -8,9 +8,9 @@ conn = await Connection.open(
   Endpoint(
     host: 'localhost',
     port: 5432,
-    database: 'managegym',
+    database: 'gym',
     username: 'postgres',
-    password: '211099',
+    password: '13960',
   ),
   settings: const ConnectionSettings(sslMode: SslMode.disable),
 );

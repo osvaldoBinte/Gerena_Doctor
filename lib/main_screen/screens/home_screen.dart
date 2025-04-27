@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
+import 'package:managegym/clientes/presentation/widgets/modal_administrar_suscripccion.dart';
 import 'package:managegym/clientes/presentation/widgets/modal_register_client_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/modal_agregar_producto.dart';
 import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_subscription_widget.dart';
-import 'package:managegym/suscripcciones/presentation/widgets/modal_agregar_suscripcion.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
 import 'package:managegym/db/database_connection.dart';
@@ -142,6 +142,20 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _showModalAgregarSuscripcion() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        // Puedes modificar nombreUsuario y idUsuario si tienes un contexto específico
+        return ModalAdministrarSuscripccion(
+          suscripcionesDisponibles: suscripcionController.suscripciones,
+          nombreUsuario: '', // O el nombre del usuario si aplica
+          idUsuario: 0,      // O el id del usuario si aplica
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -177,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        const HeaderTableClientsHome(), // <--- Nombre corregido
+        const HeaderTableClientsHome(),
         SizedBox(
           height: 360,
           width: double.infinity,
@@ -202,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           dateRange: "$diasRestantes días",
                           sex: usuario.sexo,
                           suscripcionesDisponibles: suscripcionController.suscripciones,
+                          onSuscripcionActualizada: cargarUsuarios, // <--- ESTE ES EL CAMBIO CLAVE
                         );
                       },
                     ),
@@ -226,13 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
               QuickActionButton(
                 text: 'AGREGAR UNA NUEVA SUSCRIPCCION',
                 icon: Icons.notes_outlined,
-                accion: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return const ModalAgregarSuscripccion();
-                      });
-                },
+                accion: _showModalAgregarSuscripcion,
               ),
               const SizedBox(width: 20),
               QuickActionButton(

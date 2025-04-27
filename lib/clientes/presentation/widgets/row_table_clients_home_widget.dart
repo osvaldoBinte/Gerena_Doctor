@@ -7,7 +7,7 @@ import 'package:managegym/suscripcciones/connection/agregarSuscripcion/Suscrpcio
 
 class RowTableClientsHomeWidget extends StatefulWidget {
   final int index;
-  final int idUsuario; // <--- Añade el id del usuario aquí
+  final int idUsuario;
   final String name;
   final String phoneNumber;
   final String lastSubscription;
@@ -17,11 +17,12 @@ class RowTableClientsHomeWidget extends StatefulWidget {
   final Function(int index)? onRowTap;
   final Function(int index)? onManageTap;
   final List<TipoMembresia> suscripcionesDisponibles;
+  final VoidCallback? onSuscripcionActualizada; // <--- callback para actualizar lista
 
   const RowTableClientsHomeWidget({
     super.key,
     required this.index,
-    required this.idUsuario, // <--- Añade este campo
+    required this.idUsuario,
     required this.name,
     required this.phoneNumber,
     required this.lastSubscription,
@@ -31,6 +32,7 @@ class RowTableClientsHomeWidget extends StatefulWidget {
     this.onRowTap,
     this.onManageTap,
     required this.suscripcionesDisponibles,
+    this.onSuscripcionActualizada,
   });
 
   @override
@@ -63,12 +65,12 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
 
   void _showModalEditarCliente(BuildContext context) {
     final usuario = Usuario(
-      id: widget.idUsuario, // Usa el id real aquí
+      id: widget.idUsuario,
       nombre: widget.name,
-      apellidos: '', // Si tienes apellidos, pásalos aquí
-      correo: '',    // Si tienes correo, pásalo aquí
+      apellidos: '',
+      correo: '',
       telefono: widget.phoneNumber,
-      fechaNacimiento: null, // Si tienes la fecha, pásala aquí
+      fechaNacimiento: null,
       sexo: widget.sex,
       status: widget.status,
     );
@@ -87,7 +89,8 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
         return ModalAdministrarSuscripccion(
           suscripcionesDisponibles: widget.suscripcionesDisponibles,
           nombreUsuario: widget.name,
-          idUsuario: widget.idUsuario, // <--- Pasa el idUsuario aquí
+          idUsuario: widget.idUsuario,
+          onSuscripcionActualizada: widget.onSuscripcionActualizada, // <--- callback
         );
       },
     );

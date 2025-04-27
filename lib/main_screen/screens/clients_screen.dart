@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/shared/admin_colors.dart';
+// Importa tus modelos reales:
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
@@ -27,8 +29,32 @@ List<String> meses = [
 
 AdminColors colores = AdminColors();
 
+class Cliente {
+  final int id;
+  final String nombre;
+  final String telefono;
+  final String ultimaSuscripcion;
+  final String status;
+  final String rangoFechas;
+  final String sexo;
+
+  Cliente({
+    required this.id,
+    required this.nombre,
+    required this.telefono,
+    required this.ultimaSuscripcion,
+    required this.status,
+    required this.rangoFechas,
+    required this.sexo,
+  });
+}
+
 class _ClientsScreenState extends State<ClientsScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
+
+  // Simula tu lista de clientes y suscripciones (¡reemplaza por tu lógica real!)
+  List<Cliente> clientes = [];
+  List<TipoMembresia> suscripcionesDisponibles = [];
 
   // Estados para botones de filtro
   bool hoverButtontodosLosClientes = false;
@@ -37,12 +63,44 @@ class _ClientsScreenState extends State<ClientsScreen> {
   int index = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _cargarClientes();
+    _cargarSuscripciones();
+  }
+
+  Future<void> _cargarClientes() async {
+    // Aquí pon tu lógica real para obtener los clientes actualizados
+    // Por ejemplo, desde tu base de datos o backend
+    clientes = List.generate(
+      60,
+      (i) => Cliente(
+        id: i,
+        nombre: "Cliente $i",
+        telefono: "555-000-$i",
+        ultimaSuscripcion: "Básica",
+        status: "Activo",
+        rangoFechas: "01/01/2025 - 01/02/2025",
+        sexo: "M",
+      ),
+    );
+    setState(() {});
+  }
+
+  Future<void> _cargarSuscripciones() async {
+    // Aquí pon tu lógica real para obtener los tipos de membresías
+    suscripcionesDisponibles = []; // Llénalo con tus datos reales
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Botones para filtrar usuarios
+        // ... Tus botones de filtro igual que antes ...
         Row(
           children: [
+            // ... (tus InkWell de filtros) ...
             SizedBox(
               child: InkWell(
                 borderRadius: BorderRadius.circular(50),
@@ -77,6 +135,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 ),
               ),
             ),
+            // ... los otros botones igual ...
             SizedBox(
               child: InkWell(
                 borderRadius: BorderRadius.circular(50),
@@ -186,18 +245,20 @@ class _ClientsScreenState extends State<ClientsScreen> {
           height: MediaQuery.of(context).size.height - 300,
           width: double.infinity,
           child: ListView.builder(
-            itemCount: 60, // <-- Aquí deberías usar la cantidad real de clientes
+            itemCount: clientes.length, // Usa la lista real de clientes
             itemBuilder: (context, index) {
+              final cliente = clientes[index];
               return RowTableClientsHomeWidget(
                 index: index,
-                idUsuario: index, // <-- Cambia esto por el id real del usuario
-                name: "Cliente $index",
-                phoneNumber: "555-000-$index",
-                lastSubscription: "Básica",
-                status: "Activo",
-                dateRange: "01/01/2025 - 01/02/2025",
-                sex: "M",
-                suscripcionesDisponibles: const [], // Llena esto con tus datos reales de suscripciones
+                idUsuario: cliente.id,
+                name: cliente.nombre,
+                phoneNumber: cliente.telefono,
+                lastSubscription: cliente.ultimaSuscripcion,
+                status: cliente.status,
+                dateRange: cliente.rangoFechas,
+                sex: cliente.sexo,
+                suscripcionesDisponibles: suscripcionesDisponibles,
+                onSuscripcionActualizada: _cargarClientes, // <--- AQUÍ el callback clave
               );
             },
           ),
