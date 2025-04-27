@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:managegym/clientes/presentation/widgets/header_table_clients_home_widget.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/shared/admin_colors.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
+import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
+import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioModel.dart';
+import 'package:managegym/db/database_connection.dart';
+
+class UsuarioExtraInfo {
+  final Usuario usuario;
+  final int diasRestantes;
+  final String ultimaMembresia;
+  UsuarioExtraInfo({
+    required this.usuario,
+    required this.diasRestantes,
+    required this.ultimaMembresia,
+  });
+}
+
+List<String> meses = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
 
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
@@ -10,144 +31,89 @@ class ClientsScreen extends StatefulWidget {
   State<ClientsScreen> createState() => _ClientsScreenState();
 }
 
-List<String> meses = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre'
-];
-
-AdminColors colores = AdminColors();
-
 class _ClientsScreenState extends State<ClientsScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
+  final SuscripcionController suscripcionController = Get.put(SuscripcionController());
 
-  // Estados para botones de filtro
-  bool hoverButtontodosLosClientes = false;
-  bool hoverButtonSuscripccionesApuntoExpirar = false;
-  bool hoverButtonNuevosClientes = false;
-  int index = 0;
+  List<UsuarioExtraInfo> usuarios = [];
+  List<UsuarioExtraInfo> usuariosFiltrados = [];
+  bool usuariosCargando = true;
+  final TextEditingController _searchController = TextEditingController();
+
+  AdminColors colores = AdminColors();
+
+  @override
+  void initState() {
+    super.initState();
+    cargarUsuarios();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> cargarUsuarios() async {
+    setState(() => usuariosCargando = true);
+    try {
+      final conn = Database.conn;
+      final lista = await UsuarioDB.obtenerUsuarios(conn: conn);
+      final usuariosInfo = <UsuarioExtraInfo>[];
+      for (final usuario in lista) {
+        final dias = await UsuarioDB.obtenerDiasMembresiaRestantes(
+          idUsuario: usuario.id,
+          conn: conn,
+        );
+        final titulo = await UsuarioDB.obtenerTituloUltimaMembresiaActiva(
+          idUsuario: usuario.id,
+          conn: conn,
+        );
+        usuariosInfo.add(UsuarioExtraInfo(
+          usuario: usuario,
+          diasRestantes: dias,
+          ultimaMembresia: titulo,
+        ));
+      }
+      setState(() {
+        usuarios = usuariosInfo;
+        _aplicarFiltro();
+        usuariosCargando = false;
+      });
+    } catch (e) {
+      print('Error al cargar usuarios: $e');
+      setState(() {
+        usuarios = [];
+        usuariosFiltrados = [];
+        usuariosCargando = false;
+      });
+    }
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _aplicarFiltro();
+    });
+  }
+
+  void _aplicarFiltro() {
+    String filtro = _searchController.text.toLowerCase();
+    if (filtro.isEmpty) {
+      usuariosFiltrados = List.from(usuarios);
+    } else {
+      usuariosFiltrados = usuarios.where((info) {
+        final usuario = info.usuario;
+        final nombreCompleto = "${usuario.nombre} ${usuario.apellidos}".toLowerCase();
+        return nombreCompleto.contains(filtro) || usuario.telefono.toLowerCase().contains(filtro);
+      }).toList();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Botones para filtrar usuarios
-        Row(
-          children: [
-            SizedBox(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50),
-                highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: () {
-                  setState(() {
-                    index = 0;
-                  });
-                },
-                onHover: (value) {
-                  setState(() {
-                    hoverButtontodosLosClientes = value;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: (index == 0 || hoverButtontodosLosClientes)
-                        ? Colors.orange
-                        : Colors.black,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: const Text(
-                    "Todos los clientes",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50),
-                highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: () {
-                  setState(() {
-                    index = 1;
-                  });
-                },
-                onHover: (value) {
-                  setState(() {
-                    hoverButtonSuscripccionesApuntoExpirar = value;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: (index == 1 || hoverButtonSuscripccionesApuntoExpirar)
-                        ? Colors.orange
-                        : Colors.black,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: const Text(
-                    "Suscripcciones a punto de expirar",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(50),
-                highlightColor: const Color.fromARGB(255, 167, 85, 85),
-                onTap: () {
-                  setState(() {
-                    index = 2;
-                  });
-                },
-                onHover: (value) {
-                  setState(() {
-                    hoverButtonNuevosClientes = value;
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                  decoration: BoxDecoration(
-                    color: (index == 2 || hoverButtonNuevosClientes)
-                        ? Colors.orange
-                        : Colors.black,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: const Text(
-                    "Nuevos clientes",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
-        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,13 +122,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
               width: 800,
               height: 50,
               child: TextField(
+                controller: _searchController,
                 style: TextStyle(color: colores.colorTexto),
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                        color: Color.fromARGB(255, 255, 255, 255), width: 8),
+                    borderSide: BorderSide(
+                        color: colores.colorTexto, width: 8),
                   ),
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 ),
@@ -175,9 +142,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold),
             ),
-            const SizedBox(
-              height: 20,
-            ),
           ],
         ),
         const SizedBox(height: 20),
@@ -185,22 +149,31 @@ class _ClientsScreenState extends State<ClientsScreen> {
         SizedBox(
           height: MediaQuery.of(context).size.height - 300,
           width: double.infinity,
-          child: ListView.builder(
-            itemCount: 60, // <-- Aquí deberías usar la cantidad real de clientes
-            itemBuilder: (context, index) {
-              return RowTableClientsHomeWidget(
-                index: index,
-                idUsuario: index, // <-- Cambia esto por el id real del usuario
-                name: "Cliente $index",
-                phoneNumber: "555-000-$index",
-                lastSubscription: "Básica",
-                status: "Activo",
-                dateRange: "01/01/2025 - 01/02/2025",
-                sex: "M",
-                suscripcionesDisponibles: const [], // Llena esto con tus datos reales de suscripciones
-              );
-            },
-          ),
+          child: usuariosCargando
+              ? const Center(child: CircularProgressIndicator())
+              : usuariosFiltrados.isEmpty
+                  ? Center(child: Text("No hay usuarios registrados", style: TextStyle(color: colores.colorTexto, fontSize: 18)))
+                  : ListView.builder(
+                      itemCount: usuariosFiltrados.length,
+                      itemBuilder: (context, index) {
+                        final usuarioInfo = usuariosFiltrados[index];
+                        final usuario = usuarioInfo.usuario;
+                        final diasRestantes = usuarioInfo.diasRestantes;
+                        final ultimaMembresia = usuarioInfo.ultimaMembresia;
+                        return RowTableClientsHomeWidget(
+                          index: index,
+                          idUsuario: usuario.id,
+                          name: "${usuario.nombre} ${usuario.apellidos}",
+                          phoneNumber: usuario.telefono,
+                          lastSubscription: ultimaMembresia,
+                          status: usuario.status ?? "activo",
+                          dateRange: "$diasRestantes días",
+                          sex: usuario.sexo,
+                          suscripcionesDisponibles: suscripcionController.suscripciones,
+                          onSuscripcionActualizada: cargarUsuarios,
+                        );
+                      },
+                    ),
         ),
       ],
     );

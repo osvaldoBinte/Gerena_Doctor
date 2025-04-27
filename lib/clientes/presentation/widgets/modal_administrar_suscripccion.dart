@@ -10,12 +10,14 @@ class ModalAdministrarSuscripccion extends StatefulWidget {
   final List<TipoMembresia> suscripcionesDisponibles;
   final String nombreUsuario;
   final int idUsuario;
+  final VoidCallback? onSuscripcionActualizada; // <-- NUEVO
 
   const ModalAdministrarSuscripccion({
     super.key,
     required this.suscripcionesDisponibles,
     required this.nombreUsuario,
     required this.idUsuario,
+    this.onSuscripcionActualizada, // <-- NUEVO
   });
 
   @override
@@ -141,6 +143,12 @@ class _ModalAdministrarSuscripccionState
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("¡Suscripción renovada/registrada con éxito!")),
     );
+
+    // NOTIFICAR al padre para que recargue la lista de clientes
+    if (widget.onSuscripcionActualizada != null) {
+      widget.onSuscripcionActualizada!();
+    }
+
     Navigator.of(context).pop();
   }
 

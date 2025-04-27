@@ -11,7 +11,7 @@ class Producto {
   final int? idCategoria;
   final int? idCodigoBarras;
   final String? imagenProducto; // Base64
-  final String? codigoBarras;   // <-- AGREGADO
+  final String? codigoBarras;
 
   Producto({
     required this.id,
@@ -23,7 +23,7 @@ class Producto {
     this.idCategoria,
     this.idCodigoBarras,
     this.imagenProducto,
-    this.codigoBarras, // <-- AGREGADO
+    this.codigoBarras,
   });
 
   factory Producto.fromMap(Map<String, dynamic> map) => Producto(
@@ -48,7 +48,7 @@ class Producto {
                 : map['idcodigobarras'])
             : null,
         imagenProducto: map['imagenproducto']?.toString(),
-        codigoBarras: map['codigobarras']?.toString(), // <-- AGREGADO
+        codigoBarras: map['codigobarras']?.toString(),
       );
 
   factory Producto.fromRow(List<dynamic> row) => Producto(
@@ -68,8 +68,35 @@ class Producto {
             ? (row[7] is int ? row[7] : int.parse(row[7].toString()))
             : null,
         imagenProducto: row[8]?.toString(),
-        codigoBarras: row.length > 9 ? row[9]?.toString() : null, // <-- AGREGADO
+        codigoBarras: row.length > 9 ? row[9]?.toString() : null,
       );
+
+  /// MÉTODO copyWith PARA ACTUALIZACIONES INMUTABLES
+  Producto copyWith({
+    int? id,
+    String? titulo,
+    String? descripcion,
+    double? precioVenta,
+    int? stock,
+    DateTime? fechaRegistro,
+    int? idCategoria,
+    int? idCodigoBarras,
+    String? imagenProducto,
+    String? codigoBarras,
+  }) {
+    return Producto(
+      id: id ?? this.id,
+      titulo: titulo ?? this.titulo,
+      descripcion: descripcion ?? this.descripcion,
+      precioVenta: precioVenta ?? this.precioVenta,
+      stock: stock ?? this.stock,
+      fechaRegistro: fechaRegistro ?? this.fechaRegistro,
+      idCategoria: idCategoria ?? this.idCategoria,
+      idCodigoBarras: idCodigoBarras ?? this.idCodigoBarras,
+      imagenProducto: imagenProducto ?? this.imagenProducto,
+      codigoBarras: codigoBarras ?? this.codigoBarras,
+    );
+  }
 }
 
 class ProductoDB {
@@ -112,6 +139,29 @@ class ProductoDB {
     }
   }
 
+static Future<bool> asignarStock({
+  required int id,
+  required int cantidad,
+  required dynamic conn,
+}) async {
+  try {
+    final sql = Sql.named('''
+      UPDATE producto 
+      SET stock = @cantidad
+      WHERE id = @id
+    ''');
+
+    await conn.execute(sql, parameters: {
+      'id': id,
+      'cantidad': cantidad,
+    });
+    return true;
+  } catch (e) {
+    print('Error al asignar stock: $e');
+    return false;
+  }
+}
+
   static Future<int?> insertarCodigoBarras({
     required String codigoBarras,
     required dynamic conn,
@@ -133,6 +183,29 @@ class ProductoDB {
       return null;
     } catch (e) {
       print('Error insertando código de barras: $e');
+      return null;
+    }
+  }
+
+  static Future<int?> buscarCodigoBarrasId({
+    required String codigoBarras,
+    required dynamic conn,
+  }) async {
+    try {
+      final sql = Sql.named('''
+        SELECT id FROM codigoBarras WHERE codigoBarras = @codigoBarras
+      ''');
+
+      final result = await conn.execute(sql, parameters: {
+        'codigoBarras': codigoBarras,
+      });
+
+      if (result.isNotEmpty) {
+        return result.first[0] as int;
+      }
+      return null;
+    } catch (e) {
+      print('Error buscando código de barras: $e');
       return null;
     }
   }
@@ -199,7 +272,8 @@ class ProductoDB {
     }
   }
 
-  static Future<bool> establecerStock({
+  // SOLO SUMA en la base de datos, no sumes fuera de aquí.
+  static Future<bool> agregarStock({
     required int id,
     required int cantidad,
     required dynamic conn,
@@ -207,7 +281,7 @@ class ProductoDB {
     try {
       final sql = Sql.named('''
         UPDATE producto 
-        SET stock = @cantidad
+        SET stock = stock + @cantidad
         WHERE id = @id
       ''');
 
@@ -217,7 +291,7 @@ class ProductoDB {
       });
       return true;
     } catch (e) {
-      print('Error al establecer stock: $e');
+      print('Error al agregar stock: $e');
       return false;
     }
   }
@@ -227,7 +301,6 @@ class ProductoDB {
     required dynamic conn,
   }) async {
     try {
-      // AHORA TRAE EL CODIGO DE BARRAS REAL TAMBIÉN
       final sql = Sql.named('''
         SELECT p.id, p.titulo, p.descripcion, p.precioVenta, p.stock, 
                p.fechaRegistro, p.idCategoria, p.idCodigoBarras, p.imagenProducto,
