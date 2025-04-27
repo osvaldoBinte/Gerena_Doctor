@@ -12,6 +12,7 @@ import 'package:managegym/main_screen/widgets/custom_button_widget.dart';
 import 'package:managegym/main_screen/widgets/titlebar_widget.dart';
 import 'package:managegym/main_screen/screens/home_screen.dart';
 import 'package:managegym/shared/admin_colors.dart';
+import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioController.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -62,6 +63,10 @@ void main() async {
   } catch (e) {
     print('Error al conectar a la base de datos: $e');
   }
+
+  // AQUI SE REGISTRA EL CONTROLADOR DE USUARIO PARA QUE GETX LO ENCUENTRE
+  Get.put(UsuarioController());
+
   runApp(const MyApp());
 }
 
@@ -132,6 +137,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
 
   @override
   Widget build(BuildContext context) {
+    // Instancia local de colores
+    final AdminColors colores = AdminColors();
+
     List<CustomButtonHeader> customButtons = [
       CustomButtonHeader(
         icon: Icons.home,
@@ -186,8 +194,9 @@ class _PantallaInicialState extends State<PantallaInicial> {
       AdministradoresScreen(),
       ScreenVenta()
     ];
+
     return Scaffold(
-      backgroundColor: colors.colorFondo,
+      backgroundColor: colores.colorFondo,
       body: Column(
         children: [
           TitlebarWidget(

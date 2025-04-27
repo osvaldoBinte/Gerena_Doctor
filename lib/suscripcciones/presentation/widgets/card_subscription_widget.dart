@@ -8,17 +8,18 @@ class CardSubscriptionWidget extends StatelessWidget {
   const CardSubscriptionWidget({super.key, required this.suscripcion});
 
   String getDuracionTexto() {
-    final tiempoDuracion = suscripcion.tiempoDuracion;
-    if (tiempoDuracion < 30) {
-      return "$tiempoDuracion días";
-    } else if (tiempoDuracion % 30 == 0 && tiempoDuracion < 365) {
-      int meses = (tiempoDuracion / 30).round();
+    // Usar 'duracion' si el modelo ya está actualizado, de lo contrario usa 'tiempoDuracion'
+    final duracion = suscripcion.duracion;
+    if (duracion < 30) {
+      return "$duracion días";
+    } else if (duracion % 30 == 0 && duracion < 365) {
+      int meses = (duracion / 30).round();
       return "$meses mes${meses > 1 ? 'es' : ''}";
-    } else if (tiempoDuracion % 365 == 0) {
-      int anios = (tiempoDuracion / 365).round();
+    } else if (duracion % 365 == 0) {
+      int anios = (duracion / 365).round();
       return "$anios año${anios > 1 ? 's' : ''}";
     } else {
-      return "$tiempoDuracion días";
+      return "$duracion días";
     }
   }
 
@@ -70,9 +71,9 @@ class CardSubscriptionWidget extends StatelessWidget {
             children: [
               const Icon(Icons.attach_money, color: Color.fromARGB(255, 255, 152, 0), size: 22),
               const SizedBox(width: 4),
-              Text(
+              const Text(
                 "Precio: ",
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                   fontSize: 17,
@@ -93,9 +94,9 @@ class CardSubscriptionWidget extends StatelessWidget {
             children: [
               const Icon(Icons.calendar_today_rounded, color: Color.fromARGB(255, 54, 162, 255), size: 19),
               const SizedBox(width: 6),
-              Text(
+              const Text(
                 "Duración: ",
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

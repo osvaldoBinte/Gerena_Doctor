@@ -22,13 +22,13 @@ class SuscripcionController extends GetxController {
     required String titulo,
     required String descripcion,
     required double precio,
-    required int tiempoDuracion,
+    required int duracion,
   }) async {
     final nueva = await AgregarSuscripcionModel.insertarTipoMembresia(
       titulo: titulo,
       descripcion: descripcion,
       precio: precio,
-      tiempoDuracion: tiempoDuracion,
+      duracion: duracion,
     );
     if (nueva != null) {
       await cargarSuscripciones();
@@ -42,14 +42,14 @@ class SuscripcionController extends GetxController {
     required String titulo,
     required String descripcion,
     required double precio,
-    required int tiempoDuracion,
+    required int duracion,
   }) async {
     final ok = await AgregarSuscripcionModel.actualizarTipoMembresia(
       id: id,
       titulo: titulo,
       descripcion: descripcion,
       precio: precio,
-      tiempoDuracion: tiempoDuracion,
+      duracion: duracion,
     );
     if (ok) {
       await cargarSuscripciones();
@@ -77,7 +77,7 @@ class SuscripcionController extends GetxController {
       print('No se puede eliminar: ${verificacion['mensaje']}');
       return false;
     }
-    
+
     final ok = await AgregarSuscripcionModel.eliminarTipoMembresia(id: id);
     if (ok) {
       await cargarSuscripciones();

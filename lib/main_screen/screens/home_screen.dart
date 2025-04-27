@@ -47,10 +47,10 @@ List<String> meses = [
 ];
 
 void _showModalRegisterUser(
-    BuildContext context,
-    List<TipoMembresia> suscripciones,
-    VoidCallback onRegistroExitoso,
-    ) {
+  BuildContext context,
+  List<TipoMembresia> suscripciones,
+  VoidCallback onRegistroExitoso,
+) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -71,6 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<UsuarioExtraInfo> usuariosFiltrados = [];
   bool usuariosCargando = true;
   final TextEditingController _searchController = TextEditingController();
+
+  AdminColors colores = AdminColors();
 
   @override
   void initState() {
@@ -108,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
       setState(() {
         usuarios = usuariosInfo;
-        _aplicarFiltro(); // aplica filtro después de cargar
+        _aplicarFiltro();
         usuariosCargando = false;
       });
     } catch (e) {
@@ -139,7 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }).toList();
     }
   }
-  AdminColors colores = AdminColors();
 
   @override
   Widget build(BuildContext context) {
@@ -154,12 +155,12 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 50,
               child: TextField(
                 controller: _searchController,
-                style:  TextStyle(color: colores.colorTexto),
+                style: TextStyle(color: colores.colorTexto),
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide:  BorderSide(
+                    borderSide: BorderSide(
                         color: colores.colorTexto, width: 8),
                   ),
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -168,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Text(
               "${DateTime.now().day} de $actualmonth del ${DateTime.now().year}",
-              style:  TextStyle(
+              style: TextStyle(
                   fontSize: 20,
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold),
@@ -176,14 +177,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         const SizedBox(height: 20),
-        const HeaderTableClientsHome(),
+        const HeaderTableClientsHome(), // <--- Nombre corregido
         SizedBox(
           height: 360,
           width: double.infinity,
           child: usuariosCargando
               ? const Center(child: CircularProgressIndicator())
               : usuarios.isEmpty
-                  ?  Center(child: Text("No hay usuarios registrados", style: TextStyle(color: colores.colorTexto, fontSize: 18)))
+                  ? Center(child: Text("No hay usuarios registrados", style: TextStyle(color: colores.colorTexto, fontSize: 18)))
                   : ListView.builder(
                       itemCount: usuariosFiltrados.length,
                       itemBuilder: (context, index) {
@@ -193,14 +194,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         final ultimaMembresia = usuarioInfo.ultimaMembresia;
                         return RowTableClientsHomeWidget(
                           index: index,
+                          idUsuario: usuario.id,
                           name: "${usuario.nombre} ${usuario.apellidos}",
                           phoneNumber: usuario.telefono,
                           lastSubscription: ultimaMembresia,
                           status: usuario.status ?? "activo",
                           dateRange: "$diasRestantes días",
                           sex: usuario.sexo,
-                          suscripcionesDisponibles:
-                              suscripcionController.suscripciones,
+                          suscripcionesDisponibles: suscripcionController.suscripciones,
                         );
                       },
                     ),
@@ -241,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return  ModalAgregarProducto();
+                      return ModalAgregarProducto();
                     },
                   );
                 },
@@ -259,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         const SizedBox(height: 20),
-         Row(
+        Row(
           children: [
             Text(
               "MIS SUSCRIPCCIONES",
@@ -280,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             final suscripciones = suscripcionController.suscripciones;
             if (suscripciones.isEmpty) {
-              return  Center(child: Text("No hay suscripciones" , style: TextStyle(color: colores.colorTexto, fontSize: 18)));
+              return Center(child: Text("No hay suscripciones" , style: TextStyle(color: colores.colorTexto, fontSize: 18)));
             }
             final ScrollController scrollController = ScrollController();
             return Scrollbar(
@@ -320,6 +321,7 @@ class QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AdminColors colores = AdminColors();
     return InkWell(
       onTap: () {
         accion();

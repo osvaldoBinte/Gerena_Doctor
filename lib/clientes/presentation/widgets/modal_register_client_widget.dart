@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioController.dart';
-import 'package:managegym/main_screen/screens/clients_screen.dart';
 import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/shared/widgets/input_apellidos_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
@@ -97,7 +95,9 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
             : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
       } catch (_) {}
     }
-    _totalAPagar = total;
+    setState(() {
+      _totalAPagar = total;
+    });
   }
 
   void calcularCambio() {
@@ -122,7 +122,6 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           final dia = int.parse(_diaController.text);
           final mes = int.parse(_mesController.text);
           final ano = int.parse(_anoController.text);
-          
           // Validar que la fecha sea válida
           if (dia > 0 && dia <= 31 && mes > 0 && mes <= 12 && ano >= 1900) {
             fechaNacimiento = DateTime(ano, mes, dia);
@@ -140,7 +139,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
 
         final fechaInicio = DateTime.now();
         final fechaFin = fechaInicio
-            .add(Duration(days: _suscripcionSeleccionada!.tiempoDuracion));
+            .add(Duration(days: _suscripcionSeleccionada!.duracion));
         final fechaProximoPago = fechaFin;
 
         final idUsuario = await usuarioController.crearUsuarioCompleto(
@@ -154,7 +153,7 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
           plantillaHuella: plantillaHuella,
           idTipoMembresia: _suscripcionSeleccionada!.id,
           precioMembresia: _suscripcionSeleccionada!.precio,
-          duracionMembresia: _suscripcionSeleccionada!.tiempoDuracion,
+          duracionMembresia: _suscripcionSeleccionada!.duracion,
           fechaInicioMembresia: fechaInicio,
           fechaFinMembresia: fechaFin,
           montoPago: _suscripcionSeleccionada!.precio,
@@ -321,20 +320,15 @@ class _ModalRegisterClientWidgetState extends State<ModalRegisterClientWidget> {
                                         borderSide: BorderSide(color: colores.colorTexto),
                                       ),
                                     ),
-                                    items: [
-                                      DropdownMenuItem(value: 1, child: Text('Enero', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 2, child: Text('Febrero', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 3, child: Text('Marzo', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 4, child: Text('Abril', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 5, child: Text('Mayo', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 6, child: Text('Junio', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 7, child: Text('Julio', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 8, child: Text('Agosto', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 9, child: Text('Septiembre', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 10, child: Text('Octubre', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 11, child: Text('Noviembre', style: TextStyle(color: colores.colorTexto))),
-                                      DropdownMenuItem(value: 12, child: Text('Diciembre', style: TextStyle(color: colores.colorTexto))),
-                                    ],
+                                    items: List.generate(12, (i) {
+                                      return DropdownMenuItem(
+                                        value: i + 1,
+                                        child: Text(
+                                          _mesIntATexto(i + 1),
+                                          style: TextStyle(color: colores.colorTexto),
+                                        ),
+                                      );
+                                    }),
                                     onChanged: (value) {
                                       if (value != null) {
                                         setState(() {
@@ -718,6 +712,7 @@ class InputCorreoElectronicoWidget extends StatelessWidget {
     );
   }
 }
+
 class RowSuscripccionSeleccionada extends StatefulWidget {
   final int index;
   final void Function(String id) eliminarSuscripcion;
@@ -751,28 +746,22 @@ class _RowSuscripccionSeleccionadaState
     return index % 2 == 0;
   }
 
-  // Método para formatear el precio correctamente
   String formatPrice(dynamic precio) {
     if (precio == null) return "0.00";
-    
     double numericPrice;
     if (precio is double) {
       numericPrice = precio;
     } else if (precio is int) {
       numericPrice = precio.toDouble();
     } else {
-      // Intenta convertir de string a double
       numericPrice = double.tryParse(precio.toString()) ?? 0.0;
     }
-    
     return numericPrice.toStringAsFixed(2);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el precio formateado
     final precioFormateado = formatPrice(widget.suscripcion.precio);
-    
     return Container(
       width: double.infinity,
       height: 30,

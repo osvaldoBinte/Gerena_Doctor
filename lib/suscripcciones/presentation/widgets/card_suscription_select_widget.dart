@@ -30,17 +30,18 @@ class _CardSuscriptionSelectWidgetState
   }
 
   String getDuracionTexto() {
-    final tiempoDuracion = widget.suscripcion.tiempoDuracion;
-    if (tiempoDuracion < 30) {
-      return "$tiempoDuracion días";
-    } else if (tiempoDuracion % 30 == 0 && tiempoDuracion < 365) {
-      int meses = (tiempoDuracion / 30).round();
+    // Usar 'duracion' si tu modelo ya está actualizado, si no usa 'tiempoDuracion'
+    final duracion = widget.suscripcion.duracion; // <-- Usa .duracion en vez de .tiempoDuracion
+    if (duracion < 30) {
+      return "$duracion días";
+    } else if (duracion % 30 == 0 && duracion < 365) {
+      int meses = (duracion / 30).round();
       return "$meses mes${meses > 1 ? 'es' : ''}";
-    } else if (tiempoDuracion % 365 == 0) {
-      int anios = (tiempoDuracion / 365).round();
+    } else if (duracion % 365 == 0) {
+      int anios = (duracion / 365).round();
       return "$anios año${anios > 1 ? 's' : ''}";
     } else {
-      return "$tiempoDuracion días";
+      return "$duracion días";
     }
   }
 
@@ -73,8 +74,9 @@ class _CardSuscriptionSelectWidgetState
         highlightColor: const Color.fromARGB(40, 115, 115, 115),
         child: Ink(
           decoration: BoxDecoration(
-            color: (widget.isSelected || isHovering) ? hoverColor :  Color.fromARGB(60, 40, 40, 40),
-
+            color: (widget.isSelected || isHovering)
+                ? hoverColor
+                : const Color.fromARGB(60, 40, 40, 40),
             borderRadius: BorderRadius.circular(8),
             border: (widget.isSelected || isHovering)
                 ? Border.all(
@@ -122,7 +124,7 @@ class _CardSuscriptionSelectWidgetState
                 Text(
                   widget.suscripcion.descripcion,
                   textAlign: TextAlign.center,
-                  style:  TextStyle(
+                  style: TextStyle(
                     color: colors.colorTexto,
                     fontSize: 14,
                   ),
@@ -154,7 +156,7 @@ class _CardSuscriptionSelectWidgetState
                             vertical: 4, horizontal: 8),
                         child: Text(
                           'Precio: \$${widget.suscripcion.precio}',
-                          style:  TextStyle(
+                          style: TextStyle(
                               color: colors.colorTexto,
                               fontSize: 15,
                               fontWeight: FontWeight.w500),

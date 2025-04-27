@@ -1,28 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
+import 'package:managegym/main_screen/connection/registrarUsuario/registrarUsuarioController.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/presentation/widgets/card_suscription_select_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 
 class ModalAdministrarSuscripccion extends StatefulWidget {
   final List<TipoMembresia> suscripcionesDisponibles;
   final String nombreUsuario;
+  final int idUsuario;
+
   const ModalAdministrarSuscripccion({
     super.key,
     required this.suscripcionesDisponibles,
     required this.nombreUsuario,
+    required this.idUsuario,
   });
 
   @override
-  State<ModalAdministrarSuscripccion> createState() => _ModalAdministrarSuscripccionState();
+  State<ModalAdministrarSuscripccion> createState() =>
+      _ModalAdministrarSuscripccionState();
 }
 
-class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripccion> {
+class _ModalAdministrarSuscripccionState
+    extends State<ModalAdministrarSuscripccion> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
   final ScrollController _scrollController = ScrollController();
+  final UsuarioController usuarioController = Get.find<UsuarioController>();
+
+  final TextEditingController _pagaConController = TextEditingController();
+  double _cambio = 0.0;
 
   List<String> _suscripcionesSeleccionadas = [];
   double _totalAPagar = 0.0;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _pagaConController.dispose();
+    super.dispose();
+  }
 
   void seleccionarSuscripcion(String id) {
     setState(() {
@@ -42,22 +61,93 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
     });
   }
 
-void calcularTotalAPagar() {
-  double total = 0.0;
-  for (final id in _suscripcionesSeleccionadas) {
-    try {
-      final suscripcion = widget.suscripcionesDisponibles.firstWhere(
-        (s) => s.id.toString() == id,
-      );
-      total += suscripcion.precio is double
-          ? suscripcion.precio
-          : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
-    } catch (_) {
-      // Si no la encuentra, simplemente ignora
+  void calcularTotalAPagar() {
+    double total = 0.0;
+    for (final id in _suscripcionesSeleccionadas) {
+      try {
+        final suscripcion = widget.suscripcionesDisponibles
+            .firstWhere((s) => s.id.toString() == id);
+        total += suscripcion.precio is double
+            ? suscripcion.precio
+            : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
+      } catch (_) {
+        // Si no la encuentra, simplemente ignora
+      }
     }
+    setState(() {
+      _totalAPagar = total;
+      calcularCambio();
+    });
   }
-  _totalAPagar = total;
-}
+
+  void calcularCambio() {
+    final pagaCon = double.tryParse(_pagaConController.text) ?? 0.0;
+    setState(() {
+      _cambio = pagaCon - _totalAPagar;
+    });
+  }
+
+  Future<void> _procesarPago(BuildContext context) async {
+    if (_suscripcionesSeleccionadas.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Selecciona al menos una suscripción.")),
+      );
+      return;
+    }
+    final pagaCon = double.tryParse(_pagaConController.text) ?? 0.0;
+    if (pagaCon < _totalAPagar) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("El monto pagado es insuficiente.")),
+      );
+      return;
+    }
+
+    // Puedes pedir método de pago con un Dropdown en una implementación más completa.
+    const metodoPago = "Efectivo";
+
+    for (final idSus in _suscripcionesSeleccionadas) {
+      final suscripcion = widget.suscripcionesDisponibles.firstWhere(
+        (s) => s.id.toString() == idSus,
+      );
+
+      final DateTime hoy = DateTime.now();
+      // Suponemos duración en meses (ajusta según tu modelo)
+      final DateTime fin = hoy.add(Duration(days: suscripcion.duracion * 30));
+
+      // 1. Crear venta de membresía
+      final idVenta = await usuarioController.crearVentaMembresia(
+        idTipoMembresia: suscripcion.id,
+        idUsuario: widget.idUsuario,
+        precio: suscripcion.precio.toDouble(),
+        duracion: suscripcion.duracion,
+      );
+
+      // 2. Crear membresía activa
+      if (idVenta != null) {
+        final idMembresia = await usuarioController.crearMembresiaUsuario(
+          idUsuario: widget.idUsuario,
+          idVentaMembresia: idVenta,
+          inicio: hoy,
+          fin: fin,
+        );
+
+        // 3. Crear historial de pago
+        if (idMembresia != null) {
+          await usuarioController.crearHistorialPago(
+            idMembresiaUsuario: idMembresia,
+            montoPago: suscripcion.precio.toDouble(),
+            metodoPago: metodoPago,
+            // Puedes agregar número de referencia, fechaProximoPago, etc.
+          );
+        }
+      }
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("¡Suscripción renovada/registrada con éxito!")),
+    );
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +236,9 @@ void calcularTotalAPagar() {
                 SizedBox(
                   width: 400,
                   child: TextFormField(
+                    controller: _pagaConController,
                     style: TextStyle(color: colorTextoDark),
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
                     decoration:  InputDecoration(
                       labelStyle: TextStyle(color: colores.colorTexto),
                       icon: Icon(
@@ -157,13 +249,14 @@ void calcularTotalAPagar() {
                         borderSide: BorderSide(color: colores.colorTexto),
                       ),
                     ),
+                    onChanged: (value) => calcularCambio(),
                   ),
                 ),
                 const SizedBox(
                   width: 100,
                 ),
                  Text(
-                  'Cambio:',
+                  'Cambio: \$${_cambio.toStringAsFixed(2)}',
                   style: TextStyle(
                       color: colores.colorTexto,
                       fontSize: 21,
@@ -200,9 +293,7 @@ void calcularTotalAPagar() {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    // Acción de pagar aquí
-                  },
+                  onTap: () => _procesarPago(context),
                   child: Container(
                     width: 300,
                     height: 50,

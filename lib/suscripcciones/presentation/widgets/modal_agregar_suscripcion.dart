@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
@@ -48,12 +47,12 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
       final descripcion = _descripcionController.text.trim();
       final precio = double.tryParse(_precioController.text.trim()) ?? 0;
 
-      int tiempoDuracion = 0;
+      int duracion = 0;
       if (_duracionSeleccionada != 'Personalizado') {
-        tiempoDuracion = opcionesDuracion
+        duracion = opcionesDuracion
             .firstWhere((op) => op['label'] == _duracionSeleccionada)['dias'];
       } else {
-        tiempoDuracion =
+        duracion =
             int.tryParse(_personalizadoController.text.trim()) ?? 0;
       }
 
@@ -65,7 +64,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
           titulo: titulo,
           descripcion: descripcion,
           precio: precio,
-          tiempoDuracion: tiempoDuracion,
+          duracion: duracion, // <-- el parámetro correcto
         );
 
         showDialog(
@@ -113,7 +112,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: colores.colorFondoModal,
+      backgroundColor: colors.colorFondoModal,
       content: SizedBox(
         height: 550,
         width: 700,
@@ -128,7 +127,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                   Text(
                     'AGREGAR UNA NUEVA SUSCRIPCIÓN',
                     style: TextStyle(
-                      color: colores.colorTexto,
+                      color: colors.colorTexto,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
@@ -137,7 +136,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                   TextFormField(
                     controller: _nombreController,
                     maxLength: 63,
-                    style: TextStyle(color: colores.colorTexto),
+                    style: TextStyle(color: colors.colorTexto),
                     validator: (value) {
                       if (value == null || value.isEmpty)
                         return 'Campo requerido';
@@ -147,12 +146,12 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                     },
                     decoration:  InputDecoration(
                       labelText: 'Nombre de la Suscripción',
-                      labelStyle: TextStyle(color: colores.colorTexto, fontSize: 18),
+                      labelStyle: TextStyle(color: colors.colorTexto, fontSize: 18),
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: colores.colorTexto),
+                        borderSide: BorderSide(color: colors.colorTexto),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: colores.colorTexto),
+                        borderSide: BorderSide(color: colors.colorTexto),
                       ),
                     ),
                   ),
@@ -259,7 +258,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                           width: 180,
                           child: TextFormField(
                             controller: _personalizadoController,
-                            style: TextStyle(color: colores.colorTexto),
+                            style: TextStyle(color: colors.colorTexto),
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
@@ -281,11 +280,11 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                                   color: colors.colorTexto, fontSize: 18),
                               enabledBorder: UnderlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: colores.colorTexto),
+                                    BorderSide(color: colors.colorTexto),
                               ),
                               focusedBorder: UnderlineInputBorder(
                                 borderSide:
-                                    BorderSide(color: colores.colorTexto),
+                                    BorderSide(color: colors.colorTexto),
                               ),
                             ),
                           ),
@@ -328,7 +327,7 @@ class _ModalAgregarSuscripccionState extends State<ModalAgregarSuscripccion> {
                     width: 220,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: colores.colorAccionButtons,
+                      color: colors.colorAccionButtons,
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Center(

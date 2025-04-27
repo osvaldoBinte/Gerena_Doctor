@@ -6,14 +6,14 @@ class TipoMembresia {
   final String titulo;
   final String descripcion;
   final double precio;
-  final int tiempoDuracion;
+  final int duracion; // <-- Cambié a 'duracion' para ser coherente con el resto del código
 
   TipoMembresia({
     required this.id,
     required this.titulo,
     required this.descripcion,
     required this.precio,
-    required this.tiempoDuracion,
+    required this.duracion,
   });
 
   factory TipoMembresia.fromMap(Map<String, dynamic> map) {
@@ -22,7 +22,7 @@ class TipoMembresia {
       titulo: map['titulo'] as String,
       descripcion: map['descripcion'] as String,
       precio: map['precio'] is String ? double.parse(map['precio']) : map['precio'] as double,
-      tiempoDuracion: map['tiempoDuracion'] is String ? int.parse(map['tiempoDuracion']) : map['tiempoDuracion'] as int,
+      duracion: map['tiempoDuracion'] is String ? int.parse(map['tiempoDuracion']) : map['tiempoDuracion'] as int,
     );
   }
 }
@@ -32,19 +32,19 @@ class AgregarSuscripcionModel {
     required String titulo,
     required String descripcion,
     required double precio,
-    required int tiempoDuracion,
+    required int duracion,
   }) async {
     try {
       final sql = Sql.named(
         "INSERT INTO tipomembresia (titulo, descripcion, precio, tiempoDuracion) "
-        "VALUES (@titulo, @descripcion, @precio, @tiempoDuracion) "
+        "VALUES (@titulo, @descripcion, @precio, @duracion) "
         "RETURNING id, titulo, descripcion, precio, tiempoDuracion"
       );
       final results = await Database.conn.execute(sql, parameters: {
         'titulo': titulo,
         'descripcion': descripcion,
         'precio': precio,
-        'tiempoDuracion': tiempoDuracion,
+        'duracion': duracion,
       });
 
       if (results.isNotEmpty) {
@@ -59,7 +59,7 @@ class AgregarSuscripcionModel {
           titulo: t,
           descripcion: d,
           precio: p,
-          tiempoDuracion: td,
+          duracion: td,
         );
       }
       return null;
@@ -68,7 +68,6 @@ class AgregarSuscripcionModel {
       return null;
     }
   }
-
 
   static Future<List<TipoMembresia>> obtenerTodasLasSuscripciones() async {
     try {
@@ -81,7 +80,7 @@ class AgregarSuscripcionModel {
           titulo: row[1].toString(),
           descripcion: row[2].toString(),
           precio: row[3] is double ? row[3] as double : double.tryParse(row[3].toString()) ?? 0.0,
-          tiempoDuracion: row[4] is int ? row[4] as int : int.tryParse(row[4].toString()) ?? 0,
+          duracion: row[4] is int ? row[4] as int : int.tryParse(row[4].toString()) ?? 0,
         );
       }).toList();
     } catch (e) {
@@ -95,18 +94,18 @@ class AgregarSuscripcionModel {
     required String titulo,
     required String descripcion,
     required double precio,
-    required int tiempoDuracion,
+    required int duracion,
   }) async {
     try {
       final sql = Sql.named(
-        "UPDATE tipomembresia SET titulo=@titulo, descripcion=@descripcion, precio=@precio, tiempoDuracion=@tiempoDuracion WHERE id=@id"
+        "UPDATE tipomembresia SET titulo=@titulo, descripcion=@descripcion, precio=@precio, tiempoDuracion=@duracion WHERE id=@id"
       );
       final result = await Database.conn.execute(sql, parameters: {
         'id': id,
         'titulo': titulo,
         'descripcion': descripcion,
         'precio': precio,
-        'tiempoDuracion': tiempoDuracion,
+        'duracion': duracion,
       });
       return result.affectedRows > 0;
     } catch (e) {
@@ -131,7 +130,7 @@ class AgregarSuscripcionModel {
       return false;
     }
   }
-  
+
   static Future<bool> tieneVentasAsociadas(int id) async {
     try {
       final sql = Sql.named(
@@ -140,7 +139,7 @@ class AgregarSuscripcionModel {
       final results = await Database.conn.execute(sql, parameters: {
         'id': id,
       });
-      
+
       if (results.isNotEmpty) {
         final count = results.first[0];
         return (count is int ? count : int.tryParse(count.toString()) ?? 0) > 0;

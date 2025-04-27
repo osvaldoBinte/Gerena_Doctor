@@ -7,6 +7,7 @@ import 'package:managegym/suscripcciones/connection/agregarSuscripcion/Suscrpcio
 
 class RowTableClientsHomeWidget extends StatefulWidget {
   final int index;
+  final int idUsuario; // <--- Añade el id del usuario aquí
   final String name;
   final String phoneNumber;
   final String lastSubscription;
@@ -17,12 +18,10 @@ class RowTableClientsHomeWidget extends StatefulWidget {
   final Function(int index)? onManageTap;
   final List<TipoMembresia> suscripcionesDisponibles;
 
-  // Agregar el usuario si lo tienes, o los campos necesarios para construirlo
-  // final Usuario cliente;
-
   const RowTableClientsHomeWidget({
     super.key,
     required this.index,
+    required this.idUsuario, // <--- Añade este campo
     required this.name,
     required this.phoneNumber,
     required this.lastSubscription,
@@ -32,7 +31,6 @@ class RowTableClientsHomeWidget extends StatefulWidget {
     this.onRowTap,
     this.onManageTap,
     required this.suscripcionesDisponibles,
-    // required this.cliente,
   });
 
   @override
@@ -64,9 +62,8 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
   final FocusNode _buttonFocusNode = FocusNode();
 
   void _showModalEditarCliente(BuildContext context) {
-    // Construye el modelo Usuario con los datos que tengas en la fila
     final usuario = Usuario(
-      id: widget.index, // O el ID real de tu usuario
+      id: widget.idUsuario, // Usa el id real aquí
       nombre: widget.name,
       apellidos: '', // Si tienes apellidos, pásalos aquí
       correo: '',    // Si tienes correo, pásalo aquí
@@ -79,6 +76,19 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
       context: context,
       builder: (BuildContext context) {
         return ModalEditarCliente(cliente: usuario);
+      },
+    );
+  }
+
+  void _showModalAdministrarSuscripccion(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ModalAdministrarSuscripccion(
+          suscripcionesDisponibles: widget.suscripcionesDisponibles,
+          nombreUsuario: widget.name,
+          idUsuario: widget.idUsuario, // <--- Pasa el idUsuario aquí
+        );
       },
     );
   }
@@ -224,15 +234,7 @@ class _RowTableClientsHomeWidgetState extends State<RowTableClientsHomeWidget> {
                 if (widget.onManageTap != null) {
                   widget.onManageTap!(widget.index);
                 }
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return ModalAdministrarSuscripccion(
-                      suscripcionesDisponibles: widget.suscripcionesDisponibles,
-                      nombreUsuario: widget.name,
-                    );
-                  },
-                );
+                _showModalAdministrarSuscripccion(context);
                 print("Manage subscription for ${widget.index}");
               },
               onHover: (isHovering) {

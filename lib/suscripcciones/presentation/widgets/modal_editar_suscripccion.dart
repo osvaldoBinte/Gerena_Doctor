@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
+import 'package:managegym/shared/admin_colors.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/SuscrpcionModel.dart';
 import 'package:managegym/suscripcciones/connection/agregarSuscripcion/suscrpcionController.dart';
 
@@ -18,16 +18,16 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
 
-  final List<DropdownMenuEntry<String>> dropdownMenuEntries = [
-    const DropdownMenuEntry<String>(
+  final List<DropdownMenuEntry<String>> dropdownMenuEntries = const [
+    DropdownMenuEntry<String>(
       value: 'Dia',
-      label: 'Dia',
+      label: 'Día',
     ),
-    const DropdownMenuEntry<String>(
+    DropdownMenuEntry<String>(
       value: 'Mes',
       label: 'Mes',
     ),
-    const DropdownMenuEntry<String>(
+    DropdownMenuEntry<String>(
       value: 'Ano',
       label: 'Año',
     ),
@@ -49,16 +49,16 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
     _precioController =
         TextEditingController(text: widget.suscripcion.precio.toString());
     _cantidadController = TextEditingController(
-      text: widget.suscripcion.tiempoDuracion < 30
-          ? widget.suscripcion.tiempoDuracion.toString()
-          : widget.suscripcion.tiempoDuracion % 365 == 0
-              ? (widget.suscripcion.tiempoDuracion ~/ 365).toString()
-              : (widget.suscripcion.tiempoDuracion ~/ 30).toString(),
+      text: widget.suscripcion.duracion < 30
+          ? widget.suscripcion.duracion.toString()
+          : widget.suscripcion.duracion % 365 == 0
+              ? (widget.suscripcion.duracion ~/ 365).toString()
+              : (widget.suscripcion.duracion ~/ 30).toString(),
     );
     // Detecta el tipo de fecha según la duración
-    if (widget.suscripcion.tiempoDuracion % 365 == 0) {
+    if (widget.suscripcion.duracion % 365 == 0) {
       tipoFecha = "Ano";
-    } else if (widget.suscripcion.tiempoDuracion % 30 == 0) {
+    } else if (widget.suscripcion.duracion % 30 == 0) {
       tipoFecha = "Mes";
     } else {
       tipoFecha = "Dia";
@@ -67,18 +67,18 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
 
   void actualizarSuscripccion() async {
     if (_formKey.currentState!.validate()) {
-      // Determinar tiempoDuracion según tipoFecha y cantidad
+      // Determinar duración según tipoFecha y cantidad
       int cantidad = int.tryParse(_cantidadController.text.trim()) ?? 0;
-      int tiempoDuracion = 1;
+      int duracion = 1;
       switch (tipoFecha) {
         case "Dia":
-          tiempoDuracion = cantidad;
+          duracion = cantidad;
           break;
         case "Mes":
-          tiempoDuracion = cantidad * 30;
+          duracion = cantidad * 30;
           break;
         case "Ano":
-          tiempoDuracion = cantidad * 365;
+          duracion = cantidad * 365;
           break;
       }
 
@@ -88,7 +88,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
         titulo: _nombreController.text.trim(),
         descripcion: _descripccionController.text.trim(),
         precio: double.tryParse(_precioController.text.trim()) ?? 0,
-        tiempoDuracion: tiempoDuracion,
+        duracion: duracion,
       );
       if (ok) {
         Navigator.of(context).pop();
@@ -104,7 +104,6 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
   void eliminarSuscripcion() async {
     try {
       final controller = Get.find<SuscripcionController>();
-      
       // Primero verificamos si se puede eliminar
       final verificacion = await controller.puedeEliminarSuscripcion(widget.suscripcion.id);
       if (!verificacion['puede']) {
@@ -117,7 +116,6 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
         );
         return;
       }
-      
       // Si se puede eliminar, mostramos diálogo de confirmación
       final confirm = await showDialog<bool>(
         context: context,
@@ -141,7 +139,6 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
           ],
         ),
       );
-      
       if (confirm == true) {
         bool ok = await controller.eliminarSuscripcion(id: widget.suscripcion.id);
         if (ok) {
@@ -162,6 +159,7 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
 
   @override
   Widget build(BuildContext context) {
+    AdminColors colores = AdminColors();
     return AlertDialog(
       backgroundColor: colores.colorFondoModal,
       content: SizedBox(
@@ -254,31 +252,30 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                                 children: [
                                   SizedBox(
                                     width: 190,
-                                    child: DropdownMenu<String>(
-                                      initialSelection: tipoFecha,
-                                      width: 400,
-                                      onSelected: (value) {
+                                    child: DropdownButtonFormField<String>(
+                                      value: tipoFecha,
+                                      items: dropdownMenuEntries
+                                          .map((entry) => DropdownMenuItem(
+                                                value: entry.value,
+                                                child: Text(entry.label),
+                                              ))
+                                          .toList(),
+                                      onChanged: (value) {
                                         setState(() {
                                           tipoFecha = value!;
                                         });
                                       },
-                                      dropdownMenuEntries: dropdownMenuEntries,
-                                      label:  Text('Tipo de fecha',
-                                          style:
-                                              TextStyle(color: colores.colorTexto)),
-                                      textStyle:
-                                           TextStyle(color: colores.colorTexto),
-                                      inputDecorationTheme:
-                                           InputDecorationTheme(
+                                      decoration: InputDecoration(
+                                        labelText: 'Tipo de fecha',
+                                        labelStyle: TextStyle(color: colores.colorTexto),
                                         enabledBorder: UnderlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: colores.colorTexto),
+                                          borderSide: BorderSide(color: colores.colorTexto),
                                         ),
                                         focusedBorder: UnderlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: colores.colorTexto),
+                                          borderSide: BorderSide(color: colores.colorTexto),
                                         ),
                                       ),
+                                      style: TextStyle(color: colores.colorTexto),
                                     ),
                                   ),
                                   const SizedBox(width: 20),
@@ -362,7 +359,6 @@ class _ModalEditarSuscripccionState extends State<ModalEditarSuscripccion> {
                       children: [
                         IconButton.filled(
                           onPressed: () {
-                            print("Botón eliminar presionado");
                             eliminarSuscripcion();
                           },
                           icon: const Icon(Icons.delete_forever_outlined),
