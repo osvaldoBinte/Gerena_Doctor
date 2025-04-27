@@ -1,13 +1,15 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:managegym/clientes/presentation/widgets/row_table_clients_home_widget.dart';
 import 'package:managegym/dashboard_clientes/clientes_divididos_por_sexo_container.dart';
 import 'package:managegym/dashboard_clientes/mes_top_productos_vendidos_container.dart';
 import 'package:managegym/dashboard_clientes/nuevos_miembros_mes_container.dart';
 import 'package:managegym/dashboard_clientes/rango_de_fechas_usuario_container.dart';
 import 'package:managegym/dashboard_clientes/suscripcciones_activas_mes_container.dart';
 import 'package:managegym/dashboard_clientes/ventas_por_ano_container.dart';
-import 'package:managegym/main_screen/screens/clients_screen.dart';
+import 'package:managegym/shared/admin_colors.dart';
+
+// Instancia global para este archivo
+final AdminColors colores = AdminColors();
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -18,48 +20,10 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   List<String> anos = [
-    '2023',
-    '2024',
-    '2025',
-    '2026',
-    '2027',
-    '2028',
-    '2029',
-    '2030',
-    '2031',
-    '2032',
-    '2033',
-    '2034',
-    '2035',
-    '2036',
-    '2037',
-    '2038',
-    '2039',
-    '2040',
-    '2041',
-    '2042',
-    '2043',
-    '2044',
-    '2045',
-    '2046',
-    '2047',
-    '2048',
-    '2049',
-    '2050',
+    '2023','2024','2025','2026','2027','2028','2029','2030','2031','2032','2033','2034','2035','2036','2037','2038','2039','2040','2041','2042','2043','2044','2045','2046','2047','2048','2049','2050',
   ];
   List<String> meses = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre'
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
   ];
 
   int indexAnoActual = 0;
@@ -112,22 +76,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 anos: anos,
                 mese: meses,
               ),
-              const SizedBox(
-                width: 20,
-              ),
+              const SizedBox(width: 20),
               MesTopProductosVendidosContainer(
                 anos: anos,
                 meses: meses,
               ),
-              const SizedBox(
-                width: 20,
-              ),
+              const SizedBox(width: 20),
               RangoDeFechasUsuariosContainer(anos: anos, meses: meses)
             ],
           ),
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -140,7 +98,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(width: 20),
-              // Botón Productos
               InkWell(
                 onTap: () {
                   setState(() {
@@ -149,8 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: showProductos
                         ? colores.colorAccionButtons
@@ -165,7 +121,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(width: 20),
-              // Botón Suscripciones
               InkWell(
                 onTap: () {
                   setState(() {
@@ -174,8 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: showSuscripciones
                         ? colores.colorAccionButtons
@@ -190,7 +144,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(width: 20),
-              // Leyenda
               Container(
                 width: 18,
                 height: 18,
@@ -220,14 +173,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 20,
-          ),
+          const SizedBox(height: 20),
           Row(
             children: [
               Expanded(
                   child: SizedBox(
-                height: 600, // o el alto que desees
+                height: 600,
                 child: LineChartExample(
                   showProductos: showProductos,
                   showSuscripciones: showSuscripciones,
@@ -277,54 +228,53 @@ class LineChartExample extends StatelessWidget {
       suscripcionSpots
           .add(FlSpot(i.toDouble(), data[i]['suscripcion'].toDouble()));
     }
-if (showProductos) {
-  lines.add(
-    LineChartBarData(
-      spots: productoSpots,
-      isCurved: true,
-      color: Colors.amber,
-      barWidth: 4,
-      dotData: FlDotData(
-        show: true,
-        getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-          radius: 10, // <-- Cambia el tamaño aquí (por ejemplo, 7)
+    if (showProductos) {
+      lines.add(
+        LineChartBarData(
+          spots: productoSpots,
+          isCurved: true,
           color: Colors.amber,
+          barWidth: 4,
+          dotData: FlDotData(
+            show: true,
+            getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+              radius: 10,
+              color: Colors.amber,
+            ),
+          ),
         ),
-      ),
-    ),
-  );
-}
-if (showSuscripciones) {
-  lines.add(
-    LineChartBarData(
-      spots: suscripcionSpots,
-      isCurved: true,
-      color: Colors.blue,
-      barWidth: 4,
-      dotData: FlDotData(
-        show: true,
-        getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-          radius: 10, // <-- Cambia el tamaño aquí (por ejemplo, 7)
+      );
+    }
+    if (showSuscripciones) {
+      lines.add(
+        LineChartBarData(
+          spots: suscripcionSpots,
+          isCurved: true,
           color: Colors.blue,
+          barWidth: 4,
+          dotData: FlDotData(
+            show: true,
+            getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+              radius: 10,
+              color: Colors.blue,
+            ),
+          ),
         ),
-      ),
-    ),
-  );
-}
+      );
+    }
 
     return LineChart(
       LineChartData(
         lineBarsData: lines,
         backgroundColor: colores.colorFondoModal,
         minX: -0.1,
-         maxX: data.length - 0.7, // <-- agrega espacio después de Diciembre
+        maxX: data.length - 0.7,
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
               getTitlesWidget: (value, meta) {
                 final index = value.toInt();
-                // Solo muestra el label si el valor es exactamente igual al índice y está en rango
                 if (value == index.toDouble() && index >= 0 && index < data.length) {
                   return SideTitleWidget(
                     axisSide: meta.axisSide,

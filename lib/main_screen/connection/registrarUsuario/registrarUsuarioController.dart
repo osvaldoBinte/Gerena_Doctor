@@ -8,6 +8,23 @@ class UsuarioController extends GetxController {
   var idUsuarioCreado = RxnInt();
   var error = RxnString();
 
+  /// Obtiene el historial de pagos de un usuario, incluyendo nombre de la suscripción, fechas y estado.
+  Future<List<Map<String, dynamic>>> obtenerHistorialPagosUsuario(int idUsuario) async {
+    final conn = Database.conn;
+    try {
+      final result = await UsuarioDB.obtenerHistorialPagosUsuario(
+        idUsuario: idUsuario,
+        conn: conn,
+      );
+      debugPrint('[UsuarioController] Historial de pagos obtenido (${result.length} registros)');
+      return result;
+    } catch (e) {
+      debugPrint('Error al obtener historial de pagos: $e');
+      error.value = 'No se pudo obtener el historial de pagos';
+      return [];
+    }
+  }
+
   /// Obtiene un usuario actualizado de la base de datos por su ID
   Future<Usuario?> obtenerUsuarioPorId(int id) async {
     final conn = Database.conn;
@@ -29,6 +46,77 @@ class UsuarioController extends GetxController {
     } catch (e) {
       debugPrint('Error al obtener usuario por id: $e');
       error.value = 'No se pudo obtener el usuario';
+      return null;
+    }
+  }
+
+  /// Crea una venta de membresía para un usuario existente.
+  Future<int?> crearVentaMembresia({
+    required int idTipoMembresia,
+    required int idUsuario,
+    required double precio,
+    required int duracion,
+  }) async {
+    try {
+      final conn = Database.conn;
+      return await UsuarioDB.crearVentaMembresia(
+        idTipoMembresia: idTipoMembresia,
+        idUsuario: idUsuario,
+        precio: precio,
+        duracion: duracion,
+        conn: conn,
+      );
+    } catch (e) {
+      debugPrint('Error en crearVentaMembresia: $e');
+      error.value = 'No se pudo crear la venta de membresía';
+      return null;
+    }
+  }
+
+  /// Crea la membresía activa para el usuario.
+  Future<int?> crearMembresiaUsuario({
+    required int idUsuario,
+    required int idVentaMembresia,
+    required DateTime inicio,
+    required DateTime fin,
+  }) async {
+    try {
+      final conn = Database.conn;
+      return await UsuarioDB.crearMembresiaUsuario(
+        idUsuario: idUsuario,
+        idVentaMembresia: idVentaMembresia,
+        inicio: inicio,
+        fin: fin,
+        conn: conn,
+      );
+    } catch (e) {
+      debugPrint('Error en crearMembresiaUsuario: $e');
+      error.value = 'No se pudo crear la membresía del usuario';
+      return null;
+    }
+  }
+
+  /// Crea el historial de pago de una membresía de usuario.
+  Future<int?> crearHistorialPago({
+    required int idMembresiaUsuario,
+    required double montoPago,
+    required String metodoPago,
+    String? numeroReferencia,
+    DateTime? fechaProximoPago,
+  }) async {
+    try {
+      final conn = Database.conn;
+      return await UsuarioDB.crearHistorialPago(
+        idMembresiaUsuario: idMembresiaUsuario,
+        montoPago: montoPago,
+        metodoPago: metodoPago,
+        numeroReferencia: numeroReferencia,
+        fechaProximoPago: fechaProximoPago,
+        conn: conn,
+      );
+    } catch (e) {
+      debugPrint('Error en crearHistorialPago: $e');
+      error.value = 'No se pudo crear el historial de pago';
       return null;
     }
   }

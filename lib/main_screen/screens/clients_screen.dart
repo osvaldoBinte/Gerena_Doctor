@@ -158,8 +158,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
               width: 800,
               height: 50,
               child: TextField(
-                style:  TextStyle(
-                    color: colores.colorTexto), // Cambia el color del texto a blanco
+                style: TextStyle(
+                    color: colores
+                        .colorTexto), // Cambia el color del texto a blanco
                 decoration: InputDecoration(
                   hintText: 'Buscar cliente por nombre o numero de telefono',
                   border: OutlineInputBorder(
@@ -173,7 +174,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
             ),
             Text(
               "${DateTime.now().day} de $actualmonth del ${DateTime.now().year}",
-              style:  TextStyle(
+              style: TextStyle(
                   fontSize: 20,
                   color: colores.colorTexto,
                   fontWeight: FontWeight.bold),
@@ -197,12 +198,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
             itemBuilder: (context, index) {
               return RowTableClientsHomeWidget(
                 index: index,
-                name: "luis antonio martinez marroquin",
-                phoneNumber: "2292134420",
-                lastSubscription: "Suscripccion basica de un año",
-                status: "activo",
-                dateRange: "12/12/12 - 12/12/13",
-                sex: "H", suscripcionesDisponibles: [],
+                name: "",
+                phoneNumber: "",
+                lastSubscription: "",
+                status: "",
+                dateRange: "",
+                sex: "",
+                suscripcionesDisponibles: [],
               );
             },
           ),
@@ -211,5 +213,3 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
   }
 }
-
-

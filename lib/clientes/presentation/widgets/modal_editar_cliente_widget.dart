@@ -6,6 +6,7 @@ import 'package:managegym/shared/widgets/input_fecha_nacimiento_widget.dart';
 import 'package:managegym/shared/widgets/input_nombre_widget.dart';
 import 'package:managegym/shared/widgets/input_sexo_widget.dart';
 import 'package:managegym/shared/widgets/input_telefono_widget.dart';
+import 'package:managegym/db/database_connection.dart';
 
 class ModalEditarCliente extends StatefulWidget {
   final Usuario cliente;
@@ -20,7 +21,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
   final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Controllers para los textformfield
   late final TextEditingController _nombreController;
   late final TextEditingController _apellidosController;
   late final TextEditingController _telefonoController;
@@ -30,61 +30,60 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
   late final TextEditingController _anoController = TextEditingController();
   String? _sexoController;
 
+  // Historial de pagos
+  List<Map<String, dynamic>> _historialPagos = [];
+  bool _cargandoHistorial = false;
+
   @override
   void initState() {
     super.initState();
     final cliente = widget.cliente;
-    
-    print('[ModalEditarCliente] Datos recibidos:');
-    print('Nombre: ${cliente.nombre}');
-    print('Apellidos: ${cliente.apellidos}');
-    print('Correo: ${cliente.correo}');
-    print('Teléfono: ${cliente.telefono}');
-    print('Fecha de nacimiento: ${cliente.fechaNacimiento}');
-    print('Sexo: ${cliente.sexo}');
-    
-    // Procesar el nombre para manejar el caso donde nombre contiene nombre+apellidos
+
     String nombreCompleto = cliente.nombre.trim();
     List<String> partes = nombreCompleto.split(' ');
-    
+
     if (partes.length > 1 && (cliente.apellidos == null || cliente.apellidos.isEmpty)) {
-      // Si el nombre tiene más de una palabra y apellidos está vacío,
-      // asumimos que la primera palabra es el nombre y el resto son apellidos
       _nombreController = TextEditingController(text: partes.first);
       _apellidosController = TextEditingController(text: partes.sublist(1).join(' '));
-      print('[ModalEditarCliente] Separando nombre: "${partes.first}" y apellidos: "${partes.sublist(1).join(' ')}"');
     } else {
-      // Si no, usamos los valores tal como vienen
       _nombreController = TextEditingController(text: cliente.nombre);
       _apellidosController = TextEditingController(text: cliente.apellidos);
     }
-    
-    // Manejar teléfono
     _telefonoController = TextEditingController(text: cliente.telefono);
-    
-    // Manejar correo (si viene vacío, establecemos un placeholder)
-    if (cliente.correo != null && cliente.correo.isNotEmpty) {
-      _correoController = TextEditingController(text: cliente.correo);
-    } else {
-      // Si está vacío, consultamos los datos que vimos en la BD o ponemos un placeholder
-      _correoController = TextEditingController(text: "12@gmail.com");
-    }
-
-    // Sexo (puede ser 'M' o 'F')
+    _correoController = TextEditingController(text: cliente.correo.isNotEmpty ? cliente.correo : "12@gmail.com");
     _sexoController = cliente.sexo;
 
-    // Fecha de nacimiento
     if (cliente.fechaNacimiento != null) {
       _diaController = TextEditingController(text: cliente.fechaNacimiento!.day.toString());
       _mesController.text = cliente.fechaNacimiento!.month.toString();
       _anoController.text = cliente.fechaNacimiento!.year.toString();
     } else {
-      // Si no hay fecha de nacimiento, establecemos un valor predeterminado desde la BD (1938-01-12)
       _diaController = TextEditingController(text: "12");
-      // Ya no necesitamos almacenar el nombre del mes, sino el número
-      _mesController.text = "1"; // Enero es el mes 1
+      _mesController.text = "1";
       _anoController.text = "1938";
-      print('[ModalEditarCliente] Estableciendo fecha predeterminada: 12-01-1938');
+    }
+
+    _cargarHistorialPagos();
+  }
+
+  Future<void> _cargarHistorialPagos() async {
+    setState(() {
+      _cargandoHistorial = true;
+    });
+    try {
+      final pagos = await UsuarioDB.obtenerHistorialPagosUsuario(
+        idUsuario: widget.cliente.id,
+        conn: Database.conn,
+      );
+      setState(() {
+        _historialPagos = pagos;
+        _cargandoHistorial = false;
+      });
+    } catch (e) {
+      setState(() {
+        _cargandoHistorial = false;
+      });
+      print('Error cargando historial de pagos: $e');
     }
   }
 
@@ -98,71 +97,32 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
     super.dispose();
   }
 
-  String _mesIntATexto(int mes) {
-    const meses = [
-      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-    return meses[mes - 1];
-  }
-
-  int? _mesAInt(String mes) {
-    const meses = [
-      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-    final index = meses.indexWhere((m) => m.toLowerCase() == mes.toLowerCase());
-    if (index >= 0) return index + 1;
-    return null;
+  String _formateaFecha(dynamic fecha) {
+    if (fecha == null) return '';
+    if (fecha is DateTime) {
+      return "${fecha.day.toString().padLeft(2, '0')}/${fecha.month.toString().padLeft(2, '0')}/${fecha.year}";
+    }
+    if (fecha is String && fecha.isNotEmpty) {
+      try {
+        final date = DateTime.parse(fecha);
+        return "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}";
+      } catch (_) {}
+    }
+    return fecha.toString();
   }
 
   void editarCliente() {
     if (_formKey.currentState!.validate()) {
-      print('Nombre: ${_nombreController.text}');
-      print('Apellidos: ${_apellidosController.text}');
-      print('Telefono: ${_telefonoController.text}');
-      print('Correo: ${_correoController.text}');
-      print('Dia: ${_diaController.text}');
-      print('Mes: ${_mesController.text}');
-      print('Año: ${_anoController.text}');
-      print('Sexo: $_sexoController');
-      
-      // Aquí deberías actualizar el cliente en la base de datos o backend
       try {
         final dia = int.parse(_diaController.text);
         final mes = int.parse(_mesController.text);
         final ano = int.parse(_anoController.text);
-        
-        // Esto construiría la fecha en formato yyyy-MM-dd para guardar en BD
-        final fechaFormatoSQL = '$ano-${mes.toString().padLeft(2, '0')}-${dia.toString().padLeft(2, '0')}';
-        print('Fecha formateada para SQL: $fechaFormatoSQL');
-        
-        // Crear un objeto DateTime si necesitas hacer operaciones con la fecha
         final fechaNacimiento = DateTime(ano, mes, dia);
-        print('Fecha como objeto DateTime: $fechaNacimiento');
-        
         // Aquí iría el código para actualizar el usuario en la base de datos
-        // Por ejemplo:
-        // final usuarioActualizado = Usuario(
-        //   id: widget.cliente.id,
-        //   nombre: _nombreController.text,
-        //   apellidos: _apellidosController.text,
-        //   correo: _correoController.text,
-        //   telefono: _telefonoController.text,
-        //   fechaNacimiento: fechaNacimiento,
-        //   sexo: _sexoController ?? 'M',
-        //   status: widget.cliente.status,
-        // );
-        //
-        // final usuarioController = Get.find<UsuarioController>();
-        // usuarioController.actualizarUsuario(usuarioActualizado);
-        
-        // Mostramos un mensaje de éxito (esto se debería actualizar con el resultado real)
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Cliente actualizado con éxito')),
         );
-        
-        // Cerramos el modal
         Navigator.of(context).pop();
       } catch (e) {
         print('Error al procesar la fecha: $e');
@@ -235,7 +195,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                   ),
                   Row(
                     children: [
-                      // Día
                       SizedBox(
                         width: 100,
                         child: TextFormField(
@@ -264,7 +223,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                           },
                         ),
                       ),
-                      
                       Text(
                         '-',
                         style: TextStyle(
@@ -273,8 +231,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                           fontWeight: FontWeight.bold
                         ),
                       ),
-                      
-                      // Mes - Dropdown para selección de meses
                       SizedBox(
                         width: 150,
                         child: DropdownButtonFormField<int>(
@@ -318,7 +274,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                           },
                         ),
                       ),
-                      
                       Text(
                         '-',
                         style: TextStyle(
@@ -327,8 +282,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                           fontWeight: FontWeight.bold
                         ),
                       ),
-                      
-                      // Año
                       SizedBox(
                         width: 100,
                         child: TextFormField(
@@ -358,7 +311,6 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                         ),
                       ),
                       const SizedBox(width: 88),
-                      // Sexo - Dropdown para selección
                       SizedBox(
                         width: 150,
                         child: DropdownButtonFormField<String>(
@@ -407,13 +359,14 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                             fontSize: 24,
                             fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        'Fecha de inscripccion: 12/12/2023',
-                        style: TextStyle(
-                          color: colores.colorTexto,
-                          fontSize: 20,
+                      if (_historialPagos.isNotEmpty)
+                        Text(
+                          'Fecha de inscripccion: ${_formateaFecha(_historialPagos.last["fechaInicioMembresia"])}',
+                          style: TextStyle(
+                            color: colores.colorTexto,
+                            fontSize: 20,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -421,13 +374,44 @@ class _ModalEditarClienteState extends State<ModalEditarCliente> {
                   Container(
                     width: double.infinity,
                     height: 300,
-                    child: ListView.builder(
-                      itemCount: 0, // AQUI DEBERIAS PASAR EL HISTORIAL REAL
-                      itemBuilder: (context, index) {
-                        // Aquí pones la row de la suscripción del historial
-                        return SizedBox.shrink();
-                      },
-                    ),
+                    child: _cargandoHistorial
+                        ? const Center(child: CircularProgressIndicator())
+                        : _historialPagos.isEmpty
+                            ? const Center(child: Text('Sin historial', style: TextStyle(color: Colors.white)))
+                            : ListView.builder(
+                                itemCount: _historialPagos.length,
+                                itemBuilder: (context, index) {
+                                  final pago = _historialPagos[index];
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          pago['titulo'] ?? 'Sin nombre',
+                                          style: TextStyle(color: colores.colorTexto, fontSize: 16),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          _formateaFecha(pago['fechaInicioMembresia']),
+                                          style: TextStyle(color: colores.colorTexto, fontSize: 16),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          _formateaFecha(pago['fechaFinMembresia']),
+                                          style: TextStyle(color: colores.colorTexto, fontSize: 16),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          pago['estado'] ?? 'Sin estado',
+                                          style: TextStyle(color: colores.colorTexto, fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
                   ),
                   const SizedBox(height: 60),
                   Row(

@@ -22,23 +22,23 @@ class Usuario {
     this.status,
   });
 
-factory Usuario.fromMap(Map<String, dynamic> map) {
-  print('[Usuario.fromMap] Mapeando datos: $map');
-  return Usuario(
-    id: map['id'] is int ? map['id'] : int.parse(map['id'].toString()),
-    nombre: map['nombre']?.toString() ?? '',
-    apellidos: map['apellidos']?.toString() ?? '',
-    correo: map['correo']?.toString() ?? '',
-    telefono: map['telefono']?.toString() ?? '',
-    fechaNacimiento: map['fechanacimiento'] != null
-        ? (map['fechanacimiento'] is DateTime 
-            ? map['fechanacimiento'] 
-            : DateTime.parse(map['fechanacimiento'].toString()))
-        : null,
-    sexo: map['sexo']?.toString() ?? '',
-    status: map['status']?.toString() ?? '',
-  );
-}
+  factory Usuario.fromMap(Map<String, dynamic> map) {
+    print('[Usuario.fromMap] Mapeando datos: $map');
+    return Usuario(
+      id: map['id'] is int ? map['id'] : int.parse(map['id'].toString()),
+      nombre: map['nombre']?.toString() ?? '',
+      apellidos: map['apellidos']?.toString() ?? '',
+      correo: map['correo']?.toString() ?? '',
+      telefono: map['telefono']?.toString() ?? '',
+      fechaNacimiento: map['fechanacimiento'] != null
+          ? (map['fechanacimiento'] is DateTime
+              ? map['fechanacimiento']
+              : DateTime.parse(map['fechanacimiento'].toString()))
+          : null,
+      sexo: map['sexo']?.toString() ?? '',
+      status: map['status']?.toString() ?? '',
+    );
+  }
 }
 
 class UsuarioDB {
@@ -271,7 +271,6 @@ class UsuarioDB {
       final result = await conn.execute(
           'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios');
       return result.map<Usuario>((row) {
-        // Los índices deben coincidir con el orden del SELECT arriba
         return Usuario(
           id: row[0],
           nombre: row[1]?.toString() ?? '',
@@ -289,53 +288,96 @@ class UsuarioDB {
       return [];
     }
   }
-static Future<Usuario?> obtenerUsuarioPorId({
-  required int id,
+
+  static Future<Usuario?> obtenerUsuarioPorId({
+    required int id,
+    required dynamic conn,
+  }) async {
+    print('[UsuarioDB] Obteniendo usuario ID: $id');
+    try {
+      final sql = 'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios WHERE id = $id';
+      print('[UsuarioDB] Ejecutando consulta: $sql');
+
+      final result = await conn.execute(
+        'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios WHERE id = @id',
+        parameters: {'id': id},
+      );
+
+      print('[UsuarioDB] Resultado raw: $result');
+
+      if (result.isNotEmpty) {
+        final row = result.first;
+        print('[UsuarioDB] Columnas individuales:');
+        for (var i = 0; i < row.length; i++) {
+          print('Columna $i: ${row[i]}');
+        }
+
+        final usuario = Usuario(
+          id: row[0],
+          nombre: row[1]?.toString() ?? '',
+          apellidos: row[2]?.toString() ?? '',
+          correo: row[3]?.toString() ?? '',
+          telefono: row[4]?.toString() ?? '',
+          fechaNacimiento: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
+          sexo: row[6]?.toString() ?? '',
+          status: row[7]?.toString(),
+        );
+
+        print('[UsuarioDB] Usuario creado:');
+        print('Usuario.nombre: "${usuario.nombre}"');
+        print('Usuario.apellidos: "${usuario.apellidos}"');
+        print('Usuario.correo: "${usuario.correo}"');
+
+        return usuario;
+      }
+      return null;
+    } catch (e) {
+      print('Error al obtener usuario por id: $e');
+      return null;
+    }
+  }
+
+static Future<List<Map<String, dynamic>>> obtenerHistorialPagosUsuario({
+  required int idUsuario,
   required dynamic conn,
 }) async {
-  print('[UsuarioDB] Obteniendo usuario ID: $id');
   try {
-    // Imprimir la consulta SQL exacta
-    final sql = 'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios WHERE id = $id';
-    print('[UsuarioDB] Ejecutando consulta: $sql');
-    
-    final result = await conn.execute(
-      'SELECT id, nombre, apellidos, correo, telefono, fechaNacimiento, sexo, status FROM usuarios WHERE id = @id',
-      parameters: {'id': id},
-    );
-    
-    print('[UsuarioDB] Resultado raw: $result');
-    
-    if (result.isNotEmpty) {
-      final row = result.first;
-      print('[UsuarioDB] Columnas individuales:');
-      for (var i = 0; i < row.length; i++) {
-        print('Columna $i: ${row[i]}');
-      }
-      
-      // Crear usuario con valores explícitos
-      final usuario = Usuario(
-        id: row[0],
-        nombre: row[1]?.toString() ?? '',
-        apellidos: row[2]?.toString() ?? '',
-        correo: row[3]?.toString() ?? '',
-        telefono: row[4]?.toString() ?? '',
-        fechaNacimiento: row[5] != null ? DateTime.tryParse(row[5].toString()) : null,
-        sexo: row[6]?.toString() ?? '',
-        status: row[7]?.toString(),
-      );
-      
-      print('[UsuarioDB] Usuario creado:');
-      print('Usuario.nombre: "${usuario.nombre}"');
-      print('Usuario.apellidos: "${usuario.apellidos}"');
-      print('Usuario.correo: "${usuario.correo}"');
-      
-      return usuario;
-    }
-    return null;
+    final sql = Sql.named('''
+      SELECT 
+        tm.titulo,
+        hp.fechaPago,
+        hp.montoPago,
+        hp.metodoPago,
+        hp.estado,
+        hp.numeroReferencia,
+        hp.fechaProximoPago,
+        mu.fechaInicio,
+        mu.fechaFin,
+        mu.statusMembresia
+      FROM historialPagos hp
+      JOIN membresiaUsuario mu ON hp.idMembresiaUsuario = mu.id
+      JOIN ventaMembresías vm ON mu.id_ventaMembresia = vm.id
+      JOIN tipoMembresia tm ON vm.idTipoMembresia = tm.id
+      WHERE mu.idUsuario = @idUsuario
+      ORDER BY hp.fechaPago DESC
+    ''');
+    final result = await conn.execute(sql, parameters: {'idUsuario': idUsuario});
+    // Asegúrate que esto devuelve List<Map<String, dynamic>>
+    return result.map<Map<String, dynamic>>((row) => {
+      'titulo': row[0],
+      'fechaPago': row[1],
+      'montoPago': row[2],
+      'metodoPago': row[3],
+      'estado': row[4],
+      'numeroReferencia': row[5],
+      'fechaProximoPago': row[6],
+      'fechaInicioMembresia': row[7],
+      'fechaFinMembresia': row[8],
+      'statusMembresia': row[9],
+    }).toList();
   } catch (e) {
-    print('Error al obtener usuario por id: $e');
-    return null;
+    print('Error al obtener historial de pagos del usuario: $e');
+    return [];
   }
 }
 
@@ -366,8 +408,7 @@ static Future<Usuario?> obtenerUsuarioPorId({
         } else if (rawFechaFin is String) {
           fechaFin = DateTime.parse(rawFechaFin);
         } else {
-          fechaFin =
-              DateTime.tryParse(rawFechaFin.toString()) ?? DateTime.now();
+          fechaFin = DateTime.tryParse(rawFechaFin.toString()) ?? DateTime.now();
         }
         final hoy = DateTime.now();
         debugPrint('fechaFin: $fechaFin, hoy: $hoy');

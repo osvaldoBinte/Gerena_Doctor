@@ -42,24 +42,22 @@ class _ModalAdministrarSuscripccionState extends State<ModalAdministrarSuscripcc
     });
   }
 
-  void calcularTotalAPagar() {
-    double total = 0.0;
-    for (final id in _suscripcionesSeleccionadas) {
-      try {
-        final suscripcion = widget.suscripcionesDisponibles.firstWhere(
-          (s) => s.id.toString() == id,
-        );
-        total += suscripcion.precio is double
-            ? suscripcion.precio
-            : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
-      } catch (_) {
-        // Si no la encuentra, simplemente ignora
-      }
+void calcularTotalAPagar() {
+  double total = 0.0;
+  for (final id in _suscripcionesSeleccionadas) {
+    try {
+      final suscripcion = widget.suscripcionesDisponibles.firstWhere(
+        (s) => s.id.toString() == id,
+      );
+      total += suscripcion.precio is double
+          ? suscripcion.precio
+          : double.tryParse(suscripcion.precio.toString()) ?? 0.0;
+    } catch (_) {
+      // Si no la encuentra, simplemente ignora
     }
-    setState(() {
-      _totalAPagar = total;
-    });
   }
+  _totalAPagar = total;
+}
 
   @override
   Widget build(BuildContext context) {

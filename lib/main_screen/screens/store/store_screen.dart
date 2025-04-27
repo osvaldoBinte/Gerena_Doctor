@@ -502,15 +502,14 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
             flex: 1,
             child: Center(child: buildDisponibleBadge()),
           ),
-          // IconButton para gestionar stock
+          // IconButton para gestionar stock y eliminar producto
           Expanded(
             flex: 1,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.inventory,
-                      color: colores.colorTexto, size: 28),
+                  icon: Icon(Icons.inventory, color: colores.colorTexto, size: 28),
                   tooltip: 'Agregar stock',
                   onPressed: () {
                     showDialog(
@@ -529,6 +528,11 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                       },
                     );
                   },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.redAccent, size: 28),
+                  tooltip: 'Eliminar producto',
+                  onPressed: widget.onDelete,
                 ),
               ],
             ),
