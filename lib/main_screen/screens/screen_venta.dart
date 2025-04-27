@@ -199,74 +199,74 @@ class _ScreenVentaState extends State<ScreenVenta> {
           const SizedBox(height: 20),
           //*******BUSCAR PRODUCTOS*************************************************************
           //*******BUSCAR USUARIO PARA SELECCIONARLO **********************************************
-          SizedBox(
-            width: 800,
-            height: 50,
-            child: TextField(
-              onChanged: (value) {
-                //aqui haces la busqueda de los productos
-              },
-              controller: _buscadorClientController,
-              style:  TextStyle(
-                  color: colores.colorTexto), // Cambia el color del texto a blanco
-              decoration: InputDecoration(
-                hintText: 'Buscar cliente por numero de telefono',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                      color: Color.fromARGB(255, 255, 255, 255), width: 8),
-                ),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            width: double.infinity,
-            height: 50,
-            color: colores.colorCabezeraTabla,
-            child:  Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    "Nombre",
-                    style: TextStyle(
-                        color: colores.colorTexto,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17),
-                  ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    "Numero de telefono",
-                    style: TextStyle(
-                        color: colores.colorTexto,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-              width: double.infinity,
-              height: 150,
-              child: ListView.builder(
-                itemCount: 12,
-                itemBuilder: (context, index) {
-                  return RowClienteVenta(
-                    nombre: "Juan Pérez",
-                    telefono: "2291234567",
-                    colorTexto: colorTextoDark,
-                    index: index,
-                    onTap: (i) {
-                      print('Tocaste el usuario $i');
-                    },
-                  );
-                },
-              )),
+          // SizedBox(
+          //   width: 800,
+          //   height: 50,
+          //   child: TextField(
+          //     onChanged: (value) {
+          //       //aqui haces la busqueda de los productos
+          //     },
+          //     controller: _buscadorClientController,
+          //     style:  TextStyle(
+          //         color: colores.colorTexto), // Cambia el color del texto a blanco
+          //     decoration: InputDecoration(
+          //       hintText: 'Buscar cliente por numero de telefono',
+          //       border: OutlineInputBorder(
+          //         borderRadius: BorderRadius.circular(10),
+          //         borderSide: const BorderSide(
+          //             color: Color.fromARGB(255, 255, 255, 255), width: 8),
+          //       ),
+          //       prefixIcon: const Icon(Icons.search, color: Colors.grey),
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 20),
+          // Container(
+          //   width: double.infinity,
+          //   height: 50,
+          //   color: colores.colorCabezeraTabla,
+          //   child:  Row(
+          //     children: [
+          //       Expanded(
+          //         flex: 2,
+          //         child: Text(
+          //           "Nombre",
+          //           style: TextStyle(
+          //               color: colores.colorTexto,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 17),
+          //         ),
+          //       ),
+          //       Expanded(
+          //         flex: 1,
+          //         child: Text(
+          //           "Numero de telefono",
+          //           style: TextStyle(
+          //               color: colores.colorTexto,
+          //               fontWeight: FontWeight.bold,
+          //               fontSize: 17),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(
+          //     width: double.infinity,
+          //     height: 150,
+          //     child: ListView.builder(
+          //       itemCount: 12,
+          //       itemBuilder: (context, index) {
+          //         return RowClienteVenta(
+          //           nombre: "Juan Pérez",
+          //           telefono: "2291234567",
+          //           colorTexto: colorTextoDark,
+          //           index: index,
+          //           onTap: (i) {
+          //             print('Tocaste el usuario $i');
+          //           },
+          //         );
+          //       },
+          //     )),
           //*******BUSCAR USUARIO PARA SELECCIONARLO *******************************************************
             ],
           ),
@@ -389,7 +389,7 @@ class _ScreenVentaState extends State<ScreenVenta> {
                   ),
                   child: const Center(
                     child: Text(
-                      'GUARDAR',
+                      'REALIZAR VENTA',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
