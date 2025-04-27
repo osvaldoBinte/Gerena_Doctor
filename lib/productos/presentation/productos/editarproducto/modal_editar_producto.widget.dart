@@ -1,8 +1,10 @@
 import 'dart:io';
-import 'dart:convert'; // <-- necesario para base64
-import 'package:file_selector/file_selector.dart';
+import 'dart:convert';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaController.dart';
+import 'package:managegym/main_screen/widgets/connection/categoriaModel.dart';
 import 'package:managegym/productos/presentation/productos/crearProducto/connection/producto_model.dart';
 import 'package:managegym/productos/presentation/productos/editarproducto/editar_producto_controller.dart';
 import 'package:managegym/productos/presentation/widgets/input_codigo_barras_producto.dart';
@@ -13,239 +15,255 @@ import 'package:managegym/shared/admin_colors.dart';
 
 class ModalEditarProducto extends StatelessWidget {
   final Producto? producto;
-  
-  ModalEditarProducto({Key? key, this.producto}) : super(key: key) {
-    final controller = Get.put(EditarProductoController());
-    if (producto != null) {
-      controller.initializeProducto(producto!);
-    }
-  }
-  
-  final Color colorTextoDark = const Color.fromARGB(255, 255, 255, 255);
-  final Color colorFondoDark = const Color.fromARGB(255, 33, 33, 33);
-  final AdminColors colores = AdminColors();
-  
+  final AdminColors colors = AdminColors();
+
+  ModalEditarProducto({Key? key, this.producto}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final EditarProductoController controller = Get.find<EditarProductoController>();
-    return AlertDialog(
-      backgroundColor: colores.colorFondoModal,
-      content: Container(
-        width: 1390,
-        height: 558,
-        child: Obx(() => controller.isLoading.value
-          ? Center(child: CircularProgressIndicator(color: Colors.white))
-          : Column(
+    final EditarProductoController controller = Get.put(EditarProductoController());
+    final CategoriaController categoriaController =
+        Get.isRegistered<CategoriaController>()
+            ? Get.find<CategoriaController>()
+            : Get.put(CategoriaController());
+
+    // Siempre cargar categorías y luego inicializar el producto
+    return FutureBuilder(
+      future: categoriaController.cargarCategorias(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        // Sincroniza categorías y selecciona la del producto
+        controller.cargarCategoriasYSeleccionar(categoriaController.categorias);
+
+        // Solo ahora inicializa el producto (esto es seguro porque ya tienes las categorías correctas)
+        if (producto != null && controller.idProducto == null) {
+          controller.initializeProducto(producto!);
+        }
+
+        return AlertDialog(
+          backgroundColor: colors.colorFondoModal,
+          content: Container(
+            width: 900,
+            height: 500,
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // FORMULARIO EN UNA COLUMNA
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 12,
-                      child: Column(
-                        children: [
-                          Form(
-                            key: controller.formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'MODIFICAR PRODUCTO',
-                                  style: TextStyle(
-                                    color: colores.colorTexto,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                InputNombreProductoWidget(
-                                  nombreProductoController: controller.nombreProductoController
-                                ),
-                                const SizedBox(height: 20),
-                                InputCodigoDeBarrasProductoWidget(
-                                  codigoBarrasController: controller.codigoBarrasController
-                                ),
-                                const SizedBox(height: 20),
-                                Row(
-                                  children: [
-                                    InputPrecioProductoWidget(
-                                      precioController: controller.precioController
-                                    ),
-                                    const SizedBox(width: 20),
-                                    InputStockInicialProductoWidget(
-                                      stockInicialController: controller.stockInicialController
-                                    ),
-                                    SizedBox(width: 20),
-                                    SizedBox(
-                                      width: 200,
-                                      child: DropdownMenu<String>(
-                                        initialSelection: controller.categoriaSeleccionada.value,
-                                        width: 400,
-                                        onSelected: (value) {
-                                          controller.cambiarCategoria(value);
-                                        },
-                                        dropdownMenuEntries: controller.categorias
-                                            .map((categoria) => DropdownMenuEntry<String>(
-                                                  value: categoria,
-                                                  label: categoria,
-                                                ))
-                                            .toList(),
-                                        label: Text('Categoría',
-                                          style: TextStyle(color: colores.colorTexto)),
-                                        textStyle: TextStyle(color: colores.colorTexto),
-                                        inputDecorationTheme: InputDecorationTheme(
-                                          enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: colores.colorTexto),
-                                          ),
-                                          focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(color: colores.colorTexto),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    //boton para agregar imagen
-                                    const SizedBox(width: 20),
-                                    InkWell(
-                                      onTap: controller.selectImage,
-                                      child: Container(
-                                        width: 200,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Color.fromARGB(255, 255, 131, 55),
-                                          borderRadius: BorderRadius.circular(50),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            controller.textoBotonImagen.value,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          IconButton.filled(
-                            onPressed: () async {
-                              final bool elimado = await controller.eliminarProducto();
-                              if (elimado) {
-                                Navigator.of(context).pop(true); // Cerrar el modal y notificar que se eliminó
-                              }
-                            },
-                            icon: Icon(Icons.delete_forever_outlined),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Color.fromARGB(255, 255, 75, 55),
-                            ),
-                          )
-                        ]
-                      )
-                    ),
-                  ],
+                Text(
+                  'MODIFICAR PRODUCTO',
+                  style: TextStyle(
+                    color: colors.colorTexto,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                // Vista previa de la imagen
-                Obx(() {
-                  if (controller.isImageSelected.value && controller.selectedImagePath.value != null) {
-                    // Imagen NUEVA seleccionada
-                    return Container(
-                      width: 200,
-                      height: 200,
-                      child: Image.file(
-                        File(controller.selectedImagePath.value!),
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  } else if (controller.imagenBase64.value != null && controller.imagenBase64.value!.isNotEmpty) {
-                    // Imagen ORIGINAL en base64
-                    try {
-                      return Container(
-                        width: 200,
-                        height: 200,
-                        child: Image.memory(
-                          base64Decode(controller.imagenBase64.value!),
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.broken_image, size: 80, color: Colors.white30),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Columna izquierda: Inputs
+                      Expanded(
+                        flex: 2,
+                        child: Form(
+                          key: controller.formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              InputNombreProductoWidget(
+                                nombreProductoController: controller.nombreProductoController,
+                              ),
+                              const SizedBox(height: 15),
+                              InputCodigoDeBarrasProductoWidget(
+                                codigoBarrasController: controller.codigoBarrasController,
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: InputPrecioProductoWidget(
+                                      precioController: controller.precioController,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Expanded(
+                                    child: InputStockInicialProductoWidget(
+                                      stockInicialController: controller.stockInicialController,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Obx(() {
+                                if (controller.categorias.isEmpty) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    child: Text(
+                                      'No hay categorías disponibles',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  );
+                                }
+                                return DropdownButtonFormField<Categoria>(
+                                  value: controller.categoriaSeleccionada.value,
+                                  items: controller.categorias
+                                      .map((categoria) => DropdownMenuItem<Categoria>(
+                                            value: categoria,
+                                            child: Text(
+                                              categoria.titulo,
+                                              style: TextStyle(color: colors.colorTexto),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    controller.cambiarCategoria(value);
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Categoría',
+                                    labelStyle: TextStyle(color: colors.colorTexto),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(color: colors.colorTexto),
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(color: colors.colorTexto),
+                                    ),
+                                  ),
+                                  dropdownColor: colors.colorFondoModal,
+                                  hint: Text(
+                                    "Seleccionar categoría",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
                         ),
-                      );
-                    } catch (e) {
-                      return Container(
-                        width: 200,
-                        height: 200,
-                        child: Icon(Icons.broken_image, size: 80, color: Colors.white30),
-                      );
-                    }
-                  } else {
-                    // Sin imagen, placeholder
-                    return Container(
-                      width: 200,
-                      height: 200,
-                      child: IconButton(
-                        icon: Icon(Icons.add_a_photo, color: colores.colorTexto),
-                        onPressed: controller.selectImage,
                       ),
-                    );
-                  }
-                }),
-                // BOTONES ABAJO
+                      const SizedBox(width: 30),
+                      // Columna derecha: Imagen
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: Obx(() {
+                            final bool hasNewImage = controller.isImageSelected.value;
+                            final bool hasOldImage = controller.imagenBase64.value != null && controller.imagenBase64.value!.isNotEmpty;
+                            return DottedBorder(
+                              borderType: BorderType.RRect,
+                              radius: Radius.circular(16),
+                              dashPattern: [8, 4],
+                              color: Colors.orange,
+                              strokeWidth: 2,
+                              child: InkWell(
+                                onTap: controller.selectImage,
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  width: 180,
+                                  height: 180,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: (hasNewImage || hasOldImage)
+                                        ? Colors.transparent
+                                        : Colors.orange.withOpacity(0.06),
+                                  ),
+                                  child: hasNewImage
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(16),
+                                          child: Image.file(
+                                            File(controller.selectedImagePath.value!),
+                                            fit: BoxFit.cover,
+                                            width: 180,
+                                            height: 180,
+                                          ),
+                                        )
+                                      : hasOldImage
+                                          ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(16),
+                                              child: Image.memory(
+                                                base64Decode(controller.imagenBase64.value!),
+                                                fit: BoxFit.cover,
+                                                width: 180,
+                                                height: 180,
+                                                errorBuilder: (context, error, stackTrace) =>
+                                                    Icon(Icons.broken_image, color: Colors.orange, size: 60),
+                                              ),
+                                            )
+                                          : Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.add_a_photo,
+                                                    color: Colors.orange, size: 60),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                  "Click para seleccionar\nuna imagen",
+                                                  style: TextStyle(
+                                                    color: Colors.orange,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ],
+                                            ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Botones abajo
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    InkWell(
-                      onTap: controller.isLoading.value 
-                        ? null 
-                        : () async {
-                            final bool actualizado = await controller.actualizarProducto();
-                            if (actualizado) {
-                              Navigator.of(context).pop(true); // Notificar que se actualizó
-                            }
-                          },
-                      child: Container(
-                        width: 350,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: controller.isLoading.value
-                            ? Colors.grey
-                            : Color.fromARGB(255, 255, 131, 55),
+                    Obx(() => InkWell(
+                          onTap: controller.isLoading.value
+                              ? null
+                              : () async {
+                                  final categoria = controller.categoriaSeleccionada.value;
+                                  if (categoria == null) {
+                                    Get.snackbar('Error', 'Selecciona una categoría');
+                                    return;
+                                  }
+                                  final actualizado = await controller.actualizarProducto();
+                                  if (actualizado == true) {
+                                    Navigator.of(context).pop(true);
+                                  }
+                                },
                           borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Center(
-                          child: controller.isLoading.value
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                'ACTUALIZAR PRODUCTO',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              ),
-                        ),
-                      ),
-                    ),
+                          child: Container(
+                            width: 300,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: controller.isLoading.value
+                                  ? Colors.grey
+                                  : Color.fromARGB(255, 255, 131, 55),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: Center(
+                              child: controller.isLoading.value
+                                  ? CircularProgressIndicator(color: Colors.white)
+                                  : Text(
+                                      'ACTUALIZAR PRODUCTO',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                            ),
+                          ),
+                        )),
                     InkWell(
                       onTap: () {
                         Navigator.of(context).pop();
                       },
+                      borderRadius: BorderRadius.circular(50),
                       child: Container(
-                        width: 200,
+                        width: 150,
                         height: 50,
                         decoration: BoxDecoration(
                           color: Color.fromARGB(255, 255, 75, 55),
@@ -255,20 +273,20 @@ class ModalEditarProducto extends StatelessWidget {
                           child: Text(
                             'CANCELAR',
                             style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold
-                            ),
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     ),
                   ],
-                ),
+                )
               ],
             ),
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -11,6 +11,16 @@ class Categoria {
         id: row[0] is int ? row[0] : int.tryParse(row[0].toString()) ?? 0,
         titulo: row[1].toString(),
       );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Categoria &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class CategoriaModel {

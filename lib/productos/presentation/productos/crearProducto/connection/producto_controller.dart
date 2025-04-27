@@ -19,7 +19,7 @@ class ProductoController extends GetxController {
   final selectedImagePath = Rx<String?>(null);
 
   final categoriaSeleccionada = Rx<Categoria?>(null);
-  final categorias = <Categoria>[].obs; // Lista de objetos Categoria
+  final categorias = <Categoria>[].obs;
 
   final formKey = GlobalKey<FormState>();
   final isLoading = false.obs;
@@ -31,7 +31,6 @@ class ProductoController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Usa el controlador REAL de categorías
     if (Get.isRegistered<CategoriaController>()) {
       final categoriaController = Get.find<CategoriaController>();
       categorias.assignAll(categoriaController.categorias);
@@ -51,7 +50,6 @@ class ProductoController extends GetxController {
 
     if (file == null) return;
 
-    // Guarda la ruta temporal para la vista previa
     selectedImagePath.value = file.path;
     isImageSelected.value = true;
     print('Imagen seleccionada: ${file.path}');
@@ -63,7 +61,6 @@ class ProductoController extends GetxController {
       try {
         isLoading.value = true;
 
-        // Validación adicional para la categoría
         if (categoriaSeleccionada.value == null) {
           Get.snackbar('Error', 'Por favor selecciona una categoría',
               backgroundColor: Colors.red,
@@ -77,7 +74,6 @@ class ProductoController extends GetxController {
         final double precio = double.tryParse(precioController.text) ?? 0.0;
         final int stock = int.tryParse(stockInicialController.text) ?? 0;
 
-        // ---- Aquí ya puedes obtener el id directamente ----
         final int? idCategoria = categoriaSeleccionada.value?.id;
 
         if (idCategoria == null) {
@@ -89,10 +85,8 @@ class ProductoController extends GetxController {
           return;
         }
 
-        // Variable para almacenar la imagen en Base64
         String? imagenBase64;
 
-        // Convertir la imagen a Base64 si hay una imagen seleccionada
         if (isImageSelected.value && selectedImagePath.value != null) {
           File imageFile = File(selectedImagePath.value!);
           List<int> imageBytes = await imageFile.readAsBytes();
@@ -100,22 +94,28 @@ class ProductoController extends GetxController {
           print('Imagen convertida a Base64');
         }
 
-        // 1. Insertar el código de barras en la tabla codigoBarras y obtener su id
-        final int? idCodigoBarras = await ProductoDB.insertarCodigoBarras(
-          codigoBarras: codigoBarrasController.text,
-          conn: Database.conn,
-        );
+        // --- GESTIÓN DEL CÓDIGO DE BARRAS ---
+        String codigoBarras = codigoBarrasController.text.trim();
+        int? idCodigoBarras;
 
-        if (idCodigoBarras == null) {
-          Get.snackbar('Error', 'No se pudo guardar el código de barras',
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-              snackPosition: SnackPosition.BOTTOM);
-          isLoading.value = false;
-          return;
+        if (codigoBarras.isNotEmpty) {
+          // Buscar si ya existe el código de barras
+          idCodigoBarras = await ProductoDB.buscarCodigoBarrasId(
+            codigoBarras: codigoBarras,
+            conn: Database.conn,
+          );
+          // Si no existe, insertar
+          if (idCodigoBarras == null) {
+            idCodigoBarras = await ProductoDB.insertarCodigoBarras(
+              codigoBarras: codigoBarras,
+              conn: Database.conn,
+            );
+          }
+        } else {
+          idCodigoBarras = null;
         }
 
-        // 2. Crear producto en la base de datos usando el idCodigoBarras generado
+        // 2. Crear producto en la base de datos usando el idCodigoBarras generado o encontrado
         final int? idProducto = await ProductoDB.crearProducto(
           titulo: nombreProductoController.text,
           descripcion: descripcionController.text,

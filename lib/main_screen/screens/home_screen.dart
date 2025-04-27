@@ -62,6 +62,7 @@ void _showModalRegisterUser(
   );
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
   String actualmonth = meses[DateTime.now().month - 1];
   final SuscripcionController suscripcionController =
@@ -122,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
+  
 
   void _onSearchChanged() {
     setState(() {

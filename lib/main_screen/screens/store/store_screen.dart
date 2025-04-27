@@ -295,8 +295,8 @@ class StoreScreen extends StatelessWidget {
                     disponible: disponible ? 'Sí' : 'No',
                     index: index,
                     onDelete: () => storeController.deleteProducto(producto.id),
-                    onUpdateStock: (cantidad) =>
-                        storeController.updateStock(producto.id, cantidad),
+                    onUpdateStock: (nuevoStock) =>
+                        storeController.updateStock(producto.id, nuevoStock),
                   );
                 },
               ),
@@ -342,8 +342,7 @@ class ProductRowWidget extends StatefulWidget {
   final String codigoBarras;
   final String disponible;
   final int index;
-  final dynamic
-      producto; // El producto completo para pasarlo al modal de edición
+  final dynamic producto; // El producto completo para pasarlo al modal de edición
   final VoidCallback? onDelete;
   final Function(int)? onUpdateStock;
 
@@ -374,11 +373,11 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
 
   Color getRowColor() {
     if (isHovering || isFocused) {
-      return colores.colorHoverRow; // Color de selección
+      return colores.colorHoverRow;
     }
     return widget.index % 2 == 0
         ? colores.colorRowPar
-        : colores.colorRowNoPar; // Color alternante
+        : colores.colorRowNoPar;
   }
 
   Widget buildDisponibleBadge() {
@@ -410,13 +409,21 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         print('Fila seleccionada: ${widget.nombre}');
-        showDialog(context: context, builder: (context){
-          return ModalEditarProducto(
-            producto: widget.producto,
-          );
-        });
+        final actualizado = await showDialog(
+          context: context,
+          builder: (context) {
+            return ModalEditarProducto(
+              producto: widget.producto,
+            );
+          },
+        );
+        if (actualizado == true) {
+          // Recargar productos desde el StoreController
+          final storeController = Get.find<StoreController>();
+          await storeController.loadProductos();
+        }
       },
       onHover: (hovering) {
         setState(() {
@@ -428,20 +435,17 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
         height: 100,
         decoration: BoxDecoration(
           color: isHovering
-              ? colores.colorAccionButtons // <-- Color al hacer hover/click
+              ? colores.colorAccionButtons
               : (widget.index % 2 == 0
                   ? colores.colorRowPar
                   : colores.colorRowNoPar),
         ),
         child: Row(
           children: [
-            // Imagen
             SizedBox(
                 height: 110,
                 width: 110,
                 child: widget.image ?? const SizedBox()),
-
-            // Nombre
             Expanded(
               flex: 3,
               child: Text(
@@ -454,7 +458,6 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Categoría
             Expanded(
               flex: 3,
               child: Text(
@@ -466,7 +469,6 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Precio unitario
             Expanded(
               flex: 2,
               child: Text(
@@ -479,7 +481,6 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Cantidad disponible
             Expanded(
               flex: 2,
               child: Text(
@@ -492,7 +493,6 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Código de barras
             Expanded(
               flex: 3,
               child: Text(
@@ -504,39 +504,38 @@ class _ProductRowWidgetState extends State<ProductRowWidget> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Disponible
             Expanded(
               flex: 1,
               child: Center(child: buildDisponibleBadge()),
             ),
-            // IconButton para gestionar stock y eliminar producto
             Expanded(
               flex: 1,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.inventory,
-                        color: colores.colorTexto, size: 28),
-                    tooltip: 'Agregar stock',
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return ModalAgregarStock(
-                            idProducto: widget.producto?.id,
-                            nombreProducto: widget.nombre,
-                            producto: widget.producto,
-                            onStockUpdated: (cantidad) {
-                              if (widget.onUpdateStock != null) {
-                                widget.onUpdateStock!(cantidad);
-                              }
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
+IconButton(
+  icon: Icon(Icons.inventory, color: colores.colorTexto, size: 28),
+  tooltip: 'Agregar stock',
+  onPressed: () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ModalAgregarStock(
+          idProducto: widget.producto?.id,
+          nombreProducto: widget.nombre,
+          producto: widget.producto,
+          onStockUpdated: (nuevoStock) {
+            if (widget.onUpdateStock != null) {
+              // Usar el método asignarStock en lugar de updateStock
+              final storeController = Get.find<StoreController>();
+              storeController.asignarStock(widget.producto.id, nuevoStock);
+            }
+          },
+        );
+      },
+    );
+  },
+),
                   IconButton(
                     icon: Icon(Icons.delete, color: Colors.redAccent, size: 28),
                     tooltip: 'Eliminar producto',
