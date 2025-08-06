@@ -1,4 +1,4 @@
-name: managegym
+name: gerena
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -37,7 +37,6 @@ dependencies:
   cupertino_icons: ^1.0.8
   window_manager: ^0.4.3
   sqflite: ^2.4.1
-  postgres: ^3.4.8
   file_selector: ^1.0.3
   flutter_bloc: ^9.1.0
   shared_preferences: ^2.5.3
@@ -45,12 +44,61 @@ dependencies:
   fl_chart: ^0.68.0
   dotted_border: ^2.1.0
   path_provider: ^2.1.5
-  uuid: ^4.5.1
+
+  flutter_dotenv: ^5.2.1
+  syncfusion_flutter_calendar: ^29.1.38
+  calendar_view: ^1.4.0
+  carousel_slider: ^5.0.0
+  file_picker: ^10.1.9
+  bubble: ^1.2.1
+  google_fonts: ^6.1.0
+
+
+
+
+
+flutter_native_splash:
+  color: "#004346"
+  image: assets/gerena-logo.png
+  android: true
+  ios: true
+  ios_content_mode: scaleAspectFit 
+  android_12:
+    image: assets/gerena-logo.png
+    icon_background_color: "#00597D"
+    image_dark: assets/logo/logo_ios.png
+    icon_background_color_dark: "#00597D"
+
+
+
+
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo/logoAPP.png"
+  macos:
+    generate: true
+    image_path: "assets/logo/logoAPP.png"
+  windows:
+    generate: true
+    image_path: "assets/logo/logoAPP.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  linux:
+    generate: true
+    image_path: "assets/logo/logoAPP.png"
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_localizations: # AGREGAR ESTA LÍNEA
+    sdk: flutter
+  rename: ^3.0.1
+  change_app_package_name: ^1.1.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -72,9 +120,78 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/fondo-inicio-sesion.jpeg
-    - assets/images/producto.jpeg
+      - .env
+      - dev.env
+      - test.env
+      - assets/gerena-logo.png
+      - assets/logo/logoAPP.png
 
+      - assets/Webinar.png
+      - assets/gerena-logo-home.png
+      - assets/portafolio.png
+      - assets/Notificaciones.png
+      - assets/home.png
+      - assets/BARRA-DE-ACCIONES.png
+      - assets/twitter.png
+      - assets/instagram.png
+      - assets/facebook.png
+      - assets/linkedin.png
+      - assets/perfil.png
+      - assets/tienda-producto.png
+      - assets/productoenventa.png
+      - assets/oferta/back.png
+      - assets/visa.png
+
+
+
+      - assets/categoryItem/categoryItembackground.png
+      - assets/categoryItem/producto.png
+      - assets/before/before_after.png
+      - assets/before/before_after_1.png
+      - assets/icons/truck.png
+      - assets/icons/calendar.png
+      - assets/icons/confirmado.png
+      - assets/icons/entregado.png
+      - assets/icons/preparando.png
+      - assets/icons/logo_gerena.jpg
+      - assets/icons/guardar.png
+      - assets/blog/example.png
+      - assets/menu/MENUGERENA.png
+      - assets/icons/headset_mic.png
+      - assets/icons/close.png
+      - assets/icons/search.png
+      - assets/icons/shopping_cart.png
+      - assets/icons/FOTOGRAFIA.png
+      - assets/icons/WHATSAPP.png
+      - assets/icons/LLAMADAS.png
+      - assets/icons/edit.png
+      - assets/icons/check.png
+      - assets/icons/push-pin.png
+      - assets/icons/fingerprint.png
+      - assets/icons/warning.png
+      - assets/icons/campaign.png
+      - assets/icons/link.png
+      - assets/icons/arrow_forward_ios.png
+      - assets/icons/arrow_back_ios.png
+      - assets/logo/logo_ios.png
+      - assets/example/promocion.png
+
+
+      - assets/icons/home/Calendario.png
+      - assets/icons/home/Home.png
+      - assets/icons/home/notificacione.png
+      - assets/icons/home/Perfil.png
+      - assets/icons/home/Blog.png
+      - assets/icons/home/carrito.png
+      - assets/icons/aadHistory.png
+
+      - assets/icons/home/select/Calendario.png
+      - assets/icons/home/select/Home.png
+      - assets/icons/home/select/notificaciones.png
+      - assets/icons/home/select/Perfil.png
+      - assets/icons/home/select/Blog.png
+
+      
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

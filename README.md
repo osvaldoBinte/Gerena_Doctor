@@ -1,4 +1,4 @@
-# managegym
+# Gerena
 
 A new Flutter project.
 
