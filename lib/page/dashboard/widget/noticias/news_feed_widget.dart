@@ -26,9 +26,9 @@ class NewsFeedWidget extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
-        _buildWebinarCard(),
+        buildWebinarCard(),
         const SizedBox(height: 16),
-        _buildPromoCard(),
+        buildPromoCard(),
         const SizedBox(height: 16),
         GerenaColors.createArticleCard(
           title: 'Revoluciona tus aplicaciones de tóxina botulínica siguiendo los consejos del Dr. Juan Pérez',
@@ -134,7 +134,7 @@ class NewsFeedWidget extends StatelessWidget {
       Get.to(() => GlobalShopInterface());
   }
 
-  Widget _buildWebinarCard() {
+  Widget buildWebinarCard() {
     return ClipRRect(
     borderRadius: GerenaColors.smallBorderRadius,
     child: Image.asset(
@@ -144,7 +144,7 @@ class NewsFeedWidget extends StatelessWidget {
     ),
   );
   }
-Widget _buildPromoCard() {
+Widget buildPromoCard() {
   return ClipRRect(
     borderRadius: GerenaColors.smallBorderRadius,
     child: Image.asset(

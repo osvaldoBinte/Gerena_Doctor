@@ -6,7 +6,7 @@ class DashboardController extends GetxController {
   final RxBool isCalendarFullScreen = false.obs;
   
   // Variable para controlar qué vista mostrar
-  final RxString currentView = 'calendar'.obs; // 'calendar', 'appointments', 'doctor_profile', 'user_profile'
+  final RxString currentView = 'calendar'.obs; 
   
   // Variables para las citas médicas
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);

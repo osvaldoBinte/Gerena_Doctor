@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/movil/homePage/home_page.dart';
 import 'package:gerena/movil/perfil/perfil_page.dart';
+import 'package:gerena/movil/Category/category_page.dart';
 import 'package:gerena/page/dashboard/widget/notificasiones/notification_modal.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,7 @@ class StartController extends GetxController {
   final List<Widget> pages = [
     const HomePageMovil(),
     const BlogGerena(), // Nueva página que necesitas crear
-    const CartPage(), // Nueva página que necesitas crear o puedes usar CalendarWidget()
+     CategoryPage(), // Nueva página que necesitas crear o puedes usar CalendarWidget()
     NotificationModal(),
     DoctorProfilePage(),
    

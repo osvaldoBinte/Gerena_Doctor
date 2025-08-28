@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/widget/half_cut_circle.dart';
 import 'package:gerena/page/dashboard/widget/noticias/news_feed_widget.dart';
@@ -61,7 +62,7 @@ class SidebarWidget extends StatelessWidget {
                 _buildSearchField(),
                  StatusCardWidget(),
                  SizedBox(height: 10),
-                 _buildWishlistButton(),
+                 buildWishlistButton(),
                   Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                           child: Row(
@@ -237,41 +238,6 @@ class SidebarWidget extends StatelessWidget {
   }
 
   
-  
-Widget _buildWishlistButton() {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 13),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    decoration: BoxDecoration(
-      color: GerenaColors.textLightColor,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
-      children: [
-        Icon(
-          Icons.favorite, 
-          color: GerenaColors.textPrimaryColor,
-          size: 24,
-        ),
-        // Línea horizontal expandible
-        Expanded(
-          child: Container(
-            height: 1, // Grosor de la línea
-            margin: const EdgeInsets.symmetric(horizontal: 12), // Espacio a los lados de la línea
-            color: GerenaColors.textPrimaryColor, // Color de la línea
-          ),
-        ),
-        Text(
-          'WISHLIST',
-          style: TextStyle(
-            color: GerenaColors.textPrimaryColor,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    ),
-  );
-}
   
   Widget _buildCatalogGrid() {
     return Padding(

@@ -5,6 +5,7 @@ class GerenaColors {
   // Colores principales
   static const Color primaryColor = Color(0xFF00535C);       // Color principal verde azulado oscuro
   static const Color secondaryColor = Color(0xFF63C2A7);     // Color secundario turquesa claro
+
   static const Color accentColor = Color(0xFF00A99D);        // Color de acento verde azulado medio
   static const Color backgroundlogin = Color(0xFF004346);
   static const Color backgroundcalendart = Color(0xFF005B5F);
@@ -29,6 +30,8 @@ class GerenaColors {
   static const Color textchatAnswer = Color(0xFFBAFFEB);
   static const Color textchat = Color(0xFF656565); // Texto de pregunta en gris claro
   static const Color textTertiary = Color(0xFF000000);     
+  static const Color textQuaternary = Color(0xFF00A6AD);
+
   // Colores de estado
   static const Color successColor = Color(0xFF4CAF50);      // Verde para éxito
   static const Color warningColor = Color(0xFFF7770E); 
@@ -1148,6 +1151,9 @@ static Widget createSearchContainer({
     ),
   );
 }
+
+
+
 static Widget widgetButton({
   VoidCallback? onPressed,
   String text = 'AGENDAR CITA',
