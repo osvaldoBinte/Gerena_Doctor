@@ -35,11 +35,10 @@ Widget buildBackButton(BlogController controller) {
     final article = controller.selectedSocialArticle!;
     
     return SingleChildScrollView(
-  padding: const EdgeInsets.symmetric(horizontal: 100), // ← PADDING GLOBAL AQUÍ
+  padding: const EdgeInsets.symmetric(horizontal: 100), 
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // Imagen del artículo
       Padding(
   padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
   child: Container(
@@ -48,20 +47,18 @@ Widget buildBackButton(BlogController controller) {
     decoration: BoxDecoration(
       image: DecorationImage(
         image: AssetImage(article['image']!),
-        fit: BoxFit.contain, // ← CAMBIO AQUÍ: de cover a contain
+        fit: BoxFit.contain,
       ),
     ),
   ),
 ),
       const SizedBox(height: 24),
       
-      // Header con información del artículo
       Container(
         padding: const EdgeInsets.all(GerenaColors.paddingLarge),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Fecha y autor
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -87,7 +84,6 @@ Widget buildBackButton(BlogController controller) {
             ),
             const SizedBox(height: 30),
             
-            // Título del artículo
             Text(
               article['title']!,
               style: GerenaColors.headingLarge.copyWith(
@@ -99,7 +95,6 @@ Widget buildBackButton(BlogController controller) {
             
             const SizedBox(height: 24),
             
-            // Contenido del artículo
             Text(
               article['content']!,
               style: GerenaColors.bodyLarge.copyWith(height: 1.6),

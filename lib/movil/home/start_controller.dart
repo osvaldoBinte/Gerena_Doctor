@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/movil/homePage/home_page.dart';
+import 'package:gerena/movil/notificasiones/notification_page.dart';
 import 'package:gerena/movil/perfil/perfil_page.dart';
 import 'package:gerena/movil/Category/category_page.dart';
 import 'package:gerena/page/dashboard/widget/notificasiones/notification_modal.dart';
@@ -7,12 +8,11 @@ import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:get/get.dart';
 
 class StartController extends GetxController {
-  // ✅ Actualizado: Agregada nueva página para Blog
   final List<Widget> pages = [
     const HomePageMovil(),
-    const BlogGerena(), // Nueva página que necesitas crear
-     CategoryPage(), // Nueva página que necesitas crear o puedes usar CalendarWidget()
-    NotificationModal(),
+    const BlogGerena(),
+     CategoryPage(),
+    NotificationPage(),
     DoctorProfilePage(),
    
   ];
@@ -38,14 +38,13 @@ class StartController extends GetxController {
   final RxBool showTendencias = false.obs;
   final RxBool showDoctorSearch = false.obs;
   final RxBool showDoctorProfile = false.obs;
-  final RxBool showCalendar = false.obs; // ✅ Agregado para el calendario
+  final RxBool showCalendar = false.obs;
 
   void changePage(int index) {
     selectedIndex.value = index;
-    _hideAllOverlayPages(); // ✅ Método simplificado
+    _hideAllOverlayPages();
   }
 
-  // ✅ Método simplificado para ocultar todas las páginas overlay
   void _hideAllOverlayPages() {
     showAgendarCita.value = false;
     showTendencias.value = false;
@@ -90,7 +89,6 @@ class StartController extends GetxController {
     showDoctorProfile.value = false;
   }
 
-  // ✅ Nuevo método para mostrar calendario como overlay (opcional)
   void showCalendarPage() {
     _hideAllOverlayPages();
     showCalendar.value = true;
@@ -105,7 +103,6 @@ class StartController extends GetxController {
     return pages[selectedIndex.value];
   }
 
-  // ✅ Actualizado: Incluye la nueva página de calendario
   bool get shouldShowBottomNav => !showAgendarCita.value && 
                                   !showTendencias.value && 
                                   !showDoctorSearch.value && 
@@ -113,12 +110,10 @@ class StartController extends GetxController {
                                   !showCalendar.value;
 
   String getIconPath(int index) {
-    // Si hay alguna página overlay activa, mostrar iconos normales
     if (showAgendarCita.value || showTendencias.value || showDoctorSearch.value || showDoctorProfile.value || showCalendar.value) {
       return iconPaths[index];
     }
     
-    // Mostrar icono seleccionado o normal según el índice actual
     return selectedIndex.value == index 
         ? selectedIconPaths[index] 
         : iconPaths[index];

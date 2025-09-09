@@ -111,7 +111,9 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
   static const double elevationSmall = 2.0;
   static const double elevationMedium = 4.0;
   static const double elevationLarge = 8.0;
-  
+    static const Color seepublication = Color(0xFF259BC5); // Texto
+  static const Color textSecondary = Color(0xFF656565);
+
   // Objetos BorderRadius
   static BorderRadius get smallBorderRadius => BorderRadius.circular(smallRadius);
   static BorderRadius get mediumBorderRadius => BorderRadius.circular(mediumRadius);
@@ -159,7 +161,11 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
     fontWeight: FontWeight.bold,
     color: textPrimaryColor,
   );
-  
+    static TextStyle get storyText => GoogleFonts.rubik(
+    fontSize: 14,
+    color: Colors.white,
+    height: 1.4,
+  );
   static TextStyle get headingMedium => GoogleFonts.rubik(
     fontSize: 20,
     fontWeight: FontWeight.bold,
@@ -169,7 +175,7 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
   static TextStyle get headingSmall => GoogleFonts.rubik(
     fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: textPrimaryColor,
+    color: textSecondary,
   );
   
   static TextStyle get subtitleLarge => GoogleFonts.rubik(
@@ -220,7 +226,7 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
     int maxStars = 5,
     double size = 16,
     Color filledColor = const Color(0xFF00597D),
-    Color emptyColor = const Color(0xFF929292),
+    Color emptyColor = textSecondary,
   }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -1151,6 +1157,55 @@ static Widget createSearchContainer({
     ),
   );
 }
+static Widget buildLabeledTextField(
+  String label, 
+  String hintText, // Cambiar de initialValue a hintText
+  {TextEditingController? controller}
+) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: GoogleFonts.rubik(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: GerenaColors.textPrimaryColor,
+        ),
+      ),
+      const SizedBox(height: 5),
+      TextField(
+        controller: controller,
+        style: GoogleFonts.rubik(
+          fontSize: 16,
+          color: Colors.black,
+        ),
+        decoration: InputDecoration(
+          hintText: hintText, 
+          hintStyle: GoogleFonts.rubik(
+            color: GerenaColors.textSecondaryColor,
+            fontSize: 16,
+          ),
+          filled: true,
+          fillColor: Colors.transparent,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 9,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0),
+            borderSide: BorderSide(color: GerenaColors.colorinput),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0),
+            borderSide: BorderSide(color: GerenaColors.colorinput),
+          ),
+          isDense: true,
+        ),
+      ),
+    ],
+  );
+}
 
 
 
@@ -1163,10 +1218,12 @@ static Widget widgetButton({
   EdgeInsets? padding,
   double? borderRadius,
   bool showShadow = true,
+  List<BoxShadow>? boxShadow,
   Color? borderColor,
   double? borderWidth,
   FontWeight? fontWeight,
   BoxShadow? customShadow,
+  
 }) {
   VoidCallback defaultOnPressed = () {
     try {
@@ -1211,4 +1268,6 @@ static Widget widgetButton({
     ),
   );
 }
+
+
 }

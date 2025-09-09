@@ -9,7 +9,6 @@ import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:gerena/page/store/store_page.dart';
 
 class GerenaAppBarController extends GetxController with WindowListener {
-  // Variables reactivas
   
   @override
   void onInit() {
@@ -27,12 +26,10 @@ class GerenaAppBarController extends GetxController with WindowListener {
     windowManager.close();
   }
   
-  // FUNCIÓN HELPER: Detectar si estamos en DashboardPage
   bool _isInDashboardPage() {
     final currentRoute = Get.currentRoute;
     final currentWidget = Get.context?.widget;
     
-    // Verificar si la ruta actual es DashboardPage o si el widget actual es DashboardPage
     return currentRoute == '/DashboardPage' || 
            (currentWidget != null && currentWidget.runtimeType.toString().contains('DashboardPage'));
   }
@@ -86,7 +83,6 @@ class GerenaAppBarController extends GetxController with WindowListener {
     }
   }
   
-  // Métodos de navegación ACTUALIZADOS
   void navigateToDashboard() {
     print('Navegando al Dashboard - Vista Principal');
     _smartNavigateToDashboard(view: 'main');
@@ -102,13 +98,11 @@ class GerenaAppBarController extends GetxController with WindowListener {
     _smartNavigateToDashboard(view: 'user_profile');
   }
   
-  // Otros métodos de navegación
   void navigateToStore() {
     print('Navegando a la Tienda');
     Get.offAll(() => GlobalShopInterface());
   }
   
-  // Método para mostrar el modal de notificaciones
   void showNotifications() {
     print('Mostrando modal de notificaciones');
     if (Get.context != null) {

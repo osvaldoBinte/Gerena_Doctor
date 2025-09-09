@@ -13,7 +13,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
-  // Colores del theme
   @override
   void initState() {
     super.initState();
@@ -47,24 +46,20 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   }
 
   _navigateToLogin() async {
-    // Simular tiempo de carga del splash con animación
     await Future.delayed(Duration(seconds: 3));
     
-    // Detectar si es móvil o escritorio
     bool isMobile = _isMobileDevice();
     
     if (isMobile) {
-      // Navegar al login móvil
       Get.offNamed(RoutesNames.loginPageMovil);
     } else {
-      // Navegar al login de escritorio
       Get.offNamed(RoutesNames.loginPage);
     }
   }
 
   bool _isMobileDevice() {
     final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
-    return data.size.shortestSide < 600; // Considera móvil si el lado más corto es menor a 600px
+    return data.size.shortestSide < 600; 
   }
 
   @override

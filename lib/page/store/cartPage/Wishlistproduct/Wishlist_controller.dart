@@ -252,14 +252,12 @@ class SavedProductsContent extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen del producto
           Image.asset(
               product['image'],
               fit: BoxFit.contain,
               height: 100,
             ),
           
-          // Información del producto
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),

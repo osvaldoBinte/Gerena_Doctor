@@ -77,7 +77,7 @@ class Membresia extends StatelessWidget {
                   isCurrentPlan: false,
                   cardColor: GerenaColors.cardColor,
                   hasGradientBorder: true,
-                                    hasGradientButton: true, // Nueva propiedad para botón gradiente
+                                    hasGradientButton: true, 
 
                 ),
                 _buildMembershipCard(
@@ -121,28 +121,27 @@ class Membresia extends StatelessWidget {
     Color? borderColor,
     Color? titleColor,
     bool hasGradientBorder = false,
-        bool hasGradientButton = false, // Nueva propiedad
+        bool hasGradientButton = false,
 
   }) {
-    // Si tiene borde gradiente, usar Container con gradiente
     if (hasGradientBorder) {
       return Container(
         decoration: BoxDecoration(
           borderRadius: GerenaColors.mediumBorderRadius,
           gradient: LinearGradient(
             colors: [
-             Color(0xFFFF00F6), // Magenta (izquierda arriba)
-     Color(0xFF0073FF), // Azul (arriba derecha)
-     Color(0xFF8FFF00), // Verde amarillo (abajo derecha)
-     Color(0xFFFF7300), // Naranja (abajo derecha tocando rojo)
-     Color(0xFFFF0004), // Rojo (izquierda abajo)
+             Color(0xFFFF00F6), 
+     Color(0xFF0073FF),
+     Color(0xFF8FFF00), 
+     Color(0xFFFF7300), 
+     Color(0xFFFF0004),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: Container(
-          margin: const EdgeInsets.all(3), // Grosor del borde gradiente
+          margin: const EdgeInsets.all(3), 
           decoration: BoxDecoration(
             color: cardColor ?? GerenaColors.cardColor,
             borderRadius: BorderRadius.circular(GerenaColors.mediumRadius - 2),
@@ -159,14 +158,13 @@ class Membresia extends StatelessWidget {
             isCurrentPlan: isCurrentPlan,
             currentPlanText: currentPlanText,
             titleColor: titleColor,
-                        hasGradientButton: hasGradientButton, // Pasar la propiedad
+                        hasGradientButton: hasGradientButton,
 
           ),
         ),
       );
     }
     
-    // Card normal sin gradiente
     return Container(
       decoration: BoxDecoration(
         color: cardColor ?? GerenaColors.cardColor,
@@ -187,13 +185,12 @@ class Membresia extends StatelessWidget {
         isCurrentPlan: isCurrentPlan,
         currentPlanText: currentPlanText,
         titleColor: titleColor,
-                hasGradientButton: hasGradientButton, // Pasar la propiedad
+                hasGradientButton: hasGradientButton, 
 
       ),
     );
   }
 
-  // Método separado para el contenido de la card
   Widget _buildCardContent({
     required String type,
     required String title,
@@ -205,7 +202,7 @@ class Membresia extends StatelessWidget {
     required bool isCurrentPlan,
     String? currentPlanText,
     Color? titleColor,
-        bool hasGradientButton = false, // Nueva propiedad
+        bool hasGradientButton = false, 
 
   }) {
     return Padding(
@@ -213,7 +210,6 @@ class Membresia extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header del plan
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -301,7 +297,6 @@ class Membresia extends StatelessWidget {
           
           const SizedBox(height: 16),
           
-          // Plan actual indicator (si aplica)
           if (isCurrentPlan && currentPlanText != null) ...[
             Container(
               width: double.infinity,
@@ -323,7 +318,6 @@ class Membresia extends StatelessWidget {
             const SizedBox(height: 8),
           ],
           
-          // Botón de acción
          SizedBox(
             width: double.infinity,
             height: 40,
@@ -332,8 +326,8 @@ class Membresia extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Color(0xFFC2639C), // Rosa/magenta
-                          Color(0xFFFF0101), // Rojo brillante
+                          Color(0xFFC2639C), 
+                          Color(0xFFFF0101),
                         ],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
@@ -363,7 +357,6 @@ class Membresia extends StatelessWidget {
                   )
                 : ElevatedButton(
                     onPressed: () {
-                      // Lógica para seleccionar plan
                       print('Plan seleccionado: $title');
                     },
                     style: ElevatedButton.styleFrom(

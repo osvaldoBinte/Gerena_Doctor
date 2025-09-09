@@ -6,10 +6,8 @@ import 'package:get/get.dart';
 class StatusCardWidget extends StatelessWidget {
   const StatusCardWidget({Key? key}) : super(key: key);
 
-  // Valores predefinidos dentro del widget
   String get folio => '00122357';
 
-  // Estados predefinidos - Solo "Enviado" está activo
   List<Map<String, dynamic>> get predefinedStatuses => [
     {
       'imagePath': 'assets/icons/confirmado.png',

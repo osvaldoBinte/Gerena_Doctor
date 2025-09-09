@@ -13,7 +13,6 @@ class Sugerencia extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Container(
-          //  constraints: const BoxConstraints(maxWidth: 650),
             child: Card(
               elevation: GerenaColors.elevationSmall,
               shape: RoundedRectangleBorder(
@@ -24,7 +23,6 @@ class Sugerencia extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título principal
                     Text(
                       'Comparte tus sugerencias',
                       style: GerenaColors.headingMedium.copyWith(fontSize: 18),
@@ -32,7 +30,6 @@ class Sugerencia extends StatelessWidget {
                     
                     const SizedBox(height: 24),
                     
-                    // Campo de correo electrónico
                     _buildInputField(
                       label: 'Correo electrónico',
                       placeholder: 'username@example.com',
@@ -40,7 +37,6 @@ class Sugerencia extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Fila de Nombre/s y Apellidos
                     Row(
                       children: [
                         Expanded(
@@ -55,17 +51,14 @@ class Sugerencia extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Campo de título
                     _buildInputField(label: 'Título'),
                     
                     const SizedBox(height: 16),
                     
-                    // Campo de descripción (área de texto)
                     _buildTextAreaField(label: 'Descripción'),
                     
                     const SizedBox(height: 24),
                     
-                    // Botón de enviar
                     Align(
                       alignment: Alignment.centerRight,
                       child: SizedBox(

@@ -4,6 +4,7 @@ import 'package:gerena/common/widgets/widgets_gobal.dart';
 import 'package:gerena/page/store/blogGerena/article_detail_screen.dart';
 import 'package:gerena/page/store/blogGerena/blog_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_social.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class BlogGerena extends StatelessWidget {
@@ -53,7 +54,10 @@ class _BlogGerenaContent extends StatelessWidget {
                   buildBackButton(controller),
 
                 if (controller.showArticleDetail && !controller.showBlogSocial)
-                  _buildArticleDetailContent(controller)
+                  Padding(
+  padding: EdgeInsets.symmetric(horizontal: _getResponsivePadding(context)),
+  child: _buildArticleDetailContent(controller),
+)
                 else if (controller.showBlogSocial) 
                   _buildBlogSocialContent()
                 else 
@@ -65,83 +69,129 @@ class _BlogGerenaContent extends StatelessWidget {
       },
     );
   }
+  double _getResponsivePadding(BuildContext context) {
+  double screenWidth = MediaQuery.of(context).size.width;
+  if (screenWidth > 1200) return 300;
+  if (screenWidth > 900) return 150;
+  if (screenWidth > 600) return 80;
+  return 20;
+}
+Widget _buildArticleDetailContent(BlogController controller) {
+  if (controller.selectedArticle == null) return const SizedBox.shrink();
+  
+  final article = controller.selectedArticle!;
+  final screenWidth = MediaQuery.of(Get.context!).size.width;
+  final isTablet = screenWidth > 600;
+  
+  String content = article['content']!;
+  List<String> sentences = content.split('. ');
+  
+  String part1 = sentences.take(2).join('. ') + '.';
+  String part2 = sentences.length > 4 ? sentences[2] + '.' : sentences.take(3).join('. ');
+  String part3 = sentences.skip(3).join('. ');
 
-  Widget _buildArticleDetailContent(BlogController controller) {
-    if (controller.selectedArticle == null) return const SizedBox.shrink();
-    
-    final article = controller.selectedArticle!;
-    
-    return SingleChildScrollView(
-  padding: const EdgeInsets.symmetric(horizontal: 100), 
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-   Padding(
-  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
-  child: Image.asset(
-    article['image']!,
-    width: double.infinity,
-    fit: BoxFit.fitHeight,
-   
-  ),
-),
-      
-      const SizedBox(height: 24),
-      
-      Container(
-        padding: const EdgeInsets.all(GerenaColors.paddingLarge),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  return SingleChildScrollView(
+    padding: EdgeInsets.symmetric(horizontal: isTablet ? 100 : 20),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: isTablet ? 50 : 0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12), 
+            child: Image.asset(
+              article['image']!,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 24),
+        
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  article['date'] ?? 'Hoy',
-                  style: GerenaColors.bodySmall.copyWith(
-                    color: GerenaColors.textTertiaryColor,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  article['author'] ?? 'Blog Gerena',
-                  style: GerenaColors.bodySmall.copyWith(
-                    color: GerenaColors.textTertiaryColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            Divider(
-              color: GerenaColors.textTertiaryColor.withOpacity(0.6),
-              thickness: 2,
-            ),
-            const SizedBox(height: 30),
-            
             Text(
-              article['title']!,
-              style: GerenaColors.headingLarge.copyWith(
-                fontSize: 28,
-                height: 1.3,
-                color: GerenaColors.textTertiaryColor
+              article['date'] ?? 'Hoy',
+              style: GerenaColors.bodySmall.copyWith(
+                color: GerenaColors.textTertiaryColor,
               ),
             ),
-            
-            const SizedBox(height: 24),
-            
+            const SizedBox(width: 20),
             Text(
-              article['content']!,
-              style: GerenaColors.bodyLarge.copyWith(height: 1.6),
+              article['author'] ?? 'Blog Gerena',
+              style: GerenaColors.bodySmall.copyWith(
+                color: GerenaColors.textTertiaryColor,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            
-            const SizedBox(height: 24),
           ],
         ),
-      ),
-    ],
-  ),
-);
-  }
+        
+        Divider(
+          color: GerenaColors.textTertiaryColor.withOpacity(0.6),
+          thickness: 2,
+        ),
+        
+        const SizedBox(height: 30),
+        
+        Text(
+          article['title']!,
+          style: GerenaColors.headingLarge.copyWith(
+            fontSize: 28,
+            height: 1.3,
+            color: GerenaColors.textTertiaryColor
+          ),
+        ),
+        
+        const SizedBox(height: 24),
+        
+        Text(
+          part1,
+          style: GerenaColors.bodyLarge.copyWith(height: 1.6),
+        ),
+        
+        const SizedBox(height: 24),
+        
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                article['image']!,
+                width: isTablet ? 120 : 100,
+                height: isTablet ? 90 : 75,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                part2,
+                style: GerenaColors.bodyLarge.copyWith(
+                  height: 1.6,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 24),
+        
+        Text(
+          part3,
+          style: GerenaColors.bodyLarge.copyWith(height: 1.6),
+        ),
+        
+        const SizedBox(height: 24),
+      ],
+    ),
+  );
+}
+
 Widget _buildHeader(BlogController controller) {
   return LayoutBuilder(
     builder: (context, constraints) {
@@ -191,12 +241,10 @@ Widget _buildHeader(BlogController controller) {
     },
   );
 }
-  // Contenido del Blog Gerena (vista principal)
   Widget _buildBlogGerenaContent(BlogController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Secciones principales del blog
         _buildBlogSections(controller),
         
         const SizedBox(height: 24),
@@ -215,13 +263,11 @@ Widget _buildHeader(BlogController controller) {
         
         const SizedBox(height: 16),
         
-        // Grid de artículos
         _buildArticlesGrid(controller),
       ],
     );
   }
 
-  // Contenido del Blog Social (clase BlogSocial)
   Widget _buildBlogSocialContent() {
     return const BlogSocial();
   }
@@ -279,24 +325,18 @@ Widget _buildArticlesGrid(BlogController controller) {
   
   return LayoutBuilder(
     builder: (context, constraints) {
-      // Obtener el ancho disponible
       double screenWidth = constraints.maxWidth;
       
-      // Definir el ancho mínimo que necesita cada tarjeta de artículo
-      double cardMinWidth = 250.0; // Ajusta según tu diseño
+      double cardMinWidth = 250.0; 
       
-      // Calcular cuántas columnas pueden caber
       int crossAxisCount = (screenWidth / cardMinWidth).floor();
       
-      // Limitar entre 1 y 4 columnas máximo
       crossAxisCount = crossAxisCount.clamp(1, 4);
       
-      // Ajustar el espaciado según el número de columnas
       double crossAxisSpacing = crossAxisCount == 1 ? 0 : 
                                crossAxisCount == 2 ? 20 : 
                                crossAxisCount == 3 ? 40 : 60;
       
-      // Ajustar el aspect ratio según el número de columnas
       double childAspectRatio = crossAxisCount == 1 ? 0.9 : 
                                crossAxisCount == 2 ? 1.0 : 
                                0.8;

@@ -82,7 +82,6 @@ class NewsFeedWidget extends StatelessWidget {
             'Aplicaciones clínicas de la toxina botulínica',
             '25 de Abril',
             onTap: () {
-              // Navegación para webinar - puedes personalizar esto
               _navigateToForum();
             },
           ),
@@ -92,7 +91,6 @@ class NewsFeedWidget extends StatelessWidget {
             'LINETOX 1 en \$1,500 / 3 en \$4,100',
             'Oferta especial',
             onTap: () {
-              // Navegación para promociones - puedes personalizar esto
               _navigateToForum();
             },
           ),
@@ -102,7 +100,6 @@ class NewsFeedWidget extends StatelessWidget {
             'Aplicaciones de tóxina botulínica',
             'Dr. Juan Pérez',
             onTap: () {
-              // Navegación para blog
               _navigateToForum();
             },
           ),

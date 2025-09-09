@@ -134,7 +134,6 @@ class SidebarWidget extends StatelessWidget {
                       'assets/icons/headset_mic.png',
                       width: 24,
                       height: 24,
-                        // color: GerenaColors.primaryColor,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -170,7 +169,6 @@ class SidebarWidget extends StatelessWidget {
           ),
         ),
 
-          // Noticias compactas en el sidebar
         ],
       ),
     ),
@@ -212,7 +210,7 @@ class SidebarWidget extends StatelessWidget {
               child: Container(
                 height: 20,
                 decoration: BoxDecoration(
-                  color: Color(0xFF00332E), // Color verde oscuro para el input
+                  color: Color(0xFF00332E),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Align(
@@ -308,49 +306,4 @@ Widget _buildCategoryItem(String text, String imageAssetPath) {
 
 
   
- 
-
-  // Tarjeta de noticia compacta para el sidebar
-  Widget _buildCompactNewsCard(String category, String title, String subtitle) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF00414A),
-        borderRadius: GerenaColors.smallBorderRadius,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            category,
-            style: TextStyle(
-              color: GerenaColors.secondaryColor,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            title,
-            style: TextStyle(
-              color: GerenaColors.textLightColor,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

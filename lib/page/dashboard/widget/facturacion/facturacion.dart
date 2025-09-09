@@ -24,7 +24,6 @@ class Facturacion extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Título principal
                     Text(
                       'Detalles de compra',
                       style: GerenaColors.headingMedium.copyWith(fontSize: 18),
@@ -32,7 +31,6 @@ class Facturacion extends StatelessWidget {
                     
                     const SizedBox(height: 24),
                     
-                    // Sección de detalles de compra
                     Row(
                       children: [
                         Expanded(
@@ -61,7 +59,6 @@ class Facturacion extends StatelessWidget {
                     
                     const SizedBox(height: 32),
                     
-                    // Título de facturación
                     Text(
                       'Agrega los datos de facturación',
                       style: GerenaColors.headingMedium.copyWith(fontSize: 18),
@@ -69,7 +66,6 @@ class Facturacion extends StatelessWidget {
                     
                     const SizedBox(height: 24),
                     
-                    // Primera fila - RFC y Código Postal
                     Row(
                       children: [
                         Expanded(
@@ -84,12 +80,10 @@ class Facturacion extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Segunda fila - Nombre/Razón Social
                     _buildInputField(label: 'Nombre / Razón Social'),
                     
                     const SizedBox(height: 16),
                     
-                    // Tercera fila - Régimen Fiscal y Uso de CFDI
                     Row(
                       children: [
                         Expanded(
@@ -104,17 +98,14 @@ class Facturacion extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Cuarta fila - Correo electrónico
                     _buildInputField(label: 'Correo electrónico'),
                     
                     const SizedBox(height: 16),
                     
-                    // Quinta fila - Dirección de facturación
                     _buildInputField(label: 'Dirección de facturación'),
                     
                     const SizedBox(height: 32),
                     
-                    // Botón de facturar
                     Align(
                       alignment: Alignment.centerRight,
                       child: SizedBox(
@@ -251,7 +242,7 @@ class Facturacion extends StatelessWidget {
               color: Colors.grey[600],
               size: 20,
             ),
-            items: const [], // Lista vacía por ahora
+            items: const [], 
             onChanged: (value) {
               print('Dropdown seleccionado: $value');
             },

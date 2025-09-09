@@ -99,6 +99,5 @@ import 'package:get/get.dart';
   }
    void _navigateToForum() {
     Get.find<ShopNavigationController>().navigateToBlogGerena();
-      // Luego navegamos a la interfaz
       Get.to(() => GlobalShopInterface());
   }

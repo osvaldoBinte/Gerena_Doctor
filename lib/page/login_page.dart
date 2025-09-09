@@ -38,7 +38,6 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                             GerenaColors.createAppLogo(),
                             const SizedBox(height: 50),
                             
-                            // Contenedor del formulario con ancho limitado
                             Container(
                               width: constraints.maxWidth * 0.4,
                               child: Column(
@@ -66,7 +65,6 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                                     obscureText: _obscureText,
                                   ),
                                   
-                                  // Forgot password
                                   Align(
                                     alignment: Alignment.centerRight,
                                     child: GerenaColors.createLoginTextButton(
@@ -109,7 +107,6 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                 ),
               ),
               
-              // Botones de idioma y soporte en las esquinas para escritorio
               Positioned(
                   left: 0,
                   right: 0,
@@ -119,7 +116,6 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Language selector
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -130,7 +126,7 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                               ),
                               child: Text(
                                 'ESP',
-                                style: GoogleFonts.rubik( // ✅ Aplicar Rubik
+                                style: GoogleFonts.rubik(
                                   fontWeight: FontWeight.bold,
                                   color: GerenaColors.textLightColor,
                                 ),
@@ -143,7 +139,7 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                               ),
                               child: Text(
                                 'ENG',
-                                style: GoogleFonts.rubik( // ✅ Aplicar Rubik
+                                style: GoogleFonts.rubik( 
                                   color: GerenaColors.textLightColor.withOpacity(0.7),
                                 ),
                               ),
@@ -151,7 +147,6 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                           ],
                         ),
                         
-                        // Support links
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -162,7 +157,7 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                               ),
                               child: Text(
                                 'Contáctanos',
-                                style: GoogleFonts.rubik( // ✅ Aplicar Rubik
+                                style: GoogleFonts.rubik( 
                                   color: GerenaColors.textLightColor,
                                 ),
                               ),

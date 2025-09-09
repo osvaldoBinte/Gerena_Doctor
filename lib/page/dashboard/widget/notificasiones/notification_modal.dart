@@ -55,7 +55,6 @@ class NotificationModal extends StatelessWidget {
               ),
             ),
 
-            // Contenido del modal
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(20),

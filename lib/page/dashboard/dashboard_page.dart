@@ -62,25 +62,21 @@ class DashboardPage extends StatelessWidget {
             ),
           )
         : Container(
-            // Si no mostramos AppBar o Sidebar, solo contenido principal
             child: showAppBar 
               ? Row(
                   children: [
-                    // Usamos SidebarWidget en el layout principal si showAppBar es true
                     if (showAppBar) const SidebarWidget(),
                     
-                    // Contenido principal que cambia dinámicamente
                     Expanded(
                       child: _buildDashboardContent(controller),
                     ),
                   ],
                 )
-              : _buildDashboardContent(controller), // Sin row adicional
+              : _buildDashboardContent(controller), 
           ),
     );
   }
 
-  // NUEVO MÉTODO: Contenido para móviles
  Widget _buildMobileContent(DashboardController controller) {
   return Obx(() {
     switch (controller.currentView.value) {
@@ -92,14 +88,14 @@ class DashboardPage extends StatelessWidget {
             _buildDoctorProfileContent(),
           ],
         );
-      case 'user_profile': // NUEVO CASO
+      case 'user_profile': 
         return Column(
           children: [
             const SizedBox(height: 16),
             _buildUserProfileContent(),
           ],
         );
-       case 'membresia': // NUEVO CASO
+       case 'membresia':
         return Column(
           children: [
           _buildBackButtonMembresia(controller),
@@ -114,7 +110,7 @@ class DashboardPage extends StatelessWidget {
             _buildCalendarOrAppointmentsSection(controller),
           ],
         );
-      default: // 'calendar'
+      default:
         return Column(
           children: [
             if (controller.currentView.value == 'calendar') ...[
@@ -143,7 +139,7 @@ class DashboardPage extends StatelessWidget {
                     child: _buildCalendarFullScreen(controller),
                   ),
                 )
-              : _buildMainContentWithConditionalScroll(controller), // Nueva función
+              : _buildMainContentWithConditionalScroll(controller), 
         ),
       ],
     )),
@@ -151,17 +147,14 @@ class DashboardPage extends StatelessWidget {
 }
 
 
-// Nueva función que maneja el scroll de manera condicional
 Widget _buildMainContentWithConditionalScroll(DashboardController controller) {
   return Obx(() {
-    // Si estamos en la vista default (Row con NewsFeed y Calendar), no usar SingleChildScrollView
     if (controller.currentView.value == '' || controller.currentView.value == 'default') {
       return Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildMainContent(controller),
       );
     } else {
-      // Para todas las otras vistas, usar SingleChildScrollView
       return Padding(
         padding: const EdgeInsets.all(16.0),
         child: _buildMainContent(controller),
@@ -170,7 +163,6 @@ Widget _buildMainContentWithConditionalScroll(DashboardController controller) {
   });
 }
 
-  // NUEVO MÉTODO: Construir contenido principal basado en la vista actual
  Widget _buildMainContent(DashboardController controller) {
   return Obx(() {
     switch (controller.currentView.value) {
@@ -225,7 +217,7 @@ Widget _buildMainContentWithConditionalScroll(DashboardController controller) {
       case 'appointments':
         return _buildCalendarOrAppointmentsSection(controller);
       default:
-        return _buildRowWithSelectiveScroll(controller); // Nueva función para el Row
+        return _buildRowWithSelectiveScroll(controller);
     }
   });
 }Widget _buildRowWithSelectiveScroll(DashboardController controller) {
@@ -234,14 +226,14 @@ Widget _buildMainContentWithConditionalScroll(DashboardController controller) {
     children: [
       Expanded(
         flex: 1,
-        child: SingleChildScrollView( // Solo NewsFeedWidget tiene scroll
+        child: SingleChildScrollView( 
           child: const NewsFeedWidget(),
         ),
       ),
       const SizedBox(width: 16),
       Expanded(
         flex: 3,
-        child: _buildCalendarOrAppointmentsSection(controller), // Sin scroll
+        child: _buildCalendarOrAppointmentsSection(controller),
       ),
     ],
   );
@@ -284,13 +276,12 @@ Widget _buildBackButtonMembresia(DashboardController controller) {
     padding:const  EdgeInsets.symmetric(horizontal: 60.0),
     child: Row(
       children: [
-        // Elimina Center y usa Align a la izquierda
         const Expanded(
           child: Align(
         alignment: Alignment.centerLeft,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start, // Alinea el texto a la izquierda
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
           'Membresías',
@@ -352,7 +343,6 @@ Widget _buildBackButton(DashboardController controller) {
     padding: const EdgeInsets.symmetric(vertical: 8.0),
     child: Row(
       children: [
-        // Cambiamos Expanded + Center + Flexible por solo Expanded
         Expanded(
           child: Text(
             'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
@@ -460,7 +450,6 @@ Widget _buildBackButton(DashboardController controller) {
                     size: 40,
                   ),
                   onPressed: () {
-                    // Aquí puedes agregar la lógica para agregar una nueva cita
                   },
                 ),
               ),
@@ -469,7 +458,6 @@ Widget _buildBackButton(DashboardController controller) {
         ],
       );
       } else {
-        // Mostrar el calendario normal
         return _buildCalendarAndAppointments(controller);
       }
     });
@@ -484,9 +472,8 @@ String _getDayAbbreviation(DateTime date) {
   return Container(
     child: appointments.isEmpty
         ? _buildEmptyAppointmentsState(selectedDate)
-        : Expanded( // Importante: usar Expanded para dar altura definida
+        : Expanded( 
             child: ListView.builder(
-              // Removemos shrinkWrap y NeverScrollableScrollPhysics para habilitar scroll
               padding: const EdgeInsets.all(16.0),
               itemCount: appointments.length,
               itemBuilder: (context, index) {
@@ -501,7 +488,6 @@ String _getDayAbbreviation(DateTime date) {
   );
 }
 
-  // Widget para mostrar cuando no hay citas
   Widget _buildEmptyAppointmentsState(DateTime selectedDate) {
     final formattedDate = _formatDate(selectedDate);
     
@@ -740,7 +726,6 @@ return Container(
     );
   }
 
-  // Función helper para formatear fechas
   String _formatDate(DateTime date) {
     final months = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -749,12 +734,10 @@ return Container(
     return '${date.day} de ${months[date.month - 1]} ${date.year}';
   }
   
-  // Widget para mostrar el calendario a pantalla completa
   Widget _buildCalendarFullScreen(DashboardController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Botón para volver a la vista normal
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -766,11 +749,9 @@ return Container(
               ),
               onPressed: controller.exitCalendarFullScreen,
             ),
-            // Puedes añadir aquí más botones o acciones si es necesario
           ],
         ),
         const SizedBox(height: 8),
-        // Calendario en pantalla completa
         CalendarWidget(
           onDateSelected: controller.onDateSelected,
         ),
@@ -782,7 +763,6 @@ return Container(
   Widget _buildCalendarAndAppointments(DashboardController controller) {
     return Column(
       children: [
-        // Calendario usando el widget
         CalendarWidget(
           onDateSelected: controller.onDateSelected,
         ),

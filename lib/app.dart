@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/routes/router.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/movil/homePage/PostController/post_controller.dart';
+import 'package:gerena/movil/perfil/perfil_controller.dart';
 import 'package:gerena/page/dashboard/calendar/calendar_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
 import 'package:gerena/page/store/cartPage/productDetail/product_detail_controller.dart';
 import 'package:get/get.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; // AGREGAR ESTA IMPORTACIÓN
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 //UsecaseConfig usecaseConfig = UsecaseConfig();
 
@@ -34,7 +36,10 @@ class App extends StatelessWidget {
        Get.put(ShopNavigationController());
        Get.put(ProductDetailController());
        Get.put(CalendarControllerGetx());
-       
+              Get.put(PostController()); 
+                     Get.put(PerfilController());
+
+
       }),
 
       getPages: AppPages.routes, 

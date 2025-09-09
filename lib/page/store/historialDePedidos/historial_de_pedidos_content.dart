@@ -13,7 +13,6 @@ class HistorialDePedidosContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Primer pedido
             _buildOrderCard(
               fecha: 'MIÉRCOLES 05 MARZO 2025',
               folio: 'Folio: 00122357',
@@ -37,7 +36,6 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 20),
             
-            // Segundo pedido
             _buildOrderCard(
               fecha: 'MIÉRCOLES 05 MARZO 2025',
               folio: 'Folio: 00121587',
@@ -61,7 +59,6 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 30),
             
-            // Resumen del mes
             _buildResumenDelMes(),
           ],
         ),
@@ -86,7 +83,6 @@ class HistorialDePedidosContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header con fecha y estatus
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -113,12 +109,10 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 20),
             
-            // Lista de productos
             ...productos.map((producto) => _buildProductoItem(producto)),
             
             const SizedBox(height: 16),
             
-            // Total
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -129,7 +123,6 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 16),
             
-            // Botones
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -184,7 +177,6 @@ class HistorialDePedidosContent extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen del producto
           Container(
             width: 60,
             height: 60,
@@ -214,7 +206,6 @@ class HistorialDePedidosContent extends StatelessWidget {
           
           const SizedBox(width: 12),
           
-          // Información del producto
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,7 +237,6 @@ class HistorialDePedidosContent extends StatelessWidget {
           
           const SizedBox(width: 8),
           
-          // Cantidad
           Text(
             producto.cantidad,
             style: GerenaColors.bodyMedium.copyWith(
@@ -276,7 +266,6 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 20),
             
-            // Items del resumen
             _buildResumenItem('Subtotal', '\$16,200.00 MXN', false),
             const SizedBox(height: 8),
             _buildResumenItem('Puntos acumulados utilizados', '-\$100.00 MXN', true),
@@ -289,7 +278,6 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 16),
             
-            // Línea divisoria
             Container(
               height: 1,
               color: GerenaColors.dividerColor,
@@ -297,7 +285,6 @@ class HistorialDePedidosContent extends StatelessWidget {
             
             const SizedBox(height: 16),
             
-            // Total final
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -341,7 +328,6 @@ class HistorialDePedidosContent extends StatelessWidget {
   }
 }
 
-// Clase auxiliar para manejar datos de productos
 class _ProductoData {
   final String nombre;
   final String descripcion;

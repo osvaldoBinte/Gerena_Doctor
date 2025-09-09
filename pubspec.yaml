@@ -148,6 +148,14 @@ flutter:
       - assets/categoryItem/producto.png
       - assets/before/before_after.png
       - assets/before/before_after_1.png
+      - assets/before/beforeAndAfter.jpg
+
+      - assets/icons/reacciones/recomendar.png
+      - assets/icons/reacciones/meencanta.png
+      - assets/icons/reacciones/measombra.png
+      - assets/icons/reacciones/lonecesito.png
+      - assets/icons/reacciones/Star.png
+
       - assets/icons/truck.png
       - assets/icons/calendar.png
       - assets/icons/confirmado.png
@@ -164,12 +172,14 @@ flutter:
       - assets/icons/FOTOGRAFIA.png
       - assets/icons/WHATSAPP.png
       - assets/icons/LLAMADAS.png
+      - assets/icons/phone.png
       - assets/icons/edit.png
       - assets/icons/check.png
       - assets/icons/push-pin.png
       - assets/icons/fingerprint.png
       - assets/icons/warning.png
       - assets/icons/campaign.png
+      - assets/icons/campaigndart.png
       - assets/icons/link.png
       - assets/icons/arrow_forward_ios.png
       - assets/icons/arrow_back_ios.png

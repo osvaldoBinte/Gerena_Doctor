@@ -13,11 +13,9 @@ class HomePageMovil extends StatefulWidget {
 }
 
 class _GerenaFeedScreenState extends State<HomePageMovil> {
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _buscarController = TextEditingController();
     final double availableHeight = MediaQuery.of(context).size.height -
                                    AppBar().preferredSize.height -
                                    kBottomNavigationBarHeight;
@@ -121,10 +119,11 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                     SizedBox(height: GerenaColors.paddingMedium),
                     _buildCitasSection(),
                     SizedBox(height: GerenaColors.paddingMedium),
-                   // _buildWebinarSection(),
+
+        buildWebinarCard(),
                     SizedBox(height: GerenaColors.paddingMedium),
-                   // _buildPromotionSection(),
-                    SizedBox(height: GerenaColors.paddingMedium),
+        buildPromoCard(),
+                   
                   ],
                 ),
               ),
@@ -284,11 +283,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     ),
   ],
 ),
-        const SizedBox(height: 16),
-
-        buildWebinarCard(),
-        const SizedBox(height: 16),
-        buildPromoCard(),
+       
       ],
     ),
   );

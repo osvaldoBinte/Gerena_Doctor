@@ -34,7 +34,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     super.initState();
       _scrollController = ScrollController();
 
-    // Inicializar controllers
     try {
       calendarController = Get.find<CalendarControllerGetx>();
     } catch (e) {
@@ -47,7 +46,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       dashboardController = Get.put(DashboardController());
     }
     
-    // Configurar fecha inicial después del primer frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         calendarController.updateCurrentDate(DateTime(2025, 4, 28));
@@ -56,24 +54,21 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 @override
 Widget build(BuildContext context) {
-  // Obtener el tamaño de la pantalla para calcular alturas apropiadas
   final screenHeight = MediaQuery.of(context).size.height;
-  final availableHeight = screenHeight - 120; // Restar AppBar y espacios
+  final availableHeight = screenHeight - 120; 
   
   return Container(
-    height: availableHeight, // ALTURA DEFINIDA CRUCIAL
+    height: availableHeight,
     decoration: BoxDecoration(
       color: GerenaColors.backgroundColorfondo,
     ),
     child: Column(
-      mainAxisSize: MainAxisSize.min, // IMPORTANTE: Cambiar a min
+      mainAxisSize: MainAxisSize.min, 
       children: [
-        // Header del calendario - altura fija
         _buildCalendarHeader(calendarController),
         
-        // Calendario - usar Expanded en lugar de SizedBox ✅
         Expanded(
-          flex: 6, // 60% del espacio disponible
+          flex: 6,
           child: Obx(() {
             if (kDebugMode) {
               print('Total de citas: ${calendarController.appointments.length}');
@@ -150,7 +145,7 @@ Widget build(BuildContext context) {
                          viewHeaderStyle: ViewHeaderStyle(
                             dayTextStyle: GoogleFonts.rubik(
                               fontSize: 12,
-                              color: Colors.transparent, // Ocultar el header original
+                              color: Colors.transparent, 
                             ),
                           ),
                       monthCellBuilder: (BuildContext context, MonthCellDetails details) {
@@ -179,7 +174,6 @@ Widget build(BuildContext context) {
                     ),
                   ),
                   
-                  // Bordes para ocultar
                   ..._buildBorderOverlays(),
                 ],
               ),
@@ -187,9 +181,8 @@ Widget build(BuildContext context) {
           }),
         ),
         
-        // Citas del día - usar Expanded en lugar de SizedBox ✅
         Expanded(
-          flex: 3, // 30% del espacio disponible
+          flex: 3,
           child: Obx(() => _buildDayAppointments(calendarController, dashboardController)),
         ),
       ],
@@ -235,7 +228,6 @@ Widget build(BuildContext context) {
     ),
     child: Stack(
       children: [
-        // Número del día
         Positioned(
           top: 4,
           left: 6,
@@ -254,10 +246,9 @@ Widget build(BuildContext context) {
                 '${details.date.day}',
                 style: TextStyle(
                   fontSize: 12,
-                  // ✅ Hacer invisible si no es del mes actual
                   color: isCurrentMonth 
                       ? GerenaColors.textPrimaryColor 
-                      : Colors.transparent, // ✅ Transparente para otros meses
+                      : Colors.transparent,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -265,7 +256,6 @@ Widget build(BuildContext context) {
           ),
         ),
         
-        // Indicadores de citas (solo para mes actual)
         if (isCurrentMonth && hasAppointments) ..._buildAppointmentIndicators(details.date),
       ],
     ),
@@ -276,7 +266,6 @@ Widget build(BuildContext context) {
     final appointments = calendarController.getAppointmentsForDate(date);
     
     return [
-      // Contenedor con el nombre de la primera cita
       Positioned(
         top: 32,
         left: 2,
@@ -301,7 +290,6 @@ Widget build(BuildContext context) {
         ),
       ),
       
-      // Tres puntos si hay múltiples citas
       if (appointments.length > 1)
         Positioned(
           bottom: 4,
@@ -345,7 +333,6 @@ Widget build(BuildContext context) {
 
   List<Widget> _buildBorderOverlays() {
     return [
-      // Borde izquierdo
       Positioned(
         left: 0,
         top: 0,
@@ -353,7 +340,6 @@ Widget build(BuildContext context) {
         width: 1,
         child: Container(color: GerenaColors.backgroundColorfondo),
       ),
-      // Borde derecho
       Positioned(
         right: 0,
         top: 0,
@@ -361,7 +347,6 @@ Widget build(BuildContext context) {
         width: 1,
         child: Container(color: GerenaColors.backgroundColorfondo),
       ),
-      // Borde superior
       Positioned(
         left: 0,
         right: 0,
@@ -369,7 +354,6 @@ Widget build(BuildContext context) {
         height: 1,
         child: Container(color: GerenaColors.backgroundColorfondo),
       ),
-      // Borde inferior
       Positioned(
         left: 0,
         right: 0,
@@ -433,7 +417,7 @@ Widget build(BuildContext context) {
 
   Widget _buildCalendarHeader(CalendarControllerGetx controller) {
     return Container(
-      height: 80, // Altura fija para el header
+      height: 80,
       padding: const EdgeInsets.all(16.0),
       child: Obx(() => Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -474,7 +458,7 @@ Widget build(BuildContext context) {
   }
 void _scrollToIndex(int index) {
   if (_scrollController.hasClients) {
-    double itemHeight = 100.0; // Ajusta según la altura real de tus cards
+    double itemHeight = 100.0;
     double targetOffset = index * itemHeight;
     
     _scrollController.animateTo(
@@ -483,7 +467,6 @@ void _scrollToIndex(int index) {
       curve: Curves.easeInOut,
     );
     
-    // Actualizar el índice activo
   }
     calendarController.updateCurrentAppointmentIndex(index);
 
@@ -547,7 +530,7 @@ void _scrollToIndex(int index) {
           const SizedBox(width: 8),
          Expanded(
   child: ListView.builder(
-    controller: _scrollController, // ✅ Agregar controller
+    controller: _scrollController, 
     shrinkWrap: true,
     physics: const BouncingScrollPhysics(),
     itemCount: appointmentsForDay.length,
@@ -720,7 +703,6 @@ void _scrollToIndex(int index) {
   }
 }
 
-// Clase personalizada para manejar las citas en el calendario
 class _AppointmentDataSource extends CalendarDataSource {
   _AppointmentDataSource(List<Appointment> source) {
     appointments = source;

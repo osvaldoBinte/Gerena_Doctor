@@ -48,90 +48,6 @@ class StorePage extends StatelessWidget {
     );
   }
   
-  Widget _buildTopControls() {
-    return Container(
-      height: 30,
-      color: GerenaColors.primaryColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          // Window control buttons
-          Row(
-            children: [
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  width: 14,
-                  height: 14,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          
-          const Spacer(),
-          
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.home, color: Colors.white, size: 20),
-                onPressed: () {},
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 15),
-              IconButton(
-                icon: const Icon(Icons.mail, color: Colors.white, size: 20),
-                onPressed: () {},
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 15),
-              IconButton(
-                icon: const Icon(Icons.notifications, color: Colors.white, size: 20),
-                onPressed: () {},
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 15),
-              const CircleAvatar(
-                radius: 10,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, color: Color(0xFF00535C), size: 14),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
   
  Widget _buildLeftSidebar() {
   return Container(
@@ -157,7 +73,6 @@ class StorePage extends StatelessWidget {
 }
 
   
-  // Helper method for sidebar icons
  Widget _buildSidebarIcon(IconData icon, String tooltip, VoidCallback onPressed) {
   return Tooltip(
     message: tooltip,
@@ -174,7 +89,7 @@ class StorePage extends StatelessWidget {
           icon,
           color: GerenaColors.secondaryColor,
         ),
-        onPressed: onPressed, // ← Aquí usas el callback
+        onPressed: onPressed, 
         padding: EdgeInsets.zero,
         iconSize: 24,
       ),
@@ -184,14 +99,12 @@ class StorePage extends StatelessWidget {
 
 
   
-  // Header with logo and search
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Gerena logo
           Center(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -219,20 +132,17 @@ class StorePage extends StatelessWidget {
     );
   }
   
-  // Main content with offers, catalog, and categories side by side
   Widget _buildMainContent() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left column: Offers and Catalog
           Expanded(
             flex: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Offers Section
                 Text(
                   'OFERTAS DE PRIMAVERA',
                   style: TextStyle(
@@ -243,7 +153,6 @@ class StorePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 
-                // Products Grid for offers
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -268,7 +177,6 @@ class StorePage extends StatelessWidget {
                 
                 const SizedBox(height: 24),
                 
-                // Catalog Section
                 Text(
                   'CATÁLOGO',
                   style: TextStyle(
@@ -279,7 +187,6 @@ class StorePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 
-                // Products Grid for catalog
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -315,7 +222,6 @@ class StorePage extends StatelessWidget {
           
           const SizedBox(width: 24),
           
-          // Right column: Categories
           Container(
             width: 200,
             padding: const EdgeInsets.all(16),
@@ -337,7 +243,6 @@ class StorePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 
-                // Categories checkboxes
                 Obx(() => Column(
                   children: controller.categories.map((category) {
                     return CheckboxListTile(
@@ -357,7 +262,7 @@ class StorePage extends StatelessWidget {
                 
                 const SizedBox(height: 16),
                 
-                // Filter button
+               
                 ElevatedButton(
                   onPressed: controller.filterProducts,
                   style: ElevatedButton.styleFrom(
@@ -374,7 +279,6 @@ class StorePage extends StatelessWidget {
                 
                 const SizedBox(height: 8),
                 
-                // Clear button
                 ElevatedButton(
                   onPressed: controller.clearFilters,
                   style: ElevatedButton.styleFrom(
@@ -396,7 +300,6 @@ class StorePage extends StatelessWidget {
     );
   }
   
-  // Custom product card that matches the design in the image
   Widget _buildProductCard(Map<String, String> product) {
     return Container(
       decoration: BoxDecoration(
@@ -413,11 +316,9 @@ class StorePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Product image background
           Expanded(
             child: Stack(
               children: [
-                // Background pattern
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -428,7 +329,6 @@ class StorePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Product image
                 Center(
                   child: Image.asset(
                     product['image']!,
@@ -436,7 +336,6 @@ class StorePage extends StatelessWidget {
                     fit: BoxFit.contain,
                   ),
                 ),
-                // Info button overlay
                 Positioned(
                   bottom: 5,
                   right: 5,
@@ -458,7 +357,6 @@ class StorePage extends StatelessWidget {
             ),
           ),
           
-          // Product info
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -496,7 +394,6 @@ class StorePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Button with transparent bg and green text
                 InkWell(
                   onTap: () {},
                   child: Container(

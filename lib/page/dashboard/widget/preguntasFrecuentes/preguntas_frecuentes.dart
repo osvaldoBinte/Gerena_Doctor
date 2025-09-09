@@ -21,7 +21,6 @@ class PreguntasFrecuentes extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            // Título principal
             Text(
               'Preguntas frecuentes',
               style: GerenaColors.headingLarge.copyWith(fontSize: 22),
@@ -29,7 +28,6 @@ class PreguntasFrecuentes extends StatelessWidget {
             
             const SizedBox(height: 24),
             
-            // Lista de preguntas y respuestas
             _buildFAQItem(
               question: '¿Cómo puedo realizar un pedido de productos?',
               answer: 'Desde tu portafolio de inicio puedes acceder al catálogo de Gerena haciendo clic en el botón "Catálogo" o directamente en la imagen "representativa del producto que deseas comprar.\n\nUna vez dentro del catálogo puedes ir agregando los productos que necesitas al carrito de compras. En cualquier momento, puedes hacer clic en el icono del carrito para continuar con tu compra, confirmar los productos seleccionados y la dirección de entrega.\n\nAl finalizar, se te brindará un número de folio para que puedas dar seguimiento a tu pedido y realizar tu facturación correspondiente.',
@@ -79,7 +77,6 @@ class PreguntasFrecuentes extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Pregunta
           Text(
             question,
             style: GerenaColors.headingSmall.copyWith(
@@ -90,7 +87,6 @@ class PreguntasFrecuentes extends StatelessWidget {
           
           const SizedBox(height: 12),
           
-          // Respuesta
           RichText(
             text: TextSpan(
               style: GerenaColors.bodyMedium.copyWith(
@@ -113,7 +109,6 @@ class PreguntasFrecuentes extends StatelessWidget {
       ];
     }
     
-    // Para la respuesta que tiene un link
     final parts = answer.split('click aquí');
     if (parts.length == 2) {
       return [
@@ -137,7 +132,6 @@ class PreguntasFrecuentes extends StatelessWidget {
     return [TextSpan(text: answer)];
   }
 
-  // Función para navegar a membresía
   void _navigateToMembresia() {
     try {
       if (!Get.isRegistered<DashboardController>()) {

@@ -2,27 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class BlogController extends ChangeNotifier {
-  // Estados privados para BlogGerena
   bool _showBlogSocial = false;
   bool _showArticleDetail = false;
   Map<String, String>? _selectedArticle;
 
-  // Estados privados para BlogSocial
   bool _showQuestions = false;
   bool _showSocialArticleDetail = false;
   String _selectedQuestionTitle = '';
   List<Map<String, String>> _selectedAnswers = [];
   Map<String, String>? _selectedSocialArticle;
 
-  // Controlador del carrusel
   final CarouselSliderController _carouselController = CarouselSliderController();
 
-  // Getters públicos para BlogGerena
   bool get showBlogSocial => _showBlogSocial;
   bool get showArticleDetail => _showArticleDetail;
   Map<String, String>? get selectedArticle => _selectedArticle;
 
-  // Getters públicos para BlogSocial
   bool get showQuestions => _showQuestions;
   bool get showSocialArticleDetail => _showSocialArticleDetail;
   String get selectedQuestionTitle => _selectedQuestionTitle;
@@ -30,44 +25,35 @@ class BlogController extends ChangeNotifier {
   Map<String, String>? get selectedSocialArticle => _selectedSocialArticle;
   CarouselSliderController get carouselController => _carouselController;
 
-  // Métodos para BlogGerena
-  // Método para cambiar a Blog Social
   void showBlogSocialSection() {
     _showBlogSocial = true;
     _showArticleDetail = false;
     _selectedArticle = null;
-    // Limpiar estados de BlogSocial
     _resetBlogSocialState();
     notifyListeners();
   }
 
-  // Método para cambiar a Blog Gerena
   void showBlogGerenaSection() {
     _showBlogSocial = false;
     _showArticleDetail = false;
     _selectedArticle = null;
-    // Limpiar estados de BlogSocial
     _resetBlogSocialState();
     notifyListeners();
   }
 
-  // Método para mostrar detalle de artículo en BlogGerena
   void showArticleDetailView(Map<String, String> article) {
     _showArticleDetail = true;
     _selectedArticle = article;
-    _showBlogSocial = false; // Asegurar que estemos en Blog Gerena
+    _showBlogSocial = false;
     notifyListeners();
   }
 
-  // Método para regresar de detalle de artículo en BlogGerena
   void goBackFromArticleDetail() {
     _showArticleDetail = false;
     _selectedArticle = null;
     notifyListeners();
   }
 
-  // Métodos para BlogSocial
-  // Método para mostrar detalle de pregunta
   void showQuestionDetail(String questionTitle, List<Map<String, String>> answers) {
     _showQuestions = true;
     _showSocialArticleDetail = false;
@@ -76,7 +62,6 @@ class BlogController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Método para mostrar detalle de artículo social
   void showSocialArticleDetails(Map<String, String> article) {
     _showQuestions = false;
     _showSocialArticleDetail = true;
@@ -84,7 +69,6 @@ class BlogController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Método para regresar al contenido principal de BlogSocial
   void goBackToBlogSocial() {
     _showQuestions = false;
     _showSocialArticleDetail = false;
@@ -92,7 +76,6 @@ class BlogController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Método privado para limpiar estados de BlogSocial
   void _resetBlogSocialState() {
     _showQuestions = false;
     _showSocialArticleDetail = false;
@@ -101,7 +84,6 @@ class BlogController extends ChangeNotifier {
     _selectedSocialArticle = null;
   }
 
-  // Método para limpiar todo el estado
   void resetState() {
     _showBlogSocial = false;
     _showArticleDetail = false;
@@ -110,7 +92,6 @@ class BlogController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Datos de artículos principales (secciones del blog)
   List<Map<String, String>> getBlogSectionArticles() {
     return [
       {
@@ -130,40 +111,39 @@ class BlogController extends ChangeNotifier {
     ];
   }
 
-  // Datos de artículos recientes
   List<Map<String, String>> getRecentArticles() {
     return [
       {
         'title': 'El libro de medicina estética más completo creado hasta ahora',
-        'content': 'Un compendio de libros más completo sobre medicina estética, con técnicas innovadoras y procedimientos actualizados para profesionales de la salud.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
         'date': '28/03/2024',
         'author': 'Editorial Gerena',
       },
       {
         'title': 'Nuevas las complicaciones frecuentes ocasionadas en una piel sensible: líneas temporales',
-        'content': 'Las complicaciones más frecuentes en pieles sensibles y cómo tratarlas adecuadamente con los productos correctos.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
         'date': '28/03/2024',
         'author': 'Dra. Dermatología',
       },
       {
         'title': 'Botox Gerena: todo un éxito en nuestro Centro Odontológico',
-        'content': 'El Botox Gerena se ha convertido en uno de nuestros tratamientos más solicitados por sus excelentes resultados.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
         'date': '28/03/2024',
         'author': 'Centro Gerena',
       },
       {
         'title': 'Ácido hialurónico en Centro Técnica Lengua y Odontología',
-        'content': 'El tratamiento de ácido hialurónico en nuestro centro ofrece resultados naturales y duraderos para el rejuvenecimiento facial.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
         'date': '28/03/2024',
         'author': 'Dr. Estética',
       },
       {
         'title': 'Nutrición Estética: Cómo lograr tratamientos naturales y beneficiosos',
-        'content': 'Una nutrición adecuada enriquece los resultados de los tratamientos estéticos y promueve una belleza natural desde adentro.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
         'date': '28/03/2024',
         'author': 'Dra. Nutrición Estética',
@@ -171,8 +151,6 @@ class BlogController extends ChangeNotifier {
     ];
   }
 
-  // Datos específicos para BlogSocial
-  // Datos de preguntas del carrusel
   List<Map<String, dynamic>> getCarouselQuestions() {
     return [
       {
@@ -193,7 +171,6 @@ class BlogController extends ChangeNotifier {
     ];
   }
 
-  // Respuestas para las preguntas
   List<Map<String, String>> getAnswersForQuestion1() {
     return [
       {
@@ -211,34 +188,32 @@ class BlogController extends ChangeNotifier {
     ];
   }
 
-  // Datos de artículos sociales
   List<Map<String, String>> getSocialArticles() {
     return [
       {
         'title': 'Experiencias de pacientes: testimonios reales',
-        'content': 'Descubre las experiencias reales de nuestros pacientes y cómo han transformado su vida. En este artículo exploramos casos de éxito y las lecciones aprendidas en el proceso de acompañamiento durante los tratamientos de medicina estética.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
-        'date': 'Blog Social - Hace 1 día',
+        'date': 'Hace 1 día',
         'author': 'Dr. María González',
       },
       {
         'title': 'Comunidad médica: intercambio de conocimientos',
-        'content': 'Un espacio para que profesionales compartan conocimientos y experiencias. La colaboración entre colegas es fundamental para el crecimiento profesional y la mejora continua en nuestros tratamientos.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
-        'date': 'Blog Social - Hace 2 días',
+        'date': '28/03/2024',
         'author': 'Dr. Carlos Méndez',
       },
       {
         'title': 'Tendencias en medicina estética 2024',
-        'content': 'Las últimas tendencias y técnicas en el mundo de la medicina estética. Exploramos las innovaciones más recientes y cómo están transformando la manera en que abordamos los tratamientos.',
+        'content': 'Si algo he aprendido en mi práctica como médico estético es que la clave para construir relaciones duraderas con mis pacientes no está solo en los resultados visibles, sino en cómo los acompaño durante todo el proceso. Hoy quiero compartirte cómo la educación y la transparencia han sido mis mejores herramientas para fidelizar pacientes y generar una relación de confianza real. Caso 1: Decir “no” también construye confianza Una paciente joven llegó solicitando un aumento de labios con volumen exagerado. Aunque técnicamente podía hacerlo, sentí que no era lo adecuado para su armonía facial. Le mostré ejemplos, le expliqué los riesgos estéticos a largo plazo y le ofrecí una alternativa más natural. Al principio dudó, pero semanas después regresó. Aceptó el tratamiento sugerido, quedó encantada con el resultado… y hoy es una de mis pacientes más leales. Me recomienda constantemente porque, según ella, “fui el primero que no buscó venderle algo, sino orientarla. Caso 2: El poder del antes y después explicado Otro caso que recuerdo bien es el de un paciente que no notaba los cambios tras su tratamiento de toxina botulínica. En lugar de entrar en defensiva, le mostré sus fotos clínicas comparativas, le expliqué qué músculos habían sidotratados y cómo eso influía en la expresión. Cuando entendió el proceso, no solo quedó conforme, sino que comenzó a valorar más cada detalle del tratamiento. Hoy sigue confiando en mí y siempre pide que le muestre su evolución en cada sesión. Mi enfoque: educar, explicar, acompañar Creo firmemente que parte de nuestro rol como médicos estéticos es educar al paciente: explicarle qué necesita, qué no necesita, y por qué. Incluso cuando eso signifique rechazar un procedimiento o corregir expectativas poco realistas. La transparencia genera respeto, y el respeto se convierte en fidelidad. Fidelizar a un paciente no se trata de convencer, sino de acompañar con criterio, empatía y conocimiento. La educación es una forma de cuidado. Y cuando los pacientes lo sienten, siempre vuelven',
         'image': 'assets/blog/example.png',
-        'date': 'Blog Social - Hace 3 días',
+        'date': '28/03/2024',
         'author': 'Dra. Ana Rodríguez',
       },
     ];
   }
 
-  // Método para obtener contenido específico según el tipo de artículo
   String getArticleType(String title) {
     if (title.contains('Periodontitis')) {
       return 'periodontitis';

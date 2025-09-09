@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
-import 'package:gerena/page/dashboard/widget/portafolio/mediacontroller/media_controller.dart';
+import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
@@ -17,8 +18,7 @@ class DoctorProfileContent extends StatefulWidget {
 class _DoctorProfileContentState extends State<DoctorProfileContent> {
   final TextEditingController _reviewController = TextEditingController();
   final appBarController = Get.put(GerenaAppBarController());
-  bool _isBookmarked = false;
-  int _selectedStars = 0;
+
     final MediaController mediaController = Get.put(MediaController());
 
   @override
@@ -39,7 +39,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
             'Compartir tus procedimientos',
             style: GerenaColors.headingSmall,
           ),
-          _buildProceduresSection(),
+          ShareProcedureWidget(mediaController: mediaController,),
           const SizedBox(height: 16),
           _buildBeforeAfterSection(),
           const SizedBox(height: 16),
@@ -65,7 +65,6 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Foto del doctor con esquinas redondeadas
             Container(
               width: 100,
               height: 120,
@@ -101,12 +100,10 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
             
             const SizedBox(width: 16),
             
-            // Información del doctor
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nombre del doctor con check de verificación
                   Row(
                     children: [
                       Expanded(
@@ -138,7 +135,6 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                   
                   const SizedBox(height: 6),
                   
-                  // Especialidad
                   Text(
                     'Cirujano estético',
                     style: GerenaColors.subtitleMedium.copyWith(
@@ -149,7 +145,6 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                   
                   const SizedBox(height: 8),
                   
-                  // Dirección de la clínica
                   Text(
                     'Clínica estética Gerena. Col. Providencia, Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
                     style: GerenaColors.bodySmall.copyWith(
@@ -163,7 +158,6 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                   
                   const SizedBox(height: 8),
                   
-                  // Cédula profesional
                   Text(
                     'Cédula: 010101 10101 0101041',
                     style: GerenaColors.bodySmall.copyWith(
@@ -175,10 +169,9 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                   
                   const SizedBox(height: 8),
                   
-                  // Rating con estrellas
                   Row(
                     children: [
-                      _buildStarRating(5.0), // 5 estrellas llenas como en la imagen
+                      _buildStarRating(5.0), 
                       const SizedBox(width: 8),
                       Text(
                         '404 Reseñas',
@@ -202,415 +195,6 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
     ),
   );
 }
-
- Widget _buildProceduresSection() {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: GerenaColors.cardDecoration,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Layout responsive con MediaQuery
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final isSmallScreen = constraints.maxWidth < 800;
-            
-            if (isSmallScreen) {
-              // Layout vertical para pantallas pequeñas
-              return Column(
-                children: [
-                  _buildDescriptionContainer(),
-                  const SizedBox(height: 12),
-                  _buildMediaContainer(mediaController),
-                  const SizedBox(height: 16),
-                  // Botón en pantallas pequeñas ocupa todo el ancho
-                  SizedBox(
-                    width: double.infinity,
-                    child: GerenaColors.widgetButton(
-                      onPressed: () {
-                        print('Guardando certificaciones');
-                      },
-                      text: 'GUARDAR',
-                  showShadow: false, 
-                borderRadius: 5,
-                     
-                    ),
-                  ),
-                ],
-              );
-            } else {
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: _buildDescriptionContainer(),
-                      ),
-                      
-                      const SizedBox(width: 16),
-                      
-                      Expanded(
-                        flex: 1,
-                        child: _buildMediaContainer(mediaController),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 4),
-                  
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                     GerenaColors.widgetButton(
-                      onPressed: () {
-                        print('Guardando certificaciones');
-                      },
-                      text: 'GUARDAR',
-                  showShadow: false, 
-                borderRadius: 5,
-                     
-                    ),
-                    ],
-                  ),
-                ],
-              );
-            }
-          },
-        ),
-      ],
-    ),
-  );
-}
-
-// Contenedor de descripción separado
-Widget _buildDescriptionContainer() {
-  return Container(
-    width: double.infinity,
-    
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-       
-        TextField(
-          maxLines: 5,
-          decoration: InputDecoration(
-            hintText: 'Escribe aquí los detalles del procedimiento...',
-            hintStyle: GerenaColors.bodySmall.copyWith(
-              color: GerenaColors.textSecondaryColor.withOpacity(0.7),
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: GerenaColors.smallBorderRadius,
-              borderSide: BorderSide(color: Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: GerenaColors.smallBorderRadius,
-              borderSide: BorderSide(color: GerenaColors.accentColor, width: 1.5),
-            ),
-            contentPadding: const EdgeInsets.all(12),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-// Contenedor de medios separado_ buildMediaContainer
- Widget _buildMediaContainer(MediaController controller) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: GerenaColors.smallBorderRadius,
-        border: Border.all(
-          color: GerenaColors.textSecondaryColor.withOpacity(0.3),
-          style: BorderStyle.solid,
-          width: 1,
-        ),
-      ),
-      child: Obx(() => Column(
-        children: [
-          // Título con icono
-         
-          
-          const SizedBox(height: 16),
-          
-          // Loading indicator
-          if (controller.isLoading.value)
-            const CircularProgressIndicator()
-          else
-            // Mostrar vista previa o botón de agregar
-            !controller.hasFiles
-                ? _buildAddButton(controller)
-                : _buildPreviewSection(controller),
-          
-          const SizedBox(height: 12),
-          
-          if (controller.hasFiles && !controller.isLoading.value)
-            _buildAddMoreButton(controller),
-          
-         
-          
-          const SizedBox(height: 8),
-          
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Agregar fotos / videos',
-                style: GerenaColors.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: GerenaColors.textPrimaryColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      )),
-    );
-  } Widget _buildAddButton(MediaController controller) {
-  return GestureDetector(
-    onTap: controller.pickFiles,
-    child: Icon(
-      Icons.add_box_rounded,
-      size: 50,
-    ),
-  );
-}
-
-
-  // Botón para agregar más archivos
-  Widget _buildAddMoreButton(MediaController controller) {
-    return GestureDetector(
-      onTap: controller.pickFiles,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: GerenaColors.accentColor,
-          borderRadius: GerenaColors.smallBorderRadius,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.add, color: Colors.white, size: 16),
-            const SizedBox(width: 4),
-            Text(
-              'Agregar más',
-              style: GerenaColors.bodySmall.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-   Widget _buildPreviewSection(MediaController controller) {
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 300),
-      child: SingleChildScrollView(
-        child: Obx(() => Column(
-          children: [
-            // Vista previa de imágenes
-            if (controller.hasImages) _buildImagesPreview(controller),
-            
-            // Separador
-            if (controller.hasImages && controller.hasVideos)
-              const SizedBox(height: 16),
-            
-            // Vista previa de videos
-            if (controller.hasVideos) _buildVideosPreview(controller),
-          ],
-        )),
-      ),
-    );
-  }// Vista previa de imágenes
-  Widget _buildImagesPreview(MediaController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.image, color: GerenaColors.accentColor, size: 16),
-            const SizedBox(width: 4),
-            Obx(() => Text(
-              'Imágenes (${controller.selectedImages.length})',
-              style: GerenaColors.bodySmall.copyWith(
-                fontWeight: FontWeight.w600,
-                color: GerenaColors.textPrimaryColor,
-              ),
-            )),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Obx(() => GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-            childAspectRatio: 1,
-          ),
-          itemCount: controller.selectedImages.length,
-          itemBuilder: (context, index) {
-            return _buildImagePreviewItem(
-              controller.selectedImages[index], 
-              index, 
-              controller,
-            );
-          },
-        )),
-      ],
-    );
-  }
-
-  // Vista previa de videos
-  Widget _buildVideosPreview(MediaController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.videocam, color: GerenaColors.accentColor, size: 16),
-            const SizedBox(width: 4),
-            Obx(() => Text(
-              'Videos (${controller.selectedVideos.length})',
-              style: GerenaColors.bodySmall.copyWith(
-                fontWeight: FontWeight.w600,
-                color: GerenaColors.textPrimaryColor,
-              ),
-            )),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Obx(() => ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: controller.selectedVideos.length,
-          itemBuilder: (context, index) {
-            return _buildVideoPreviewItem(
-              controller.selectedVideos[index], 
-              index, 
-              controller,
-            );
-          },
-        )),
-      ],
-    );
-  }
-  Widget _buildImagePreviewItem(File imageFile, int index, MediaController controller) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: GerenaColors.smallBorderRadius,
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: GerenaColors.smallBorderRadius,
-            child: Image.file(
-              imageFile,
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[200],
-                  child: Icon(Icons.broken_image, color: Colors.grey[400]),
-                );
-              },
-            ),
-          ),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: GestureDetector(
-              onTap: () => controller.removeImage(index),
-                child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  'assets/icons/close.png',
-                 
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }Widget _buildVideoPreviewItem(File videoFile, int index, MediaController controller) {
-    String fileName = videoFile.path.split(Platform.pathSeparator).last;
-    
-    return FutureBuilder<Map<String, dynamic>>(
-      future: controller.getFileInfo(videoFile),
-      builder: (context, snapshot) {
-        double mb = 0;
-        if (snapshot.hasData) {
-          mb = snapshot.data!['sizeMB'] ?? 0;
-        }
-        
-        return Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: GerenaColors.smallBorderRadius,
-            border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: GerenaColors.accentColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.play_circle_fill, color: GerenaColors.accentColor, size: 24),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      fileName,
-                      style: GerenaColors.bodySmall.copyWith(fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${mb.toStringAsFixed(1)} MB',
-                      style: GerenaColors.bodySmall.copyWith(
-                        color: GerenaColors.textSecondaryColor,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () => controller.removeVideo(index),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  child: Icon(Icons.delete_outline, color: Colors.red[400], size: 18),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildBeforeAfterSection() {
     return Row(
@@ -670,11 +254,11 @@ Widget _buildDescriptionContainer() {
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 12),
-       // Opción 1: Ancho fijo para cada imagen
+  
 Row(
   children: images.map((imagePath) {
     return Container(
-      width: 120, // Ancho fijo
+      width: 120, 
       height: 100,
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
@@ -687,7 +271,7 @@ Row(
           imagePath,
           width: 120,
           height: 100,
-          fit: BoxFit.cover, // Mantiene proporciones y llena el contenedor
+          fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             print('Error cargando imagen: $imagePath - $error');
             return Container(
@@ -818,11 +402,10 @@ Row(
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
-          // Opción 1: Ancho fijo para cada imagen
 Row(
   children: images.map((imagePath) {
     return Container(
-      width: 120, // Ancho fijo
+      width: 120,
       height: 100,
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
@@ -835,7 +418,7 @@ Row(
           imagePath,
           width: 120,
           height: 100,
-          fit: BoxFit.cover, // Mantiene proporciones y llena el contenedor
+          fit: BoxFit.cover, 
           errorBuilder: (context, error, stackTrace) {
             print('Error cargando imagen: $imagePath - $error');
             return Container(
@@ -902,35 +485,4 @@ Row(
 
  
 
-
-  void _submitReview() {
-    // Aquí iría la lógica para enviar la reseña
-    setState(() {
-      _reviewController.clear();
-      _selectedStars = 0;
-    });
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Reseña publicada exitosamente'),
-        backgroundColor: GerenaColors.successColor,
-      ),
-    );
-  }
-
-  void _showErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Error', style: GerenaColors.headingSmall.copyWith(color: GerenaColors.errorColor)),
-        content: Text('Por favor, selecciona una calificación y escribe una reseña.', style: GerenaColors.bodyMedium),
-        actions: [
-          GerenaColors.createPrimaryButton(
-            text: 'Entendido',
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
-  }
 }

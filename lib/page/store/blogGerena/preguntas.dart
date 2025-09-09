@@ -13,7 +13,6 @@ class DialogoAbierto extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título de la sección
             Text(
               'Diálogo Abierto',
               style: GerenaColors.headingLarge.copyWith(
@@ -23,7 +22,6 @@ class DialogoAbierto extends StatelessWidget {
             
             const SizedBox(height: 16),
             
-            // Pregunta inicial
             _buildQuestionCard(
               context: context,
               doctorName: "Dr. Juan González",
@@ -33,7 +31,6 @@ class DialogoAbierto extends StatelessWidget {
             ),
             const SizedBox(height: GerenaColors.paddingMedium),
             
-            // Respuestas dinámicas
             ...controller.selectedAnswers.map((answer) => Column(
               children: [
                 const SizedBox(height: 10),
@@ -75,7 +72,6 @@ class DialogoAbierto extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Avatar del doctor
             Container(
               width: 60,
               height: 60,
@@ -90,12 +86,10 @@ class DialogoAbierto extends StatelessWidget {
             
             const SizedBox(width: GerenaColors.paddingMedium),
             
-            // Contenido de la pregunta
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nombre del doctor
                   Text(
                     doctorName,
                     style: GerenaColors.headingSmall.copyWith(
@@ -106,7 +100,6 @@ class DialogoAbierto extends StatelessWidget {
                   
                   const SizedBox(height: 8),
                   
-                  // Pregunta
                   Text(
                     question,
                     style: GerenaColors.bodyMedium.copyWith(
@@ -117,7 +110,6 @@ class DialogoAbierto extends StatelessWidget {
                   if (showRespondButton) ...[
                     const SizedBox(height: GerenaColors.paddingMedium),
                     
-                    // Botón responder
                     Align(
                       alignment: Alignment.centerRight,
                       child: GerenaColors.createPrimaryButton(
@@ -147,7 +139,6 @@ class DialogoAbierto extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Avatar del doctor
             Container(
               width: 60,
               height: 60,
@@ -162,12 +153,10 @@ class DialogoAbierto extends StatelessWidget {
             
             const SizedBox(width: GerenaColors.paddingMedium),
             
-            // Contenido de la respuesta
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nombre del doctor
                   Text(
                     doctorName,
                     style: GerenaColors.headingSmall.copyWith(
@@ -178,7 +167,6 @@ class DialogoAbierto extends StatelessWidget {
                   
                   const SizedBox(height: 8),
                   
-                  // Respuesta
                   Text(
                     answer,
                     style: GerenaColors.bodyMedium.copyWith(
@@ -195,9 +183,7 @@ class DialogoAbierto extends StatelessWidget {
     );
   }
 
-  // Método privado para mostrar el diálogo de respuesta
   void _showResponseDialog(BuildContext context) async {
-    String respuesta = '';
     
     await showDialog(
       context: context,
@@ -235,11 +221,9 @@ class DialogoAbierto extends StatelessWidget {
             GerenaColors.createPrimaryButton(
               text: "ENVIAR",
               onPressed: () {
-                // Aquí puedes manejar el envío de la respuesta
-                // Por ejemplo, podrías agregar un método al controlador para enviar respuestas
+               
                 Navigator.of(context).pop();
                 
-                // Opcional: Mostrar snackbar de confirmación
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Respuesta enviada correctamente'),

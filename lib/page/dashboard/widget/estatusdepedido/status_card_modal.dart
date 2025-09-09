@@ -37,7 +37,6 @@ import 'package:get/get.dart';
                   return Transform.translate(
                     offset: Offset(0, offset.dy * MediaQuery.of(context).size.height),
                     child: Transform.scale(
-                      // Escala responsiva
                       scale: MediaQuery.of(context).size.width < 800 ? 0.9 : 0.8,
                       child: child,
                     ),
@@ -57,7 +56,7 @@ import 'package:get/get.dart';
                         constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width < 800 
                               ? MediaQuery.of(context).size.width * 0.85
-                              : 400, // Ancho máximo del contenido
+                              : 400, 
                         ),
                         child: StatusCardWidget(),
                       ),

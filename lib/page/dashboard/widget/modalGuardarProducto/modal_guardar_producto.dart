@@ -18,7 +18,6 @@ class ModalGuardarProducto extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header con título y botón cerrar
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -51,13 +50,11 @@ class ModalGuardarProducto extends StatelessWidget {
               ),
             ),
             
-            // Contenido del modal
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Opciones de frecuencia
                   Row(
                     children: [
                       Expanded(child: _buildFrequencyOption('Semanal', false)),
@@ -72,7 +69,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   
                   const SizedBox(height: 24),
                   
-                  // Fecha de inicio
                   Text(
                     'FECHA DE INICIO',
                     style: GerenaColors.bodyMedium.copyWith(
@@ -85,7 +81,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   
                   const SizedBox(height: 20),
                   
-                  // Método de pago
                   Text(
                     'MÉTODO DE PAGO',
                     style: GerenaColors.bodyMedium.copyWith(
@@ -98,7 +93,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   
                   const SizedBox(height: 20),
                   
-                  // Dirección de entrega
                   Text(
                     'DIRECCIÓN DE ENTREGA',
                     style: GerenaColors.bodyMedium.copyWith(
@@ -108,7 +102,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   
-                  // Dirección principal seleccionada
                   _buildAddressOption(
                     name: 'Juan Pedro Gonzalez Perez +52 3333303333',
                     address: 'Col. Providencia, Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
@@ -118,7 +111,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   
                   const SizedBox(height: 12),
                   
-                  // Dirección alternativa
                   _buildAddressOption(
                     name: 'En sucursal',
                     address: 'Col. Lorem ipsum Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
@@ -127,7 +119,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   
                   const SizedBox(height: 24),
                   
-                  // Opciones finales
                   Row(
                     children: [
                       Expanded(
@@ -168,7 +159,6 @@ class ModalGuardarProducto extends StatelessWidget {
                   
                   const SizedBox(height: 24),
                   
-                  // Botón programar pedido
                   Align(
                     alignment: Alignment.centerRight,
                     child: SizedBox(
@@ -296,7 +286,6 @@ class ModalGuardarProducto extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Checkbox
           Container(
             width: 20,
             height: 20,
@@ -312,7 +301,6 @@ class ModalGuardarProducto extends StatelessWidget {
           
           const SizedBox(width: 12),
           
-          // Información de dirección
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +324,6 @@ class ModalGuardarProducto extends StatelessWidget {
             ),
           ),
           
-          // Icono de editar (solo para la dirección seleccionada)
           if (hasEditIcon)
             Container(
               padding: const EdgeInsets.all(4),
@@ -384,7 +371,6 @@ class ModalGuardarProducto extends StatelessWidget {
     );
   }
 
-  // Método estático para mostrar el modal
   static void show(BuildContext context) {
     showDialog(
       context: context,

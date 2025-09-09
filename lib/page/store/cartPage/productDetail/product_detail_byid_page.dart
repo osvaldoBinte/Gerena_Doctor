@@ -7,86 +7,74 @@ import 'product_detail_controller.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final Map<String, String> product;
-  
+
   const ProductDetailPage({
-    Key? key, 
+    Key? key,
     required this.product,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Inicializar el controlador
     final controller = Get.put(ProductDetailController());
-    
+
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorfondo,
-     
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Container principal que contiene el detalle del producto
             Container(
               margin: EdgeInsets.all(16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Contenedor para la imagen del producto (izquierda)
                   Expanded(
                     flex: 1,
                     child: ProductImageSection(
-                      product: product, 
+                      product: product,
                       controller: controller,
                     ),
                   ),
-                  
                   SizedBox(width: 16),
-                  
-                  // Contenedor para la información del producto (derecha)
                   Expanded(
                     flex: 2,
                     child: ProductInfoSection(
-                      product: product, 
+                      product: product,
                       controller: controller,
                     ),
                   ),
                 ],
               ),
             ),
-            
             const SizedBox(height: 16),
-            
-           // Productos relacionados
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Divider(
-        color: GerenaColors.primaryColor.withOpacity(0.3),
-        thickness: 1,
-      ),
-      const SizedBox(height: 8),
-      Row(
-        children: [
-          Icon(Icons.sync_alt, color: GerenaColors.primaryColor),
-          const SizedBox(width: 8),
-          Text(
-            'PRODUCTOS RELACIONADOS',
-            style: TextStyle(
-              color: GerenaColors.primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(
+                    color: GerenaColors.primaryColor.withOpacity(0.3),
+                    thickness: 1,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.sync_alt, color: GerenaColors.primaryColor),
+                      const SizedBox(width: 8),
+                      Text(
+                        'PRODUCTOS RELACIONADOS',
+                        style: TextStyle(
+                          color: GerenaColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    ],
-  ),
-),
             const SizedBox(height: 8),
-            
-            // Carousel para productos relacionados
             RelatedProductsCarousel(),
           ],
         ),
@@ -98,17 +86,17 @@ Padding(
 class ProductImageSection extends StatelessWidget {
   final Map<String, String> product;
   final ProductDetailController controller;
-  
+
   const ProductImageSection({
     Key? key,
     required this.product,
     required this.controller,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 550, // Ajustar altura para que coincida aproximadamente con la sección de info
+      height: 550,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
@@ -129,50 +117,48 @@ class ProductImageSection extends StatelessWidget {
 
 class ProductImageCarousel extends StatelessWidget {
   final ProductDetailController controller;
-  
+
   const ProductImageCarousel({
     Key? key,
     required this.controller,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Carrusel de imágenes
         Obx(() => CarouselSlider(
-          carouselController: controller.carouselController,
-          options: CarouselOptions(
-            height: 550, // Ajustar altura para ocupar todo el container padre
-            viewportFraction: 1.0,
-            enlargeCenterPage: false,
-            enableInfiniteScroll: true,
-            onPageChanged: controller.onImageChanged,
-          ),
-          items: controller.productImages.map((imagePath) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/tienda-producto.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      imagePath,
-                      height: 300,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
+              carouselController: controller.carouselController,
+              options: CarouselOptions(
+                height: 550,
+                viewportFraction: 1.0,
+                enlargeCenterPage: false,
+                enableInfiniteScroll: true,
+                onPageChanged: controller.onImageChanged,
+              ),
+              items: controller.productImages.map((imagePath) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/tienda-producto.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          imagePath,
+                          height: 300,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-          }).toList(),
-        )),
-        
+              }).toList(),
+            )),
         Positioned(
           left: 0,
           top: 0,
@@ -213,28 +199,26 @@ class ProductImageCarousel extends StatelessWidget {
             onPressed: controller.nextImage,
           ),
         ),
-        
-        // Indicadores
         Positioned(
           bottom: 10,
           left: 0,
           right: 0,
           child: Obx(() => Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: controller.productImages.asMap().entries.map((entry) {
-              return Container(
-                width: 8.0,
-                height: 8.0,
-                margin: EdgeInsets.symmetric(horizontal: 4.0),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: controller.currentImageIndex.value == entry.key
-                      ? GerenaColors.secondaryColor
-                      : Colors.grey.withOpacity(0.5),
-                ),
-              );
-            }).toList(),
-          )),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: controller.productImages.asMap().entries.map((entry) {
+                  return Container(
+                    width: 8.0,
+                    height: 8.0,
+                    margin: EdgeInsets.symmetric(horizontal: 4.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: controller.currentImageIndex.value == entry.key
+                          ? GerenaColors.secondaryColor
+                          : Colors.grey.withOpacity(0.5),
+                    ),
+                  );
+                }).toList(),
+              )),
         ),
       ],
     );
@@ -244,13 +228,13 @@ class ProductImageCarousel extends StatelessWidget {
 class ProductInfoSection extends StatelessWidget {
   final Map<String, String> product;
   final ProductDetailController controller;
-  
+
   const ProductInfoSection({
     Key? key,
     required this.product,
     required this.controller,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -269,7 +253,6 @@ class ProductInfoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Categoría
           Text(
             'Categoría: Toxina Botulínica Tipo A',
             style: TextStyle(
@@ -277,10 +260,7 @@ class ProductInfoSection extends StatelessWidget {
               fontSize: 14,
             ),
           ),
-          
           const SizedBox(height: 8),
-          
-          // Título del producto
           Text(
             product['name'] ?? 'MD COLAGENASA',
             style: TextStyle(
@@ -289,10 +269,7 @@ class ProductInfoSection extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          
           const SizedBox(height: 12),
-          
-          // Precio
           Text(
             product['price'] ?? '1,000.00 MXN',
             style: TextStyle(
@@ -301,10 +278,7 @@ class ProductInfoSection extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          
           const SizedBox(height: 4),
-          
-          // Descuento
           Text(
             '4 X \$8,400.00 MXN',
             style: TextStyle(
@@ -312,15 +286,9 @@ class ProductInfoSection extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          
           const SizedBox(height: 16),
-          
-          // Línea divisora
           Divider(),
-          
           const SizedBox(height: 8),
-          
-          // Descripción
           Text(
             'Descripción:',
             style: TextStyle(
@@ -329,9 +297,7 @@ class ProductInfoSection extends StatelessWidget {
               color: GerenaColors.textPrimaryColor,
             ),
           ),
-          
           const SizedBox(height: 8),
-          
           Text(
             'La Toxina Botulínica tipo A LinuraseTM se reconstituye en solución fisiológica estéril al 0.9% NaCl (cloruro de sodio) para generar una solución inyectable; el procedimiento debe llevarse a cabo en condiciones de asepsia y antisepsia.',
             style: TextStyle(
@@ -339,10 +305,7 @@ class ProductInfoSection extends StatelessWidget {
               color: GerenaColors.textPrimaryColor,
             ),
           ),
-          
           const SizedBox(height: 16),
-          
-          // Características
           Text(
             'Características:',
             style: TextStyle(
@@ -351,9 +314,7 @@ class ProductInfoSection extends StatelessWidget {
               color: GerenaColors.textPrimaryColor,
             ),
           ),
-          
           const SizedBox(height: 8),
-          
           Text(
             'Vial de 100 Unidades\nMayor potencia, bloqueo musculas más eficaz.\nDuración hasta por más de 5 meses',
             style: TextStyle(
@@ -361,22 +322,15 @@ class ProductInfoSection extends StatelessWidget {
               color: GerenaColors.textPrimaryColor,
             ),
           ),
-          
           const SizedBox(height: 16),
-          
-          // Línea divisora
           Divider(),
-          
           const SizedBox(height: 8),
-          
-          // Enlaces
           InkWell(
-            onTap: () {
-              // Acción para términos y condiciones
-            },
+            onTap: () {},
             child: Row(
               children: [
-                Icon(Icons.description_outlined, size: 16, color: GerenaColors.primaryColor),
+                Icon(Icons.description_outlined,
+                    size: 16, color: GerenaColors.primaryColor),
                 const SizedBox(width: 4),
                 Text(
                   'Consulta términos y condiciones de la venta',
@@ -388,16 +342,13 @@ class ProductInfoSection extends StatelessWidget {
               ],
             ),
           ),
-          
           const SizedBox(height: 8),
-          
           InkWell(
-            onTap: () {
-              // Acción para descargar ficha técnica
-            },
+            onTap: () {},
             child: Row(
               children: [
-                Icon(Icons.download_outlined, size: 16, color: GerenaColors.primaryColor),
+                Icon(Icons.download_outlined,
+                    size: 16, color: GerenaColors.primaryColor),
                 const SizedBox(width: 4),
                 Text(
                   'Descargar Ficha Técnica',
@@ -409,10 +360,7 @@ class ProductInfoSection extends StatelessWidget {
               ],
             ),
           ),
-          
           const SizedBox(height: 24),
-          
-          // Botón de añadir al carrito
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -426,10 +374,7 @@ class ProductInfoSection extends StatelessWidget {
               ),
             ),
           ),
-          
           const SizedBox(height: 16),
-          
-          // Botón de favorito
           Align(
             alignment: Alignment.centerRight,
             child: Container(
@@ -456,45 +401,42 @@ class ProductInfoSection extends StatelessWidget {
 class RelatedProductsCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Usar el controlador existente
     final controller = Get.find<ProductDetailController>();
-    
+
     return Container(
       height: 250,
       padding: EdgeInsets.symmetric(horizontal: 16),
       child: Stack(
         children: [
           Obx(() => CarouselSlider(
-            carouselController: controller.relatedCarouselController,
-            options: CarouselOptions(
-              height: 250,
-              viewportFraction: 1.0,
-              enableInfiniteScroll: true,
-              autoPlay: false,
-              onPageChanged: controller.onRelatedPageChanged,
-            ),
-            items: controller.relatedProductPages.map((pageItems) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: pageItems.map((product) {
-                      return Expanded(
-                        child: RelatedProductCard(
-                          name: product['name']!,
-                          price: product['price']!,
-                          originalPrice: product['originalPrice']!,
-                          label: product['label']!,
-                        ),
+                carouselController: controller.relatedCarouselController,
+                options: CarouselOptions(
+                  height: 250,
+                  viewportFraction: 1.0,
+                  enableInfiniteScroll: true,
+                  autoPlay: false,
+                  onPageChanged: controller.onRelatedPageChanged,
+                ),
+                items: controller.relatedProductPages.map((pageItems) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: pageItems.map((product) {
+                          return Expanded(
+                            child: RelatedProductCard(
+                              name: product['name']!,
+                              price: product['price']!,
+                              originalPrice: product['originalPrice']!,
+                              label: product['label']!,
+                            ),
+                          );
+                        }).toList(),
                       );
-                    }).toList(),
+                    },
                   );
-                },
-              );
-            }).toList(),
-          )),
-          
-          // Flechas de navegación
+                }).toList(),
+              )),
           Obx(() {
             if (controller.relatedProductPages.length > 1) {
               return Stack(
@@ -555,14 +497,14 @@ class RelatedProductCard extends StatelessWidget {
   final String price;
   final String originalPrice;
   final String label;
-  
+
   const RelatedProductCard({
     required this.name,
     required this.price,
     required this.originalPrice,
     required this.label,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -582,7 +524,6 @@ class RelatedProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen
           Stack(
             children: [
               ClipRRect(
@@ -622,8 +563,6 @@ class RelatedProductCard extends StatelessWidget {
               ),
             ],
           ),
-          
-          // Información del producto
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -639,9 +578,7 @@ class RelatedProductCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                
                 const SizedBox(height: 4),
-                
                 Text(
                   price,
                   style: TextStyle(
@@ -650,7 +587,6 @@ class RelatedProductCard extends StatelessWidget {
                     color: GerenaColors.textPrimaryColor,
                   ),
                 ),
-                
                 Text(
                   originalPrice,
                   style: TextStyle(
@@ -659,11 +595,10 @@ class RelatedProductCard extends StatelessWidget {
                     decoration: TextDecoration.lineThrough,
                   ),
                 ),
-                
                 const SizedBox(height: 8),
-                
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
                   decoration: BoxDecoration(
                     color: GerenaColors.secondaryColor,
                     borderRadius: BorderRadius.circular(4),

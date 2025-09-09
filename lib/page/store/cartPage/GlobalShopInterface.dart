@@ -92,7 +92,6 @@ class GlobalShopInterface extends StatelessWidget {
                       
                       Expanded(
                         child: Obx(() {
-                          // Store View
                           if (navigationController.currentView.value == 0) {
                             return SingleChildScrollView(
                               child: Column(
@@ -365,7 +364,6 @@ class GlobalShopInterface extends StatelessWidget {
                             );
                           }
                           
-                          // Fallback
                           return Center(
                             child: Text(
                               'Vista no disponible',

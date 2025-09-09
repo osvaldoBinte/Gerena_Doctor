@@ -6,15 +6,12 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:get/get.dart';
 class ProductDetailController extends GetxController {
-  // Para el carrusel principal de imágenes
   final carouselController = CarouselSliderController();
   final currentImageIndex = 0.obs;
   
-  // Para el carrusel de productos relacionados
   final relatedCarouselController = CarouselSliderController();
   final currentRelatedPage = 0.obs;
   
-  // Imágenes del producto
   final productImages = <String>[
     'assets/productoenventa.png',
     'assets/productoenventa.png',
@@ -22,7 +19,6 @@ class ProductDetailController extends GetxController {
     'assets/productoenventa.png',
   ].obs;
   
-  // Productos relacionados
   final relatedProducts = [
     {'name': 'INNOTOX', 'price': '₱3,000.00 MXN', 'originalPrice': '₱3,100.00 MXN', 'label': 'EN PROMOCIÓN'},
     {'name': 'NABOTA', 'price': '₱3,000.00 MXN', 'originalPrice': '₱3,100.00 MXN', 'label': 'EN PROMOCIÓN'},
@@ -34,13 +30,11 @@ class ProductDetailController extends GetxController {
     {'name': 'MD COLAGENASA', 'price': '₱3,000.00 MXN', 'originalPrice': '₱3,100.00 MXN', 'label': 'EN PROMOCIÓN'},
   ].obs;
   
-  // Lista de páginas para el carrusel de productos relacionados
   final relatedProductPages = <List<Map<String, String>>>[].obs;
   
   @override
   void onInit() {
     super.onInit();
-    // Inicializar las páginas de productos relacionados
     _initRelatedProductPages();
   }
   
@@ -81,7 +75,6 @@ class ProductDetailController extends GetxController {
   }
   
   void _initRelatedProductPages() {
-    // Dividir la lista de productos en páginas de 4 elementos
     final int itemsPerPage = 4;
     relatedProductPages.clear();
     
@@ -98,7 +91,6 @@ class ProductDetailController extends GetxController {
   }
   
   void addToCart(Map<String, String> product) {
-    // Aquí implementarías la lógica para añadir al carrito
     Get.snackbar(
       'Producto añadido',
       '${product['name']} ha sido añadido al carrito',

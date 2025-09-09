@@ -87,7 +87,6 @@ class EstatusDePedido extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Título principal
         Text(
           'ESTATUS DE PEDIDO:',
           style: GerenaColors.headingSmall.copyWith(
@@ -98,7 +97,6 @@ class EstatusDePedido extends StatelessWidget {
         
         const SizedBox(height: 8),
         
-        // Información del pedido
         Row(
           children: [
             Expanded(
@@ -222,7 +220,6 @@ class EstatusDePedido extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Columna de tiempo
           SizedBox(
             width: 60,
             child: Text(
@@ -237,7 +234,6 @@ class EstatusDePedido extends StatelessWidget {
             ),
           ),
           
-          // Timeline visual
           Column(
             children: [
               Container(
@@ -262,7 +258,6 @@ class EstatusDePedido extends StatelessWidget {
           
           const SizedBox(width: 12),
           
-          // Contenido del status
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,7 +288,6 @@ class EstatusDePedido extends StatelessWidget {
     );
   }
 
-  // Getter para obtener la lista de status (para usar en la condición)
   List<_StatusItem> get statusList => [
     _StatusItem(
       time: '8:20 AM',
@@ -335,7 +329,6 @@ class EstatusDePedido extends StatelessWidget {
 
 
 
-// Clase auxiliar para manejar los datos de cada status
 class _StatusItem {
   final String time;
   final String title;
