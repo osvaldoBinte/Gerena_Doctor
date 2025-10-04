@@ -5,4 +5,5 @@ class RoutesNames {
   static const String loginPageMovil = '/loginMovil';
   static const String dashboardSPage = '/dashboardS';
   static const String eventbyid = '/eventbyid';
+  static const String categoryById = '/Category-ById-Page';
 }

@@ -208,7 +208,7 @@ class DialogoAbierto extends StatelessWidget {
                       ),
                       onChanged: (value) {
                         setState(() {
-                          respuesta = value;
+                         // respuesta = value;
                         });
                       },
                     ),

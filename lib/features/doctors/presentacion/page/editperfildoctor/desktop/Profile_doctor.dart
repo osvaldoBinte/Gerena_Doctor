@@ -4,6 +4,7 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
@@ -18,47 +19,62 @@ class UserProfileContent extends StatefulWidget {
 }
 
 class _UserProfileContentState extends State<UserProfileContent> {
-  @override
+     final PrefilDortorController controller= Get.find<PrefilDortorController>();
+
+ @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 1200;
-    final PromotionController promotionController =
-        Get.put(PromotionController());
 
-    return Container(
-      color: GerenaColors.backgroundColorfondo,
-      child: isSmallScreen
-          ? SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  buildProfileSection(),
-                  const SizedBox(height: 20),
-                  _buildRightSections(),
-                ],
-              ),
-            )
-          : Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 350,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: buildProfileSection(),
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+
+      if (controller.doctorProfile.value == null) {
+        return Center(
+          child: Text('No se pudo cargar el perfil'),
+        );
+      }
+
+      return Container(
+        color: GerenaColors.backgroundColorfondo,
+        child: isSmallScreen
+            ? SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    buildProfileSection(),
+                    const SizedBox(height: 20),
+                    _buildRightSections(),
+                  ],
                 ),
-                Expanded(
-                  child: Container(
-                    height: MediaQuery.of(context).size.height * 0.9,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child: _buildRightSections(),
+              )
+            : Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 350,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: buildProfileSection(),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.9,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16.0),
+                        child: _buildRightSections(),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-    );
+                ],
+              ),
+      );
+    });
   }
+
 
   Widget _buildRightSections() {
     return Column(
@@ -175,7 +191,6 @@ class _UserProfileContentState extends State<UserProfileContent> {
                             ),
                           ),
                           const SizedBox(height: 15),
-
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -235,98 +250,150 @@ class _UserProfileContentState extends State<UserProfileContent> {
   }
 
   Widget _buildAccountSettingsSection() {
-    return Card(
-      elevation: GerenaColors.elevationSmall,
-      shape: RoundedRectangleBorder(
-        borderRadius: GerenaColors.mediumBorderRadius,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Configuración de la cuenta',
-              style: GoogleFonts.rubik(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: GerenaColors.textPrimaryColor,
-              ),
-            ),
-            Text(
-              '*Campo obligatorio',
-              style: GoogleFonts.rubik(
-                fontSize: 12,
-                color: GerenaColors.textSecondaryColor,
-              ),
-            ),
-            Text(
-              'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
-              style: GoogleFonts.rubik(
-                fontSize: 14,
-                color: GerenaColors.textSecondaryColor,
-              ),
-            ),
-            const SizedBox(height: 20),
+  final doctor = controller.doctorProfile.value!;
+  final nombres = doctor.nombreCompleto.split(' ');
+  final nombre = nombres.isNotEmpty ? nombres[0] : '';
+  final apellidos = nombres.length > 1 ? nombres.sublist(1).join(' ') : '';
 
-            Row(
-              children: [
-                Expanded(
+  return Card(
+    elevation: GerenaColors.elevationSmall,
+    shape: RoundedRectangleBorder(
+      borderRadius: GerenaColors.mediumBorderRadius,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Configuración de la cuenta',
+            style: GoogleFonts.rubik(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: GerenaColors.textPrimaryColor,
+            ),
+          ),
+          Text(
+            '*Campo obligatorio',
+            style: GoogleFonts.rubik(
+              fontSize: 12,
+              color: GerenaColors.textSecondaryColor,
+            ),
+          ),
+          Text(
+            'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
+            style: GoogleFonts.rubik(
+              fontSize: 14,
+              color: GerenaColors.textSecondaryColor,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.8,
+                        child: GerenaColors.buildLabeledTextField(
+                          'Nombre/s*',
+                          nombre,
+                          hintText: 'Juan Pedro',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: FractionallySizedBox(
+                      widthFactor: 0.8,
+                      child: GerenaColors.buildLabeledTextField(
+                        'Apellidos*',
+                        apellidos,
+                        hintText: 'González Pérez',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: 0.64,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GerenaColors.buildLabeledTextField(
-                          'Nombre/s*', 'Juan Pedro'),
+                        'Profesión*',
+                        doctor.especialidad,
+                        hintText: 'Cirujano estético',
+                      ),
                       const SizedBox(height: 15),
-                      _labeledDropdownField('Profesión*', 'Cirujano estético'),
+                      GerenaColors.buildLabeledTextField(
+                        'Dirección',
+                        doctor.direccion,
+                        hintText: 'Col. Providencia, Av. Lorem ipsum #3050',
+                      ),
                       const SizedBox(height: 15),
-                      GerenaColors.buildLabeledTextField('Dirección',
-                          'Col. Providencia, Av. Lorem ipsum #3050'),
+                      GerenaColors.buildLabeledTextField(
+                        'Email',
+                        doctor.email,
+                        hintText: 'doctor@ejemplo.com',
+                      ),
+                      const SizedBox(height: 15),
+                      GerenaColors.buildLabeledTextField(
+                        'Teléfono',
+                        doctor.telefono,
+                        hintText: '33 1234 5678',
+                      ),
+                      const SizedBox(height: 15),
                     ],
                   ),
                 ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GerenaColors.buildLabeledTextField(
-                          'Apellidos*', 'González Pérez'),
-                      const SizedBox(height: 15),
-                      GerenaColors.buildLabeledTextField(
-                          'Empresa/Clínica', 'Clínica estética Gerena'),
-                      const SizedBox(height: 15),
-                      _labeledDropdownField(
-                          'Ciudad*', 'Guadalajara, Jalisco, México'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            Align(
-              alignment: Alignment.bottomRight,
-              child: SizedBox(
-                width: 120,
-                child: GerenaColors.widgetButton(
-                  onPressed: () {
-                    print('Guardando configuración de cuenta');
-                  },
-                  text: 'GUARDAR',
-                  borderRadius: 5,
-                  showShadow: false,
-                ),
               ),
-            ),
-          ],
-        ),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: constraints.maxWidth * 0.64,
+                        child: GerenaColors.buildLabeledTextField(
+                          'Licencia Profesional',
+                          doctor.numeroLicencia,
+                          hintText: '1234567',
+                        ),
+                      ),
+                      const Spacer(),
+                      SizedBox(
+                        width: 100,
+                        child: GerenaColors.widgetButton(
+                          onPressed: () {
+                            print('Guardando configuración de cuenta');
+                          },
+                          text: 'GUARDAR',
+                          borderRadius: 5,
+                          showShadow: false,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   Widget _buildAcademicFormationSection() {
+        final doctor = controller.doctorProfile.value!;
+
     return Card(
       elevation: GerenaColors.elevationSmall,
       shape: RoundedRectangleBorder(
@@ -353,48 +420,99 @@ class _UserProfileContentState extends State<UserProfileContent> {
               ),
             ),
             const SizedBox(height: 20),
-
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GerenaColors.buildLabeledTextField(
-                    'Título', 'Ej. Rinomodelación'),
-                const SizedBox(height: 15),
-                GerenaColors.buildLabeledTextField(
-                    'Disciplina académica', 'Ej. Medicina estética'),
-                const SizedBox(height: 15),
-                GerenaColors.buildLabeledTextField('Institución', ''),
-                const SizedBox(height: 15),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: 120,
-                    child: GerenaColors.widgetButton(
-                      onPressed: () {
-                        print('Guardando formación académica 1');
-                      },
-                      text: 'GUARDAR',
-                      showShadow: false,
-                      borderRadius: 5,
+                Row(
+                  children: [
+                    Flexible(
+                      flex: 5,
+                      child: GerenaColors.buildLabeledTextField(
+                          'Título', 'Ej. Rinomodelación'),
                     ),
-                  ),
+                    Flexible(
+                      flex: 3,
+                      child: Container(),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 15),
-                GerenaColors.buildLabeledTextField('Certificaciones', ''),
-                const SizedBox(height: 15),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: 120,
-                    child: GerenaColors.widgetButton(
-                      onPressed: () {
-                        print('Guardando certificaciones');
-                      },
-                      text: 'GUARDAR',
-                      showShadow: false,
-                      borderRadius: 5,
+                Row(
+                  children: [
+                    Flexible(
+                      flex: 5,
+                      child: GerenaColors.buildLabeledTextField(
+                          'Disciplina académica', 'Ej. Medicina estética'),
                     ),
-                  ),
+                    Flexible(
+                      flex: 3,
+                      child: Container(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      flex: 5,
+                      child:
+                          GerenaColors.buildLabeledTextField('Institución', ''),
+                    ),
+                    const SizedBox(width: 15),
+                    Flexible(
+                      flex: 3,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 2.0),
+                          child: SizedBox(
+                            width: 100,
+                            child: GerenaColors.widgetButton(
+                              onPressed: () {
+                                print('Guardando formación académica 1');
+                              },
+                              text: 'GUARDAR',
+                              showShadow: false,
+                              borderRadius: 5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      flex: 5,
+                      child: GerenaColors.buildLabeledTextField(
+                          'Certificaciones', ''),
+                    ),
+                    const SizedBox(width: 15),
+                    Flexible(
+                      flex: 3,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 2.0),
+                          child: SizedBox(
+                            width: 100,
+                            child: GerenaColors.widgetButton(
+                              onPressed: () {
+                                print('Guardando certificaciones');
+                              },
+                              text: 'GUARDAR',
+                              showShadow: false,
+                              borderRadius: 5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -403,7 +521,132 @@ class _UserProfileContentState extends State<UserProfileContent> {
       ),
     );
   }
+Widget _buildAcademicFormationSectio2n() {
+  final doctor = controller.doctorProfile.value!;
 
+  return Card(
+    elevation: GerenaColors.elevationSmall,
+    shape: RoundedRectangleBorder(
+      borderRadius: GerenaColors.mediumBorderRadius,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Formación académica',
+            style: GoogleFonts.rubik(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: GerenaColors.textPrimaryColor,
+            ),
+          ),
+          Text(
+            'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
+            style: GoogleFonts.rubik(
+              fontSize: 14,
+              color: GerenaColors.textSecondaryColor,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Educación',
+                      doctor.educacion,
+                      hintText: 'Ej. Universidad de Guadalajara - Medicina',
+                    ),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: Container(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Especialidad',
+                      doctor.especialidad,
+                      hintText: 'Ej. Medicina estética',
+                    ),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: Container(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Experiencia (años)',
+                      doctor.experienciaTiempo > 0 
+                        ? doctor.experienciaTiempo.toString() 
+                        : '',
+                      hintText: 'Ej. 5',
+                    ),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: Container(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Biografía',
+                      doctor.biografia,
+                      hintText: 'Describe tu experiencia profesional',
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Flexible(
+                    flex: 3,
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 2.0),
+                        child: SizedBox(
+                          width: 100,
+                          child: GerenaColors.widgetButton(
+                            onPressed: () {
+                              print('Guardando formación académica');
+                            },
+                            text: 'GUARDAR',
+                            showShadow: false,
+                            borderRadius: 5,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
   Widget _buildConnectedAccountsSection() {
     return Card(
       elevation: GerenaColors.elevationSmall,
@@ -458,6 +701,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
               ),
             ),
             const SizedBox(height: 15),
+            Divider(height: 2, color: GerenaColors.colorinput),
             _socialMediaConnectRow(
               icon: Icon(
                 Icons.menu,
@@ -468,7 +712,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
               name: 'LinkedIn',
               isConnected: false,
             ),
-            Divider(color: GerenaColors.dividerColor),
+            Divider(height: 2, color: GerenaColors.colorinput),
             _socialMediaConnectRow(
               icon: Icon(
                 Icons.menu,
@@ -479,7 +723,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
               name: 'Facebook',
               isConnected: false,
             ),
-            Divider(color: GerenaColors.dividerColor),
+            Divider(height: 2, color: GerenaColors.colorinput),
             _socialMediaConnectRow(
               icon: Icon(
                 Icons.menu,
@@ -490,7 +734,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
               name: 'X',
               isConnected: false,
             ),
-            Divider(color: GerenaColors.dividerColor),
+            Divider(height: 2, color: GerenaColors.colorinput),
             _socialMediaConnectRow(
               icon: Icon(
                 Icons.menu,
@@ -581,11 +825,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                   child: IntrinsicHeight(
                     child: Row(
                       children: [
-                        Expanded(
-                          child: GerenaColors.buildLabeledTextField(
-                              'Título del vínculo', ''),
-                        ),
-                        const SizedBox(width: 16),
+                       
                         Expanded(
                           child: GerenaColors.buildLabeledTextField('URL', ''),
                         ),
@@ -593,7 +833,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 30),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 0),
                   child: GerenaColors.widgetButton(
@@ -627,14 +867,14 @@ class _UserProfileContentState extends State<UserProfileContent> {
         ),
         const SizedBox(height: 5),
         Container(
-          width: double.infinity,  
+          width: double.infinity,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
             borderRadius: GerenaColors.smallBorderRadius,
           ),
           child: DropdownButtonFormField<String>(
             value: value,
-            isExpanded: true, 
+            isExpanded: true,
             decoration: const InputDecoration(
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -654,7 +894,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                   style: GoogleFonts.rubik(
                     color: GerenaColors.textPrimaryColor,
                   ),
-                  overflow: TextOverflow.ellipsis, 
+                  overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                 ),
               );

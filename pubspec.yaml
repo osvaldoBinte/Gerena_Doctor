@@ -59,15 +59,15 @@ dependencies:
 
 flutter_native_splash:
   color: "#004346"
-  image: assets/gerena-logo.png
+  image:  assets/logo/logo_ios.png
   android: true
   ios: true
   ios_content_mode: scaleAspectFit 
   android_12:
-    image: assets/gerena-logo.png
-    icon_background_color: "#00597D"
+    image: assets/logo/logo_ios.png
+    icon_background_color: "#004346"
     image_dark: assets/logo/logo_ios.png
-    icon_background_color_dark: "#00597D"
+    icon_background_color_dark: "#004346"
 
 
 

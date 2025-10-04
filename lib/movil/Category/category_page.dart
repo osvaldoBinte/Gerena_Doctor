@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CategoryPage extends StatefulWidget {
@@ -234,62 +236,7 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   void _navigateToCategory(CategoryItem category) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: GerenaColors.backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: GerenaColors.mediumBorderRadius,
-          ),
-          title: Text(
-            category.name,
-            style: GerenaColors.headingMedium,
-            textAlign: TextAlign.center,
-          ),
-          content: Container(
-            height: 100,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: GerenaColors.primaryColor,
-                    borderRadius: GerenaColors.smallBorderRadius,
-                  ),
-                  child: Icon(
-                    Icons.category,
-                    color: GerenaColors.textLightColor,
-                  ),
-                ),
-                SizedBox(height: GerenaColors.paddingSmall),
-                Text(
-                  'Próximamente disponible',
-                  style: GerenaColors.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: TextButton.styleFrom(
-                foregroundColor: GerenaColors.accentColor,
-              ),
-              child: Text(
-                'Cerrar',
-                style: GoogleFonts.rubik(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+    Get.toNamed(RoutesNames.categoryById);
   }
 }
 

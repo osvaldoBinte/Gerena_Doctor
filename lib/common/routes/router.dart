@@ -1,11 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
-import 'package:gerena/common/splashpage/splash_page.dart';
+import 'package:gerena/features/auth/presentacion/page/Splash/splash_page.dart';
+import 'package:gerena/features/auth/presentacion/page/login/login_page.dart';
+import 'package:gerena/movil/Category/category_by_id_page.dart';
 import 'package:gerena/movil/home/start_page.dart';
-import 'package:gerena/movil/login/login_page_movil.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
-import 'package:gerena/page/login_page.dart';
 import 'package:get/get.dart';
 class AppPages {
   static final routes = [
@@ -14,6 +14,7 @@ class AppPages {
       name: RoutesNames.welcomePage,
       page: () => SplashPage(),
     ),
+    GetPage(name: RoutesNames.categoryById, page: ()=>CategoryByIdPage()),
     GetPage(
       name: RoutesNames.loginPage,
       page: () => LoginPage(),
@@ -25,7 +26,7 @@ class AppPages {
     ),
     GetPage(
       name: RoutesNames.loginPageMovil,
-      page: () => LoginPageMovil(),
+      page: () => LoginPage(),
     ),
     GetPage(
       name: RoutesNames.dashboardSPage,

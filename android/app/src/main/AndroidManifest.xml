@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Los permisos van AQUÍ, FUERA de <application> -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    
     <application
         android:label="Gerena"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+        <!-- Ya NO va <uses-permission> aquí dentro -->
 
         <activity
             android:name=".MainActivity"

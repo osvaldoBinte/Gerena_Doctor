@@ -188,6 +188,7 @@ class NotificationPage extends StatelessWidget {
                                 child: GerenaColors.widgetButton(
                                   text: 'Cancelar',
                                   showShadow: false,
+                                   fontSize:10,
                                   borderRadius: 40
                                 ),
                               ),
@@ -201,7 +202,8 @@ class NotificationPage extends StatelessWidget {
                                 child: GerenaColors.widgetButton(
                                   text: 'chat',
                                   showShadow: false,
-                                  borderRadius: 40
+                                  borderRadius: 40,
+                                  fontSize:10
                                 ),
                               ),
                             ),
@@ -215,6 +217,7 @@ class NotificationPage extends StatelessWidget {
                                   text: 'Aceptar',
                                   backgroundColor: GerenaColors.backgroundlogin,
                                   showShadow: false,
+                                   fontSize:10,
                                   borderRadius: 40
                                 ),
                               ),

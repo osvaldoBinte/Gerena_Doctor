@@ -13,6 +13,7 @@ String enviromentSelect = Enviroment.testing.value;
 void main() async {
   
   await dotenv.load(fileName: enviromentSelect);
+debugPrint('======== Entorno: $enviromentSelect');
   await PreferencesUser().initiPrefs();
  FlutterError.onError = (FlutterErrorDetails details) {
     if (details.exception.toString().contains('KeyDownEvent') ||
@@ -26,7 +27,7 @@ void main() async {
     FlutterError.presentError(details);
   };
 
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();  
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

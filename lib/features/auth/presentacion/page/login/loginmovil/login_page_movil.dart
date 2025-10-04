@@ -17,6 +17,8 @@ class _LoginScreenState extends State<LoginPageMovil> {
 
   @override
   Widget build(BuildContext context) {
+        final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: GerenaColors.backgroundlogin,
       body: SafeArea(
@@ -25,7 +27,19 @@ class _LoginScreenState extends State<LoginPageMovil> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              GerenaColors.createAppLogo(),
+               Container(
+              height: screenSize.height * 0.3,
+              width: double.infinity,
+             
+              child: Center(
+                child: Image.asset(
+                  'assets/gerena-logo.png',
+                  width: screenSize.width * 0.7,
+                  height: 120,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
               
               GerenaColors.createLoginLabel('Correo electrónico'),
               

@@ -3,106 +3,134 @@ import 'package:gerena/common/theme/App_Theme.dart';
 
 class Membresia extends StatelessWidget {
   const Membresia({Key? key}) : super(key: key);
-
+ 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: GerenaColors.backgroundColorfondo,
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 60.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              childAspectRatio: 0.70,
-              crossAxisSpacing: 40,
-              mainAxisSpacing: 16,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          int crossAxisCount;
+          double horizontalPadding;
+          double crossAxisSpacing;
+          double childAspectRatio;
+
+          if (constraints.maxWidth < 600) {
+            crossAxisCount = 1;
+            horizontalPadding = 16.0;
+            crossAxisSpacing = 16.0;
+            childAspectRatio = 0.85; 
+          } else if (constraints.maxWidth < 900) {
+            crossAxisCount = 2;
+            horizontalPadding = 32.0;
+            crossAxisSpacing = 24.0;
+            childAspectRatio = 0.75;
+          } else {
+            crossAxisCount = 2;
+            horizontalPadding = 60.0;
+            crossAxisSpacing = 40.0;
+            childAspectRatio = 0.70;
+          }
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildMembershipCard(
-                  type:'BASIC',
-                  title: 'Disfruta nuestros beneficios esenciales',
-                  price: '\$49.00 MXN / mensual',
-                  benefits: [
-                    'Acceso a la plataforma de compras con precios exclusivos para miembros.',
-                    'Gestión de citas y agenda digital básica manual.',
-                    'Soporte técnico por chat y correo.',
-                    'Acceso a fórmula para 1 cita al mes (individual).',
-                    'Historial de pedidos y seguimiento en tiempo real.',
-                    'Descuentos en capacitaciones y webinars (5% off).',
-                    'Publicidad básica en el directorio de médicos.',
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: crossAxisCount,
+                  childAspectRatio: childAspectRatio,
+                  crossAxisSpacing: crossAxisSpacing,
+                  mainAxisSpacing: 16,
+                  children: [
+                    _buildMembershipCard(
+                      type:'BASIC',
+                      title: 'Disfruta nuestros beneficios esenciales',
+                      price: '\$49.00 MXN / mensual',
+                      benefits: [
+                        'Acceso a la plataforma de compras con precios exclusivos para miembros.',
+                        'Gestión de citas y agenda digital básica manual.',
+                        'Soporte técnico por chat y correo.',
+                        'Acceso a fórmula para 1 cita al mes (individual).',
+                        'Historial de pedidos y seguimiento en tiempo real.',
+                        'Descuentos en capacitaciones y webinars (5% off).',
+                        'Publicidad básica en el directorio de médicos.',
+                      ],
+                      buttonText: 'ELEGIR PLAN',
+                      buttonColor: GerenaColors.secondaryColor,
+                      isCurrentPlan: false,
+                      screenWidth: constraints.maxWidth,
+                    ),
+                    _buildMembershipCard(
+                      type: 'PLUS',
+                      title: 'Automatización y crecimiento del consultorio',
+                      subtitle: 'PLUS CIENTÍFICO / EMPRESARIAL',
+                      price: '\$125.00 MXN / mensual',
+                      benefits: [
+                        'Todos los beneficios de Gerena Basic más:',
+                        'Gestión de citas avanzada (confirmaciones automáticas por WhatsApp-SMS.',
+                        'Acceso al sistema de recompensas y descuentos promocionales.',
+                        'Publicidad dentro de la red para atraer pacientes de otras ciudades.',
+                        'Webinar clínico digital para cada paciente.',
+                        'Videoconsulta (limitadas con pacientes dentro tu app).',
+                        '10% de descuento en capacitaciones y webinars.',
+                      ],
+                      buttonText: 'DOMICILIAR PAGO',
+                      buttonColor: GerenaColors.primaryColor,
+                      isCurrentPlan: true,
+                      currentPlanText: 'MI PLAN ACTUAL',
+                      screenWidth: constraints.maxWidth,
+                    ),
+                    _buildMembershipCard(
+                      title: 'Exclusividad y prestigio en el mundo estético',
+                      type: 'ELITE',
+                      price: '\$275.00 MXN / mensual',
+                      benefits: [
+                        'Todos los beneficios de Gerena PRO más:',
+                        'Integración completa en el directorio con vista de médicos verificados.',
+                        'Promoción dentro de productos exclusivos de productos premium.',
+                        'Publicidad avanzada en la app + redes sociales de Gerena.',
+                        'Prioridad en soporte a nuevos productos y capacitaciones.',
+                        'Atención personalizada con un ejecutivo de ventas especializado.',
+                        '30% de descuento en capacitaciones y acceso a cursos exclusivos.',
+                        'Espacio para subir su propio portafolio digital con fotos de antes y después.',
+                      ],
+                      buttonText: 'ELEGIR PLAN',
+                      buttonColor: Colors.red,
+                      isCurrentPlan: false,
+                      cardColor: GerenaColors.cardColor,
+                      hasGradientBorder: true,
+                      hasGradientButton: true,
+                      screenWidth: constraints.maxWidth,
+                    ),
+                    _buildMembershipCard(
+                      title: 'Médicos top con máxima visibilidad y beneficios VIP',
+                      type: 'BLACK',
+                      price: '\$725.00 MXN / mensual',
+                      benefits: [
+                        'Exclusivo 100 membresías por ciudad',
+                        'Todos los beneficios de Gerena Elite más:',
+                        'Publicidad masiva en campañas de pago diario en redes sociales.',
+                        'Menciones en video semanales y entrevistas exclusivas en el blog de Gerena.',
+                        'Página de doctor propia con credenciales de chat, consulta y citas.',
+                        'Acceso a campañas de productos antes que nadie.',
+                        'Espacio en la home de la app como médico destacado.',
+                        'Invitación a eventos y congresos exclusivos de Gerena.',
+                        '50% de descuento en capacitaciones y certificaciones.',
+                      ],
+                      buttonText: 'ELEGIR PLAN',
+                      buttonColor: GerenaColors.primaryColor,
+                      isCurrentPlan: true,
+                      screenWidth: constraints.maxWidth,
+                    ),
                   ],
-                  buttonText: 'ELEGIR PLAN',
-                  buttonColor: GerenaColors.secondaryColor,
-                  isCurrentPlan: false,
-                ),
-                _buildMembershipCard(
-                  type: 'PLUS',
-                  title: 'Automatización y crecimiento del consultorio',
-                  subtitle: 'PLUS CIENTÍFICO / EMPRESARIAL',
-                  price: '\$125.00 MXN / mensual',
-                  benefits: [
-                    'Todos los beneficios de Gerena Basic más:',
-                    'Gestión de citas avanzada (confirmaciones automáticas por WhatsApp-SMS.',
-                    'Acceso al sistema de recompensas y descuentos promocionales.',
-                    'Publicidad dentro de la red para atraer pacientes de otras ciudades.',
-                    'Webinar clínico digital para cada paciente.',
-                    'Videoconsulta (limitadas con pacientes dentro tu app).',
-                    '10% de descuento en capacitaciones y webinars.',
-                  ],
-                  buttonText: 'DOMICILIAR PAGO',
-                  buttonColor: GerenaColors.primaryColor,
-                  isCurrentPlan: true,
-                  currentPlanText: 'MI PLAN ACTUAL',
-                ),
-                _buildMembershipCard(
-                                    title: 'Exclusividad y prestigio en el mundo estético',
-
-                  type: 'ELITE',
-                  price: '\$275.00 MXN / mensual',
-                  benefits: [
-                    'Todos los beneficios de Gerena PRO más:',
-                    'Integración completa en el directorio con vista de médicos verificados.',
-                    'Promoción dentro de productos exclusivos de productos premium.',
-                    'Publicidad avanzada en la app + redes sociales de Gerena.',
-                    'Prioridad en soporte a nuevos productos y capacitaciones.',
-                    'Atención personalizada con un ejecutivo de ventas especializado.',
-                    '30% de descuento en capacitaciones y acceso a cursos exclusivos.',
-                    'Espacio para subir su propio portafolio digital con fotos de antes y después.',
-                  ],
-                  buttonText: 'ELEGIR PLAN',
-                  buttonColor: Colors.red,
-                  isCurrentPlan: false,
-                  cardColor: GerenaColors.cardColor,
-                  hasGradientBorder: true,
-                                    hasGradientButton: true, 
-
-                ),
-                _buildMembershipCard(
-                  title: 'Médicos top con máxima visibilidad y beneficios VIP',
-                  type: 'BLACK',
-                  price: '\$725.00 MXN / mensual',
-                  benefits: [
-                    'Exclusivo 100 membresías por ciudad',
-                    'Todos los beneficios de Gerena Elite más:',
-                    'Publicidad masiva en campañas de pago diario en redes sociales.',
-                    'Menciones en video semanales y entrevistas exclusivas en el blog de Gerena.',
-                    'Página de doctor propia con credenciales de chat, consulta y citas.',
-                    'Acceso a campañas de productos antes que nadie.',
-                    'Espacio en la home de la app como médico destacado.',
-                    'Invitación a eventos y congresos exclusivos de Gerena.',
-                    '50% de descuento en capacitaciones y certificaciones.',
-                  ],
-                  buttonText: 'ELEGIR PLAN',
-                buttonColor: GerenaColors.primaryColor,
-                  isCurrentPlan: true,
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -121,9 +149,18 @@ class Membresia extends StatelessWidget {
     Color? borderColor,
     Color? titleColor,
     bool hasGradientBorder = false,
-        bool hasGradientButton = false,
-
+    bool hasGradientButton = false,
+    required double screenWidth,
   }) {
+    // Ajustar tamaños de fuente según el ancho de pantalla
+    double titleFontSize = screenWidth < 600 ? 18 : 15;
+    double typeFontSize = screenWidth < 600 ? 28 : 24;
+    double subtitleFontSize = screenWidth < 600 ? 12 : 10;
+    double priceFontSize = screenWidth < 600 ? 16 : 13;
+    double benefitFontSize = screenWidth < 600 ? 16 : 15;
+    double buttonFontSize = screenWidth < 600 ? 14 : 12;
+    double cardPadding = screenWidth < 600 ? 20 : 16;
+
     if (hasGradientBorder) {
       return Container(
         decoration: BoxDecoration(
@@ -131,10 +168,10 @@ class Membresia extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
              Color(0xFFFF00F6), 
-     Color(0xFF0073FF),
-     Color(0xFF8FFF00), 
-     Color(0xFFFF7300), 
-     Color(0xFFFF0004),
+             Color(0xFF0073FF),
+             Color(0xFF8FFF00), 
+             Color(0xFFFF7300), 
+             Color(0xFFFF0004),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -148,7 +185,7 @@ class Membresia extends StatelessWidget {
             boxShadow: [GerenaColors.lightShadow],
           ),
           child: _buildCardContent(
-            type:type,
+            type: type,
             title: title,
             subtitle: subtitle,
             price: price,
@@ -158,8 +195,14 @@ class Membresia extends StatelessWidget {
             isCurrentPlan: isCurrentPlan,
             currentPlanText: currentPlanText,
             titleColor: titleColor,
-                        hasGradientButton: hasGradientButton,
-
+            hasGradientButton: hasGradientButton,
+            titleFontSize: titleFontSize,
+            typeFontSize: typeFontSize,
+            subtitleFontSize: subtitleFontSize,
+            priceFontSize: priceFontSize,
+            benefitFontSize: benefitFontSize,
+            buttonFontSize: buttonFontSize,
+            cardPadding: cardPadding,
           ),
         ),
       );
@@ -185,8 +228,14 @@ class Membresia extends StatelessWidget {
         isCurrentPlan: isCurrentPlan,
         currentPlanText: currentPlanText,
         titleColor: titleColor,
-                hasGradientButton: hasGradientButton, 
-
+        hasGradientButton: hasGradientButton,
+        titleFontSize: titleFontSize,
+        typeFontSize: typeFontSize,
+        subtitleFontSize: subtitleFontSize,
+        priceFontSize: priceFontSize,
+        benefitFontSize: benefitFontSize,
+        buttonFontSize: buttonFontSize,
+        cardPadding: cardPadding,
       ),
     );
   }
@@ -202,11 +251,17 @@ class Membresia extends StatelessWidget {
     required bool isCurrentPlan,
     String? currentPlanText,
     Color? titleColor,
-        bool hasGradientButton = false, 
-
+    bool hasGradientButton = false,
+    required double titleFontSize,
+    required double typeFontSize,
+    required double subtitleFontSize,
+    required double priceFontSize,
+    required double benefitFontSize,
+    required double buttonFontSize,
+    required double cardPadding,
   }) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(cardPadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -216,7 +271,7 @@ class Membresia extends StatelessWidget {
               Text(
                 title,
                 style: GerenaColors.headingMedium.copyWith(
-                  fontSize: 15,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.bold,
                   color: titleColor ?? GerenaColors.textPrimaryColor,
                 ),
@@ -224,7 +279,7 @@ class Membresia extends StatelessWidget {
               Text(
                 type,
                 style: GerenaColors.headingMedium.copyWith(
-                  fontSize: 24,
+                  fontSize: typeFontSize,
                   fontWeight: FontWeight.bold,
                   color: titleColor ?? GerenaColors.textPrimaryColor,
                 ),
@@ -234,7 +289,7 @@ class Membresia extends StatelessWidget {
                 Text(
                   subtitle,
                   style: GerenaColors.bodySmall.copyWith(
-                    fontSize: 10,
+                    fontSize: subtitleFontSize,
                     fontWeight: FontWeight.w600,
                     color: titleColor ?? GerenaColors.textPrimaryColor,
                   ),
@@ -244,7 +299,7 @@ class Membresia extends StatelessWidget {
               Text(
                 price,
                 style: GerenaColors.bodyMedium.copyWith(
-                  fontSize: 13,
+                  fontSize: priceFontSize,
                   fontWeight: FontWeight.w600,
                   color: titleColor ?? GerenaColors.textPrimaryColor,
                 ),
@@ -282,7 +337,7 @@ class Membresia extends StatelessWidget {
                         child: Text(
                           benefit,
                           style: GerenaColors.bodySmall.copyWith(
-                            fontSize: 15,
+                            fontSize: benefitFontSize,
                             height: 1.3,
                             color: titleColor ?? GerenaColors.textPrimaryColor,
                           ),
@@ -308,9 +363,9 @@ class Membresia extends StatelessWidget {
               child: Text(
                 currentPlanText,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   color: GerenaColors.secondaryColor,
-                  fontSize: 17,
+                  fontSize: buttonFontSize + 3,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -345,8 +400,8 @@ class Membresia extends StatelessWidget {
                           alignment: Alignment.center,
                           child: Text(
                             buttonText,
-                            style: const TextStyle(
-                              fontSize: 12,
+                            style: TextStyle(
+                              fontSize: buttonFontSize,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -369,8 +424,8 @@ class Membresia extends StatelessWidget {
                     ),
                     child: Text(
                       buttonText,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: buttonFontSize,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

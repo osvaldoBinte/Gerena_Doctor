@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:get/get.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 
@@ -17,7 +18,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _initializeAnimations();
-    _navigateToLogin();
   }
 
   void _initializeAnimations() {
@@ -45,22 +45,7 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
     _animationController.forward();
   }
 
-  _navigateToLogin() async {
-    await Future.delayed(Duration(seconds: 3));
-    
-    bool isMobile = _isMobileDevice();
-    
-    if (isMobile) {
-      Get.offNamed(RoutesNames.loginPageMovil);
-    } else {
-      Get.offNamed(RoutesNames.loginPage);
-    }
-  }
 
-  bool _isMobileDevice() {
-    final data = MediaQueryData.fromWindow(WidgetsBinding.instance.window);
-    return data.size.shortestSide < 600; 
-  }
 
   @override
   void dispose() {
@@ -70,6 +55,8 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
 
   @override
 Widget build(BuildContext context) {
+      final SplashController controller = Get.find<SplashController>();
+
   return Scaffold(
     backgroundColor: GerenaColors.backgroundlogin,
     body: SafeArea(

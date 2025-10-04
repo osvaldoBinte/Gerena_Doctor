@@ -1,12 +1,11 @@
 import 'package:gerena/page/dashboard/widget/notificasiones/notification_modal.dart';
-import 'package:gerena/page/editperfildoctor/Profile_doctor.dart'; 
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/desktop/Profile_doctor.dart'; 
 import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart'; 
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:get/get.dart'; 
 import 'package:window_manager/window_manager.dart'; 
 import 'package:flutter/material.dart'; 
 import 'package:gerena/page/dashboard/dashboard_page.dart'; 
-import 'package:gerena/page/store/store_page.dart';
 
 class GerenaAppBarController extends GetxController with WindowListener {
   

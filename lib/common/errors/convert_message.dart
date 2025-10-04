@@ -12,18 +12,30 @@ String convertMessageException({required dynamic error}) {
   }
 }
 
+String cleanExceptionMessage(dynamic e) {
+  String message = e.toString();
 
-String formatTextWithLineBreaks(String text) {
-    String processedText = text
-        .replaceAll('Dr. ', 'TEMP_DR_PLACEHOLDER ')
-        .replaceAll('Dra. ', 'TEMP_DRA_PLACEHOLDER ');
-    processedText = processedText
-        .replaceAll('. ', '.\n\n')
-        .replaceAll('.', '.\n')
-        .replaceAll('\n\n', '\n');
-    processedText = processedText
-        .replaceAll('TEMP_DR_PLACEHOLDER ', 'Dr. ')
-        .replaceAll('TEMP_DRA_PLACEHOLDER ', 'Dra. ')
-        .trim();
-    return processedText;
+  while (message.trim().startsWith("Exception:")) {
+    message = message.trim().replaceFirst("Exception:", "").trim();
   }
+  
+  message = message.replaceAll("Exception:", "").trim();
+  message = message.replaceAll("Error de conexión:", "").trim();
+  
+  if (message.isEmpty) {
+    message = "Error desconocido";
+  }
+
+  return message;
+}
+String formatErrorForAlert(String errorMessage) {
+  if (errorMessage.length > 200) {
+    List<String> lines = errorMessage.split('\n');
+    if (lines.length > 1) {
+      return '${lines.first}\n\nVer consola para más detalles.';
+    } else {
+      return '${errorMessage.substring(0, 200)}...';
+    }
+  }
+  return errorMessage;
+}

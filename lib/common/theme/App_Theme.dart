@@ -132,8 +132,8 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
     offset: const Offset(0, 4),
   );
   static BoxShadow get darkShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.5),
-    blurRadius: 12,
+    color: Colors.black.withOpacity(0.4),
+    blurRadius: 10,
     offset: const Offset(0, 6),
   );
   static BoxShadow get storyShadow => BoxShadow(
@@ -634,30 +634,42 @@ static Widget createArticleCard({
 
 static Widget createAppLogo({
   String imagePath = 'assets/gerena-logo.png',
-  double size = 150,
-  EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 60.0, vertical: 70.0),
+  double? size,
+  EdgeInsets? padding,
 }) {
-  return Padding(
-    padding: padding,
-    child: Center(
-      child: ClipOval(
-        child: Container(
-          width: size,  
-          height: size,
-          child: Center(
-            child: Image.asset(
-              imagePath,
-              width: size,
-              height: size,
-              fit: BoxFit.cover, 
+  return Builder(
+    builder: (context) {
+      double screenWidth = MediaQuery.of(context).size.width;
+      
+      // Valores por defecto más seguros
+      double safeSize = size ?? (screenWidth > 400 ? 150 : 100);
+      EdgeInsets safePadding = padding ?? EdgeInsets.symmetric(
+        horizontal: screenWidth > 400 ? 60.0 : 30.0,
+        vertical: screenWidth > 400 ? 70.0 : 40.0,
+      );
+      
+      return Padding(
+        padding: safePadding,
+        child: Center(
+          child: ClipOval(
+            child: Container(
+              width: safeSize,
+              height: safeSize,
+              child: Center(
+                child: Image.asset(
+                  imagePath,
+                  width: safeSize,
+                  height: safeSize,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
         ),
-      ),
-    ),
+      );
+    },
   );
 }
-
  static Widget createMainScaffold({
     required Widget body,
     required int currentIndex,
@@ -725,47 +737,51 @@ static Widget createBottomNavigationBar({
   );
 }
  static Widget createLoginTextField({
-    required TextEditingController controller,
-    required String hintText,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-    Widget? suffixIcon,
-  }) {
-    return Container(
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        style: GoogleFonts.rubik(
-          fontSize: 16,
-          color: Colors.black,
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: GoogleFonts.rubik(
-            color: Colors.grey,
-            fontSize: 16,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: suffixIcon,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 9,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(100),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(100),
-            borderSide: BorderSide(color: secondaryColor),
-          ),
-          isDense: true,
-        ),
+  required TextEditingController controller,
+  required String hintText,
+  bool obscureText = false,
+  TextInputType keyboardType = TextInputType.text,
+  Widget? suffixIcon,
+  FocusNode? focusNode,
+  void Function(String)? onSubmitted,
+}) {
+  return Container(
+    child: TextField(
+      controller: controller,
+      focusNode: focusNode,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      onSubmitted: onSubmitted,
+      style: GoogleFonts.rubik(
+        fontSize: 16,
+        color: Colors.black,
       ),
-    );
-  }
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: GoogleFonts.rubik(
+          color: Colors.grey,
+          fontSize: 16,
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        suffixIcon: suffixIcon,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 9,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(100),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(100),
+          borderSide: BorderSide(color: secondaryColor),
+        ),
+        isDense: true,
+      ),
+    ),
+  );
+}
 
    static Widget createLoginTextButton({
     required String text,
@@ -787,51 +803,55 @@ static Widget createBottomNavigationBar({
       ),
     );
   }
-   static Widget createLoginButton({
-    required String text,
-    required VoidCallback onPressed,
-    bool isPrimary = true,
-    double width = 220,
-    Widget? icon,
-  }) {
-    return SizedBox(
-      width: width,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: textTertiaryColor,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
-          ),
-          elevation: 0,
+ static Widget createLoginButton({
+  required String text,
+  required VoidCallback onPressed,
+  bool isPrimary = true,
+  double width = 220,
+  Widget? icon,
+}) {
+  return SizedBox(
+    width: width,
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: textTertiaryColor,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
         ),
-        child: icon != null 
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                icon,
-                const SizedBox(width: 8),
-                Text(
+        elevation: 0,
+      ),
+      child: icon != null 
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              icon,
+              const SizedBox(width: 8),
+              Flexible( 
+                child: Text(
                   text,
                   style: GoogleFonts.rubik(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                 ),
-              ],
-            )
-          : Text(
-              text,
-              style: GoogleFonts.rubik(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
               ),
+            ],
+          )
+        : Text(
+            text,
+            style: GoogleFonts.rubik(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
             ),
-      ),
-    );
-  }
+          ),
+    ),
+  );
+}
    static Widget createLoginLabel(String text) {
     return Text(
       text,
@@ -1157,11 +1177,14 @@ static Widget createSearchContainer({
     ),
   );
 }
+
 static Widget buildLabeledTextField(
   String label, 
-  String hintText, // Cambiar de initialValue a hintText
-  {TextEditingController? controller}
+  String initialValue,
+  {TextEditingController? controller, String? hintText}
 ) {
+  final textController = controller ?? TextEditingController(text: initialValue);
+  
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -1175,15 +1198,15 @@ static Widget buildLabeledTextField(
       ),
       const SizedBox(height: 5),
       TextField(
-        controller: controller,
+        controller: textController,
         style: GoogleFonts.rubik(
           fontSize: 16,
           color: Colors.black,
         ),
         decoration: InputDecoration(
-          hintText: hintText, 
+          hintText: initialValue.isEmpty ? hintText : null, // Solo muestra hint si está vacío
           hintStyle: GoogleFonts.rubik(
-            color: GerenaColors.textSecondaryColor,
+            color: GerenaColors.textSecondaryColor.withOpacity(0.6),
             fontSize: 16,
           ),
           filled: true,
@@ -1206,7 +1229,6 @@ static Widget buildLabeledTextField(
     ],
   );
 }
-
 
 
 static Widget widgetButton({
