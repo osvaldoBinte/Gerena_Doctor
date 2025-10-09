@@ -13,7 +13,7 @@ class DoctorModel extends DoctorEntity {
     required super.direccion,
     required super.biografia,
     required super.educacion,
-    required super.foto,
+     super.foto,
   });
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(
@@ -28,7 +28,7 @@ class DoctorModel extends DoctorEntity {
       direccion: json['direccion'],
       biografia: json['biografia'],
       educacion: json['educacion'],
-      foto: json['foto'],
+      foto: json['foto']??'',
     );
   }
   Map<String, dynamic> toJson() {

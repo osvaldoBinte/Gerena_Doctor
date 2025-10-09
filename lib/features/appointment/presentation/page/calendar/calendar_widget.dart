@@ -32,166 +32,172 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   @override
   void initState() {
     super.initState();
-      _scrollController = ScrollController();
+    _scrollController = ScrollController();
 
-    try {
-      calendarController = Get.find<CalendarControllerGetx>();
-    } catch (e) {
-      calendarController = Get.put(CalendarControllerGetx());
-    }
-    
+    calendarController = Get.find<CalendarControllerGetx>();
+
     try {
       dashboardController = Get.find<DashboardController>();
     } catch (e) {
       dashboardController = Get.put(DashboardController());
     }
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        calendarController.updateCurrentDate(DateTime(2025, 4, 28));
-      }
-    });
   }
-@override
-Widget build(BuildContext context) {
-  final screenHeight = MediaQuery.of(context).size.height;
-  final availableHeight = screenHeight - 120; 
-  
-  return Container(
-    height: availableHeight,
-    decoration: BoxDecoration(
-      color: GerenaColors.backgroundColorfondo,
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min, 
-      children: [
-        _buildCalendarHeader(calendarController),
-        
-        Expanded(
-          flex: 6,
-          child: Obx(() {
-            if (kDebugMode) {
-              print('Total de citas: ${calendarController.appointments.length}');
-              for (var appt in calendarController.appointments) {
-                print('Cita: ${appt.subject} - ${appt.startTime} - ${appt.endTime}');
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final availableHeight = screenHeight - 120;
+
+    return Container(
+      height: availableHeight,
+      decoration: BoxDecoration(
+        color: GerenaColors.backgroundColorfondo,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildCalendarHeader(calendarController),
+          Expanded(
+            flex: 6,
+            child: Obx(() {
+              if (kDebugMode) {
+                print(
+                    'Total de citas: ${calendarController.appointments.length}');
+                for (var appt in calendarController.appointments) {
+                  print(
+                      'Cita: ${appt.subject} - ${appt.startTime} - ${appt.endTime}');
+                }
               }
-            }
-            
-            return Container(
-              width: double.infinity,
-              child: Stack(
-                children: [
+
+              return Container(
+                width: double.infinity,
+                child: Stack(
+                  children: [
                     Positioned(
-                        left: 0,
-                        right: 0,
-                        top: 0,
-                        height: 40,
-                        child: Container(
-                          color: GerenaColors.backgroundColorFondo,
-                          child: _buildCustomWeekDayHeader(),
+                      left: -1,
+                      right: -1,
+                      top: -1,
+                      bottom: -1,
+                      child: SfCalendar(
+                        view: CalendarView.month,
+                        controller: calendarController.calendarController,
+                        dataSource: _getCalendarDataSource(
+                            calendarController.appointments),
+                        initialDisplayDate:
+                            calendarController.selectedDate.value,
+                        initialSelectedDate:
+                            calendarController.selectedDate.value,
+                        showNavigationArrow: false,
+                        headerHeight: 0,
+                        viewHeaderHeight: 40,
+                        selectionDecoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border.all(color: Colors.transparent),
                         ),
-                      ),
-                  Positioned(
-                    left: -1,
-                    right: -1,
-                    top: -1,
-                    bottom: -1,
-                    child: SfCalendar(
-                      view: CalendarView.month,
-                      controller: calendarController.calendarController,
-                      dataSource: _getCalendarDataSource(calendarController.appointments),
-                      initialDisplayDate: calendarController.selectedDate.value,
-                      initialSelectedDate: calendarController.selectedDate.value,
-                      showNavigationArrow: false,
-                      headerHeight: 0,
-                      viewHeaderHeight: 40,
-                      selectionDecoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border: Border.all(color: Colors.transparent),
-                      ),
-                      onViewChanged: (ViewChangedDetails details) {
-                        if (details.visibleDates.isNotEmpty && mounted) {
-                          final newFocusDate = details.visibleDates[details.visibleDates.length ~/ 2];
-                          
-                          if (calendarController.focusedDate.value.month != newFocusDate.month ||
-                              calendarController.focusedDate.value.year != newFocusDate.year) {
-                            calendarController.focusedDate.value = newFocusDate;
-                          }
-                        }
-                      },
-                      monthViewSettings: MonthViewSettings(
-                        showAgenda: false,
-                        appointmentDisplayMode: MonthAppointmentDisplayMode.none,
-                        appointmentDisplayCount: 3,
-                        monthCellStyle: MonthCellStyle(
-                          textStyle: TextStyle(
-                            fontSize: 12,
-                            color: Colors.transparent,
-                          ),
-                          trailingDatesTextStyle: TextStyle(
-                            fontSize: 12,
-                            color: Colors.transparent,
-                          ),
-                          leadingDatesTextStyle: TextStyle(
-                            fontSize: 12,
-                            color: Colors.transparent,
-                          ),
-                          todayBackgroundColor: Colors.transparent,
-                          todayTextStyle: TextStyle(
-                            color: Colors.transparent,
-                          ),
-                        ),
-                      ),
-                         viewHeaderStyle: ViewHeaderStyle(
-                            dayTextStyle: GoogleFonts.rubik(
-                              fontSize: 12,
-                              color: Colors.transparent, 
-                            ),
-                          ),
-                      monthCellBuilder: (BuildContext context, MonthCellDetails details) {
-                        return _buildCalendarCell(details);
-                      },
-                      onTap: (CalendarTapDetails details) {
-                        if (!mounted) return;
-                        
-                        if (details.targetElement == CalendarElement.calendarCell) {
-                          if (details.date != null) {
-                            _handleDateTap(details.date!, calendarController, dashboardController);
-                            
-                            if (widget.onDateSelected != null) {
-                              widget.onDateSelected!(details.date!);
+                        onViewChanged: (ViewChangedDetails details) {
+                          if (details.visibleDates.isNotEmpty && mounted) {
+                            final newFocusDate = details
+                                .visibleDates[details.visibleDates.length ~/ 2];
+                            print('Fecha enfocada cambiada a: $newFocusDate');
+
+                            if (calendarController.focusedDate.value.month !=
+                                    newFocusDate.month ||
+                                calendarController.focusedDate.value.year !=
+                                    newFocusDate.year) {
+                              calendarController.focusedDate.value =
+                                  newFocusDate;
+
+                              final firstDayOfMonth = DateTime(
+                                  newFocusDate.year, newFocusDate.month, 1);
+                              calendarController
+                                  .loadAppointmentsForDate(firstDayOfMonth);
+
+                              print(
+                                  'Cargando citas para el mes: ${newFocusDate.month}/${newFocusDate.year}');
                             }
                           }
-                        } else if (details.targetElement == CalendarElement.appointment) {
-                          if (details.date != null) {
-                            _handleDateTap(details.date!, calendarController, dashboardController);
+                        },
+                        monthViewSettings: MonthViewSettings(
+                          showAgenda: false,
+                          appointmentDisplayMode:
+                              MonthAppointmentDisplayMode.none,
+                          appointmentDisplayCount: 3,
+                          monthCellStyle: MonthCellStyle(
+                            textStyle: TextStyle(
+                              fontSize: 12,
+                              color: Colors.transparent,
+                            ),
+                            trailingDatesTextStyle: TextStyle(
+                              fontSize: 12,
+                              color: Colors.transparent,
+                            ),
+                            leadingDatesTextStyle: TextStyle(
+                              fontSize: 12,
+                              color: Colors.transparent,
+                            ),
+                            todayBackgroundColor: Colors.transparent,
+                            todayTextStyle: TextStyle(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                        ),
+                        viewHeaderStyle: ViewHeaderStyle(
+                          dayTextStyle: GoogleFonts.rubik(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: GerenaColors.textPrimaryColor,
+                          ),
+                        ),
+                        monthCellBuilder:
+                            (BuildContext context, MonthCellDetails details) {
+                          return _buildCalendarCell(details);
+                        },
+                        onTap: (CalendarTapDetails details) {
+                          if (!mounted) return;
+
+                          if (details.targetElement ==
+                              CalendarElement.calendarCell) {
+                            if (details.date != null) {
+                              _handleDateTap(details.date!, calendarController,
+                                  dashboardController);
+
+                              if (widget.onDateSelected != null) {
+                                widget.onDateSelected!(details.date!);
+                              }
+                            }
+                          } else if (details.targetElement ==
+                              CalendarElement.appointment) {
+                            if (details.date != null) {
+                              _handleDateTap(details.date!, calendarController,
+                                  dashboardController);
+                            }
                           }
-                        }
-                      },
-                      appointmentBuilder: (BuildContext context, CalendarAppointmentDetails details) {
-                        return Container();
-                      },
+                        },
+                        appointmentBuilder: (BuildContext context,
+                            CalendarAppointmentDetails details) {
+                          return Container();
+                        },
+                      ),
                     ),
-                  ),
-                  
-                  ..._buildBorderOverlays(),
-                ],
-              ),
-            );
-          }),
-        ),
-        
-        Expanded(
-          flex: 3,
-          child: Obx(() => _buildDayAppointments(calendarController, dashboardController)),
-        ),
-      ],
-    ),
-  );
-}
+                    ..._buildBorderOverlays(),
+                  ],
+                ),
+              );
+            }),
+          ),
+          Expanded(
+            flex: 3,
+            child: Obx(() =>
+                _buildDayAppointments(calendarController, dashboardController)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCustomWeekDayHeader() {
     final weekDays = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
-    
+
     return Row(
       children: weekDays.map((day) {
         return Expanded(
@@ -211,60 +217,66 @@ Widget build(BuildContext context) {
       }).toList(),
     );
   }
+
   Widget _buildCalendarCell(MonthCellDetails details) {
-  final isCurrentMonth = details.date.month == details.visibleDates[details.visibleDates.length ~/ 2].month;
-  final hasAppointments = calendarController.getAppointmentsForDate(details.date).isNotEmpty;
-  final isSelected = calendarController.selectedDate.value != null &&
-      details.date.day == calendarController.selectedDate.value!.day &&
-      details.date.month == calendarController.selectedDate.value!.month &&
-      details.date.year == calendarController.selectedDate.value!.year;
-  
-  return Container(
-    decoration: BoxDecoration(
-      border: Border.all(
-        color: GerenaColors.backgroundcalendart,
-        width: 0.5,
+    final isCurrentMonth = details.date.month ==
+        details.visibleDates[details.visibleDates.length ~/ 2].month;
+    final hasAppointments =
+        calendarController.getAppointmentsForDate(details.date).isNotEmpty;
+    final isSelected = calendarController.selectedDate.value != null &&
+        details.date.day == calendarController.selectedDate.value!.day &&
+        details.date.month == calendarController.selectedDate.value!.month &&
+        details.date.year == calendarController.selectedDate.value!.year;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: GerenaColors.backgroundcalendart,
+          width: 0.5,
+        ),
       ),
-    ),
-    child: Stack(
-      children: [
-        Positioned(
-          top: 4,
-          left: 6,
-          child: Container(
-            width: 24,
-            height: 24,
-            decoration: isSelected ? BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: GerenaColors.primaryColor,
-                width: 2,
-              ),
-            ) : null,
-            child: Center(
-              child: Text(
-                '${details.date.day}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isCurrentMonth 
-                      ? GerenaColors.textPrimaryColor 
-                      : Colors.transparent,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      child: Stack(
+        children: [
+          Positioned(
+            top: 4,
+            left: 6,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: isSelected
+                  ? BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: GerenaColors.primaryColor,
+                        width: 2,
+                      ),
+                    )
+                  : null,
+              child: Center(
+                child: Text(
+                  '${details.date.day}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isCurrentMonth
+                        ? GerenaColors.textPrimaryColor
+                        : Colors.transparent,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        
-        if (isCurrentMonth && hasAppointments) ..._buildAppointmentIndicators(details.date),
-      ],
-    ),
-  );
-}
+          if (isCurrentMonth && hasAppointments)
+            ..._buildAppointmentIndicators(details.date),
+        ],
+      ),
+    );
+  }
 
   List<Widget> _buildAppointmentIndicators(DateTime date) {
     final appointments = calendarController.getAppointmentsForDate(date);
-    
+
     return [
       Positioned(
         top: 32,
@@ -289,7 +301,6 @@ Widget build(BuildContext context) {
           ),
         ),
       ),
-      
       if (appointments.length > 1)
         Positioned(
           bottom: 4,
@@ -364,22 +375,26 @@ Widget build(BuildContext context) {
     ];
   }
 
-  void _handleDateTap(DateTime tappedDate, CalendarControllerGetx calendarController, DashboardController dashboardController) {
-    if (_lastTappedDate != null && 
+  void _handleDateTap(
+      DateTime tappedDate,
+      CalendarControllerGetx calendarController,
+      DashboardController dashboardController) {
+    if (_lastTappedDate != null &&
         _lastTappedDate!.day == tappedDate.day &&
         _lastTappedDate!.month == tappedDate.month &&
         _lastTappedDate!.year == tappedDate.year) {
-      
       _tapCount++;
-      
+
       if (_tapCount == 2) {
         print('Doble tap detectado en: $tappedDate');
-        
-        final appointmentsForDay = calendarController.getAppointmentsForDate(tappedDate);
+
+        final appointmentsForDay =
+            calendarController.getAppointmentsForDate(tappedDate);
         if (appointmentsForDay.isNotEmpty) {
-          dashboardController.showMedicalAppointments(tappedDate, appointmentsForDay);
+          dashboardController.showMedicalAppointments(
+              tappedDate, appointmentsForDay);
         }
-        
+
         _tapCount = 0;
         _lastTappedDate = null;
         return;
@@ -387,10 +402,10 @@ Widget build(BuildContext context) {
     } else {
       _tapCount = 1;
     }
-    
+
     calendarController.selectedDate.value = tappedDate;
     _lastTappedDate = tappedDate;
-    
+
     Future.delayed(const Duration(milliseconds: 500), () {
       _tapCount = 0;
       _lastTappedDate = null;
@@ -399,7 +414,7 @@ Widget build(BuildContext context) {
 
   CalendarDataSource _getCalendarDataSource(List<Appointment> appointments) {
     final List<Appointment> meetings = <Appointment>[];
-    
+
     for (var appointment in appointments) {
       meetings.add(Appointment(
         startTime: appointment.startTime,
@@ -411,7 +426,7 @@ Widget build(BuildContext context) {
         isAllDay: false,
       ));
     }
-    
+
     return _AppointmentDataSource(meetings);
   }
 
@@ -420,63 +435,65 @@ Widget build(BuildContext context) {
       height: 80,
       padding: const EdgeInsets.all(16.0),
       child: Obx(() => Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          IconButton(
-            icon: Icon(
-              Icons.chevron_left,
-              color: GerenaColors.primaryColor,
-              size: 40, 
-            ),
-            onPressed: controller.previousPeriod,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          SizedBox(width: 18),
-          Text(
-            controller.getFormattedDate(),
-            style: TextStyle(
-              fontWeight: FontWeight.w900,
-              fontSize: 27,
-              color: GerenaColors.textPrimaryColor,
-            ),
-          ),
-          SizedBox(width: 18),
-          IconButton(
-            icon: Icon(
-              Icons.chevron_right,
-              color: GerenaColors.primaryColor,
-              size: 40, 
-            ),
-            onPressed: controller.nextPeriod,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-        ],
-      )),
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.chevron_left,
+                  color: GerenaColors.primaryColor,
+                  size: 40,
+                ),
+                onPressed: controller.previousPeriod,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+              SizedBox(width: 18),
+              Text(
+                controller.getFormattedDate(),
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 27,
+                  color: GerenaColors.textPrimaryColor,
+                ),
+              ),
+              SizedBox(width: 18),
+              IconButton(
+                icon: Icon(
+                  Icons.chevron_right,
+                  color: GerenaColors.primaryColor,
+                  size: 40,
+                ),
+                onPressed: controller.nextPeriod,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          )),
     );
   }
-void _scrollToIndex(int index) {
-  if (_scrollController.hasClients) {
-    double itemHeight = 100.0;
-    double targetOffset = index * itemHeight;
-    
-    _scrollController.animateTo(
-      targetOffset,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-    
-  }
-    calendarController.updateCurrentAppointmentIndex(index);
 
-}
-  Widget _buildDayAppointments(CalendarControllerGetx controller, DashboardController dashboardController) {
+  void _scrollToIndex(int index) {
+    if (_scrollController.hasClients) {
+      double itemHeight = 100.0;
+      double targetOffset = index * itemHeight;
+
+      _scrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+    calendarController.updateCurrentAppointmentIndex(index);
+  }
+
+  Widget _buildDayAppointments(CalendarControllerGetx controller,
+      DashboardController dashboardController) {
     if (controller.selectedDate.value == null) {
       return const Center(child: SizedBox.shrink());
     }
 
-    final appointmentsForDay = controller.getAppointmentsForDate(controller.selectedDate.value!);
+    final appointmentsForDay =
+        controller.getAppointmentsForDate(controller.selectedDate.value!);
 
     if (appointmentsForDay.isEmpty) {
       return Padding(
@@ -506,7 +523,8 @@ void _scrollToIndex(int index) {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16.0),
-        child: buildAppointmentCard(appointmentsForDay[0], controller, dashboardController),
+        child: buildAppointmentCard(
+            appointmentsForDay[0], controller, dashboardController),
       );
     }
 
@@ -526,20 +544,19 @@ void _scrollToIndex(int index) {
               ),
             ),
           ),
-          
           const SizedBox(width: 8),
-         Expanded(
-  child: ListView.builder(
-    controller: _scrollController, 
-    shrinkWrap: true,
-    physics: const BouncingScrollPhysics(),
-    itemCount: appointmentsForDay.length,
-    itemBuilder: (context, index) {
-      return buildAppointmentCard(appointmentsForDay[index], controller, dashboardController);
-    },
-  ),
-),
-         
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              itemCount: appointmentsForDay.length,
+              itemBuilder: (context, index) {
+                return buildAppointmentCard(
+                    appointmentsForDay[index], controller, dashboardController);
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -548,11 +565,11 @@ void _scrollToIndex(int index) {
   Widget _buildCircleIndicator(int index, CalendarControllerGetx controller) {
     return Obx(() {
       final isActive = index == controller.currentAppointmentIndex.value;
-      
+
       return GestureDetector(
         onTap: () {
-        _scrollToIndex(index);
-      },
+          _scrollToIndex(index);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.symmetric(vertical: 4),
@@ -560,35 +577,38 @@ void _scrollToIndex(int index) {
           height: isActive ? 12 : 8,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive 
-                ? GerenaColors.colorHoverRow
-                : Colors.white,
+            color: isActive ? GerenaColors.colorHoverRow : Colors.white,
             border: Border.all(
-              color: isActive 
-                  ? GerenaColors.colorHoverRow 
-                  : Colors.grey[300]!,
+              color: isActive ? GerenaColors.colorHoverRow : Colors.grey[300]!,
               width: isActive ? 2 : 1,
             ),
-            boxShadow: isActive ? [
-              BoxShadow(
-                color: GerenaColors.colorHoverRow.withOpacity(0.3),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ] : null,
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: GerenaColors.colorHoverRow.withOpacity(0.3),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
         ),
       );
     });
   }
 
-  Widget buildAppointmentCard(Appointment appointment, CalendarControllerGetx controller, DashboardController dashboardController) {
+  Widget buildAppointmentCard(
+      Appointment appointment,
+      CalendarControllerGetx controller,
+      DashboardController dashboardController) {
     final hour = appointment.startTime.hour;
     final minute = appointment.startTime.minute;
     final period = hour < 12 ? 'A.M.' : 'P.M.';
     final formattedHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-    final formattedTime = '$formattedHour:${minute.toString().padLeft(2, '0')} $period';
-    final formattedDate = DateFormat('d \'de\' MMMM \'de\' yyyy', 'es_ES').format(appointment.startTime);
+    final formattedTime =
+        '$formattedHour:${minute.toString().padLeft(2, '0')} $period';
+    final formattedDate = DateFormat('d \'de\' MMMM \'de\' yyyy', 'es_ES')
+        .format(appointment.startTime);
 
     String tipoVisita = 'Seguimiento';
     if (appointment.location != null && appointment.location!.isNotEmpty) {
@@ -599,11 +619,13 @@ void _scrollToIndex(int index) {
     if (appointment.notes != null && appointment.notes!.isNotEmpty) {
       procedimiento = appointment.notes!;
     }
-    
+
     return GestureDetector(
       onTap: () {
-        final appointmentsForDay = controller.getAppointmentsForDate(appointment.startTime);
-        dashboardController.showMedicalAppointments(appointment.startTime, appointmentsForDay);
+        final appointmentsForDay =
+            controller.getAppointmentsForDate(appointment.startTime);
+        dashboardController.showMedicalAppointments(
+            appointment.startTime, appointmentsForDay);
       },
       child: Container(
         width: double.infinity,
@@ -627,7 +649,6 @@ void _scrollToIndex(int index) {
                 child: _buildDefaultAvatar(),
               ),
               const SizedBox(width: 12),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,7 +682,6 @@ void _scrollToIndex(int index) {
                   ],
                 ),
               ),
-
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,
@@ -675,7 +695,8 @@ void _scrollToIndex(int index) {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     child: Text(
                       formattedTime,
                       style: TextStyle(
@@ -707,7 +728,7 @@ class _AppointmentDataSource extends CalendarDataSource {
   _AppointmentDataSource(List<Appointment> source) {
     appointments = source;
   }
-  
+
   @override
   DateTime getStartTime(int index) {
     return appointments![index].startTime;
@@ -732,12 +753,12 @@ class _AppointmentDataSource extends CalendarDataSource {
   bool isAllDay(int index) {
     return appointments![index].isAllDay;
   }
-  
+
   @override
   String? getNotes(int index) {
     return appointments![index].notes;
   }
-  
+
   @override
   String? getLocation(int index) {
     return appointments![index].location;

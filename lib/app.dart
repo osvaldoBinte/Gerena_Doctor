@@ -9,7 +9,7 @@ import 'package:gerena/features/auth/presentacion/page/login/login_controller.da
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:gerena/movil/perfil/perfil_controller.dart';
-import 'package:gerena/page/dashboard/calendar/calendar_controller.dart';
+import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
@@ -40,6 +40,7 @@ class App extends StatelessWidget {
         Get.put(AuthService(), permanent: true);
         Get.put(usecaseConfig.loginUsecase!, permanent: true);
         Get.put(usecaseConfig.doctorProfileUsecase!, permanent: true);
+        Get.put(usecaseConfig.getAppointmentsUsecase!, permanent: true);
 
 
 
@@ -47,10 +48,10 @@ class App extends StatelessWidget {
         Get.lazyPut(() => LoginController(loginUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => SplashController(doctorProfileUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => PrefilDortorController(doctorProfileUsecase:  Get.find()), fenix: true);
+        Get.lazyPut(() => CalendarControllerGetx(getAppointmentsUsecase: Get.find()), fenix: true);
       Get.put(DashboardController());
        Get.put(ShopNavigationController());
        Get.put(ProductDetailController());
-       Get.put(CalendarControllerGetx());
               Get.put(PostController()); 
                      Get.put(PerfilController());
 

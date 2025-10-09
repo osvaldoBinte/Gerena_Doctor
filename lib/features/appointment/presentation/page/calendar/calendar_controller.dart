@@ -1,4 +1,6 @@
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/appointment/domain/usecase/get_appointments_usecase.dart';
+import 'package:gerena/features/appointment/domain/entities/getappointment/get_apppointment_entity.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +11,21 @@ enum CalendarViewType {
 }
 
 class CalendarControllerGetx extends GetxController {
+  final GetAppointmentsUsecase getAppointmentsUsecase;
+  CalendarControllerGetx({required this.getAppointmentsUsecase});
 
-  final Rx<DateTime> focusedDate = DateTime(2025, 4, 28).obs;  
-  final Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime(2025, 4, 28));
+  // Inicializar con el día 1 del mes actual
+  final Rx<DateTime> focusedDate = DateTime(DateTime.now().year, DateTime.now().month, 1).obs;  
+  final Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime(DateTime.now().year, DateTime.now().month, 1));
   final Rx<DateTime?> lastTappedDate = Rx<DateTime?>(null);
   final Rx<CalendarViewType> currentViewType = CalendarViewType.month.obs;
   final RxBool isProcessingViewChange = false.obs;
   final RxList<Appointment> appointments = <Appointment>[].obs;
   final RxBool showAppointmentDetails = false.obs;
+  final RxBool isLoading = false.obs;
 
   final RxInt currentAppointmentIndex = 0.obs;
   late PageController pageController;
-
 
   late CalendarController calendarController;
 
@@ -32,13 +37,12 @@ class CalendarControllerGetx extends GetxController {
     calendarController.selectedDate = selectedDate.value;
     calendarController.view = CalendarView.month;
     
-
     pageController = PageController(
-        viewportFraction: 0.55, 
-
+      viewportFraction: 0.55, 
     );
     
-    loadDefaultAppointments();
+    // Cargar citas de la fecha inicial
+    loadAppointmentsForDate(focusedDate.value);
   }
 
   @override
@@ -80,6 +84,9 @@ class CalendarControllerGetx extends GetxController {
     
     resetCarouselIndex();
     
+    // Cargar citas para la nueva fecha
+    loadAppointmentsForDate(date);
+    
     if (currentViewType.value == CalendarViewType.day) {
       calendarController.view = CalendarView.day;
     } else {
@@ -91,72 +98,64 @@ class CalendarControllerGetx extends GetxController {
     showAppointmentDetails.value = false;
   }
 
-  void loadDefaultAppointments() {
-    final List<Appointment> defaultAppointments = <Appointment>[];
-    
-    final int year = 2025;
-    final int month = 4;
-    
-    final DateTime startTime1 = DateTime(year, month, 28, 10, 30);
-    final DateTime endTime1 = startTime1.add(const Duration(hours: 1));
-    defaultAppointments.add(Appointment(
-      subject: 'Fabiola Gómez Gómez',
-      startTime: startTime1,
-      endTime: endTime1,
-      color: GerenaColors.accentColor,
-      notes: 'Procedimiento: Relleno Dérmico De Labios',
-      location: 'Seguimiento',
-    ));
-    
-    final DateTime startTime2 = DateTime(year, month, 28, 12, 30);
-    final DateTime endTime2 = startTime2.add(const Duration(hours: 1));
-    defaultAppointments.add(Appointment(
-      subject: 'Jessica Fernández Gutiérrez',
-      startTime: startTime2,
-      endTime: endTime2,
-      color: GerenaColors.accentColor,
-      notes: 'Procedimiento: Toxina Botulínica En Tercio Superior Del Rostro',
-      location: 'Primera cita',
-    ));
-    
-    final DateTime startTime3 = DateTime(year, month, 28, 15, 0);
-    final DateTime endTime3 = startTime3.add(const Duration(hours: 1));
-    defaultAppointments.add(Appointment(
-      subject: 'Andrés Flores Pacheco',
-      startTime: startTime3,
-      endTime: endTime3,
-      color: GerenaColors.accentColor,
-      notes: 'Procedimiento: Toxina Botulínica En Tercio Superior Del Rostro',
-      location: 'Seguimiento',
-    ));
-    
-    final DateTime startTime4 = DateTime(year, month, 30, 12, 30);
-    final DateTime endTime4 = startTime4.add(const Duration(hours: 1));
-    defaultAppointments.add(Appointment(
-      subject: 'Jessica Fernandez Gutierrez',
-      startTime: startTime4,
-      endTime: endTime4,
-      color: GerenaColors.accentColor,
-      notes: 'Procedimiento: Toxina Botulínica En Tercio Superior Del Rostro',
-      location: 'Primera Cita',
-    ));
-    
-    final DateTime startTime5 = DateTime(year, month, 19, 14, 0);
-    final DateTime endTime5 = startTime5.add(const Duration(hours: 1));
-    defaultAppointments.add(Appointment(
-      subject: 'Laura Méndez Torres',
-      startTime: startTime5,
-      endTime: endTime5,
-      color: GerenaColors.accentColor,
-      notes: 'Procedimiento: Aplicación de Enzimas Reductoras',
-      location: 'Seguimiento',
-    ));
-    
-    for (var appointment in defaultAppointments) {
-      print('Cargando cita: ${appointment.subject} - ${appointment.startTime} - ${appointment.endTime}');
+  // Cargar citas desde el usecase
+  Future<void> loadAppointmentsForDate(DateTime date) async {
+    try {
+      isLoading.value = true;
+      
+      // Formatear fecha como string (formato: YYYY-MM-DD)
+      final dateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      
+      // Calcular el número de días del mes
+      final daysInMonth = _getDaysInMonth(date.year, date.month);
+      
+      print('Cargando citas para: $dateString con $daysInMonth días en el mes');
+      
+      // Obtener citas del usecase pasando la fecha y los días del mes
+      final appointmentEntities = await getAppointmentsUsecase.execute(dateString, daysInMonth.toString());
+      
+      // Convertir entidades a objetos Appointment
+      final appointmentsList = appointmentEntities.map((entity) {
+        return _convertEntityToAppointment(entity);
+      }).toList();
+      
+      appointments.assignAll(appointmentsList);
+      
+      print('Citas cargadas: ${appointmentsList.length}');
+      
+    } catch (e) {
+      print('Error al cargar citas: $e');
+      appointments.clear();
+    } finally {
+      isLoading.value = false;
     }
+  }
+
+  // Obtener el número de días en un mes específico
+  int _getDaysInMonth(int year, int month) {
+    // Crear una fecha del primer día del siguiente mes y restar un día
+    final firstDayNextMonth = DateTime(year, month + 1, 1);
+    final lastDayCurrentMonth = firstDayNextMonth.subtract(const Duration(days: 1));
+    return lastDayCurrentMonth.day;
+  }
+
+  // Convertir GetApppointmentEntity a Appointment
+  Appointment _convertEntityToAppointment(GetApppointmentEntity entity) {
+    // Parsear las fechas
+    final startDateTime = DateTime.parse(entity.startDateTime);
+    final endDateTime = DateTime.parse(entity.endDateTime);
     
-    appointments.assignAll(defaultAppointments);
+    return Appointment(
+      subject: entity.clientName,
+      startTime: startDateTime,
+      endTime: endDateTime,
+      color: GerenaColors.accentColor,
+      notes: entity.consultationReason.isNotEmpty 
+          ? 'Procedimiento: ${entity.consultationReason}' 
+          : 'Sin motivo especificado',
+      location: entity.appointmentType,
+      id: entity.id,
+    );
   }
 
   void updateAppointments(List<Appointment> newAppointments) {
@@ -253,6 +252,9 @@ class CalendarControllerGetx extends GetxController {
       
       resetCarouselIndex();
       
+      // Cargar citas para el nuevo período
+      loadAppointmentsForDate(focusedDate.value);
+      
       try {
         calendarController.displayDate = focusedDate.value;
         if (currentViewType.value == CalendarViewType.day) {
@@ -279,6 +281,9 @@ class CalendarControllerGetx extends GetxController {
       
       resetCarouselIndex();
       
+      // Cargar citas para el nuevo período
+      loadAppointmentsForDate(focusedDate.value);
+      
       try {
         calendarController.displayDate = focusedDate.value;
         if (currentViewType.value == CalendarViewType.day) {
@@ -295,7 +300,18 @@ class CalendarControllerGetx extends GetxController {
   void updateFocusedDateFromViewChange(List<DateTime> visibleDates) {
     if (visibleDates.isNotEmpty && !isProcessingViewChange.value) {
       isProcessingViewChange.value = true;
-      focusedDate.value = visibleDates[visibleDates.length ~/ 2];
+      
+      final newFocusedDate = visibleDates[visibleDates.length ~/ 2];
+      
+      // Solo actualizar y cargar si el mes cambió
+      if (focusedDate.value.month != newFocusedDate.month || 
+          focusedDate.value.year != newFocusedDate.year) {
+        focusedDate.value = newFocusedDate;
+        
+        // Cargar citas para el nuevo mes
+        loadAppointmentsForDate(newFocusedDate);
+      }
+      
       isProcessingViewChange.value = false;
     }
   }

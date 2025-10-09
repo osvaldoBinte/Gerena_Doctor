@@ -15,12 +15,15 @@ class LoginPage extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 800;
 
-    return Scaffold(
-      backgroundColor: GerenaColors.backgroundlogin,
-      body: SafeArea(
-        child: isMobile 
-          ? _buildMobileLayout(controller, context)
-          : _buildDesktopLayout(controller, context),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: GerenaColors.backgroundlogin,
+        body: SafeArea(
+          child: isMobile 
+            ? _buildMobileLayout(controller, context)
+            : _buildDesktopLayout(controller, context),
+        ),
       ),
     );
   }

@@ -9,7 +9,7 @@ import 'package:gerena/page/dashboard/widget/preguntasFrecuentes/preguntas_frecu
 import 'package:gerena/page/dashboard/widget/sugerencia/sugerencia.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/desktop/Profile_doctor.dart';
 import 'package:get/get.dart';
-import 'package:gerena/page/dashboard/calendar/calendar_widget.dart';
+import 'package:gerena/features/appointment/presentation/page/calendar/calendar_widget.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar.dart';
 import 'package:gerena/page/dashboard/widget/sidebar/sidebar_widget.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';

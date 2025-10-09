@@ -10,7 +10,7 @@ class DoctorEntity  {
   final String direccion;
   final String biografia;
   final String educacion;
-  final String foto;
+   String? foto;
   DoctorEntity({
     required this.userId,
     required this.nombreCompleto,
@@ -23,6 +23,6 @@ class DoctorEntity  {
     required this.direccion,
     required this.biografia,
     required this.educacion,
-    required this.foto,
+ this.foto,
   });
 }

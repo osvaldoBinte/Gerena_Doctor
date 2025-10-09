@@ -26,7 +26,6 @@ class SplashController extends GetxController {
       };
 
     } catch (e) {
-      print('❌ Error al verificar sesión: $e');
       Get.offAllNamed(RoutesNames.loginPage);
     } finally {
       isLoading.value = false;

@@ -33,7 +33,7 @@ class AuthService extends GetxService {
       if (sessionJson != null && sessionJson.isNotEmpty) {
         final Map<String, dynamic> sessionMap = jsonDecode(sessionJson);
         _cachedUserData = LoginResponseModel.fromJson(sessionMap);
-        print('✅ Datos de usuario obtenidos correctamente');
+        print('✅ Datos de usuario obtenidos correctamente $sessionMap');
         return _cachedUserData;
       }
 
