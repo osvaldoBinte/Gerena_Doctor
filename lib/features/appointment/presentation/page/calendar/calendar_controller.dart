@@ -252,7 +252,6 @@ class CalendarControllerGetx extends GetxController {
       
       resetCarouselIndex();
       
-      // Cargar citas para el nuevo período
       loadAppointmentsForDate(focusedDate.value);
       
       try {
