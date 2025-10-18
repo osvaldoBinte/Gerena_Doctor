@@ -8,7 +8,7 @@ import 'package:gerena/features/doctors/data/model/doctor_model.dart';
 import 'package:gerena/features/doctors/domain/entities/doctor/doctor_entity.dart';
 import 'package:http/http.dart' as http;
 
-class DoctosDataSources {
+class DoctosDataSourcesImp {
 
     String defaultApiServer = AppConstants.serverBase;
  Future<DoctorEntity> getDoctorProfile({required String token}) async {

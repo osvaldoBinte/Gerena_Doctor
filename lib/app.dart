@@ -40,7 +40,11 @@ class App extends StatelessWidget {
         Get.put(AuthService(), permanent: true);
         Get.put(usecaseConfig.loginUsecase!, permanent: true);
         Get.put(usecaseConfig.doctorProfileUsecase!, permanent: true);
-        Get.put(usecaseConfig.getAppointmentsUsecase!, permanent: true);
+        Get.put(usecaseConfig.getAppointmentsUsecase!, permanent: true);      
+        Get.put(usecaseConfig.getMedicineByIdUsecase!, permanent: true);
+        Get.put(usecaseConfig.getMyOrderUsecase!, permanent:  true);
+        Get.put(usecaseConfig.searchingForMedicationsUsecase!,permanent: true);
+        Get.put(usecaseConfig.getOrderByIdUsecase!, permanent: true);
 
 
 
