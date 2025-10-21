@@ -98,7 +98,7 @@ class MarketplaceDataSourcesImp {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
 
-        final List category = responseDecode['medicamentos'];
+        final List category =responseDecode;
         return category
             .map((json) => CategoryModel.fromJson(json))
             .toList();

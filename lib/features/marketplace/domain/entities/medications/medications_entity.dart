@@ -4,16 +4,16 @@ class MedicationsEntity {
   final String description;
   final double price;
   final int stock;
-  final String imagen;
+   String? imagen;
   final String categoria;
-  final String activo;
+  final bool activo;
   MedicationsEntity({
    required this.id,
    required this.name,
    required this.description,
    required this.price,
    required this.stock,
-   required this.imagen,
+    this.imagen,
    required this.categoria,
    required this.activo
 

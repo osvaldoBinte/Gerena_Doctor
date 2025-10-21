@@ -7,7 +7,7 @@ class SearchingForMedicationsModel extends MedicationsEntity {
       required super.description,
       required super.price,
       required super.stock,
-      required super.imagen,
+       super.imagen,
       required super.categoria,
       required super.activo});
 
@@ -18,7 +18,7 @@ class SearchingForMedicationsModel extends MedicationsEntity {
         description: json['descripcion']??'',
         price: json['precio']??0.0,
         stock: json['stock']??0,
-        imagen: json['imagen']??'',
+        imagen: json['imagen'],
         categoria: json['categoria']??'',
         activo: json['activo']??'');
   }

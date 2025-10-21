@@ -11,7 +11,7 @@ import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/deskt
 import 'package:get/get.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_widget.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar.dart';
-import 'package:gerena/page/dashboard/widget/sidebar/sidebar_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/Category/sidebar_widget.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class DashboardPage extends StatelessWidget {

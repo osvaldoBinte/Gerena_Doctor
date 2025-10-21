@@ -7,6 +7,8 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:gerena/movil/perfil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
@@ -45,7 +47,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getMyOrderUsecase!, permanent:  true);
         Get.put(usecaseConfig.searchingForMedicationsUsecase!,permanent: true);
         Get.put(usecaseConfig.getOrderByIdUsecase!, permanent: true);
-
+        Get.put(usecaseConfig.getCategoryUsecase!,permanent: true);
 
 
 
@@ -53,11 +55,13 @@ class App extends StatelessWidget {
         Get.lazyPut(() => SplashController(doctorProfileUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => PrefilDortorController(doctorProfileUsecase:  Get.find()), fenix: true);
         Get.lazyPut(() => CalendarControllerGetx(getAppointmentsUsecase: Get.find()), fenix: true);
-      Get.put(DashboardController());
-       Get.put(ShopNavigationController());
-       Get.put(ProductDetailController());
-              Get.put(PostController()); 
-                     Get.put(PerfilController());
+        Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find()), fenix:  true);
+        Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find()), fenix:  true);
+        Get.put(DashboardController());
+        Get.put(ShopNavigationController());
+        Get.put(ProductDetailController());
+        Get.put(PostController()); 
+        Get.put(PerfilController());
 
 
       }),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/movil/homePage/home_page.dart';
 import 'package:gerena/movil/notificasiones/notification_page.dart';
 import 'package:gerena/movil/perfil/perfil_page.dart';
-import 'package:gerena/movil/Category/category_page.dart';
+import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
 import 'package:gerena/page/dashboard/widget/notificasiones/notification_modal.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:get/get.dart';

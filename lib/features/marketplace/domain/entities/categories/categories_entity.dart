@@ -1,6 +1,6 @@
 class CategoriesEntity {
-  final String? foto;  
-  final String name;
+  final String? image;  
+  final String category;
   
-  CategoriesEntity({this.foto, required this.name});
+  CategoriesEntity({this.image, required this.category});
 }
