@@ -1,6 +1,6 @@
 import 'package:gerena/page/dashboard/widget/notificasiones/notification_modal.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/desktop/Profile_doctor.dart'; 
-import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart'; 
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart'; 
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:get/get.dart'; 
 import 'package:window_manager/window_manager.dart'; 

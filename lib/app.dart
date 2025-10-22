@@ -14,7 +14,7 @@ import 'package:gerena/movil/perfil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
-import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:gerena/page/store/cartPage/productDetail/product_detail_controller.dart';
 import 'package:gerena/usecase_config.dart';
 import 'package:get/get.dart';
@@ -48,6 +48,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.searchingForMedicationsUsecase!,permanent: true);
         Get.put(usecaseConfig.getOrderByIdUsecase!, permanent: true);
         Get.put(usecaseConfig.getCategoryUsecase!,permanent: true);
+        Get.put(usecaseConfig.getMedicinesOnSaleUsecase!, permanent:  true);
 
 
 
@@ -56,7 +57,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => PrefilDortorController(doctorProfileUsecase:  Get.find()), fenix: true);
         Get.lazyPut(() => CalendarControllerGetx(getAppointmentsUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find()), fenix:  true);
-        Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find()), fenix:  true);
+        Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(ProductDetailController());

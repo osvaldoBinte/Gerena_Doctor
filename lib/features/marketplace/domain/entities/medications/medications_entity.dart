@@ -7,6 +7,7 @@ class MedicationsEntity {
    String? imagen;
   final String categoria;
   final bool activo;
+   double? previousprice;
   MedicationsEntity({
    required this.id,
    required this.name,
@@ -15,7 +16,8 @@ class MedicationsEntity {
    required this.stock,
     this.imagen,
    required this.categoria,
-   required this.activo
+   required this.activo,
+   required this.previousprice
 
   });
   

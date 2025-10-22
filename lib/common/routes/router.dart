@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_page.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_page.dart';
-import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_page.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/mobil/get_medications_page.dart';
 import 'package:gerena/movil/home/start_page.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:get/get.dart';

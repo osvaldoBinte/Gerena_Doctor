@@ -5,6 +5,8 @@ import 'package:gerena/features/marketplace/domain/entities/orders/orders_entity
 abstract class MarketplaceRepository {
   Future<List<CategoriesEntity>>categories();
   Future<List<MedicationsEntity>> searchingformedications(String categoria,String busqueda,);
+    Future<List<MedicationsEntity>> medicinesonsale();
+
   Future<MedicationsEntity> getmedicineByID(int id);
    Future<OrderEntity> myorders();
   Future<OrderEntity> orderbyID(int id);

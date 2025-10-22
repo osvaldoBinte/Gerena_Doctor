@@ -11,6 +11,7 @@ import 'package:gerena/features/marketplace/data/datasources/marketplace_data_so
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicine_by_id_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/get_medicines_on_sale_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_my_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_order_by_id_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
@@ -41,6 +42,7 @@ class UsecaseConfig {
    GetMedicineByIdUsecase?getMedicineByIdUsecase;
    SearchingForMedicationsUsecase? searchingForMedicationsUsecase;
    GetCategoryUsecase? getCategoryUsecase;
+   GetMedicinesOnSaleUsecase? getMedicinesOnSaleUsecase;
 
 
 
@@ -66,6 +68,7 @@ class UsecaseConfig {
      searchingForMedicationsUsecase = SearchingForMedicationsUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getCategoryUsecase = GetCategoryUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getOrderByIdUsecase = GetOrderByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+     getMedicinesOnSaleUsecase = GetMedicinesOnSaleUsecase(marketplaceRepository: marketplaceRepositoryImp!);
     
   }
 }

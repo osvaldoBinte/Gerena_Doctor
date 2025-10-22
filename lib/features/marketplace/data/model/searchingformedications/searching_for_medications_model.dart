@@ -9,7 +9,7 @@ class SearchingForMedicationsModel extends MedicationsEntity {
       required super.stock,
        super.imagen,
       required super.categoria,
-      required super.activo});
+      required super.activo, required super.previousprice});
 
   factory SearchingForMedicationsModel.fromJson(Map<String, dynamic> json) {
     return SearchingForMedicationsModel(
@@ -20,7 +20,11 @@ class SearchingForMedicationsModel extends MedicationsEntity {
         stock: json['stock']??0,
         imagen: json['imagen'],
         categoria: json['categoria']??'',
-        activo: json['activo']??'');
+        activo: json['activo']??'',
+        previousprice: json['precioAnterior'],
+        
+        );
+        
   }
   Map<String, dynamic> toJson() {
     return {
@@ -31,7 +35,8 @@ class SearchingForMedicationsModel extends MedicationsEntity {
       'stock':stock,
       'imagen':imagen,
       'categoria':categoria,
-      'activo':activo
+      'activo':activo,
+      'precioAnterior':previousprice
     };
   }
 }

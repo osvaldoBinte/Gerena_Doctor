@@ -7,7 +7,7 @@ import 'package:gerena/page/dashboard/widget/half_cut_circle.dart';
 import 'package:gerena/page/dashboard/widget/noticias/news_feed_widget.dart';
 import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
 import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
-import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
 
 class SidebarWidget extends StatelessWidget {
@@ -17,8 +17,10 @@ class SidebarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DashboardController dashboardController = Get.find<DashboardController>();
-    final CategoryController categoryController = Get.find<CategoryController>();
+    final DashboardController dashboardController =
+        Get.find<DashboardController>();
+    final CategoryController categoryController =
+        Get.find<CategoryController>();
 
     return Container(
       width: 350,
@@ -42,7 +44,8 @@ class SidebarWidget extends StatelessWidget {
                           children: [
                             SizedBox(height: 15),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -62,29 +65,48 @@ class SidebarWidget extends StatelessWidget {
                                   horizontal: 16.0, vertical: 8.0),
                               child: Row(
                                 children: [
-                                  Text(
-                                    'CATÁLOGO',
-                                    style: TextStyle(
-                                      color: GerenaColors.textLightColor,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Get.find<ShopNavigationController>()
+                                          .navigateToStore();
+                                      Get.to(
+                                        () => GlobalShopInterface(),
+                                        arguments: {
+                                          'categoryName': '',
+                                          'showOffers': true,
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      'CATÁLOGO',
+                                      style: TextStyle(
+                                        color: GerenaColors.textLightColor,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            
-                            // Grid dinámico con categorías del controller
+
                             _buildCatalogGrid(categoryController),
-                            
-                            Obx(() => (dashboardController.isCalendarFullScreen.value ||
-                                    dashboardController.currentView.value == 'appointments' ||
-                                    dashboardController.currentView.value == 'doctor_profile' ||
-                                    dashboardController.currentView.value == 'user_profile' ||
-                                    dashboardController.currentView.value == 'membresia' ||
-                                    dashboardController.currentView.value == 'PreguntasFrecuentes')
+
+                            Obx(() => (dashboardController
+                                        .isCalendarFullScreen.value ||
+                                    dashboardController.currentView.value ==
+                                        'appointments' ||
+                                    dashboardController.currentView.value ==
+                                        'doctor_profile' ||
+                                    dashboardController.currentView.value ==
+                                        'user_profile' ||
+                                    dashboardController.currentView.value ==
+                                        'membresia' ||
+                                    dashboardController.currentView.value ==
+                                        'PreguntasFrecuentes')
                                 ? const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 16.0),
                                     child: NewsFeedWidget(),
                                   )
                                 : const SizedBox.shrink()),
@@ -96,7 +118,6 @@ class SidebarWidget extends StatelessWidget {
                 ),
               ),
             ),
-
             GestureDetector(
               onTap: () {
                 showDialog(
@@ -108,7 +129,8 @@ class SidebarWidget extends StatelessWidget {
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: GerenaColors.surfaceColor,
                   borderRadius: GerenaColors.smallBorderRadius,
@@ -130,7 +152,8 @@ class SidebarWidget extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 3),
                         decoration: BoxDecoration(
                           color: GerenaColors.primaryColor,
                           borderRadius: BorderRadius.circular(8.0),
@@ -149,7 +172,6 @@ class SidebarWidget extends StatelessWidget {
                 ),
               ),
             ),
-
             Container(
               width: 60,
               height: 4,
@@ -226,7 +248,6 @@ class SidebarWidget extends StatelessWidget {
 
   Widget _buildCatalogGrid(CategoryController controller) {
     return Obx(() {
-      // Estado de carga
       if (controller.isLoading.value) {
         return Container(
           height: 200,
@@ -238,7 +259,6 @@ class SidebarWidget extends StatelessWidget {
         );
       }
 
-      // Estado de error
       if (controller.errorMessage.isNotEmpty) {
         return Container(
           padding: EdgeInsets.all(16),
@@ -248,7 +268,8 @@ class SidebarWidget extends StatelessWidget {
               SizedBox(height: 8),
               Text(
                 controller.errorMessage.value,
-                style: TextStyle(color: GerenaColors.textLightColor, fontSize: 12),
+                style:
+                    TextStyle(color: GerenaColors.textLightColor, fontSize: 12),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 8),
@@ -293,7 +314,6 @@ class SidebarWidget extends StatelessWidget {
             return _buildCategoryItem(
               category.category ?? 'Sin categoria',
               category.image ?? '',
-           
             );
           },
         ),
@@ -302,18 +322,16 @@ class SidebarWidget extends StatelessWidget {
   }
 
   Widget _buildCategoryItem(
-    String text, 
-    String imageAssetPath, {
-    String? categoryId,
-  }) {
+    String text,
+    String imageAssetPath, ) {
     return InkWell(
       onTap: () {
         Get.find<ShopNavigationController>().navigateToStore();
         Get.to(
           () => GlobalShopInterface(),
           arguments: {
-            'categoryId': categoryId,
             'categoryName': text,
+            'showOffers': false,
           },
         );
       },

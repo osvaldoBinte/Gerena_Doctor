@@ -7,7 +7,7 @@ import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_wid
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
-import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 

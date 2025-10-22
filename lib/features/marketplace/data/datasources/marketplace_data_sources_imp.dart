@@ -13,12 +13,55 @@ import 'dart:io';
 
 class MarketplaceDataSourcesImp {
   String defaultApiServer = AppConstants.serverBase;
+Future<List<MedicationsEntity>> searchingformedications(
+    String categoria, String busqueda, String token) async {
+  try {
+    Uri url = Uri.parse(
+        '$defaultApiServer/Marketplace/medicamentos?categoria=$categoria&busqueda=$busqueda');
+    
+    // 🟢 IMPRIME LA URL AQUÍ
+    print('==URL completa: $url');
+    print('==URL string: ${url.toString()}');
+    
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    });
 
-  Future<List<MedicationsEntity>> searchingformedications(
-      String categoria, String busqueda, String token) async {
+    // También puedes imprimir el status code
+    print('==Status Code: ${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      final dataUTF8 = utf8.decode(response.bodyBytes);
+      final responseDecode = jsonDecode(dataUTF8);
+
+      final List medications = responseDecode['medicamentos'];
+      
+      // 🟢 IMPRIME LA CANTIDAD DE MEDICAMENTOS
+      print('==Medicamentos encontrados: ${medications.length}');
+      
+      return medications
+          .map((json) => SearchingForMedicationsModel.fromJson(json))
+          .toList();
+    }
+
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+    print('error: $e');
+    throw Exception('$e');
+  }
+}
+  Future<List<MedicationsEntity>> medicinesonsale( String token) async {
     try {
       Uri url = Uri.parse(
-          '$defaultApiServer/Marketplace/medicamentos?categoria=$categoria&busqueda=$busqueda');
+          '$defaultApiServer/Marketplace/ofertas');
 
       final response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
@@ -48,7 +91,6 @@ class MarketplaceDataSourcesImp {
       throw Exception('$e');
     }
   }
-
   Future<MedicationsEntity> getmedicationsby(int id, String token) async {
     try {
       Uri url = Uri.parse('$defaultApiServer/Marketplace/medicamentos/$id');

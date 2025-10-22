@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/movil/menbresia/menbreria_movil.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
-import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 

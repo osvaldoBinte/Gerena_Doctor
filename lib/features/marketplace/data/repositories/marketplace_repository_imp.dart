@@ -9,6 +9,7 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   final MarketplaceDataSourcesImp marketplaceDataSourcesImp;
   final AuthService authService = AuthService();
   MarketplaceRepositoryImp({required this.marketplaceDataSourcesImp});
+  
   @override
   Future<List<CategoriesEntity>> categories()async {
     final session = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
@@ -38,5 +39,11 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   Future<OrderEntity> orderbyID(int id) async {
     final session = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await marketplaceDataSourcesImp.getordersbyid(session, id);
+  }
+  
+  @override
+  Future<List<MedicationsEntity>> medicinesonsale() async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await marketplaceDataSourcesImp.medicinesonsale(token);
   }
 }

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 
-import 'package:gerena/page/store/cartPage/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart'; 
   Widget buildCompactNewsCard(
     String category, 

@@ -7,8 +7,8 @@ class CategoryController extends GetxController {
   
   CategoryController({required this.getCategoryUsecase});
 
-  // Estado reactivo
   var categories = <CategoriesEntity>[].obs;
+  var selectedCategories = <String>[].obs;
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
@@ -33,6 +33,23 @@ class CategoryController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  void toggleCategory(String category) {
+    if (selectedCategories.contains(category)) {
+      selectedCategories.remove(category);
+    } else {
+      selectedCategories.add(category);
+    }
+  }
+
+  bool isCategorySelected(String category) {
+    return selectedCategories.contains(category);
+  }
+
+  void clearFilters() {
+    selectedCategories.clear();
+  }
+
 
   void retryFetch() {
     fetchCategories();

@@ -24,6 +24,8 @@ class GerenaColors {
   static const Color textPrimaryColor = Color(0xFF00535C);  // Texto principal en verde azulado oscuro
   static const Color textSecondaryColor = Colors.grey;  
   static const Color textTertiaryColor = Color(0xFF656565); // Texto terciario gris claro
+    static const Color textpreviousprice = Color(0xFFFF4D4D); // Texto terciario gris claro
+
   static const Color textLightColor = Colors.white;         // Texto en color claro para fondos oscuros
   static const Color textDarkColor = Color(0xFF004346);   
   static const Color textchatDefault = Color(0xFFEDEDED); // Texto secundario claro
@@ -968,7 +970,79 @@ static Widget createArticleCardFlexible({
   );
 }
 
-// VERSIÓN PARA USAR EN GRIDS: Con altura fija y footer siempre abajo
+ static Widget createSearchTextField({
+    required TextEditingController controller,
+    String hintText = '',
+    VoidCallback? onSearchPressed,
+    Function(String)? onChanged, // Nuevo parámetro
+  }) {
+    return Container(
+      height: 35,
+      decoration: BoxDecoration(
+        color: GerenaColors.primaryColor,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 10),
+            child: GestureDetector(
+              onTap: onSearchPressed,
+              child: Image.asset(
+                'assets/icons/search.png',
+                width: 20,
+                height: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: SizedBox(
+                height: 19,
+                child: TextField(
+                  controller: controller,
+                  onChanged: onChanged, // Agregar el callback
+                  style: GoogleFonts.rubik(fontSize: 14, color: Colors.black),
+                  decoration: InputDecoration(
+                    hintText: hintText,
+                    hintStyle: GoogleFonts.rubik(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 0,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.blue.shade200),
+                    ),
+                    isDense: true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 15),
+        ],
+      ),
+    );
+  }
 static Widget createArticleCardForGrid({
   required String title, 
   required String content, 
