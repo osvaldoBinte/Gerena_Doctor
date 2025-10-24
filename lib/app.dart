@@ -15,7 +15,6 @@ import 'package:gerena/features/appointment/presentation/page/calendar/calendar_
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
-import 'package:gerena/page/store/cartPage/productDetail/product_detail_controller.dart';
 import 'package:gerena/usecase_config.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -60,7 +59,6 @@ class App extends StatelessWidget {
         Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
-        Get.put(ProductDetailController());
         Get.put(PostController()); 
         Get.put(PerfilController());
 

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
@@ -11,14 +13,14 @@ import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedi
 import 'package:gerena/page/dashboard/widget/facturacion/facturacion.dart';
 import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
-import 'package:gerena/page/store/cartPage/Wishlistproduct/Wishlist_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/Wishlist_controller.dart';
 import 'package:gerena/page/store/historialDePedidos/historial_de_pedidos_content.dart';
 import 'package:gerena/page/store/store_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:gerena/page/store/cartPage/cart_page.dart';
-import '../../../../../../page/store/cartPage/productDetail/product_detail_byid_page.dart';
+import 'productDetail/product_detail_byid_page.dart';
 
 class ShopNavigationController extends GetxController {
   final RxInt currentView = 0.obs;
@@ -543,13 +545,11 @@ class GlobalShopInterface extends StatelessWidget {
                 }
               },
               onChanged: (value) {
-                // El debounce ya está configurado en el controller
                 print('🔍 Escribiendo: $value');
               },
             ),
           ),
           const SizedBox(width: 12),
-          // Botón para cerrar barra de búsqueda
           Container(
             width: 35,
             height: 35,
@@ -646,7 +646,8 @@ Widget _buildMainContent() {
       ],
     ),
   );
-}Widget _buildOffersSection() {
+}
+Widget _buildOffersSection() {
   return Obx(() {
     if (!medicationsController.showOffers.value) {
       return const SizedBox.shrink();
@@ -678,7 +679,6 @@ Widget _buildMainContent() {
 
         const SizedBox(height: 16),
 
-        // Loading de ofertas
         if (medicationsController.isLoadingOffers.value)
           Center(
             child: Padding(
@@ -688,7 +688,6 @@ Widget _buildMainContent() {
               ),
             ),
           )
-        // Error de ofertas
         else if (medicationsController.errorMessageOffers.isNotEmpty)
           Center(
             child: Column(
@@ -708,7 +707,6 @@ Widget _buildMainContent() {
               ],
             ),
           )
-        // Carousel de ofertas
         else if (medicationsController.medicationsOnSale.isNotEmpty)
           Row(
             children: [
@@ -758,6 +756,7 @@ Widget _buildMainContent() {
                       'description': medication.description,
                       'stock': medication.stock.toString(),
                       'id': medication.id.toString(),
+                      'category': medication.categoria ?? '',
                     };
 
                     if (medication.previousprice != null && 
@@ -771,7 +770,14 @@ Widget _buildMainContent() {
                         return Container(
                           width: MediaQuery.of(context).size.width,
                           margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: _buildProductCard(productData),
+                          child: ProductCardWidget(
+                            product: productData,
+                            onTap: () => navigationController.navigateToProductDetail(productData),
+                            onFavoritePressed: () {
+                              // Lógica para añadir a favoritos
+                              print('Añadido a favoritos: ${medication.name}');
+                            },
+                          ),
                         );
                       },
                     );
@@ -822,11 +828,11 @@ Widget _buildMainContent() {
       ],
     );
   });
-}Widget _buildCatalogSection() {
+}
+Widget _buildCatalogSection() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      // Header del catálogo
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Column(
@@ -853,7 +859,6 @@ Widget _buildMainContent() {
         ),
       ),
 
-      // Grid de productos (Obx separado)
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Column(
@@ -928,6 +933,7 @@ Widget _buildMainContent() {
                     'description': medication.description,
                     'stock': medication.stock.toString(),
                     'id': medication.id.toString(),
+                    'category': medication.categoria ?? '',
                   };
 
                   if (medication.previousprice != null &&
@@ -937,13 +943,12 @@ Widget _buildMainContent() {
                         '${medication.previousprice!.toStringAsFixed(2)} MXN';
                   }
 
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: _buildProductCard(productData),
-                      );
+                  return ProductCardWidget(
+                    product: productData,
+                    onTap: () => navigationController.navigateToProductDetail(productData),
+                    onFavoritePressed: () {
+                      // Lógica para añadir a favoritos
+                      print('Añadido a favoritos: ${medication.name}');
                     },
                   );
                 },
@@ -954,7 +959,10 @@ Widget _buildMainContent() {
       ),
     ],
   );
-}Widget _buildCategoriesSidebar() {
+}
+
+
+Widget _buildCategoriesSidebar() {
   return Container(
     width: 240,
     padding: const EdgeInsets.all(16),
@@ -1075,234 +1083,5 @@ Widget _buildMainContent() {
     ),
   );
 }
-  Widget _buildProductCard(Map<String, String> product) {
-    final bool hasDiscount = product['hasDiscount'] == 'true';
-
-    return GestureDetector(
-      onTap: () => navigationController.navigateToProductDetail(product),
-      child: Container(
-        decoration: BoxDecoration(
-          color: GerenaColors.cardColor,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(8)),
-                      image: DecorationImage(
-                        image: AssetImage('assets/tienda-producto.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                Center(
-  child: Hero(
-    tag: 'product-${product['name']}',
-    child: (product['image']?.isNotEmpty ?? false)
-        ? Image.network(
-            product['image']!,
-            height: 120,
-            fit: BoxFit.contain,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              
-              return Container(
-                height: 120,
-                child: Center(
-                  child: SizedBox(
-                    width: 30,
-                    height: 30,
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                          : null,
-                      color: GerenaColors.primaryColor,
-                      strokeWidth: 3,
-                    ),
-                  ),
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  color: GerenaColors.backgroundColorfondo,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.broken_image_outlined,
-                      size: 50,
-                      color: GerenaColors.textTertiaryColor.withOpacity(0.4),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Imagen no disponible',
-                      style: GoogleFonts.rubik(
-                        fontSize: 10,
-                        color: GerenaColors.textTertiaryColor.withOpacity(0.6),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            },
-          )
-        : Container(
-            height: 120,
-            decoration: BoxDecoration(
-              color: GerenaColors.backgroundColorfondo,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.image_outlined,
-                  size: 50,
-                  color: GerenaColors.textTertiaryColor.withOpacity(0.4),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sin imagen',
-                  style: GoogleFonts.rubik(
-                    fontSize: 10,
-                    color: GerenaColors.textTertiaryColor.withOpacity(0.6),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-  ),
-),
-                  Positioned(
-                    bottom: 5,
-                    right: 5,
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                      ),
-                      child: Image.asset(
-                        'assets/icons/guardar.png',
-                        width: 16,
-                        height: 16,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product['name']!,
-                          style: GoogleFonts.rubik(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: GerenaColors.primaryColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.favorite_border,
-                            color: Colors.grey),
-                        onPressed: () {},
-                        iconSize: 20,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                  if (hasDiscount) ...[
-                    Text(
-                      product['price']!,
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: GerenaColors.textDarkColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      product['oldPrice']!,
-                      style: GoogleFonts.rubik(
-                        fontSize: 10,
-                        color: GerenaColors.descuento,
-                        decoration: TextDecoration.lineThrough,
-                        decorationColor: GerenaColors.descuento,
-                      ),
-                    ),
-                  ] else ...[
-                    Text(
-                      product['price']!,
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: GerenaColors.textDarkColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: InkWell(
-                      onTap: () =>
-                          navigationController.navigateToProductDetail(product),
-                      borderRadius: BorderRadius.circular(4),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        decoration: BoxDecoration(
-                          color: GerenaColors.buttoninformation,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          ' VER INFORMACIÓN ',
-                          style: GoogleFonts.rubik(
-                            color: GerenaColors.textLightColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+ 
 }
