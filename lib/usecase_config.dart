@@ -15,6 +15,7 @@ import 'package:gerena/features/marketplace/domain/usecase/get_medicines_on_sale
 import 'package:gerena/features/marketplace/domain/usecase/get_my_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_order_by_id_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class UsecaseConfig {
@@ -43,6 +44,7 @@ class UsecaseConfig {
    SearchingForMedicationsUsecase? searchingForMedicationsUsecase;
    GetCategoryUsecase? getCategoryUsecase;
    GetMedicinesOnSaleUsecase? getMedicinesOnSaleUsecase;
+   ShoppingCartUsecase? shoppingCartUsecase;
 
 
 
@@ -69,6 +71,7 @@ class UsecaseConfig {
      getCategoryUsecase = GetCategoryUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getOrderByIdUsecase = GetOrderByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getMedicinesOnSaleUsecase = GetMedicinesOnSaleUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+     shoppingCartUsecase = ShoppingCartUsecase(marketplaceRepository: marketplaceRepositoryImp!);
     
   }
 }

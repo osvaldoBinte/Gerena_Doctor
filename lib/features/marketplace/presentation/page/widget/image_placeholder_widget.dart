@@ -36,10 +36,7 @@ class ImagePlaceholderWidget extends StatelessWidget {
       height: height,
       width: width,
       padding: padding,
-      decoration: BoxDecoration(
-        color: backgroundColor ?? GerenaColors.backgroundColorfondo,
-        borderRadius: borderRadius ?? BorderRadius.circular(8),
-      ),
+     
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -133,56 +130,6 @@ class LoadingImagePlaceholder extends StatelessWidget {
           strokeWidth: 3,
         ),
       ),
-    );
-  }
-}
-
-// Variante predefinida para "Sin resultados"
-class NoResultsPlaceholder extends StatelessWidget {
-  final double? height;
-  final double? width;
-  final String? customText;
-
-  const NoResultsPlaceholder({
-    Key? key,
-    this.height,
-    this.width,
-    this.customText,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ImagePlaceholderWidget(
-      icon: Icons.search_off,
-      text: customText ?? 'No se encontraron resultados',
-      height: height ?? 120,
-      width: width,
-      iconSize: 60,
-      fontSize: 12,
-    );
-  }
-}
-
-// Variante predefinida para "Sin productos"
-class NoProductsPlaceholder extends StatelessWidget {
-  final double? height;
-  final double? width;
-
-  const NoProductsPlaceholder({
-    Key? key,
-    this.height,
-    this.width,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ImagePlaceholderWidget(
-      icon: Icons.inventory_2_outlined,
-      text: 'No hay productos disponibles',
-      height: height ?? 120,
-      width: width,
-      iconSize: 60,
-      fontSize: 12,
     );
   }
 }

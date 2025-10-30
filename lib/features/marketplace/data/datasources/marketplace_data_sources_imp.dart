@@ -3,9 +3,15 @@ import 'package:gerena/common/errors/api_errors.dart';
 import 'package:gerena/features/marketplace/data/model/category/category_model.dart';
 import 'package:gerena/features/marketplace/data/model/ordes/order_entity.dart';
 import 'package:gerena/features/marketplace/data/model/searchingformedications/searching_for_medications_model.dart';
+import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_items_model.dart';
+import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_post_model.dart';
+import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_response_model.dart';
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/orders_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -19,26 +25,17 @@ Future<List<MedicationsEntity>> searchingformedications(
     Uri url = Uri.parse(
         '$defaultApiServer/Marketplace/medicamentos?categoria=$categoria&busqueda=$busqueda');
     
-    // 🟢 IMPRIME LA URL AQUÍ
-    print('==URL completa: $url');
-    print('==URL string: ${url.toString()}');
-    
     final response = await http.get(url, headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     });
 
-    // También puedes imprimir el status code
-    print('==Status Code: ${response.statusCode}');
 
     if (response.statusCode == 200) {
       final dataUTF8 = utf8.decode(response.bodyBytes);
       final responseDecode = jsonDecode(dataUTF8);
 
       final List medications = responseDecode['medicamentos'];
-      
-      // 🟢 IMPRIME LA CANTIDAD DE MEDICAMENTOS
-      print('==Medicamentos encontrados: ${medications.length}');
       
       return medications
           .map((json) => SearchingForMedicationsModel.fromJson(json))
@@ -216,6 +213,45 @@ Future<List<MedicationsEntity>> searchingformedications(
           OrderModel order =
               OrderModel.fromJson(responseDecode);
           return order;
+        } else {
+          throw Exception('Respuesta vacía o formato incorrecto');
+        }
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+    }
+  }
+  Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity, String token) async{
+     try {
+      Uri url = Uri.parse('$defaultApiServer/Marketplace/carrito/validar');
+
+        final response = await http.post( url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+        },
+        body:
+            jsonEncode(ShoppingCartItemsModel.fromEntity(shoppingcartpostentity).toJson()),
+      );
+      if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final  shopping = responseDecode;
+        if (shopping is Map<String, dynamic>) {
+          ShoppingCartResponseModel shopping =
+              ShoppingCartResponseModel.fromJson(responseDecode);
+          return shopping;
         } else {
           throw Exception('Respuesta vacía o formato incorrecto');
         }

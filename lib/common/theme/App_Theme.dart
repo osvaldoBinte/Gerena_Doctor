@@ -274,7 +274,6 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
       titleTextStyle: navbarText,
     ),
     
-    // Card
     cardTheme: CardThemeData(
       color: colorSubsCardBackground,
       elevation: elevationSmall,

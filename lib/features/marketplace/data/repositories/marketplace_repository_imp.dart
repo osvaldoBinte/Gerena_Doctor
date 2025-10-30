@@ -3,6 +3,9 @@ import 'package:gerena/features/marketplace/data/datasources/marketplace_data_so
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/orders_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart';
 import 'package:gerena/features/marketplace/domain/repositories/marketplace_repository.dart';
 
 class MarketplaceRepositoryImp extends MarketplaceRepository {
@@ -45,5 +48,18 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   Future<List<MedicationsEntity>> medicinesonsale() async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await marketplaceDataSourcesImp.medicinesonsale(token);
+  }
+  
+  @override
+  Future<void> createaneworder() {
+    // TODO: implement createaneworder
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity) async {
+        final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+
+    return await marketplaceDataSourcesImp.validatecart(shoppingcartpostentity, token);
   }
 }

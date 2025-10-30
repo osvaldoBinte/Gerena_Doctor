@@ -13,12 +13,11 @@ class HomePageMovil extends StatefulWidget {
 }
 
 class _GerenaFeedScreenState extends State<HomePageMovil> {
-
   @override
   Widget build(BuildContext context) {
     final double availableHeight = MediaQuery.of(context).size.height -
-                                   AppBar().preferredSize.height -
-                                   kBottomNavigationBarHeight;
+        AppBar().preferredSize.height -
+        kBottomNavigationBarHeight;
 
     String _getStoryUserImage(int index) {
       final List<String> userImages = [
@@ -38,79 +37,78 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         child: Column(
           children: [
             Container(
-              height: 100,
-              color: GerenaColors.backgroundColorFondo,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                   return Container(
-                          margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-                          child: Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  print("Agregar mi historia");
-                                },
-                                child: Stack(
-                                  children: [
-                                    GerenaColors.createStoryRing(
-                                      child: Image.asset(
-                                        'assets/perfil.png',
-                                        fit: BoxFit.cover,
-                                      ),
-                                      hasStory: false,
-                                      size: 80,
+                height: 100,
+                color: GerenaColors.backgroundColorFondo,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: 6,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Container(
+                        margin:
+                            const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                print("Agregar mi historia");
+                              },
+                              child: Stack(
+                                children: [
+                                  GerenaColors.createStoryRing(
+                                    child: Image.asset(
+                                      'assets/perfil.png',
+                                      fit: BoxFit.cover,
                                     ),
-                                    Positioned(
-                                      right: 0,
-                                      bottom: 0,
-                                      child: SizedBox(
-                                        width: 29,
-                                        height: 29,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Image.asset(
-                                            'assets/icons/aadHistory.png',
-                                            fit: BoxFit.contain,
-                                          ),
+                                    hasStory: false,
+                                    size: 80,
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: SizedBox(
+                                      width: 29,
+                                      height: 29,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Image.asset(
+                                          'assets/icons/aadHistory.png',
+                                          fit: BoxFit.contain,
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                  }
-
-                  return Container(
-                    margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                          },
-                          child: GerenaColors.createStoryRing(
-                            child: Image.asset(
-                              _getStoryUserImage(index),
-                              fit: BoxFit.cover,
                             ),
-                            hasStory: true,
-                            isViewed: false,
-                            size: 80,
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              )
-            ),
-            
+                      );
+                    }
+
+                    return Container(
+                      margin:
+                          const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                      child: Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {},
+                            child: GerenaColors.createStoryRing(
+                              child: Image.asset(
+                                _getStoryUserImage(index),
+                                fit: BoxFit.cover,
+                              ),
+                              hasStory: true,
+                              isViewed: false,
+                              size: 80,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                )),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -119,11 +117,9 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                     SizedBox(height: GerenaColors.paddingMedium),
                     _buildCitasSection(),
                     SizedBox(height: GerenaColors.paddingMedium),
-
-        buildWebinarCard(),
+                    buildWebinarCard(),
                     SizedBox(height: GerenaColors.paddingMedium),
-        buildPromoCard(),
-                   
+                    buildPromoCard(),
                   ],
                 ),
               ),
@@ -157,8 +153,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 height: 26,
                 heightcontainer: 15,
                 iconSize: 18,
-                onTap: () {
-                },
+                onTap: () {},
               ),
             ),
           ],
@@ -173,248 +168,244 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         physics: const BouncingScrollPhysics(),
       ),
     );
-  }Widget _buildCitasSection() {
-  final List<Map<String, String>> citas = [
-    {
-      'doctorName': 'Jessica Fernández Gutiérrez',
-      'appointmentType': 'Primera Cita',
-      'treatment': 'Toxina Botulínica En Tercio Superior Del Rostro',
-      'time': '10:30 A.M.',
-      'date': '19/04/2025',
-      'profileImage': 'assets/doctor_profile.png',
-    },
-    {
-      'doctorName': 'Dr. Carlos Mendoza',
-      'appointmentType': 'Consulta Control',
-      'treatment': 'Revisión de Rellenos Faciales',
-      'time': '3:15 P.M.',
-      'date': '22/04/2025',
-      'profileImage': 'assets/doctor_profile2.png',
-    },
-    {
-      'doctorName': 'Dra. Ana Martínez',
-      'appointmentType': 'Procedimiento',
-      'treatment': 'Aplicación de Bioestimuladores Faciales',
-      'time': '11:00 A.M.',
-      'date': '25/04/2025',
-      'profileImage': 'assets/doctor_profile3.png',
-    },
-  ];
+  }
 
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'CITAS',
-          style: GoogleFonts.rubik(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: GerenaColors.textPrimaryColor,
-          ),
-        ),
-        SizedBox(height: GerenaColors.paddingSmall),
-        
-        Container(
-          height: 200, 
-          child: PageView.builder(
-            controller: PageController(viewportFraction: 0.85), 
-            itemCount: citas.length,
-            itemBuilder: (context, index) {
-              final cita = citas[index];
-              return Container(
-                margin: const EdgeInsets.only(right: 12),
-                child: _buildCitaCard(
-                  doctorName: cita['doctorName']!,
-                  appointmentType: cita['appointmentType']!,
-                  treatment: cita['treatment']!,
-                  time: cita['time']!,
-                  date: cita['date']!,
-                  profileImage: cita['profileImage']!,
-                ),
-              );
-            },
-          ),
-        ),
-        
-        SizedBox(height: 20),
-        Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Container(
-      width: 30,
-      height: 5,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: BorderRadius.circular(2),
-        boxShadow: [GerenaColors.mediumShadow],
-      ),
-    ),
-    SizedBox(width: 6),
-    Container(
-      width: 80,
-      height: 5,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: BorderRadius.circular(2),
-        boxShadow: [GerenaColors.mediumShadow],
-      ),
-    ),
-    SizedBox(width: 6),
-    Container(
-      width: 30,
-      height: 5,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: BorderRadius.circular(2),
-        boxShadow: [GerenaColors.mediumShadow],
-      ),
-    ),
-     SizedBox(width: 6),
-    Container(
-      width: 20,
-      height: 5,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: BorderRadius.circular(2),
-        boxShadow: [GerenaColors.mediumShadow],
-      ),
-    ),
-  ],
-),
-       
-      ],
-    ),
-  );
-}
-Widget _buildCitaCard({
-  required String doctorName,
-  required String appointmentType,
-  required String treatment,
-  required String time,
-  required String date,
-  required String profileImage,
-}) {
-  return Container(
-    decoration: BoxDecoration(
-      color: GerenaColors.backgroundColor,
-      borderRadius: GerenaColors.mediumBorderRadius,
-      boxShadow: [GerenaColors.lightShadow],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
+  Widget _buildCitasSection() {
+    final List<Map<String, String>> citas = [
+      {
+        'doctorName': 'Jessica Fernández Gutiérrez',
+        'appointmentType': 'Primera Cita',
+        'treatment': 'Toxina Botulínica En Tercio Superior Del Rostro',
+        'time': '10:30 A.M.',
+        'date': '19/04/2025',
+        'profileImage': 'assets/doctor_profile.png',
+      },
+      {
+        'doctorName': 'Dr. Carlos Mendoza',
+        'appointmentType': 'Consulta Control',
+        'treatment': 'Revisión de Rellenos Faciales',
+        'time': '3:15 P.M.',
+        'date': '22/04/2025',
+        'profileImage': 'assets/doctor_profile2.png',
+      },
+      {
+        'doctorName': 'Dra. Ana Martínez',
+        'appointmentType': 'Procedimiento',
+        'treatment': 'Aplicación de Bioestimuladores Faciales',
+        'time': '11:00 A.M.',
+        'date': '25/04/2025',
+        'profileImage': 'assets/doctor_profile3.png',
+      },
+    ];
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'CITAS',
+            style: GoogleFonts.rubik(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: GerenaColors.textPrimaryColor,
+            ),
+          ),
+          SizedBox(height: GerenaColors.paddingSmall),
+          Container(
+            height: 200,
+            child: PageView.builder(
+              controller: PageController(viewportFraction: 0.85),
+              itemCount: citas.length,
+              itemBuilder: (context, index) {
+                final cita = citas[index];
+                return Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  child: _buildCitaCard(
+                    doctorName: cita['doctorName']!,
+                    appointmentType: cita['appointmentType']!,
+                    treatment: cita['treatment']!,
+                    time: cita['time']!,
+                    date: cita['date']!,
+                    profileImage: cita['profileImage']!,
+                  ),
+                );
+              },
+            ),
+          ),
+          SizedBox(height: 20),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      doctorName,
-                      style: GoogleFonts.rubik(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: GerenaColors.textPrimaryColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      appointmentType,
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: GerenaColors.textSecondaryColor,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      treatment,
-                      style: GoogleFonts.rubik(
-                        fontSize: 11,
-                        color: GerenaColors.textTertiaryColor,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              Container(
+                width: 30,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: GerenaColors.backgroundColor,
+                  borderRadius: BorderRadius.circular(2),
+                  boxShadow: [GerenaColors.mediumShadow],
                 ),
               ),
-              
-              SizedBox(width: 16),
-              
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [GerenaColors.lightShadow],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        profileImage,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: GerenaColors.primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              color: GerenaColors.textLightColor,
-                              size: 30,
-                            ),
-                          );
-                        },
+              SizedBox(width: 6),
+              Container(
+                width: 80,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: GerenaColors.backgroundColor,
+                  borderRadius: BorderRadius.circular(2),
+                  boxShadow: [GerenaColors.mediumShadow],
+                ),
+              ),
+              SizedBox(width: 6),
+              Container(
+                width: 30,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: GerenaColors.backgroundColor,
+                  borderRadius: BorderRadius.circular(2),
+                  boxShadow: [GerenaColors.mediumShadow],
+                ),
+              ),
+              SizedBox(width: 6),
+              Container(
+                width: 20,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: GerenaColors.backgroundColor,
+                  borderRadius: BorderRadius.circular(2),
+                  boxShadow: [GerenaColors.mediumShadow],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCitaCard({
+    required String doctorName,
+    required String appointmentType,
+    required String treatment,
+    required String time,
+    required String date,
+    required String profileImage,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: GerenaColors.backgroundColor,
+        borderRadius: GerenaColors.mediumBorderRadius,
+        boxShadow: [GerenaColors.lightShadow],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        doctorName,
+                        style: GoogleFonts.rubik(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: GerenaColors.textPrimaryColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        appointmentType,
+                        style: GoogleFonts.rubik(
+                          fontSize: 12,
+                          color: GerenaColors.textSecondaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        treatment,
+                        style: GoogleFonts.rubik(
+                          fontSize: 11,
+                          color: GerenaColors.textTertiaryColor,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [GerenaColors.lightShadow],
+                      ),
+                      child: ClipOval(
+                        child: Image.asset(
+                          profileImage,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: GerenaColors.primaryColor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.person,
+                                color: GerenaColors.textLightColor,
+                                size: 30,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                   Text(
+                    SizedBox(height: 20),
+                    Text(
                       time,
                       style: GoogleFonts.rubik(
                         fontSize: 13,
                         color: GerenaColors.textQuaternary,
                       ),
                     ),
-                  SizedBox(height: 20),
-                  Text(
-                    date,
-                    style: GoogleFonts.rubik(
-                      fontSize: 10,
-                      color: GerenaColors.textTertiaryColor,
+                    SizedBox(height: 20),
+                    Text(
+                      date,
+                      style: GoogleFonts.rubik(
+                        fontSize: 10,
+                        color: GerenaColors.textTertiaryColor,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          
-          SizedBox(height: 12),
-          
-          Center(
-            child: IntrinsicWidth(
-              child: GerenaColors.widgetButton(
-                onPressed: () {
-                },
-                text: 'Ver Ficha',
-                showShadow: false,
-                borderRadius: 20,
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            Center(
+              child: IntrinsicWidth(
+                child: GerenaColors.widgetButton(
+                  onPressed: () {},
+                  text: 'Ver Ficha',
+                  showShadow: false,
+                  borderRadius: 20,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildWebinarSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -567,7 +558,6 @@ Widget _buildCitaCard({
               ),
             ),
           ),
-          
           Expanded(
             flex: 1,
             child: Container(

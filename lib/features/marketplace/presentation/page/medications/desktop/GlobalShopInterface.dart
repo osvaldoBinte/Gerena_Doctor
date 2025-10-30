@@ -19,7 +19,7 @@ import 'package:gerena/page/store/store_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:gerena/page/store/cartPage/cart_page.dart';
+import 'package:gerena/features/marketplace/presentation/page/cartPage/cart_page.dart';
 import 'productDetail/product_detail_byid_page.dart';
 
 class ShopNavigationController extends GetxController {
@@ -118,59 +118,11 @@ class GlobalShopInterface extends StatelessWidget {
                             );
                           } else if (navigationController.currentView.value ==
                               1) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 60),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                        borderRadius: BorderRadius.circular(25),
-                                        onTap: navigationController
-                                            .navigateToStore,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    GerenaColors.secondaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              padding: EdgeInsets.all(8.0),
-                                              child: const Icon(
-                                                Icons.arrow_back,
-                                                color:
-                                                    GerenaColors.textLightColor,
-                                                size: 24,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'CONFIRMAR PEDIDO',
-                                              style: GoogleFonts.rubik(
-                                                color: GerenaColors
-                                                    .textPrimaryColor,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Expanded(
+                            return  Expanded(
                                     child: CartPageContent(
-                                      onBackPressed:
-                                          navigationController.navigateToStore,
+                                     // onBackPressed: navigationController.navigateToStore,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
+                                  );
                           } else if (navigationController.currentView.value ==
                                   2 &&
                               navigationController.selectedProduct.value !=

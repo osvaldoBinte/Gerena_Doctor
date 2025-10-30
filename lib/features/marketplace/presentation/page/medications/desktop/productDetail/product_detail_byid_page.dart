@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:carousel_slider/carousel_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/widget/carousel_indicators_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final Map<String, String> product;
@@ -18,11 +19,8 @@ class ProductDetailPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     final controller = Get.find<GetMedicationsController>();
-
-    final carouselController = CarouselSliderController();
-    final currentImageIndex = 0.obs;
 
     final productCategory = product['category'] ?? '';
     if (productCategory.isNotEmpty) {
@@ -42,18 +40,11 @@ class ProductDetailPage extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 1,
-                    child: ProductImageSection(
-                      product: product,
-                      carouselController: carouselController,
-                      currentImageIndex: currentImageIndex,
-                    ),
+                    child: ProductImageSection(product: product),
                   ),
-                  SizedBox(width: 40),
                   Expanded(
                     flex: 2,
-                    child: ProductInfoSection(
-                      product: product,
-                    ),
+                    child: ProductInfoSection(product: product),
                   ),
                 ],
               ),
@@ -97,182 +88,39 @@ class ProductDetailPage extends StatelessWidget {
 
 class ProductImageSection extends StatelessWidget {
   final Map<String, String> product;
-  final CarouselSliderController carouselController;
-  final RxInt currentImageIndex;
 
   const ProductImageSection({
     Key? key,
     required this.product,
-    required this.carouselController,
-    required this.currentImageIndex,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final productImages = [
-      product['image'] ?? '',
+    final List<String> productImages = [
+      if (product['image'] != null && product['image']!.isNotEmpty) product['image']!,
+      'assets/images/celosome_1.png',
+      'assets/images/celosome_2.png',
+      'assets/images/celosome_3.png',
+      'assets/images/celosome_4.png',
     ];
 
-    return Column(
-      children: [
-        Container(
+    return Container(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: ProductCarouselWidget(
+          images: productImages,
+          indicatorStyle: IndicatorStyle.dots,
           height: 600,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: ProductImageCarousel(
-              carouselController: carouselController,
-              currentImageIndex: currentImageIndex,
-              productImages: productImages,
-            ),
-          ),
+          containerWidth: 470, // ⭐ MÁS ANCHO para escritorio
+          containerHeight: 600, // ⭐ Altura personalizada
+          showNavigationButtons: productImages.length > 1,
+          autoPlay: false,
+          backgroundImage: 'assets/tienda-producto.png',
+          imagePadding: 60,
+          activeIndicatorColor: GerenaColors.secondaryColor,
+          inactiveIndicatorColor: Colors.grey.withOpacity(0.5),
         ),
-        const SizedBox(height: 16),
-        Obx(() => Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: productImages.asMap().entries.map((entry) {
-                return GestureDetector(
-                  onTap: () => carouselController.animateToPage(entry.key),
-                  child: Container(
-                    width: 8.0,
-                    height: 8.0,
-                    margin: EdgeInsets.symmetric(horizontal: 4.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: currentImageIndex.value == entry.key
-                          ? GerenaColors.secondaryColor
-                          : Colors.grey.withOpacity(0.5),
-                    ),
-                  ),
-                );
-              }).toList(),
-            )),
-      ],
-    );
-  }
-}
-
-class ProductImageCarousel extends StatelessWidget {
-  final CarouselSliderController carouselController;
-  final RxInt currentImageIndex;
-  final List<String> productImages;
-
-  const ProductImageCarousel({
-    Key? key,
-    required this.carouselController,
-    required this.currentImageIndex,
-    required this.productImages,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        CarouselSlider(
-          carouselController: carouselController,
-          options: CarouselOptions(
-            height: 600,
-            viewportFraction: 1.0,
-            enlargeCenterPage: false,
-            enableInfiniteScroll: productImages.length > 1,
-            onPageChanged: (index, reason) {
-              currentImageIndex.value = index;
-            },
-          ),
-          items: productImages.map((imagePath) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/tienda-producto.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: Center(
-                    child: (imagePath.isEmpty)
-                        ? NoImagePlaceholder(height: 300)
-                        : imagePath.startsWith('http')
-                            ? Image.network(
-                                imagePath,
-                                height: 300,
-                                fit: BoxFit.contain,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return LoadingImagePlaceholder(height: 300);
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return BrokenImagePlaceholder(height: 300);
-                                },
-                              )
-                            : Image.asset(
-                                imagePath,
-                                height: 300,
-                                fit: BoxFit.contain,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return NoImagePlaceholder(height: 300);
-                                },
-                              ),
-                  ),
-                );
-              },
-            );
-          }).toList(),
-        ),
-        if (productImages.length > 1) ...[
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: GerenaColors.secondaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.arrow_back_ios,
-                  color: GerenaColors.surfaceColor,
-                  size: 18,
-                ),
-              ),
-              onPressed: () => carouselController.previousPage(),
-            ),
-          ),
-          Positioned(
-            right: 0,
-            top: 0,
-            bottom: 0,
-            child: IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: GerenaColors.secondaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.arrow_forward_ios,
-                  color: GerenaColors.surfaceColor,
-                  size: 18,
-                ),
-              ),
-              onPressed: () => carouselController.nextPage(),
-            ),
-          ),
-        ],
-      ],
+      ),
     );
   }
 }
@@ -292,6 +140,7 @@ class ProductInfoSection extends StatefulWidget {
 class _ProductInfoSectionState extends State<ProductInfoSection> {
   bool isDescriptionExpanded = false;
   bool isCharacteristicsExpanded = false;
+  ShoppingCartController get cartController => Get.find<ShoppingCartController>();
 
   @override
   Widget build(BuildContext context) {
@@ -357,14 +206,14 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
+          /*  Text(
               '4 X \$8,400.00 MXN',
               style: GoogleFonts.rubik(
                 color: GerenaColors.textpreviousprice,
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
               ),
-            ),
+            ),*/
             const SizedBox(height: 16),
             Divider(),
             const SizedBox(height: 8),
@@ -428,27 +277,53 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
               ),
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Get.snackbar(
-                    'Producto añadido',
-                    '${widget.product['name']} se añadió al carrito',
-                    snackPosition: SnackPosition.BOTTOM,
+            
+            
+            Column(
+              children: [
+                GerenaColors.widgetButton(
+                  text: 'AGREGAR AL CARRITO',
+                  onPressed: () async {
+                  final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
+                  final precio = double.tryParse(
+                    widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
                   );
+                  
+                  if (medicamentoId != null && precio != null && medicamentoId > 0) {
+                    await cartController.addToCart(
+                      medicamentoId: medicamentoId,
+                      precio: precio,
+                      cantidad: 1,
+                    );
+                  } else {
+                    Get.snackbar(
+                      'Error',
+                      'No se pudo agregar el producto al carrito',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  }
                 },
-                icon: Icon(Icons.shopping_cart),
-                label: Text(
-                  'AÑADIR AL CARRITO',
-                  style: GoogleFonts.rubik(),
-                ),
-                style: ElevatedButton.styleFrom(
                   backgroundColor: GerenaColors.secondaryColor,
-                  foregroundColor: Colors.white,
+                  textColor: GerenaColors.textLightColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  borderRadius: 25,
+                  showShadow: false,
                 ),
-              ),
+                const SizedBox(height: 12),
+                GerenaColors.widgetButton(
+                  text: 'COMPRAR AHORA',
+                  onPressed: () {},
+                  backgroundColor: GerenaColors.primaryColor,
+                  textColor: GerenaColors.textLightColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  borderRadius: 25,
+                  showShadow: false,
+                ),
+              ],
             ),
             const SizedBox(height: 16),
           ],

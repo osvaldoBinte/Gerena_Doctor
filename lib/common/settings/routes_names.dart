@@ -6,4 +6,6 @@ class RoutesNames {
   static const String dashboardSPage = '/dashboardS';
   static const String eventbyid = '/eventbyid';
   static const String categoryById = '/Category-ById-Page';
+  static const String productDetail = '/product-detail';
+  static const String shoppdingcart = '/CartPageContent';
 }
