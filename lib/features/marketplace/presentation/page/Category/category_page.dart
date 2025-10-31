@@ -3,10 +3,13 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CategoryPage extends GetView<CategoryController> {
+  final RxBool showWishlist = false.obs;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,66 +45,107 @@ class CategoryPage extends GetView<CategoryController> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
+            Obx(() => Container(
               padding: EdgeInsets.all(GerenaColors.paddingMedium),
-              child: buildWishlistButton(),
-            ),
+              color:showWishlist.value? GerenaColors.backgroundColor :GerenaColors.backgroundColorfondo,
+              child: Row(
+                
+                children: [
+                  if (showWishlist.value) ...[
+                    InkWell(
+                      borderRadius: BorderRadius.circular(25),
+                      onTap: () {
+                        showWishlist.value = false;
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: GerenaColors.secondaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: EdgeInsets.all(8.0),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: GerenaColors.textLightColor,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  
+                  Expanded(
+                    child: buildWishlistButton(
+                      onTap: () {
+                        showWishlist.toggle();
+                      },
+                      showShadow: showWishlist.value ? false : true
+                    ),
+                  ),
+                ],
+              ),
+            )),
+            
             Expanded(
-              child: Obx(() {
-                // Estado de carga
-                if (controller.isLoading.value) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: GerenaColors.primaryColor,
-                    ),
-                  );
-                }
-                
-                // Estado de error
-                if (controller.errorMessage.isNotEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 60,
-                          color: Colors.red,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          controller.errorMessage.value,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.rubik(fontSize: 16),
-                        ),
-                        SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: controller.retryFetch,
-                          child: Text('Reintentar'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                
-                // Lista vacía
-                if (controller.categories.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No hay categorías disponibles',
-                      style: GoogleFonts.rubik(fontSize: 16),
-                    ),
-                  );
-                }
-                
-                // Grid con categorías
-                return _buildCategoryGridWithLines(controller.categories);
-              }),
-            ),
+  child: Obx(() => showWishlist.value
+      ? SavedProductsContent(
+          onBackPressed: () => showWishlist.value = false,
+        )
+      : _buildCategoriesView()),
+),
+
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildCategoriesView() {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Center(
+          child: CircularProgressIndicator(
+            color: GerenaColors.primaryColor,
+          ),
+        );
+      }
+      
+      if (controller.errorMessage.isNotEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.error_outline,
+                size: 60,
+                color: Colors.red,
+              ),
+              SizedBox(height: 16),
+              Text(
+                controller.errorMessage.value,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.rubik(fontSize: 16),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: controller.retryFetch,
+                child: Text('Reintentar'),
+              ),
+            ],
+          ),
+        );
+      }
+      
+      if (controller.categories.isEmpty) {
+        return Center(
+          child: Text(
+            'No hay categorías disponibles',
+            style: GoogleFonts.rubik(fontSize: 16),
+          ),
+        );
+      }
+      
+      return _buildCategoryGridWithLines(controller.categories);
+    });
   }
 
   Widget _buildCategoryGridWithLines(List categories) {
@@ -233,7 +277,6 @@ class CategoryPage extends GetView<CategoryController> {
   }
 
   void _navigateToCategory(dynamic category) {
-    // Pasa el nombre de la categoría a la siguiente página
     Get.toNamed(
       RoutesNames.categoryById,
       arguments: {

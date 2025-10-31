@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:gerena/common/constants/constants.dart';
+import 'package:gerena/common/widgets/snackbar_helper.dart'; // ⭐ Importa tu archivo de snackbars
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart';
@@ -17,7 +18,6 @@ class ShoppingCartController extends GetxController {
   final Rx<ShoppingCartResponseEntity?> cartResponse = Rx<ShoppingCartResponseEntity?>(null);
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-  
   
   @override
   void onInit() {
@@ -43,11 +43,11 @@ class ShoppingCartController extends GetxController {
         }).toList();
         
         await validateCart();
-      } else {
       }
     } catch (e, stackTrace) {
       error.value = 'Error al cargar el carrito: $e';
-    
+      print('❌ Error loading cart: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo cargar el carrito'); // ⭐ Agregado
     }
   }
   
@@ -62,9 +62,13 @@ class ShoppingCartController extends GetxController {
       final cartJson = json.encode(cartList);
      
       _prefs.savePrefs(type: String, key: AppConstants.cartKey, value: cartJson);
+      
+      print('💾 Carrito guardado: ${cartItems.length} items');
     } catch (e, stackTrace) {
       error.value = 'Error al guardar el carrito: $e';
-     }
+      print('❌ Error saving cart: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo guardar el carrito'); // ⭐ Agregado
+    }
   }
   
   Future<void> addToCart({
@@ -73,7 +77,6 @@ class ShoppingCartController extends GetxController {
     int cantidad = 1,
   }) async {
     try {
-     
       final existingIndex = cartItems.indexWhere(
         (item) => item.medicamentoId == medicamentoId
       );
@@ -93,30 +96,19 @@ class ShoppingCartController extends GetxController {
         ));
       }
       
-      
       await saveCartToPreferences();
       await validateCart();
       
-      Get.snackbar(
-        'Éxito',
-        'Producto agregado al carrito',
-        snackPosition: SnackPosition.BOTTOM,
-        duration: Duration(seconds: 2),
-      );
       
     } catch (e, stackTrace) {
       error.value = 'Error al agregar al carrito: $e';
-       Get.snackbar(
-        'Error',
-        error.value,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      print('❌ Error: $e\n$stackTrace');
+      showErrorSnackbar(error.value); // ⭐ Cambiado
     }
   }
   
   Future<void> updateQuantity(int medicamentoId, int newQuantity) async {
     try {
-       
       if (newQuantity <= 0) {
         print('⚠️ Cantidad <= 0, eliminando producto');
         await removeFromCart(medicamentoId);
@@ -136,31 +128,31 @@ class ShoppingCartController extends GetxController {
         
         await saveCartToPreferences();
         await validateCart();
+        
+        // ⭐ Opcional: puedes agregar feedback visual
+        // showSuccessSnackbar('Cantidad actualizada');
       } else {
+        print('⚠️ Producto no encontrado en el carrito');
       }
     } catch (e, stackTrace) {
       error.value = 'Error al actualizar cantidad: $e';
-    
+      print('❌ Error: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo actualizar la cantidad'); // ⭐ Agregado
     }
   }
   
   Future<void> removeFromCart(int medicamentoId) async {
     try {
-    
-      
       cartItems.removeWhere((item) => item.medicamentoId == medicamentoId);
       
       await saveCartToPreferences();
       await validateCart();
       
-      Get.snackbar(
-        'Producto eliminado',
-        'El producto ha sido removido del carrito',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      showSuccessSnackbar('Producto removido del carrito'); // ⭐ Cambiado
     } catch (e, stackTrace) {
       error.value = 'Error al eliminar producto: $e';
-     
+      print('❌ Error: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo eliminar el producto'); // ⭐ Agregado
     }
   }
   
@@ -174,18 +166,18 @@ class ShoppingCartController extends GetxController {
       isLoading.value = true;
       error.value = '';
       
-      
-     
       final entity = ShoppingCartItemsEntity(shopping: cartItems);
       
       final response = await shoppingCartUsecase.execute(entity);
       
       cartResponse.value = response;
-     
+      
+      print('✅ Carrito validado: ${response.itenms.length} items');
       
     } catch (e, stackTrace) {
       error.value = 'Error al validar carrito: $e';
-    
+      print('❌ Error validating cart: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo validar el carrito'); // ⭐ Agregado
     } finally {
       isLoading.value = false;
     }
@@ -195,6 +187,8 @@ class ShoppingCartController extends GetxController {
     cartItems.clear();
     cartResponse.value = null;
     await _prefs.clearOnePreference(key: AppConstants.cartKey);
+    
+    showSuccessSnackbar('Carrito limpiado correctamente'); // ⭐ Agregado
   }
   
   int get totalItems => cartItems.fold(0, (sum, item) => sum + item.cantidad);

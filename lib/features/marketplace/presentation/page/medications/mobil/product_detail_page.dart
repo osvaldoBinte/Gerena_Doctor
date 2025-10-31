@@ -7,6 +7,7 @@ import 'package:gerena/features/marketplace/presentation/page/medications/mobil/
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/widget/product_card_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/carousel_indicators_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -117,11 +118,10 @@ class _ProductDetailContent extends StatefulWidget {
 }
 
 class _ProductDetailContentState extends State<_ProductDetailContent> {
-  bool _isFavorite = false;
-
-  // ⭐ Obtener el ShoppingCartController
+  // ⭐ Obtener los controllers
   ShoppingCartController get cartController =>
       Get.find<ShoppingCartController>();
+  WishlistController get wishlistController => Get.find<WishlistController>();
 
   @override
   void initState() {
@@ -151,8 +151,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
             SliverToBoxAdapter(
               child: Column(
                 children: [
-
-                const SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -166,7 +165,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                   _buildImageCarousel(),
                   Divider(height: 2, color: GerenaColors.colorinput),
                   _buildProductInfo(),
-                  _buildActionButtons(), // ⭐ Sin selector de cantidad
+                  _buildActionButtons(),
                   Divider(height: 2, color: GerenaColors.colorinput),
                   _buildSimilarProducts(),
                   Divider(height: 2, color: GerenaColors.colorinput),
@@ -240,7 +239,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                   ),
                 ],
                 const SizedBox(height: 8),
-                Row(
+                /*  Row(
                   children: [
                     Icon(
                       widget.medication.stock > 0
@@ -265,30 +264,30 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                     ),
                   ],
                 ),
+                
+                 */
+              
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-              });
-              Get.snackbar(
-                _isFavorite ? 'Agregado a favoritos' : 'Eliminado de favoritos',
-                widget.medication.name,
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor:
-                    _isFavorite ? GerenaColors.successColor : Colors.grey[600],
-                colorText: Colors.white,
-                duration: const Duration(seconds: 2),
-              );
-            },
-            child: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? GerenaColors.errorColor : Colors.grey[400],
-              size: 40,
-            ),
-          ),
+          // ⭐ Botón de corazón con Wishlist
+          Obx(() {
+            final isInWishlist = wishlistController.isInWishlist(widget.medication.id);
+            
+            return GestureDetector(
+              onTap: () {
+                wishlistController.toggleWishlist(
+                  medicamentoId: widget.medication.id,
+                  precio: widget.medication.price,
+                );
+              },
+              child: Icon(
+                isInWishlist ? Icons.favorite : Icons.favorite_border,
+                color: isInWishlist ? GerenaColors.errorColor : Colors.grey[400],
+                size: 40,
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -309,7 +308,6 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                 text: 'AGREGAR AL CARRITO',
                 onPressed: isAvailable
                     ? () async {
-                        // ⭐ Siempre envía cantidad = 1
                         await cartController.addToCart(
                           medicamentoId: widget.medication.id,
                           precio: widget.medication.price,
@@ -332,17 +330,15 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                 text: 'COMPRAR AHORA',
                 onPressed: isAvailable
                     ? () async {
-                        // ⭐ Siempre envía cantidad = 1
                         await cartController.addToCart(
                           medicamentoId: widget.medication.id,
                           precio: widget.medication.price,
                           cantidad: 1,
                         );
 
-                        // Navegar al carrito
                         Get.toNamed(
                           RoutesNames.shoppdingcart,
-                        ); // O ajusta según tu ruta
+                        );
                       }
                     : null,
                 backgroundColor:

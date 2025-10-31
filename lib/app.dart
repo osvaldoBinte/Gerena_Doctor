@@ -11,6 +11,7 @@ import 'package:gerena/features/marketplace/presentation/page/Category/category_
 import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_datail_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:gerena/movil/perfil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
@@ -62,6 +63,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => ProductDetailController(getMedicineByIdUsecase: Get.find(),), fenix:  true);
         Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(),), fenix:  true,);
+        Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

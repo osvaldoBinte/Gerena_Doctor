@@ -4,6 +4,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/ejemplo/ejemplo_%20saved_products_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar.dart';
@@ -13,7 +14,6 @@ import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedi
 import 'package:gerena/page/dashboard/widget/facturacion/facturacion.dart';
 import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
-import 'package:gerena/features/marketplace/presentation/page/wishlist/Wishlist_controller.dart';
 import 'package:gerena/page/store/historialDePedidos/historial_de_pedidos_content.dart';
 import 'package:gerena/page/store/store_controller.dart';
 import 'package:get/get.dart';

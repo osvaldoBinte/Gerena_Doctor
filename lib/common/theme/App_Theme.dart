@@ -177,7 +177,7 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
   static TextStyle get headingSmall => GoogleFonts.rubik(
     fontSize: 16,
     fontWeight: FontWeight.bold,
-    color: textSecondary,
+    color: textTertiaryColor,
   );
   
   static TextStyle get subtitleLarge => GoogleFonts.rubik(

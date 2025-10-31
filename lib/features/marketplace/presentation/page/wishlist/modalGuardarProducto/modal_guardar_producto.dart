@@ -10,10 +10,9 @@ class ModalGuardarProducto extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
-        constraints: const BoxConstraints(maxWidth: 600),
+        constraints: const BoxConstraints(maxWidth: 800),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: GerenaColors.mediumBorderRadius,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -24,34 +23,32 @@ class ModalGuardarProducto extends StatelessWidget {
                 color: Colors.grey[50],
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+                  topRight: Radius.circular(2),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                  'FRECUENCIA DEL PEDIDO',
-                  style: GerenaColors.headingSmall.copyWith(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
+                    'FRECUENCIA DEL PEDIDO',
+                    style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: Image.asset(
-                    'assets/icons/close.png',
-                    
-                  ),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Image.asset(
+                      'assets/icons/close.png',
+                    ),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
             ),
-            
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -59,66 +56,69 @@ class ModalGuardarProducto extends StatelessWidget {
                     children: [
                       Expanded(child: _buildFrequencyOption('Semanal', false)),
                       const SizedBox(width: 8),
-                      Expanded(child: _buildFrequencyOption('Quincenal', false)),
+                      Expanded(
+                          child: _buildFrequencyOption('Quincenal', false)),
                       const SizedBox(width: 8),
                       Expanded(child: _buildFrequencyOption('Mensual', true)),
                       const SizedBox(width: 8),
-                      Expanded(child: _buildFrequencyOption('Personalizado', false)),
+                      Expanded(
+                          child: _buildFrequencyOption('Personalizado', false)),
                     ],
                   ),
-                  
                   const SizedBox(height: 24),
-                  
                   Text(
                     'FECHA DE INICIO',
-                    style: GerenaColors.bodyMedium.copyWith(
+                    style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _buildDateField('01/04/1987'),
-                  
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.2,
+                        child: _buildDateField('01/04/1987'),
+                      )),
                   const SizedBox(height: 20),
-                  
                   Text(
                     'MÉTODO DE PAGO',
-                    style: GerenaColors.bodyMedium.copyWith(
+                   style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _buildPaymentMethod(),
-                  
+                  Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.4,
+                        child: _buildPaymentMethod(),
+                      )),
                   const SizedBox(height: 20),
-                  
                   Text(
                     'DIRECCIÓN DE ENTREGA',
-                    style: GerenaColors.bodyMedium.copyWith(
+                   style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      fontSize: 13,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  
                   _buildAddressOption(
                     name: 'Juan Pedro Gonzalez Perez +52 3333303333',
-                    address: 'Col. Providencia, Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
+                    address:
+                        'Col. Providencia, Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
                     isSelected: true,
                     hasEditIcon: true,
                   ),
-                  
                   const SizedBox(height: 12),
-                  
                   _buildAddressOption(
                     name: 'En sucursal',
-                    address: 'Col. Lorem ipsum Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
+                    address:
+                        'Col. Lorem ipsum Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
                     isSelected: false,
                   ),
-                  
                   const SizedBox(height: 24),
-                  
                   Row(
                     children: [
                       Expanded(
@@ -127,13 +127,19 @@ class ModalGuardarProducto extends StatelessWidget {
                           children: [
                             Text(
                               'CONFIRMACIÓN PREVIA AL ENVÍO',
-                              style: GerenaColors.bodySmall.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11,
-                              ),
+                              style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                             ),
                             const SizedBox(height: 8),
-                            _buildDropdownField('Si'),
+                                Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.3,
+                        child:                             _buildDropdownField('Si'),
+
+                      )),
                           ],
                         ),
                       ),
@@ -144,47 +150,37 @@ class ModalGuardarProducto extends StatelessWidget {
                           children: [
                             Text(
                               'FACTURA PROGRAMADA',
-                              style: GerenaColors.bodySmall.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11,
-                              ),
+                              style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                             ),
                             const SizedBox(height: 8),
-                            _buildDropdownField('Si'),
+                              Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                          widthFactor: 0.3,
+                        child:                             _buildDropdownField('Si'),
+
+                      )),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  
                   const SizedBox(height: 24),
-                  
                   Align(
                     alignment: Alignment.centerRight,
                     child: SizedBox(
                       width: 160,
-                      height: 40,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          print('Programar pedido');
-                          Navigator.of(context).pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: GerenaColors.secondaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'PROGRAMAR PEDIDO',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                    
+                      child:  GerenaColors.widgetButton(
+                text: 'PROGRAMAR PEDIDO',
+                onPressed: () {
+                 
+                },
+                customShadow: GerenaColors.mediumShadow,
+              ),
                     ),
                   ),
                 ],
@@ -198,13 +194,13 @@ class ModalGuardarProducto extends StatelessWidget {
 
   Widget _buildFrequencyOption(String text, bool isSelected) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       decoration: BoxDecoration(
         color: isSelected ? GerenaColors.secondaryColor : Colors.white,
         border: Border.all(
           color: isSelected ? GerenaColors.secondaryColor : Colors.grey[300]!,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         text,
@@ -221,11 +217,7 @@ class ModalGuardarProducto extends StatelessWidget {
   Widget _buildDateField(String date) {
     return Container(
       height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(4),
-      ),
+    
       child: TextFormField(
         initialValue: date,
         decoration: const InputDecoration(
@@ -235,38 +227,41 @@ class ModalGuardarProducto extends StatelessWidget {
         style: const TextStyle(fontSize: 13),
       ),
     );
-  }
-
-  Widget _buildPaymentMethod() {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(4),
+  }Widget _buildPaymentMethod() {
+  return Container(
+    height: 40,
+    width: double.infinity,
+    child: DropdownButtonFormField<String>(
+      isExpanded: true,
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.zero,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.zero,
+        ),
       ),
-      child: DropdownButtonFormField<String>(
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        ),
-        value: 'VISA 5545 15****** 9965',
-        icon: Icon(
-          Icons.keyboard_arrow_down,
-          color: Colors.grey[600],
-          size: 18,
-        ),
-        style: const TextStyle(fontSize: 13, color: Colors.black),
-        items: const [
-          DropdownMenuItem(
-            value: 'VISA 5545 15****** 9965',
-            child: Text('VISA 5545 15****** 9965'),
+      value: 'VISA 5545 15****** 9965',
+      icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey, size: 18),
+      style: const TextStyle(fontSize: 13, color: Colors.black),
+      items: const [
+        DropdownMenuItem(
+          value: 'VISA 5545 15****** 9965',
+          child: Text(
+            'VISA 5545 15****** 9965',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
-        ],
-        onChanged: (value) {},
-      ),
-    );
-  }
+        ),
+      ],
+      onChanged: (value) {},
+    ),
+  );
+}
+
 
   Widget _buildAddressOption({
     required String name,
@@ -298,9 +293,7 @@ class ModalGuardarProducto extends StatelessWidget {
                 ? const Icon(Icons.check, color: Colors.white, size: 14)
                 : null,
           ),
-          
           const SizedBox(width: 12),
-          
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,7 +316,6 @@ class ModalGuardarProducto extends StatelessWidget {
               ],
             ),
           ),
-          
           if (hasEditIcon)
             Container(
               padding: const EdgeInsets.all(4),
@@ -342,34 +334,57 @@ class ModalGuardarProducto extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdownField(String value) {
-    return Container(
-      height: 32,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: DropdownButtonFormField<String>(
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+
+Widget _buildDropdownField(String value) {
+  return Container(
+    height: 32,
+    constraints: BoxConstraints(minWidth: 0), // ⭐ Permite que se comprima si es necesario
+    child: DropdownButtonFormField<String>(
+      isExpanded: true,
+      isDense: true, // ⭐ Reduce el espacio interno
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 4), // ⭐ Reducido aún más
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.zero,
         ),
-        value: value,
-        icon: Icon(
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.zero,
+        ),
+      ),
+      value: value,
+      icon: Padding(
+        padding: const EdgeInsets.only(right: 2), // ⭐ Reduce espacio del icono
+        child: Icon(
           Icons.keyboard_arrow_down,
           color: Colors.grey[600],
-          size: 16,
+          size: 14, // ⭐ Reducido de 16 a 14
         ),
-        style: const TextStyle(fontSize: 11, color: Colors.black),
-        items: [
-          DropdownMenuItem(value: 'Si', child: Text(value)),
-          DropdownMenuItem(value: 'No', child: Text('No')),
-        ],
-        onChanged: (newValue) {},
       ),
-    );
-  }
+      style: const TextStyle(fontSize: 10, color: Colors.black), // ⭐ Reducido de 11 a 10
+      items: [
+        DropdownMenuItem(
+          value: 'Si',
+          child: Text(
+            'Si',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+        DropdownMenuItem(
+          value: 'No',
+          child: Text(
+            'No',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ],
+      onChanged: (newValue) {},
+    ),
+  );
+}
 
   static void show(BuildContext context) {
     showDialog(

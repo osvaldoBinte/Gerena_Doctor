@@ -3,6 +3,7 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,6 +29,9 @@ class ProductCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener el WishlistController
+    final wishlistController = Get.find<WishlistController>();
+
     return GestureDetector(
       onTap: onTap ??
           () {
@@ -42,7 +46,7 @@ class ProductCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildImageSection(),
+            _buildImageSection(wishlistController),
             const SizedBox(height: 8),
             _buildProductInfo(),
           ],
@@ -51,7 +55,7 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildImageSection() {
+  Widget _buildImageSection(WishlistController wishlistController) {
     return Container(
       height: imageHeight,
       child: Stack(
@@ -88,26 +92,39 @@ class ProductCardWidget extends StatelessWidget {
             Positioned(
               top: 5,
               right: 5,
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
-                child: Image.asset(
-                  'assets/icons/guardar.png',
-                  width: 16,
-                  height: 16,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.bookmark_border,
-                      size: 16,
-                      color: Colors.grey,
+              child: Obx(() {
+                final isInWishlist = wishlistController.isInWishlist(medication.id);
+                
+                return InkWell(
+                  onTap: () {
+                    wishlistController.toggleWishlist(
+                      medicamentoId: medication.id,
+                      precio: medication.price,
                     );
                   },
-                ),
-              ),
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: Image.asset(
+                      'assets/icons/guardar.png',
+                      width: 16,
+                      height: 16,
+                      fit: BoxFit.contain,
+                      color: isInWishlist ? GerenaColors.primaryColor : null,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          isInWishlist ? Icons.bookmark : Icons.bookmark_border,
+                          size: 16,
+                          color: isInWishlist ? GerenaColors.primaryColor : Colors.grey,
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }),
             ),
 
           // Botón de favorito (bottom right)
@@ -115,21 +132,30 @@ class ProductCardWidget extends StatelessWidget {
             Positioned(
               bottom: 5,
               right: 5,
-              child: IconButton(
-                icon: const Icon(Icons.favorite_border, color: Colors.grey),
-                onPressed: onFavoritePressed ??
-                    () {
-                      Get.snackbar(
-                        'Favoritos',
-                        '${medication.name} agregado a favoritos',
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: const Duration(seconds: 2),
-                      );
-                    },
-                iconSize: 18,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
+              child: Obx(() {
+                final isInWishlist = wishlistController.isInWishlist(medication.id);
+                
+                return IconButton(
+                  icon: Icon(
+                    isInWishlist ? Icons.favorite : Icons.favorite_border,
+                    color: isInWishlist ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: () {
+                    wishlistController.toggleWishlist(
+                      medicamentoId: medication.id,
+                      precio: medication.price,
+                    );
+                    
+                    // Si existe el callback original, también lo ejecuta
+                    if (onFavoritePressed != null) {
+                      onFavoritePressed!();
+                    }
+                  },
+                  iconSize: 18,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                );
+              }),
             ),
 
           // Badge de stock agotado

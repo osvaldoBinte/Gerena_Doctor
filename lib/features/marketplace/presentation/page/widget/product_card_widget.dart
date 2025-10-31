@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
 
 class ProductCardWidget extends StatelessWidget {
   final Map<String, String> product;
@@ -20,6 +22,13 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasDiscount = product['hasDiscount'] == 'true';
+    
+    // Obtener el WishlistController
+    final wishlistController = Get.find<WishlistController>();
+    
+    // Extraer el ID y precio del producto
+    final medicamentoId = int.tryParse(product['id'] ?? '0') ?? 0;
+    final precio = _extractPrice(product['price'] ?? '0.00');
 
     return GestureDetector(
       onTap: onTap,
@@ -39,16 +48,31 @@ class ProductCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _buildImageSection(hasDiscount),
+              child: _buildImageSection(
+                hasDiscount, 
+                wishlistController, 
+                medicamentoId, 
+                precio
+              ),
             ),
-            _buildProductInfo(hasDiscount),
+            _buildProductInfo(
+              hasDiscount, 
+              wishlistController, 
+              medicamentoId, 
+              precio
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildImageSection(bool hasDiscount) {
+  Widget _buildImageSection(
+    bool hasDiscount, 
+    WishlistController wishlistController,
+    int medicamentoId,
+    double precio,
+  ) {
     return Stack(
       children: [
         Container(
@@ -71,19 +95,32 @@ class ProductCardWidget extends StatelessWidget {
           Positioned(
             bottom: 5,
             right: 5,
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-              ),
-              child: Image.asset(
-                'assets/icons/guardar.png',
-                width: 16,
-                height: 16,
-                fit: BoxFit.contain,
-              ),
-            ),
+            child: Obx(() {
+              final isInWishlist = wishlistController.isInWishlist(medicamentoId);
+              
+              return InkWell(
+                onTap: () {
+                  wishlistController.toggleWishlist(
+                    medicamentoId: medicamentoId,
+                    precio: precio,
+                  );
+                },
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/icons/guardar.png',
+                    width: 16,
+                    height: 16,
+                    fit: BoxFit.contain,
+                    color: isInWishlist ? GerenaColors.primaryColor : null,
+                  ),
+                ),
+              );
+            }),
           ),
       ],
     );
@@ -131,7 +168,12 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProductInfo(bool hasDiscount) {
+  Widget _buildProductInfo(
+    bool hasDiscount,
+    WishlistController wishlistController,
+    int medicamentoId,
+    double precio,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -153,13 +195,31 @@ class ProductCardWidget extends StatelessWidget {
                 ),
               ),
               if (showFavoriteButton)
-                IconButton(
-                  icon: const Icon(Icons.favorite_border, color: Colors.grey),
-                  onPressed: onFavoritePressed ?? () {},
-                  iconSize: 20,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
+                Obx(() {
+                  final isInWishlist = wishlistController.isInWishlist(medicamentoId);
+                  
+                  return IconButton(
+                    icon: Icon(
+                      isInWishlist ? Icons.favorite : Icons.favorite_border,
+                      color: isInWishlist ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: () {
+                      // Llama al controller para guardar/eliminar
+                      wishlistController.toggleWishlist(
+                        medicamentoId: medicamentoId,
+                        precio: precio,
+                      );
+                      
+                      // Si existe el callback original, también lo ejecuta
+                      if (onFavoritePressed != null) {
+                        onFavoritePressed!();
+                      }
+                    },
+                    iconSize: 20,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  );
+                }),
             ],
           ),
           if (hasDiscount) ...[
@@ -216,5 +276,21 @@ class ProductCardWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Método auxiliar para extraer el precio numérico del string
+  double _extractPrice(String priceString) {
+    try {
+      // Elimina "MXN" y espacios, luego convierte a double
+      final cleanPrice = priceString
+          .replaceAll('MXN', '')
+          .replaceAll('\$', '')
+          .replaceAll(',', '')
+          .trim();
+      return double.tryParse(cleanPrice) ?? 0.0;
+    } catch (e) {
+      print('Error al extraer precio: $e');
+      return 0.0;
+    }
   }
 }

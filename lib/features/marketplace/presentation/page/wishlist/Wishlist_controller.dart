@@ -1,114 +1,209 @@
-import 'package:flutter/material.dart';
-import 'package:gerena/common/widgets/simple_counter.dart';
-import 'package:gerena/page/dashboard/widget/modalGuardarProducto/modal_guardar_producto.dart';
-import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
-import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
+import 'dart:convert';
+import 'package:gerena/common/constants/constants.dart';
+import 'package:gerena/common/widgets/snackbar_helper.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart';
+import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
+import 'package:gerena/framework/preferences_service.dart';
 import 'package:get/get.dart';
-import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class WishlistController extends GetxController {
-  final RxMap<String, List<Map<String, dynamic>>> savedProductsByCategory = <String, List<Map<String, dynamic>>>{}.obs;
+  final ShoppingCartUsecase shoppingCartUsecase;
+  final PreferencesUser _prefs = PreferencesUser();
   
-  final RxBool hasProgrammedList = false.obs;
+  WishlistController({required this.shoppingCartUsecase});
+  
+  final RxList<ShoppingCartPostEntity> wishlistItems = <ShoppingCartPostEntity>[].obs;
+  final Rx<ShoppingCartResponseEntity?> wishlistResponse = Rx<ShoppingCartResponseEntity?>(null);
+  final RxBool isLoading = false.obs;
+  final RxString error = ''.obs;
   
   @override
   void onInit() {
     super.onInit();
-    savedProductsByCategory.value = {
-      'Armonización facial': [
-        {
-          'id': '1',
-          'name': 'CELOSOME IMPLANT',
-          'price': '\$1,050.00 MXN',
-          'image': 'assets/productoenventa.png',
-          'description': 'Celosome está diseñado para el tratamiento facial y el rejuvenecimiento de la piel para brindar perfecta satisfacción y seguridad. Celosome te trae una piel visiblemente más joven y saludable.',
-          'quantity': 8
-        },
-        {
-          'id': '2',
-          'name': 'CELOSOME MID',
-          'price': '\$1,050.00 MXN',
-          'image': 'assets/productoenventa.png',
-          'description': 'Celosome está diseñado para el tratamiento facial y el rejuvenecimiento de la piel para brindar perfecta satisfacción y seguridad. Celosome te trae una piel visiblemente más joven y saludable.',
-          'quantity': 8
-        },
-      ],
-      'Labios': [
-        {
-          'id': '3',
-          'name': 'RED VOLUMEN',
-          'price': '\$1,500.00 MXN',
-          'image': 'assets/productoenventa.png',
-          'description': 'El AH reticulado, fabricado con su propia tecnología especializada, tiene efectos duraderos debido a su excelente resistencia enzimática a la descomposición lenta en el cuerpo a pesar de la pequeña cantidad de BDDE.',
-          'quantity': 8,
-          'programmed': true
-        }
-      ]
-    };
-    
-    checkProgrammedLists();
+    loadWishlistFromPreferences();
   }
   
-  void checkProgrammedLists() {
-    hasProgrammedList.value = false;
-    
-    savedProductsByCategory.forEach((category, products) {
-      for (var product in products) {
-        if (product['programmed'] == true) {
-          hasProgrammedList.value = true;
-          break;
-        }
-      }
-    });
-  }
-  
-  void adjustQuantity(String categoryName, int productIndex, bool increase) {
-    if (savedProductsByCategory.containsKey(categoryName)) {
-      var products = savedProductsByCategory[categoryName]!;
-      if (productIndex >= 0 && productIndex < products.length) {
-        var product = Map<String, dynamic>.from(products[productIndex]);
+  Future<void> loadWishlistFromPreferences() async {
+    try {
+      final wishlistJson = await _prefs.loadPrefs(
+        type: String, 
+        key: AppConstants.wishlistKey
+      );
+      
+      print('💝 Wishlist JSON: $wishlistJson');
+      
+      if (wishlistJson != null && wishlistJson.isNotEmpty) {
+        final List<dynamic> decoded = json.decode(wishlistJson);
         
-        if (increase) {
-          product['quantity'] = (product['quantity'] as int) + 1;
-        } else if (product['quantity'] > 1) {
-          product['quantity'] = (product['quantity'] as int) - 1;
-        }
+        wishlistItems.value = decoded.map((item) {
+          return ShoppingCartPostEntity(
+            medicamentoId: item['medicamentoId'],
+            cantidad: item['cantidad'] ?? 1,
+            precioGuardado: item['precioGuardado'].toDouble(),
+          );
+        }).toList();
         
-        products[productIndex] = product;
-        savedProductsByCategory[categoryName] = List.from(products);
+        await validateWishlist();
       }
+    } catch (e, stackTrace) {
+      error.value = 'Error al cargar la wishlist: $e';
+      print('❌ Error loading wishlist: $e\n$stackTrace');
     }
   }
   
-  void programOrder(String categoryName) {
-    if (savedProductsByCategory.containsKey(categoryName)) {
-      var products = savedProductsByCategory[categoryName]!;
-      for (int i = 0; i < products.length; i++) {
-        var product = Map<String, dynamic>.from(products[i]);
-        product['programmed'] = true;
-        products[i] = product;
+  Future<void> saveWishlistToPreferences() async {
+    try {
+      final wishlistList = wishlistItems.map((item) => {
+        'medicamentoId': item.medicamentoId,
+        'cantidad': item.cantidad,
+        'precioGuardado': item.precioGuardado,
+      }).toList();
+      
+      final wishlistJson = json.encode(wishlistList);
+      
+       _prefs.savePrefs(
+        type: String, 
+        key: AppConstants.wishlistKey, 
+        value: wishlistJson
+      );
+      
+      print('💾 Wishlist guardada: ${wishlistItems.length} items');
+    } catch (e, stackTrace) {
+      error.value = 'Error al guardar la wishlist: $e';
+      print('❌ Error saving wishlist: $e\n$stackTrace');
+    }
+  }
+  
+  Future<void> toggleWishlist({
+    required int medicamentoId,
+    required double precio,
+  }) async {
+    try {
+      final isInWishlist = this.isInWishlist(medicamentoId);
+      
+      if (isInWishlist) {
+        await removeFromWishlist(medicamentoId);
+      } else {
+        await addToWishlist(medicamentoId: medicamentoId, precio: precio);
+      }
+    } catch (e) {
+      error.value = 'Error al actualizar wishlist: $e';
+      showErrorSnackbar(error.value); // ⭐ Cambiado
+    }
+  }
+  
+  Future<void> addToWishlist({
+    required int medicamentoId,
+    required double precio,
+  }) async {
+    try {
+      // Verifica si ya existe
+      final existingIndex = wishlistItems.indexWhere(
+        (item) => item.medicamentoId == medicamentoId
+      );
+      
+      if (existingIndex != -1) {
+        showErrorSnackbar('Este producto ya está en tu wishlist'); // ⭐ Cambiado (error porque ya existe)
+        return;
       }
       
-      savedProductsByCategory[categoryName] = List.from(products);
-      checkProgrammedLists();
+      // Agrega con cantidad fija de 1
+      wishlistItems.add(ShoppingCartPostEntity(
+        medicamentoId: medicamentoId,
+        cantidad: 1,
+        precioGuardado: precio,
+      ));
+      
+      await saveWishlistToPreferences();
+      await validateWishlist();
+      
+    //  showSuccessSnackbar('💝 Producto agregado a tu lista de deseos'); // ⭐ Cambiado
+      
+    } catch (e, stackTrace) {
+      error.value = 'Error al agregar a wishlist: $e';
+      print('❌ Error: $e\n$stackTrace');
+      showErrorSnackbar(error.value); // ⭐ Cambiado
     }
   }
   
-  void removeProduct(String categoryName, int productIndex) {
-    if (savedProductsByCategory.containsKey(categoryName)) {
-      var products = List<Map<String, dynamic>>.from(savedProductsByCategory[categoryName]!);
-      if (productIndex >= 0 && productIndex < products.length) {
-        products.removeAt(productIndex);
-        
-        if (products.isEmpty) {
-          savedProductsByCategory.remove(categoryName);
-        } else {
-          savedProductsByCategory[categoryName] = products;
-        }
-        
-        checkProgrammedLists();
-      }
+  Future<void> removeFromWishlist(int medicamentoId) async {
+    try {
+      wishlistItems.removeWhere((item) => item.medicamentoId == medicamentoId);
+      
+      await saveWishlistToPreferences();
+      await validateWishlist();
+      
+      showSuccessSnackbar('Producto removido de tu wishlist'); // ⭐ Cambiado
+    } catch (e, stackTrace) {
+      error.value = 'Error al eliminar de wishlist: $e';
+      print('❌ Error: $e\n$stackTrace');
+      showErrorSnackbar(error.value); // ⭐ Cambiado
     }
   }
+  
+  Future<void> validateWishlist() async {
+    if (wishlistItems.isEmpty) {
+      wishlistResponse.value = null;
+      return;
+    }
+    
+    try {
+      isLoading.value = true;
+      error.value = '';
+      
+      final entity = ShoppingCartItemsEntity(shopping: wishlistItems);
+      
+      final response = await shoppingCartUsecase.execute(entity);
+      
+      wishlistResponse.value = response;
+      
+      print('✅ Wishlist validada: ${response.itenms.length} items');
+      
+    } catch (e, stackTrace) {
+      error.value = 'Error al validar wishlist: $e';
+      print('❌ Error validating wishlist: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo validar la wishlist'); // ⭐ Cambiado
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  Future<void> moveToCart(int medicamentoId) async {
+    try {
+      final item = wishlistItems.firstWhereOrNull(
+        (item) => item.medicamentoId == medicamentoId
+      );
+      
+      if (item != null) {
+        // Aquí podrías llamar al ShoppingCartController para agregar
+        // Get.find<ShoppingCartController>().addToCart(...)
+        
+        await removeFromWishlist(medicamentoId);
+        
+        showSuccessSnackbar('🛒 Producto movido al carrito de compras'); // ⭐ Cambiado
+      }
+    } catch (e) {
+      error.value = 'Error al mover al carrito: $e';
+      showErrorSnackbar(error.value); // ⭐ Cambiado
+    }
+  }
+  
+  Future<void> clearWishlist() async {
+    wishlistItems.clear();
+    wishlistResponse.value = null;
+    await _prefs.clearOnePreference(key: AppConstants.wishlistKey);
+    
+    showSuccessSnackbar('Wishlist limpiada - Todos los productos removidos'); // ⭐ Cambiado
+  }
+  
+  // Getters útiles
+  int get totalItems => wishlistItems.length;
+  
+  bool isInWishlist(int medicamentoId) {
+    return wishlistItems.any((item) => item.medicamentoId == medicamentoId);
+  }
+  
+  List<int> get wishlistIds => wishlistItems.map((item) => item.medicamentoId).toList();
 }

@@ -5,6 +5,7 @@ import 'package:gerena/features/marketplace/presentation/page/medications/deskto
 import 'package:gerena/features/marketplace/presentation/page/widget/carousel_indicators_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
@@ -111,8 +112,8 @@ class ProductImageSection extends StatelessWidget {
           images: productImages,
           indicatorStyle: IndicatorStyle.dots,
           height: 600,
-          containerWidth: 470, // ⭐ MÁS ANCHO para escritorio
-          containerHeight: 600, // ⭐ Altura personalizada
+          containerWidth: 470,
+          containerHeight: 600,
           showNavigationButtons: productImages.length > 1,
           autoPlay: false,
           backgroundImage: 'assets/tienda-producto.png',
@@ -141,9 +142,14 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
   bool isDescriptionExpanded = false;
   bool isCharacteristicsExpanded = false;
   ShoppingCartController get cartController => Get.find<ShoppingCartController>();
+  WishlistController get wishlistController => Get.find<WishlistController>();
 
   @override
   Widget build(BuildContext context) {
+    // Extraer el ID y precio del producto
+    final medicamentoId = int.tryParse(widget.product['id'] ?? '0') ?? 0;
+    final precio = _extractPrice(widget.product['price'] ?? '0.00');
+
     return Container(
       height: 600,
       padding: EdgeInsets.all(16),
@@ -180,19 +186,43 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
                 ),
                 Row(
                   children: [
-                    Image.asset(
-                      'assets/icons/WISHLIST.png',
-                      width: 30,
-                      height: 30,
-                      fit: BoxFit.contain,
-                    ),
+                    Obx(() {
+                      final isInWishlist = wishlistController.isInWishlist(medicamentoId);
+                      
+                      return InkWell(
+                        onTap: () {
+                          wishlistController.toggleWishlist(
+                            medicamentoId: medicamentoId,
+                            precio: precio,
+                          );
+                        },
+                        child: Icon(
+                          isInWishlist ? Icons.favorite : Icons.favorite_border,
+                          color: isInWishlist ? Colors.red : GerenaColors.textTertiaryColor,
+                          size: 30,
+                        ),
+                      );
+                    }),
                     SizedBox(width: 8),
-                    Image.asset(
-                      'assets/icons/guardar.png',
-                      width: 30,
-                      height: 30,
-                      fit: BoxFit.contain,
-                    ),
+                    Obx(() {
+                      final isInWishlist = wishlistController.isInWishlist(medicamentoId);
+                      
+                      return InkWell(
+                        onTap: () {
+                          wishlistController.toggleWishlist(
+                            medicamentoId: medicamentoId,
+                            precio: precio,
+                          );
+                        },
+                        child: Image.asset(
+                          'assets/icons/guardar.png',
+                          width: 30,
+                          height: 30,
+                          fit: BoxFit.contain,
+                          color: isInWishlist ? GerenaColors.primaryColor : null,
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ],
@@ -206,14 +236,6 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
               ),
             ),
             const SizedBox(height: 4),
-          /*  Text(
-              '4 X \$8,400.00 MXN',
-              style: GoogleFonts.rubik(
-                color: GerenaColors.textpreviousprice,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            ),*/
             const SizedBox(height: 16),
             Divider(),
             const SizedBox(height: 8),
@@ -278,31 +300,30 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
             ),
             const SizedBox(height: 24),
             
-            
             Column(
               children: [
                 GerenaColors.widgetButton(
                   text: 'AGREGAR AL CARRITO',
                   onPressed: () async {
-                  final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
-                  final precio = double.tryParse(
-                    widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
-                  );
-                  
-                  if (medicamentoId != null && precio != null && medicamentoId > 0) {
-                    await cartController.addToCart(
-                      medicamentoId: medicamentoId,
-                      precio: precio,
-                      cantidad: 1,
+                    final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
+                    final precio = double.tryParse(
+                      widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
                     );
-                  } else {
-                    Get.snackbar(
-                      'Error',
-                      'No se pudo agregar el producto al carrito',
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                  }
-                },
+                    
+                    if (medicamentoId != null && precio != null && medicamentoId > 0) {
+                      await cartController.addToCart(
+                        medicamentoId: medicamentoId,
+                        precio: precio,
+                        cantidad: 1,
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        'No se pudo agregar el producto al carrito',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
+                  },
                   backgroundColor: GerenaColors.secondaryColor,
                   textColor: GerenaColors.textLightColor,
                   fontSize: 16,
@@ -376,6 +397,21 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
         ),
       ],
     );
+  }
+
+  // Método auxiliar para extraer el precio numérico del string
+  double _extractPrice(String priceString) {
+    try {
+      final cleanPrice = priceString
+          .replaceAll('MXN', '')
+          .replaceAll('\$', '')
+          .replaceAll(',', '')
+          .trim();
+      return double.tryParse(cleanPrice) ?? 0.0;
+    } catch (e) {
+      print('Error al extraer precio: $e');
+      return 0.0;
+    }
   }
 }
 
