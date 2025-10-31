@@ -118,7 +118,7 @@ class _ProductDetailContent extends StatefulWidget {
 }
 
 class _ProductDetailContentState extends State<_ProductDetailContent> {
-  // ⭐ Obtener los controllers
+
   ShoppingCartController get cartController =>
       Get.find<ShoppingCartController>();
   WishlistController get wishlistController => Get.find<WishlistController>();
@@ -128,7 +128,6 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
     super.initState();
   }
 
-  // Imágenes del producto
   List<String> get _productImages {
     if (widget.medication.imagen != null &&
         widget.medication.imagen!.isNotEmpty) {
@@ -264,13 +263,12 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                     ),
                   ],
                 ),
-                
+                  
                  */
               
               ],
             ),
           ),
-          // ⭐ Botón de corazón con Wishlist
           Obx(() {
             final isInWishlist = wishlistController.isInWishlist(widget.medication.id);
             

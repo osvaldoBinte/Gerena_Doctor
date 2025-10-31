@@ -9,7 +9,7 @@ import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;
 
 String enviromentSelect = Enviroment.testing.value;
-
+ 
 void main() async {
   
   await dotenv.load(fileName: enviromentSelect);

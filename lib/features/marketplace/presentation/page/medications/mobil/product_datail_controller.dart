@@ -15,12 +15,10 @@ class ProductDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Obtener el ID del medicamento de los argumentos
     final arguments = Get.arguments;
     
     int? medicineId;
     
-    // Manejar diferentes tipos de argumentos
     if (arguments is int) {
       medicineId = arguments;
     } else if (arguments is Map<String, dynamic>) {
