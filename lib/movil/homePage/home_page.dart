@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
+import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,6 +14,17 @@ class HomePageMovil extends StatefulWidget {
 }
 
 class _GerenaFeedScreenState extends State<HomePageMovil> {
+  // Obtener el controlador del calendario
+  final CalendarControllerGetx calendarController = Get.find<CalendarControllerGetx>();
+
+@override
+void initState() {
+  super.initState();
+  final fechaInicial = DateTime(2025, 9, 1);
+  calendarController.loadAppointmentsForDate(fechaInicial);
+}
+
+
   @override
   Widget build(BuildContext context) {
     final double availableHeight = MediaQuery.of(context).size.height -
@@ -21,12 +33,12 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
 
     String _getStoryUserImage(int index) {
       final List<String> userImages = [
-        'assets/perfil.png',
-        'assets/perfil.png',
-        'assets/perfil.png',
-        'assets/perfil.png',
-        'assets/perfil.png',
-        'assets/perfil.png'
+        'https://img.freepik.com/foto-gratis/medica-hospital-estetoscopio_23-2148827774.jpg?semt=ais_hybrid&w=740&q=80',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVloHdKoEaDEdR8yLKxemlzDDBu7lQ-MzqCw&s',
+        'https://img.freepik.com/foto-gratis/retrato-terapeuta-profesional-experimentado-estetoscopio-mirando-camara_1098-19305.jpg?semt=ais_hybrid&w=740&q=80',
+        'https://www.doctoranytime.mx/blog/wp-content/uploads/2022/12/2df54e3a5439308aacd85d8c275e888f.png',
+        'https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg',
+        'https://snibbs.co/cdn/shop/articles/What_are_the_Challenges_of_Being_a_Doctor.jpg?v=1684314843'
       ];
       return userImages[index];
     }
@@ -95,7 +107,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                           GestureDetector(
                             onTap: () {},
                             child: GerenaColors.createStoryRing(
-                              child: Image.asset(
+                              child: Image.network(
                                 _getStoryUserImage(index),
                                 fit: BoxFit.cover,
                               ),
@@ -171,70 +183,280 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
   }
 
   Widget _buildCitasSection() {
-    final List<Map<String, String>> citas = [
-      {
-        'doctorName': 'Jessica Fernández Gutiérrez',
-        'appointmentType': 'Primera Cita',
-        'treatment': 'Toxina Botulínica En Tercio Superior Del Rostro',
-        'time': '10:30 A.M.',
-        'date': '19/04/2025',
-        'profileImage': 'assets/doctor_profile.png',
-      },
-      {
-        'doctorName': 'Dr. Carlos Mendoza',
-        'appointmentType': 'Consulta Control',
-        'treatment': 'Revisión de Rellenos Faciales',
-        'time': '3:15 P.M.',
-        'date': '22/04/2025',
-        'profileImage': 'assets/doctor_profile2.png',
-      },
-      {
-        'doctorName': 'Dra. Ana Martínez',
-        'appointmentType': 'Procedimiento',
-        'treatment': 'Aplicación de Bioestimuladores Faciales',
-        'time': '11:00 A.M.',
-        'date': '25/04/2025',
-        'profileImage': 'assets/doctor_profile3.png',
-      },
-    ];
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'CITAS',
-            style: GoogleFonts.rubik(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: GerenaColors.textPrimaryColor,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'CITAS',
+                style: GoogleFonts.rubik(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: GerenaColors.textPrimaryColor,
+                ),
+              ),
+              // Botón para recargar citas
+              Obx(() => calendarController.isLoading.value
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: GerenaColors.primaryColor,
+                      ),
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.refresh, size: 20),
+                      onPressed: () {
+                        calendarController.loadAppointmentsForDate(
+                          calendarController.focusedDate.value,
+                        );
+                      },
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints(),
+                    )),
+            ],
           ),
           SizedBox(height: GerenaColors.paddingSmall),
-          Container(
-            height: 200,
-            child: PageView.builder(
-              controller: PageController(viewportFraction: 0.85),
-              itemCount: citas.length,
-              itemBuilder: (context, index) {
-                final cita = citas[index];
-                return Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  child: _buildCitaCard(
-                    doctorName: cita['doctorName']!,
-                    appointmentType: cita['appointmentType']!,
-                    treatment: cita['treatment']!,
-                    time: cita['time']!,
-                    date: cita['date']!,
-                    profileImage: cita['profileImage']!,
+          
+          // Usa Obx para reactividad
+          Obx(() {
+            // Mostrar loading
+            if (calendarController.isLoading.value && 
+                calendarController.appointments.isEmpty) {
+              return Container(
+                height: 200,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: GerenaColors.primaryColor,
                   ),
-                );
-              },
+                ),
+              );
+            }
+            
+            // Obtener citas futuras ordenadas
+            final upcomingAppointments = _getUpcomingAppointments();
+            
+            // Mostrar mensaje si no hay citas
+            if (upcomingAppointments.isEmpty) {
+              return Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: GerenaColors.backgroundColor,
+                  borderRadius: GerenaColors.mediumBorderRadius,
+                  boxShadow: [GerenaColors.lightShadow],
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 48,
+                        color: GerenaColors.textSecondaryColor,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'No tienes citas próximas',
+                        style: GoogleFonts.rubik(
+                          fontSize: 14,
+                          color: GerenaColors.textSecondaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () {
+                          // Navegar a pantalla de crear cita
+                          print('Ir a crear cita');
+                        },
+                        child: Text(
+                          'Agendar cita',
+                          style: GoogleFonts.rubik(
+                            fontSize: 13,
+                            color: GerenaColors.primaryColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            
+            // Mostrar las citas
+            return Column(
+              children: [
+                Container(
+                  height: 200,
+                  child: PageView.builder(
+                    controller: PageController(viewportFraction: 0.85),
+                    itemCount: upcomingAppointments.length,
+                    itemBuilder: (context, index) {
+                      final appointment = upcomingAppointments[index];
+                      return Container(
+                        margin: const EdgeInsets.only(right: 12),
+                        child: _buildCitaCard(appointment),
+                      );
+                    },
+                  ),
+                ),
+                if (upcomingAppointments.length > 1) ...[
+                  SizedBox(height: 20),
+                  _buildPageIndicators(upcomingAppointments.length),
+                ],
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+// Obtener citas del mes actual cargado en el controller
+List<dynamic> _getUpcomingAppointments() {
+  // Obtener todas las citas del mes cargado
+  final allAppointments = calendarController.appointments.toList();
+  
+  if (allAppointments.isEmpty) {
+    return [];
+  }
+  
+  // Ordenar por fecha
+  allAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
+  
+  // Limitar a las primeras 5 citas
+  return allAppointments.take(5).toList();
+}
+
+  Widget _buildCitaCard(dynamic appointment) {
+  // Formatear fechas
+  final String formattedTime = _formatTime(appointment.startTime);
+  final String formattedDate = _formatDate(appointment.startTime);
+  
+  // Extraer información
+  final String doctorName = appointment.subject ?? 'Sin nombre';
+  final String appointmentType = appointment.location ?? 'Cita general';
+  final String treatment = appointment.notes ?? 'Sin descripción';
+  
+  return Container(
+    decoration: BoxDecoration(
+      color: GerenaColors.backgroundColor,
+      borderRadius: GerenaColors.mediumBorderRadius,
+      boxShadow: [GerenaColors.lightShadow],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      doctorName,
+                      style: GoogleFonts.rubik(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: GerenaColors.textPrimaryColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      appointmentType,
+                      style: GoogleFonts.rubik(
+                        fontSize: 12,
+                        color: GerenaColors.textSecondaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      treatment,
+                      style: GoogleFonts.rubik(
+                        fontSize: 11,
+                        color: GerenaColors.textTertiaryColor,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [GerenaColors.lightShadow],
+                    ),
+                    child: ClipOval(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: GerenaColors.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          color: GerenaColors.textLightColor,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    formattedTime,
+                    style: GoogleFonts.rubik(
+                      fontSize: 13,
+                      color: GerenaColors.textQuaternary,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    formattedDate,
+                    style: GoogleFonts.rubik(
+                      fontSize: 10,
+                      color: GerenaColors.textTertiaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Center(
+            child: IntrinsicWidth(
+              child: GerenaColors.widgetButton(
+                onPressed: () {
+                  _navigateToAppointmentDetails(appointment);
+                },
+                text: 'Ver Ficha',
+                showShadow: false,
+                borderRadius: 20,
+              ),
             ),
           ),
-          SizedBox(height: 20),
-          Row(
+        ],
+      ),
+    ),
+  );
+}
+  Widget _buildPageIndicators(int count) {
+    if (count <= 1) return SizedBox.shrink();
+    
+    return  Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
@@ -277,133 +499,30 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
+          );
   }
 
-  Widget _buildCitaCard({
-    required String doctorName,
-    required String appointmentType,
-    required String treatment,
-    required String time,
-    required String date,
-    required String profileImage,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: GerenaColors.mediumBorderRadius,
-        boxShadow: [GerenaColors.lightShadow],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        doctorName,
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: GerenaColors.textPrimaryColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        appointmentType,
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: GerenaColors.textSecondaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Text(
-                        treatment,
-                        style: GoogleFonts.rubik(
-                          fontSize: 11,
-                          color: GerenaColors.textTertiaryColor,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [GerenaColors.lightShadow],
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          profileImage,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: GerenaColors.primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.person,
-                                color: GerenaColors.textLightColor,
-                                size: 30,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      time,
-                      style: GoogleFonts.rubik(
-                        fontSize: 13,
-                        color: GerenaColors.textQuaternary,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      date,
-                      style: GoogleFonts.rubik(
-                        fontSize: 10,
-                        color: GerenaColors.textTertiaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Center(
-              child: IntrinsicWidth(
-                child: GerenaColors.widgetButton(
-                  onPressed: () {},
-                  text: 'Ver Ficha',
-                  showShadow: false,
-                  borderRadius: 20,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+  // Métodos auxiliares para formatear fechas
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour > 12 ? dateTime.hour - 12 : (dateTime.hour == 0 ? 12 : dateTime.hour);
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final period = dateTime.hour >= 12 ? 'P.M.' : 'A.M.';
+    return '$hour:$minute $period';
+  }
+
+  String _formatDate(DateTime dateTime) {
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+    final year = dateTime.year;
+    return '$day/$month/$year';
+  }
+
+  void _navigateToAppointmentDetails(dynamic appointment) {
+    // Implementa la navegación a los detalles
+    print('Ver detalles de cita ID: ${appointment.id}');
+    
+    // Ejemplo de navegación (descomenta cuando tengas la pantalla):
+    // Get.to(() => AppointmentDetailsPage(appointmentId: appointment.id));
   }
 
   Widget _buildWebinarSection() {

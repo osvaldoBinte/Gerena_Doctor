@@ -64,17 +64,11 @@ class LoginPage extends StatelessWidget {
           ),
           
           const SizedBox(height: 5),
-          
-          Center(
-            child: GerenaColors.createLoginTextButton(
-              text: 'Registrarse',
-              onPressed: controller.onRegisterTap,
-            ),
-          ),
+       
           
           const SizedBox(height: 20),
           
-          _buildFooterMobile(),
+        //  _buildFooterMobile(),
           
           const SizedBox(height: 20),
         ],
@@ -141,7 +135,7 @@ class LoginPage extends StatelessWidget {
           ),
         ),
         
-        _buildFooterDesktop(),
+      //  _buildFooterDesktop(),
       ],
     );
   }

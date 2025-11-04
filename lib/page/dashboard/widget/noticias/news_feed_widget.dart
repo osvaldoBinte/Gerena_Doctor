@@ -34,7 +34,7 @@ class NewsFeedWidget extends StatelessWidget {
           title: 'Revoluciona tus aplicaciones de tóxina botulínica siguiendo los consejos del Dr. Juan Pérez',
           content: 'Aplicar toxina botulínica no es solo una técnica, es un arte que se perfecciona con conocimiento, práctica y paciencia. Sigue estos consejos del Dr. Juan Pérez y podrás dar un paso más en la excelencia de tus tratamientos y ofrecer...',
           date: 'Blog Gerena | Lun 31 de Marzo',
-          imagePath: 'assets/Webinar.png',
+          imagePath: 'https://www.esheformacion.com/assets/base/img/uploads/64353608f4215Facotres.jpg',
           onReadMorePressed: () {
             _navigateToForum();
           },
@@ -46,7 +46,7 @@ class NewsFeedWidget extends StatelessWidget {
           title: 'Casos reales: cómo fidelicé a mis pacientes con educación y transparencia',
           content: 'En un entorno donde muchos pacientes llegan con dudas, miedo o expectativas irreales, descubrí que la ética en consulta estética definitiva no está solo en los resultados estéticos, sino en cómo los acompañó desde el primer contacto.',
           date: 'Blog Social | Lun 31 de Marzo',
-          imagePath: 'assets/Webinar.png',
+          imagePath: 'https://www.esheformacion.com/assets/base/img/uploads/643532b3621beMedicoMexico.jpg',
           onReadMorePressed: () {
             _navigateToForum();
           },

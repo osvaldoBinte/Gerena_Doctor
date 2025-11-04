@@ -23,10 +23,8 @@ class ProductCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool hasDiscount = product['hasDiscount'] == 'true';
     
-    // Obtener el WishlistController
     final wishlistController = Get.find<WishlistController>();
     
-    // Extraer el ID y precio del producto
     final medicamentoId = int.tryParse(product['id'] ?? '0') ?? 0;
     final precio = _extractPrice(product['price'] ?? '0.00');
 

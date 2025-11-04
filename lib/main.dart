@@ -4,16 +4,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gerena/app.dart';
 import 'package:gerena/common/settings/enviroment.dart';
 import 'package:gerena/framework/preferences_service.dart';
-
+import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;
 
 String enviromentSelect = Enviroment.testing.value;
- 
+
 void main() async {
   
   await dotenv.load(fileName: enviromentSelect);
-debugPrint('======== Entorno: $enviromentSelect');
   await PreferencesUser().initiPrefs();
  FlutterError.onError = (FlutterErrorDetails details) {
     if (details.exception.toString().contains('KeyDownEvent') ||
@@ -27,7 +26,7 @@ debugPrint('======== Entorno: $enviromentSelect');
     FlutterError.presentError(details);
   };
 
-  WidgetsFlutterBinding.ensureInitialized();  
+  WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -44,23 +43,25 @@ debugPrint('======== Entorno: $enviromentSelect');
     final windowHeight = (screenSize.height * 0.8).clamp(800.0, 1080.0);
     
     final minWidth = (screenSize.width * 0.8).clamp(1000.0, 1400.0);
-final minHeight = (screenSize.height * 0.8).clamp(700.0, 900.0);
+    final minHeight = (screenSize.height * 0.8).clamp(700.0, 900.0);
 
     WindowOptions windowOptions = const WindowOptions(
       center: true,
       title: "Gerena",
       backgroundColor: Color.fromARGB(100, 33, 33, 33),
       skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.hidden,
+      titleBarStyle: TitleBarStyle.normal, // Cambiado de hidden a normal
       windowButtonVisibility: true,
+      
     );
 
     await windowManager.setSize(Size(windowWidth, windowHeight));
-    await windowManager.setMinimumSize(Size(windowWidth, windowHeight));
+    await windowManager.setMinimumSize(Size(minWidth, minHeight)); // Corregido para usar las variables correctas
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
+       await windowManager.maximize(); 
     });
   }
 

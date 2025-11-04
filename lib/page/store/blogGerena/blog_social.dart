@@ -203,7 +203,7 @@ double _getResponsivePadding(BuildContext context) {
         //Image.asset(article['image']!, fit: BoxFit.cover),
         Padding(padding: EdgeInsets.symmetric(horizontal: 50)
  ,
-      child:         Image.asset(article['image']!, fit: BoxFit.cover),
+      child:         Image.network(article['image']!, fit: BoxFit.cover),
        ),
         SizedBox(height: 20),
 
@@ -250,7 +250,7 @@ Row(
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(article['image']!, width:  120 , height:  60, fit: BoxFit.cover),
+            Image.network(article['image']!, width:  120 , height:  60, fit: BoxFit.cover),
             SizedBox(width: 12),
             Expanded(child: Text(part2, style: TextStyle(fontSize: 14, height: 1.5))),
           ],

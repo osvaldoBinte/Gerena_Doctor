@@ -335,7 +335,30 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
                 const SizedBox(height: 12),
                 GerenaColors.widgetButton(
                   text: 'COMPRAR AHORA',
-                  onPressed: () {},
+                  onPressed: () async {
+                    final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
+                    final precio = double.tryParse(
+                      widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
+                    );
+                    
+                    if (medicamentoId != null && precio != null && medicamentoId > 0) {
+                      await cartController.addToCart(
+                        medicamentoId: medicamentoId,
+                        precio: precio,
+                        cantidad: 1,
+                      );
+                           final navigationController = Get.find<ShopNavigationController>();
+
+                                    navigationController.navigateToCart();
+                                Get.to(() => GlobalShopInterface());
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        'No se pudo agregar el producto al carrito',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
+                  },
                   backgroundColor: GerenaColors.primaryColor,
                   textColor: GerenaColors.textLightColor,
                   fontSize: 16,

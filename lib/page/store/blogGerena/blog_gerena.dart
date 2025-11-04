@@ -99,7 +99,7 @@ Widget _buildArticleDetailContent(BlogController controller) {
           padding: EdgeInsets.symmetric(horizontal: isTablet ? 50 : 0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12), 
-            child: Image.asset(
+            child: Image.network(
               article['image']!,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -159,7 +159,7 @@ Widget _buildArticleDetailContent(BlogController controller) {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
+              child: Image.network(
                 article['image']!,
                 width: isTablet ? 120 : 100,
                 height: isTablet ? 90 : 75,

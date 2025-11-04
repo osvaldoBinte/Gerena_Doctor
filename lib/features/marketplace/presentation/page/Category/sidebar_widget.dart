@@ -5,15 +5,49 @@ import 'package:gerena/features/marketplace/presentation/page/Category/category_
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/widget/half_cut_circle.dart';
 import 'package:gerena/page/dashboard/widget/noticias/news_feed_widget.dart';
-import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
 import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart'; // Importa url_launcher
 
 class SidebarWidget extends StatelessWidget {
   const SidebarWidget({
     Key? key,
   }) : super(key: key);
+
+  // Función para abrir WhatsApp
+  Future<void> _openWhatsApp() async {
+    final Uri whatsappUrl = Uri.parse(
+      'https://api.whatsapp.com/send/?phone=%E2%80%AA%E2%80%AA5213321642470&text=Hola+necesito+m%C3%A1s+informaci%C3%B3n.&type=phone_number&app_absent=0'
+    );
+    
+    try {
+      if (await canLaunchUrl(whatsappUrl)) {
+        await launchUrl(
+          whatsappUrl,
+          mode: LaunchMode.externalApplication, // Abre en la app externa
+        );
+      } else {
+        // Si no puede abrir WhatsApp, muestra un mensaje
+        Get.snackbar(
+          'Error',
+          'No se pudo abrir WhatsApp. Por favor, verifica que esté instalado.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      print('Error al abrir WhatsApp: $e');
+      Get.snackbar(
+        'Error',
+        'Ocurrió un error al intentar abrir WhatsApp',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +93,14 @@ class SidebarWidget extends StatelessWidget {
                             _buildSearchField(),
                             StatusCardWidget(),
                             SizedBox(height: 10),
-                            buildWishlistButton(),
+                            buildWishlistButton(
+                              onTap: () {
+                                  final navigationController = Get.find<ShopNavigationController>();
+
+                                      navigationController.navigateToWishlist();
+                                Get.to(() => GlobalShopInterface());
+                              },
+                            ),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16.0, vertical: 8.0),
@@ -119,14 +160,7 @@ class SidebarWidget extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return const GerenaModalBot();
-                  },
-                );
-              },
+              onTap: _openWhatsApp, // Cambio aquí: ahora llama a _openWhatsApp
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20.0),
                 padding:
@@ -159,7 +193,7 @@ class SidebarWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Text(
-                          'Gerena Bot',
+                          'Gerena',
                           textAlign: TextAlign.right,
                           style: TextStyle(
                             color: GerenaColors.surfaceColor,
@@ -323,7 +357,8 @@ class SidebarWidget extends StatelessWidget {
 
   Widget _buildCategoryItem(
     String text,
-    String imageAssetPath, ) {
+    String imageAssetPath,
+  ) {
     return InkWell(
       onTap: () {
         Get.find<ShopNavigationController>().navigateToStore();
@@ -377,7 +412,7 @@ class SidebarWidget extends StatelessWidget {
             text,
             style: TextStyle(
               color: GerenaColors.textLightColor,
-              fontSize: 12,
+              fontSize: 11,
             ),
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,

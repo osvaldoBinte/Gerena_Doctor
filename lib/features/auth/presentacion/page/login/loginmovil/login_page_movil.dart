@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginPageMovil> {
               ),
               
               const SizedBox(height: 20),
-              
+              /*
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginPageMovil> {
                     ),
                   ),
                 ],
-              ),
+              ),*/
               
               const SizedBox(height: 20),
             ],

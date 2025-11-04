@@ -21,15 +21,15 @@ class StartController extends GetxController {
     'assets/icons/home/Home.png',
     'assets/icons/home/Blog.png',
     'assets/icons/home/carrito.png', 
-    'assets/icons/home/notificacione.png',
+    'assets/icons/home/notificaciones.png',
     'assets/icons/home/Perfil.png',
   ];
 
   final List<String> selectedIconPaths = [
     'assets/icons/home/select/Home.png',
     'assets/icons/home/select/Blog.png',
-    'assets/icons/home/carrito.png', 
-    'assets/icons/home/select/notificaciones.png', 
+    'assets/icons/home/select/carrito.png', 
+    'assets/icons/home/select/notificacione.png', 
     'assets/icons/home/select/Perfil.png',
   ];
 

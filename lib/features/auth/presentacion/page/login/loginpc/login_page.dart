@@ -106,7 +106,7 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                         )
                 ),
               ),
-              
+               /*
               Positioned(
                   left: 0,
                   right: 0,
@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                             ),
                           ],
                         ),
-                        
+                       
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -193,6 +193,7 @@ class _LoginPageState extends State<LoginPage> with WindowListener {
                     ),
                   ),
                 ),
+                */
             ],
           );
         },

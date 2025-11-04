@@ -550,7 +550,7 @@ static Widget createArticleCard({
             topLeft: Radius.circular(smallRadius),
             topRight: Radius.circular(smallRadius),
           ),
-          child: Image.asset(
+          child: Image.network(
             imagePath,
             width: double.infinity,
             height: 160,

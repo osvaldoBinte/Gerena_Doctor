@@ -94,6 +94,8 @@ class _UserProfileContentState extends State<UserProfileContent> {
   }
 
   Widget buildProfileSection() {
+      final doctor = controller.doctorProfile.value!;
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
       color: GerenaColors.backgroundColorfondo,
@@ -114,8 +116,8 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         boxShadow: [GerenaColors.mediumShadow],
                       ),
                       child: ClipRRect(
-                        child: Image.asset(
-                          'assets/perfil.png',
+                        child: Image.network(
+                          doctor.foto!,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Icon(
@@ -251,10 +253,6 @@ class _UserProfileContentState extends State<UserProfileContent> {
 
   Widget _buildAccountSettingsSection() {
   final doctor = controller.doctorProfile.value!;
-  final nombres = doctor.nombreCompleto.split(' ');
-  final nombre = nombres.isNotEmpty ? nombres[0] : '';
-  final apellidos = nombres.length > 1 ? nombres.sublist(1).join(' ') : '';
-
   return Card(
     elevation: GerenaColors.elevationSmall,
     shape: RoundedRectangleBorder(
@@ -301,7 +299,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         widthFactor: 0.8,
                         child: GerenaColors.buildLabeledTextField(
                           'Nombre/s*',
-                          nombre,
+                          doctor.nombre ?? '',
                           hintText: 'Juan Pedro',
                         ),
                       ),
@@ -313,7 +311,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                       widthFactor: 0.8,
                       child: GerenaColors.buildLabeledTextField(
                         'Apellidos*',
-                        apellidos,
+                        doctor.apellidos?? '',
                         hintText: 'González Pérez',
                       ),
                     ),
@@ -392,135 +390,149 @@ class _UserProfileContentState extends State<UserProfileContent> {
   );
 }
   Widget _buildAcademicFormationSection() {
-        final doctor = controller.doctorProfile.value!;
+  final doctor = controller.doctorProfile.value!;
 
-    return Card(
-      elevation: GerenaColors.elevationSmall,
-      shape: RoundedRectangleBorder(
-        borderRadius: GerenaColors.mediumBorderRadius,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Formación académica',
-              style: GoogleFonts.rubik(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: GerenaColors.textPrimaryColor,
-              ),
+  return Card(
+    elevation: GerenaColors.elevationSmall,
+    shape: RoundedRectangleBorder(
+      borderRadius: GerenaColors.mediumBorderRadius,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Formación académica',
+            style: GoogleFonts.rubik(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: GerenaColors.textPrimaryColor,
             ),
-            Text(
-              'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
-              style: GoogleFonts.rubik(
-                fontSize: 14,
-                color: GerenaColors.textSecondaryColor,
-              ),
+          ),
+          Text(
+            'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
+            style: GoogleFonts.rubik(
+              fontSize: 14,
+              color: GerenaColors.textSecondaryColor,
             ),
-            const SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: GerenaColors.buildLabeledTextField(
-                          'Título', 'Ej. Rinomodelación'),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Título',
+                      doctor.titulo ?? '',
+                      hintText: 'Ej. Rinomodelación',
                     ),
-                    Flexible(
-                      flex: 3,
-                      child: Container(),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: Container(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Disciplina académica',
+                      doctor.especialidad,
+                      hintText: 'Ej. Medicina estética',
                     ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: GerenaColors.buildLabeledTextField(
-                          'Disciplina académica', 'Ej. Medicina estética'),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: Container(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Institución',
+                      doctor.institucion ?? '',
+                      hintText: 'Ej. Universidad de Guadalajara',
                     ),
-                    Flexible(
-                      flex: 3,
-                      child: Container(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child:
-                          GerenaColors.buildLabeledTextField('Institución', ''),
-                    ),
-                    const SizedBox(width: 15),
-                    Flexible(
-                      flex: 3,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 2.0),
-                          child: SizedBox(
-                            width: 100,
-                            child: GerenaColors.widgetButton(
-                              onPressed: () {
-                                print('Guardando formación académica 1');
-                              },
-                              text: 'GUARDAR',
-                              showShadow: false,
-                              borderRadius: 5,
-                            ),
+                  ),
+                  const SizedBox(width: 15),
+                  Flexible(
+                    flex: 3,
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 2.0),
+                        child: SizedBox(
+                          width: 100,
+                          child: GerenaColors.widgetButton(
+                            onPressed: () {
+                              print('Guardando formación académica 1');
+                              // Aquí puedes implementar la lógica de guardado
+                            },
+                            text: 'GUARDAR',
+                            showShadow: false,
+                            borderRadius: 5,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: GerenaColors.buildLabeledTextField(
-                          'Certificaciones', ''),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Flexible(
+                    flex: 5,
+                    child: GerenaColors.buildLabeledTextField(
+                      'Certificaciones',
+                      doctor.certificacion ?? '',
+                      hintText: 'Ej. Certificación en Botox Avanzado',
                     ),
-                    const SizedBox(width: 15),
-                    Flexible(
-                      flex: 3,
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 2.0),
-                          child: SizedBox(
-                            width: 100,
-                            child: GerenaColors.widgetButton(
-                              onPressed: () {
-                                print('Guardando certificaciones');
-                              },
-                              text: 'GUARDAR',
-                              showShadow: false,
-                              borderRadius: 5,
-                            ),
+                  ),
+                  const SizedBox(width: 15),
+                  Flexible(
+                    flex: 3,
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 2.0),
+                        child: SizedBox(
+                          width: 100,
+                          child: GerenaColors.widgetButton(
+                            onPressed: () {
+                              print('Guardando certificaciones');
+                              // Aquí puedes implementar la lógica de guardado
+                            },
+                            text: 'GUARDAR',
+                            showShadow: false,
+                            borderRadius: 5,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 Widget _buildAcademicFormationSectio2n() {
   final doctor = controller.doctorProfile.value!;
 

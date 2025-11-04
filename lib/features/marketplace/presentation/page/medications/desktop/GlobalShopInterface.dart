@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/ejemplo/ejemplo_%20saved_products_content.dart';
@@ -374,19 +375,23 @@ class GlobalShopInterface extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildLeftSidebar() {
-    return Container(
-      width: 50,
-      height: double.infinity,
-      color: GerenaColors.backgroundColorfondo,
-      child: Column(children: [
+Widget _buildLeftSidebar() {
+  // ⭐ Obtén el controlador del carrito
+  final cartController = Get.find<ShoppingCartController>();
+  
+  return Container(
+    width: 50,
+    height: double.infinity,
+    color: GerenaColors.backgroundColorfondo,
+    child: Column(
+      children: [
         const SizedBox(height: 20),
         _buildSidebarIcon(
           imagePath: 'assets/icons/search.png',
           tooltip: 'Buscar',
-          onPressed: () {          navigationController.toggleSearchBar();
-},
+          onPressed: () {
+            navigationController.toggleSearchBar();
+          },
         ),
         _buildSidebarIcon(
           imagePath: 'assets/icons/truck.png',
@@ -407,13 +412,16 @@ class GlobalShopInterface extends StatelessWidget {
             navigationController.navigateToWishlist();
           },
         ),
-        _buildSidebarIcon(
+        
+        Obx(() => _buildSidebarIcon(
           imagePath: 'assets/icons/shopping_cart.png',
           tooltip: 'Carrito',
+          badgeCount: cartController.totalItems, 
           onPressed: () {
             navigationController.navigateToCart();
           },
-        ),
+        )),
+        
         const Spacer(),
         _buildSidebarIcon(
           imagePath: 'assets/icons/headset_mic.png',
@@ -428,52 +436,99 @@ class GlobalShopInterface extends StatelessWidget {
           },
         ),
         const SizedBox(height: 20),
-      ]),
-    );
-  }
+      ],
+    ),
+  );
+}
 
- Widget _buildSidebarIcon({
+Widget _buildSidebarIcon({
   IconData? icon,
   String? imagePath,
   required String tooltip,
   required VoidCallback onPressed,
+  int? badgeCount, // ⭐ NUEVO parámetro
 }) {
   return Tooltip(
     message: tooltip,
-    child: Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: GerenaColors.primaryColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      width: 48,
-      height: 48,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onPressed,
-          child: Center(
-            child: icon != null
-                ? Icon(
-                    icon,
-                    color: GerenaColors.secondaryColor,
-                    size: 24,
-                  )
-                : (imagePath != null && imagePath.isNotEmpty
-                    ? Image.asset(
-                        imagePath,
-                        width: 24,
-                        height: 24,
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: GerenaColors.primaryColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          width: 48,
+          height: 48,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: onPressed,
+              child: Center(
+                child: icon != null
+                    ? Icon(
+                        icon,
                         color: GerenaColors.secondaryColor,
+                        size: 24,
                       )
-                    : const Icon(
-                        Icons.error,
-                        color: Colors.red,
-                      )),
+                    : (imagePath != null && imagePath.isNotEmpty
+                        ? Image.asset(
+                            imagePath,
+                            width: 24,
+                            height: 24,
+                            color: GerenaColors.secondaryColor,
+                          )
+                        : const Icon(
+                            Icons.error,
+                            color: Colors.red,
+                          )),
+              ),
+            ),
           ),
         ),
-      ),
+        
+        // ⭐ BADGE - Indicador numérico
+        if (badgeCount != null && badgeCount > 0)
+          Positioned(
+            right: -4,
+            top: 6,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: GerenaColors.backgroundColorfondo,
+                  width: 2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              constraints: const BoxConstraints(
+                minWidth: 20,
+                minHeight: 20,
+              ),
+              child: Center(
+                child: Text(
+                  badgeCount > 99 ? '99+' : badgeCount.toString(),
+                  style: GoogleFonts.rubik(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+      ],
     ),
   );
 }Widget _buildSearchBar() {

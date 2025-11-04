@@ -45,12 +45,11 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
           ],
         ),
       ),
-      body: Stack( // ⭐ Cambiar SafeArea por Stack
+      body: Stack( 
         children: [
           SafeArea(
             child: Column(
               children: [
-                // Header con categoría y botón de limpiar
                 Container(
                   padding: EdgeInsets.all(GerenaColors.paddingMedium),
                   child: Row(
@@ -115,10 +114,8 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
 
                 Divider(height: 2, color: GerenaColors.dividerColor),
 
-                // Contenido principal
                 Expanded(
                   child: Obx(() {
-                    // Estado de carga
                     if (controller.isLoading.value) {
                       return Center(
                         child: CircularProgressIndicator(
@@ -127,7 +124,6 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                       );
                     }
 
-                    // Estado de error
                     if (controller.errorMessage.isNotEmpty) {
                       return Center(
                         child: Column(
@@ -160,7 +156,6 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                       );
                     }
 
-                    // Estado vacío
                     if (controller.medications.isEmpty) {
                       return Center(
                         child: Column(
@@ -190,12 +185,10 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                       );
                     }
 
-                    // Grid de productos
                     return LayoutBuilder(
                       builder: (context, constraints) {
                         final width = MediaQuery.of(context).size.width;
 
-                        // Determinar número de columnas según el ancho
                         int crossAxisCount = 2;
                         if (width >= 1200) {
                           crossAxisCount = 5;
@@ -225,7 +218,6 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  // Productos en la fila
                                   for (int i = 0; i < itemsInRow; i++) ...[
                                     Expanded(
                                       child: ProductCardWidget(
@@ -244,7 +236,6 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                                       ),
                                     ),
 
-                                    // Divisor vertical entre productos
                                     if (i < itemsInRow - 1)
                                       VerticalDivider(
                                         width: 1,
@@ -253,7 +244,6 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                                       ),
                                   ],
 
-                                  // Espacios vacíos para mantener el grid uniforme
                                   if (itemsInRow < crossAxisCount)
                                     ...List.generate(
                                       crossAxisCount - itemsInRow,

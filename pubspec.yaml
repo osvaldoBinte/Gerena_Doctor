@@ -52,6 +52,7 @@ dependencies:
   file_picker: ^10.1.9
   bubble: ^1.2.1
   google_fonts: ^6.1.0
+  url_launcher: ^6.3.2
 
 
 
@@ -191,7 +192,7 @@ flutter:
 
       - assets/icons/home/Calendario.png
       - assets/icons/home/Home.png
-      - assets/icons/home/notificacione.png
+      - assets/icons/home/notificaciones.png
       - assets/icons/home/Perfil.png
       - assets/icons/home/Blog.png
       - assets/icons/home/carrito.png
@@ -199,9 +200,10 @@ flutter:
 
       - assets/icons/home/select/Calendario.png
       - assets/icons/home/select/Home.png
-      - assets/icons/home/select/notificaciones.png
+      - assets/icons/home/select/notificacione.png
       - assets/icons/home/select/Perfil.png
       - assets/icons/home/select/Blog.png
+      - assets/icons/home/select/carrito.png
 
       
   # An image asset can refer to one or more resolution-specific "variants", see

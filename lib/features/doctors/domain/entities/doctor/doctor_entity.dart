@@ -1,6 +1,8 @@
 class DoctorEntity  {
   final int userId;
   final String nombreCompleto;
+   String? nombre;
+   String? apellidos;
   final String email;
   final String numeroLicencia;
   final String especialidad;
@@ -11,7 +13,11 @@ class DoctorEntity  {
   final String biografia;
   final String educacion;
    String? foto;
-  DoctorEntity({
+   String?titulo;
+   String?institucion;
+   String?certificacion;
+   String?institucionCertificacion ;
+  DoctorEntity( {
     required this.userId,
     required this.nombreCompleto,
     required this.email,
@@ -24,5 +30,11 @@ class DoctorEntity  {
     required this.biografia,
     required this.educacion,
  this.foto,
+ this.nombre, this.apellidos,
+  this.titulo,
+  this.institucion,
+  this.certificacion,
+  this.institucionCertificacion,
+    
   });
 }

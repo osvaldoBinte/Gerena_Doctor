@@ -249,7 +249,7 @@ class CategoryPage extends GetView<CategoryController> {
                     fontWeight: FontWeight.w600,
                     color: GerenaColors.textPrimaryColor,
                   ),
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
