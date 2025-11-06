@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/page/dashboard/widget/membresia/membresia.dart';
@@ -433,28 +434,33 @@ Widget _buildBackButton(DashboardController controller) {
             ),
             const SizedBox(height: 16),
           Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: GerenaColors.textPrimaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  icon: const Icon(
-                    Icons.add,
-                    color: GerenaColors.textLightColor,
-                    size: 40,
-                  ),
-                  onPressed: () {
-                  },
-                ),
-              ),
-            ),
-          ),
+  alignment: Alignment.centerRight,
+  child: Padding(
+    padding: const EdgeInsets.only(right: 16.0),
+    child: Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: GerenaColors.textPrimaryColor,
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: const Icon(
+          Icons.add,
+          color: GerenaColors.textLightColor,
+          size: 40,
+        ),
+        onPressed: () {
+          // Abrir el modal
+          ModalAgregarCita.show(
+            clienteId: 123, // Reemplaza con el ID real del cliente
+            doctorId: 456,  // Reemplaza con el ID real del doctor
+          );
+        },
+      ),
+    ),
+  ),
+),
         ],
       );
       } else {

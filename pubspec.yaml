@@ -53,6 +53,7 @@ dependencies:
   bubble: ^1.2.1
   google_fonts: ^6.1.0
   url_launcher: ^6.3.2
+  flutter_stripe: ^12.1.0
 
 
 
@@ -181,9 +182,10 @@ flutter:
       - assets/icons/push-pin.png
       - assets/icons/fingerprint.png
       - assets/icons/warning.png
-      - assets/icons/campaign.png
+      - assets/icons/campaign.png 
       - assets/icons/campaigndart.png
       - assets/icons/link.png
+      - assets/icons/payment_card.png
       - assets/icons/arrow_forward_ios.png
       - assets/icons/arrow_back_ios.png
       - assets/logo/logo_ios.png

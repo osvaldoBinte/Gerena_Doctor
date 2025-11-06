@@ -453,16 +453,22 @@ class CartPageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title) {
-    return Text(
+Widget _buildSection(String title) {
+  return GestureDetector(
+    onTap: () {
+      Get.find<ShopNavigationController>().navigateToPaymentCards();
+      Get.to(() => GlobalShopInterface());
+    },
+    child: Text(
       title,
       style: GoogleFonts.rubik(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: GerenaColors.textTertiaryColor,
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildSelectedAddress(String name, String address,
       {bool isSelected = false}) {

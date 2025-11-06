@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -487,81 +488,197 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   Widget _buildDayAppointments(CalendarControllerGetx controller,
-      DashboardController dashboardController) {
-    if (controller.selectedDate.value == null) {
-      return const Center(child: SizedBox.shrink());
-    }
+    DashboardController dashboardController) {
+  if (controller.selectedDate.value == null) {
+    return const Center(child: SizedBox.shrink());
+  }
 
-    final appointmentsForDay =
-        controller.getAppointmentsForDate(controller.selectedDate.value!);
+  final appointmentsForDay =
+      controller.getAppointmentsForDate(controller.selectedDate.value!);
 
-    if (appointmentsForDay.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: GerenaColors.smallBorderRadius,
-            ),
-            child: Text(
-              'No hay citas para el ${controller.formatSelectedDate(controller.selectedDate.value!)}',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: GerenaColors.textSecondaryColor,
-                fontStyle: FontStyle.italic,
+  // Cuando NO hay citas
+  if (appointmentsForDay.isEmpty) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: GerenaColors.smallBorderRadius,
+              ),
+              child: Text(
+                'No hay citas para el ${controller.formatSelectedDate(controller.selectedDate.value!)}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: GerenaColors.textSecondaryColor,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
           ),
         ),
-      );
-    }
-
-    if (appointmentsForDay.length == 1) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16.0),
-        child: buildAppointmentCard(
-            appointmentsForDay[0], controller, dashboardController),
-      );
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 20,
-            height: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                appointmentsForDay.length,
-                (index) => _buildCircleIndicator(index, controller),
-              ),
+        // Botón flotante cuando NO hay citas
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: GerenaColors.textPrimaryColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              itemCount: appointmentsForDay.length,
-              itemBuilder: (context, index) {
-                return buildAppointmentCard(
-                    appointmentsForDay[index], controller, dashboardController);
+            child: IconButton(
+              icon: const Icon(
+                Icons.add,
+                color: GerenaColors.textLightColor,
+                size: 40,
+              ),
+              onPressed: () {
+                // Abrir el modal
+                ModalAgregarCita.show(
+                  clienteId: 123, // Reemplaza con el ID real del cliente
+                  doctorId: 456,  // Reemplaza con el ID real del doctor
+                );
               },
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
+  // Cuando hay UNA sola cita
+  if (appointmentsForDay.length == 1) {
+    return Stack(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16.0),
+          child: buildAppointmentCard(
+              appointmentsForDay[0], controller, dashboardController),
+        ),
+        // Botón flotante cuando hay UNA cita
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: GerenaColors.textPrimaryColor,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.add,
+                color: GerenaColors.textLightColor,
+                size: 40,
+              ),
+              onPressed: () {
+                // Abrir el modal
+                ModalAgregarCita.show(
+                  clienteId: 123, // Reemplaza con el ID real del cliente
+                  doctorId: 456,  // Reemplaza con el ID real del doctor
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Cuando hay MÚLTIPLES citas
+  return Stack(
+    children: [
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  appointmentsForDay.length,
+                  (index) => _buildCircleIndicator(index, controller),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                itemCount: appointmentsForDay.length,
+                itemBuilder: (context, index) {
+                  return buildAppointmentCard(appointmentsForDay[index],
+                      controller, dashboardController);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      // Botón flotante cuando hay MÚLTIPLES citas
+      Positioned(
+        bottom: 16,
+        right: 16,
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            color: GerenaColors.textPrimaryColor,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.add,
+              color: GerenaColors.textLightColor,
+              size: 40,
+            ),
+            onPressed: () {
+              // Abrir el modal
+              ModalAgregarCita.show(
+                clienteId: 123, // Reemplaza con el ID real del cliente
+                doctorId: 456,  // Reemplaza con el ID real del doctor
+              );
+            },
+          ),
+        ),
+      ),
+    ],
+  );
+}
   Widget _buildCircleIndicator(int index, CalendarControllerGetx controller) {
     return Obx(() {
       final isActive = index == controller.currentAppointmentIndex.value;

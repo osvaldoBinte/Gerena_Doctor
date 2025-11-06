@@ -4,6 +4,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/ejemplo/ejemplo_%20saved_products_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
@@ -64,14 +65,16 @@ class ShopNavigationController extends GetxController {
     currentView.value = 6;
     selectedProduct.value = null;
   }
-
+void navigateToPaymentCards() {
+    currentView.value = 7;
+    selectedProduct.value = null;
+  }
   void navigateBackToUserProfile() {
     Get.offAll(() => const DashboardPage(), arguments: {
       'showUserProfile': true,
     });
   }
   
-  // NUEVO: Toggle del buscador
   void toggleSearchBar() {
     showSearchBar.value = !showSearchBar.value;
   }
@@ -351,6 +354,20 @@ class GlobalShopInterface extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: BlogGerena(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (navigationController.currentView.value ==
+                              7) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 60),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: PaymentCardsScreen(),
                                   ),
                                 ],
                               ),

@@ -6,6 +6,7 @@ import 'package:gerena/features/auth/presentacion/page/login/login_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/cartPage/cart_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/get_medications_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_detail_page.dart';
+import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
 import 'package:gerena/movil/home/start_page.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:get/get.dart';
@@ -37,6 +38,10 @@ class AppPages {
     GetPage(
       name: RoutesNames.shoppdingcart,
       page: () => CartPageContent(),
+    ),
+    GetPage(
+      name: RoutesNames.paymentCardsPage,
+      page: () => PaymentCardsScreen(),
     ),
     GetPage(name: RoutesNames.productDetail, page: () =>ProductDetailPage()),
     GetPage(

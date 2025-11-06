@@ -8,4 +8,5 @@ class RoutesNames {
   static const String categoryById = '/Category-ById-Page';
   static const String productDetail = '/product-detail';
   static const String shoppdingcart = '/CartPageContent';
+  static const String paymentCardsPage = '/payment-cards-page';
 }

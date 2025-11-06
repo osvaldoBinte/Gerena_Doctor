@@ -20,13 +20,15 @@ class SplashController extends GetxController {
      
       await doctorProfileUsecase.execute();
        if (GetPlatform.isMobile) {
-        Get.offAllNamed(RoutesNames.homePage, arguments: 0);
+       // Get.offAllNamed(RoutesNames.homePage, arguments: 0);
+        Get.offAllNamed(RoutesNames.paymentCardsPage, arguments: 0);
       } else {
         Get.toNamed(RoutesNames.dashboardSPage);
       };
 
     } catch (e) {
-      Get.offAllNamed(RoutesNames.loginPage);
+     // Get.offAllNamed(RoutesNames.loginPage);
+       Get.offAllNamed(RoutesNames.paymentCardsPage, arguments: 0);
     } finally {
       isLoading.value = false;
     }

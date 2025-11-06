@@ -66,7 +66,7 @@ class GerenaColors {
   
   // Utilidades con valores computados
   static final Color shadoCard = Colors.black.withOpacity(0.1);
-  static final Color dividerColor = Colors.grey.withOpacity(0.2);
+  static final Color dividerColor =Color(0xff656565);
 
 
 static final Color shadowColor = Colors.grey.withOpacity(0.5);

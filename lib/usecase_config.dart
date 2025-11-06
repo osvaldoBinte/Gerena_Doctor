@@ -1,12 +1,14 @@
 import 'package:gerena/features/appointment/data/datasources/appointment_data_sources_imp.dart';
 import 'package:gerena/features/appointment/data/repositories/appointment_repository_imp.dart';
 import 'package:gerena/features/appointment/domain/usecase/get_appointments_usecase.dart';
+import 'package:gerena/features/appointment/domain/usecase/post_appointment_usecase.dart';
 import 'package:gerena/features/auth/data/datasources/auth_data_sources_imp.dart';
 import 'package:gerena/features/auth/data/repositories/auth_repository_imp.dart';
 import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/doctors/data/datasources/doctos_data_sources_imp.dart';
 import 'package:gerena/features/doctors/data/repositories/doctor_repository_imp.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
+import 'package:gerena/features/doctors/domain/usecase/get_doctor_availability_usecase.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
@@ -32,6 +34,7 @@ class UsecaseConfig {
    DoctorRepositoryImp? doctorRepositoryImp;
    DoctosDataSourcesImp? doctosDataSources;
    DoctorProfileUsecase? doctorProfileUsecase;
+   GetDoctorAvailabilityUsecase? getDoctorAvailabilityUsecase;
 
    AppointmentRepositoryImp? appointmentRepositoryImp;
    AppointmentDataSourcesImp? appointmentDataSourcesImp;
@@ -45,6 +48,7 @@ class UsecaseConfig {
    GetCategoryUsecase? getCategoryUsecase;
    GetMedicinesOnSaleUsecase? getMedicinesOnSaleUsecase;
    ShoppingCartUsecase? shoppingCartUsecase;
+   PostAppointmentUsecase? postAppointmentUsecase;
 
 
 
@@ -63,6 +67,8 @@ class UsecaseConfig {
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
      getAppointmentsUsecase = GetAppointmentsUsecase(appointmentRepository: appointmentRepositoryImp!);
+     getDoctorAvailabilityUsecase = GetDoctorAvailabilityUsecase(doctorRepository: doctorRepositoryImp!);
+     postAppointmentUsecase = PostAppointmentUsecase(appointmentRepository: appointmentRepositoryImp!);
 
      getMedicineByIdUsecase = GetMedicineByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getMyOrderUsecase = GetMyOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);

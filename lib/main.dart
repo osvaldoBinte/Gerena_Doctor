@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gerena/app.dart';
+import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/settings/enviroment.dart';
 import 'package:gerena/framework/preferences_service.dart';
 import 'package:get/get.dart';
@@ -13,6 +15,8 @@ String enviromentSelect = Enviroment.testing.value;
 void main() async {
   
   await dotenv.load(fileName: enviromentSelect);
+    Stripe.publishableKey = AppConstants.stripePublishableKey  ;
+
   await PreferencesUser().initiPrefs();
  FlutterError.onError = (FlutterErrorDetails details) {
     if (details.exception.toString().contains('KeyDownEvent') ||
@@ -50,13 +54,13 @@ void main() async {
       title: "Gerena",
       backgroundColor: Color.fromARGB(100, 33, 33, 33),
       skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal, // Cambiado de hidden a normal
+      titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,
       
     );
 
     await windowManager.setSize(Size(windowWidth, windowHeight));
-    await windowManager.setMinimumSize(Size(minWidth, minHeight)); // Corregido para usar las variables correctas
+    await windowManager.setMinimumSize(Size(minWidth, minHeight)); 
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();

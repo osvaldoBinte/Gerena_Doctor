@@ -4,6 +4,7 @@ import 'package:gerena/common/routes/router.dart';
 import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/add_appointment_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
@@ -52,6 +53,8 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getCategoryUsecase!,permanent: true);
         Get.put(usecaseConfig.getMedicinesOnSaleUsecase!, permanent:  true);
         Get.put(usecaseConfig.shoppingCartUsecase!,permanent:  true);
+         Get.put(usecaseConfig.postAppointmentUsecase!,permanent:  true);
+          Get.put(usecaseConfig.getDoctorAvailabilityUsecase!,permanent:  true);
 
 
 
@@ -64,6 +67,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => ProductDetailController(getMedicineByIdUsecase: Get.find(),), fenix:  true);
         Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(),), fenix:  true,);
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
+        Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 
