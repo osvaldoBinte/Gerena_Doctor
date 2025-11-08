@@ -7,6 +7,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/add_appointment_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
+import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
@@ -54,13 +55,14 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getCategoryUsecase!,permanent: true);
         Get.put(usecaseConfig.getMedicinesOnSaleUsecase!, permanent:  true);
         Get.put(usecaseConfig.shoppingCartUsecase!,permanent:  true);
-         Get.put(usecaseConfig.postAppointmentUsecase!,permanent:  true);
-          Get.put(usecaseConfig.getDoctorAvailabilityUsecase!,permanent:  true);
-          Get.put(usecaseConfig.attachPaymentMethodToCustomerUsecase!,permanent:  true);
-          Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
-          Get.put(usecaseConfig.deletePaymentMethodUsecase!,permanent:  true);
-          Get.put(usecaseConfig.getPaymentMethodsUsecase!,permanent:  true);
-          Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
+        Get.put(usecaseConfig.postAppointmentUsecase!,permanent:  true);
+        Get.put(usecaseConfig.getDoctorAvailabilityUsecase!,permanent:  true);
+        Get.put(usecaseConfig.attachPaymentMethodToCustomerUsecase!,permanent:  true);
+        Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
+        Get.put(usecaseConfig.deletePaymentMethodUsecase!,permanent:  true);
+        Get.put(usecaseConfig.getPaymentMethodsUsecase!,permanent:  true);
+        Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
+        Get.put(usecaseConfig.getBannersUsecase!, permanent: true);
 
 
 
@@ -75,6 +77,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(),), fenix: true,);
+        Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

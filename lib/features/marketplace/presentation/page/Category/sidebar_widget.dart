@@ -4,7 +4,7 @@ import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/widget/half_cut_circle.dart';
-import 'package:gerena/page/dashboard/widget/noticias/news_feed_widget.dart';
+import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
 import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';

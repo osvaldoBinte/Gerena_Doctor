@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gerena/movil/homePage/home_page.dart';
+import 'package:gerena/features/auth/presentacion/page/home/homemovil/home_page.dart';
 import 'package:gerena/movil/notificasiones/notification_page.dart';
 import 'package:gerena/movil/perfil/perfil_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';

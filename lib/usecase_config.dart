@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:gerena/features/appointment/data/datasources/appointment_data_sources_imp.dart';
 import 'package:gerena/features/appointment/data/repositories/appointment_repository_imp.dart';
 import 'package:gerena/features/appointment/domain/usecase/get_appointments_usecase.dart';
@@ -5,6 +6,9 @@ import 'package:gerena/features/appointment/domain/usecase/post_appointment_usec
 import 'package:gerena/features/auth/data/datasources/auth_data_sources_imp.dart';
 import 'package:gerena/features/auth/data/repositories/auth_repository_imp.dart';
 import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
+import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
+import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
+import 'package:gerena/features/banners/domain/usecase/get_banners_usecase.dart';
 import 'package:gerena/features/doctors/data/datasources/doctos_data_sources_imp.dart';
 import 'package:gerena/features/doctors/data/repositories/doctor_repository_imp.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
@@ -29,11 +33,13 @@ class UsecaseConfig {
    AuthRepositoryImp? authRepositoryImp;
    MarketplaceRepositoryImp? marketplaceRepositoryImp;
    PaymentRepositoryImpl? paymentRepositoryImp;
+   BannersRepositoryImp? bannersRepositoryImp;
 
 
    AuthDataSourcesImp? authDataSources;
    MarketplaceDataSourcesImp?marketplaceDataSourcesImp;
    PaymentDataSourcesImp? paymentDataSourcesImp;
+   BannersDataSourcesImp? bannersDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -63,6 +69,8 @@ class UsecaseConfig {
    DeletePaymentMethodUsecase? deletePaymentMethodUsecase;
    GetPaymentMethodsUsecase? getPaymentMethodsUsecase;
 
+   GetBannersUsecase? getBannersUsecase;
+
 
 
 
@@ -72,12 +80,14 @@ class UsecaseConfig {
       appointmentDataSourcesImp = AppointmentDataSourcesImp();
       marketplaceDataSourcesImp = MarketplaceDataSourcesImp();
       paymentDataSourcesImp = PaymentDataSourcesImp();
+      bannersDataSourcesImp = BannersDataSourcesImp();
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
      authRepositoryImp = AuthRepositoryImp(authDataSources: authDataSources!);
       appointmentRepositoryImp = AppointmentRepositoryImp(appointmentDataSources: appointmentDataSourcesImp!);
       marketplaceRepositoryImp = MarketplaceRepositoryImp(marketplaceDataSourcesImp: marketplaceDataSourcesImp!);
       paymentRepositoryImp = PaymentRepositoryImpl( paymentDataSourcesImp: paymentDataSourcesImp!, );
+      bannersRepositoryImp = BannersRepositoryImp(bannersDataSourcesImp: bannersDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -99,6 +109,8 @@ class UsecaseConfig {
       createPaymentMethodUsecase = CreatePaymentMethodUsecase(repository: paymentRepositoryImp!);
       deletePaymentMethodUsecase = DeletePaymentMethodUsecase(repository: paymentRepositoryImp!);
       getPaymentMethodsUsecase = GetPaymentMethodsUsecase(repository: paymentRepositoryImp!);
+      
+      getBannersUsecase = GetBannersUsecase(repository: bannersRepositoryImp!);
       
 
     

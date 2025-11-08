@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
+import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -42,85 +43,83 @@ void initState() {
       ];
       return userImages[index];
     }
-
-    List<Widget> allItems = [
+ List<Widget> allItems = [
       Container(
         height: availableHeight,
         child: Column(
           children: [
             Container(
-                height: 100,
-                color: GerenaColors.backgroundColorFondo,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: 6,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Container(
-                        margin:
-                            const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-                        child: Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                print("Agregar mi historia");
-                              },
-                              child: Stack(
-                                children: [
-                                  GerenaColors.createStoryRing(
-                                    child: Image.asset(
-                                      'assets/perfil.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                    hasStory: false,
-                                    size: 80,
-                                  ),
-                                  Positioned(
-                                    right: 0,
-                                    bottom: 0,
-                                    child: SizedBox(
-                                      width: 29,
-                                      height: 29,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Image.asset(
-                                          'assets/icons/aadHistory.png',
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
+              height: 100,
+              color: GerenaColors.backgroundColorFondo,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: 6,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
                     return Container(
-                      margin:
-                          const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                      margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
                       child: Column(
                         children: [
                           GestureDetector(
-                            onTap: () {},
-                            child: GerenaColors.createStoryRing(
-                              child: Image.network(
-                                _getStoryUserImage(index),
-                                fit: BoxFit.cover,
-                              ),
-                              hasStory: true,
-                              isViewed: false,
-                              size: 80,
+                            onTap: () {
+                              print("Agregar mi historia");
+                            },
+                            child: Stack(
+                              children: [
+                                GerenaColors.createStoryRing(
+                                  child: Image.asset(
+                                    'assets/perfil.png',
+                                    fit: BoxFit.cover,
+                                  ),
+                                  hasStory: false,
+                                  size: 80,
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: SizedBox(
+                                    width: 29,
+                                    height: 29,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Image.asset(
+                                        'assets/icons/aadHistory.png',
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     );
-                  },
-                )),
+                  }
+
+                  return Container(
+                    margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {},
+                          child: GerenaColors.createStoryRing(
+                            child: Image.network(
+                              _getStoryUserImage(index),
+                              fit: BoxFit.cover,
+                            ),
+                            hasStory: true,
+                            isViewed: false,
+                            size: 80,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -129,9 +128,16 @@ void initState() {
                     SizedBox(height: GerenaColors.paddingMedium),
                     _buildCitasSection(),
                     SizedBox(height: GerenaColors.paddingMedium),
-                    buildWebinarCard(),
-                    SizedBox(height: GerenaColors.paddingMedium),
-                    buildPromoCard(),
+                    
+                    // ✅ Usar el widget reutilizable de banners
+                    BannersListWidget(
+                      height: 200,
+                      maxBanners: 2, // Mostrar máximo 2 banners
+                      onBannerTap: () {
+                        print('Banner tapped');
+                        // Navegar a donde necesites
+                      },
+                    ),
                   ],
                 ),
               ),

@@ -4,7 +4,7 @@ import 'package:gerena/features/appointment/presentation/page/addappointment/mod
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/page/dashboard/widget/membresia/membresia.dart';
-import 'package:gerena/page/dashboard/widget/noticias/news_feed_widget.dart';
+import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
 import 'package:gerena/page/portafolio/doctor_profile_page.dart';
 import 'package:gerena/page/dashboard/widget/preguntasFrecuentes/preguntas_frecuentes.dart';
 import 'package:gerena/page/dashboard/widget/sugerencia/sugerencia.dart';
