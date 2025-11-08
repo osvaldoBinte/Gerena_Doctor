@@ -9,24 +9,31 @@ import 'package:gerena/features/doctors/data/datasources/doctos_data_sources_imp
 import 'package:gerena/features/doctors/data/repositories/doctor_repository_imp.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/get_doctor_availability_usecase.dart';
+import 'package:gerena/features/marketplace/data/datasources/Payment_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
+import 'package:gerena/features/marketplace/data/repositories/payment_repository_imp.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicine_by_id_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicines_on_sale_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_my_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_order_by_id_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/attach_payment_method_to_customer_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/create_payment_method_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_methods_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 class UsecaseConfig {
    AuthRepositoryImp? authRepositoryImp;
    MarketplaceRepositoryImp? marketplaceRepositoryImp;
+   PaymentRepositoryImpl? paymentRepositoryImp;
 
 
    AuthDataSourcesImp? authDataSources;
    MarketplaceDataSourcesImp?marketplaceDataSourcesImp;
+   PaymentDataSourcesImp? paymentDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -51,6 +58,12 @@ class UsecaseConfig {
    PostAppointmentUsecase? postAppointmentUsecase;
 
 
+   AttachPaymentMethodToCustomerUsecase? attachPaymentMethodToCustomerUsecase;
+   CreatePaymentMethodUsecase? createPaymentMethodUsecase;
+   DeletePaymentMethodUsecase? deletePaymentMethodUsecase;
+   GetPaymentMethodsUsecase? getPaymentMethodsUsecase;
+
+
 
 
   UsecaseConfig(){
@@ -58,11 +71,13 @@ class UsecaseConfig {
      doctosDataSources = DoctosDataSourcesImp();
       appointmentDataSourcesImp = AppointmentDataSourcesImp();
       marketplaceDataSourcesImp = MarketplaceDataSourcesImp();
+      paymentDataSourcesImp = PaymentDataSourcesImp();
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
      authRepositoryImp = AuthRepositoryImp(authDataSources: authDataSources!);
       appointmentRepositoryImp = AppointmentRepositoryImp(appointmentDataSources: appointmentDataSourcesImp!);
       marketplaceRepositoryImp = MarketplaceRepositoryImp(marketplaceDataSourcesImp: marketplaceDataSourcesImp!);
+      paymentRepositoryImp = PaymentRepositoryImpl( paymentDataSourcesImp: paymentDataSourcesImp!, );
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -78,6 +93,14 @@ class UsecaseConfig {
      getOrderByIdUsecase = GetOrderByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getMedicinesOnSaleUsecase = GetMedicinesOnSaleUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      shoppingCartUsecase = ShoppingCartUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+
+
+      attachPaymentMethodToCustomerUsecase = AttachPaymentMethodToCustomerUsecase(repository: paymentRepositoryImp!);
+      createPaymentMethodUsecase = CreatePaymentMethodUsecase(repository: paymentRepositoryImp!);
+      deletePaymentMethodUsecase = DeletePaymentMethodUsecase(repository: paymentRepositoryImp!);
+      getPaymentMethodsUsecase = GetPaymentMethodsUsecase(repository: paymentRepositoryImp!);
+      
+
     
   }
 }

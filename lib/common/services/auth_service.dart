@@ -48,7 +48,10 @@ class AuthService extends GetxService {
     final userData = await getUserData();
     return userData?.token;
   }
-
+Future<String?> getStripeCustomerId() async {
+  final userData = await getUserData();
+  return userData?.user.stripeId;
+}
   Future<String?> getUsuarioEmail() async {
     final userData = await getUserData();
     return userData?.user.email;
@@ -87,6 +90,7 @@ class AuthService extends GetxService {
         rol: loginResponse.user.rol,
         nombreCompleto: loginResponse.user.nombreCompleto,
         telefono: loginResponse.user.telefono,
+        stripeId: loginResponse.user.stripeId,
       );
       
       modelToSave = LoginResponseModel(
@@ -147,6 +151,7 @@ class AuthService extends GetxService {
       'rol': userData.user.rol,
       'nombreCompleto': userData.user.nombreCompleto,
       'telefono': userData.user.telefono,
+      'stripeId': userData.user.stripeId,
     };
   }
 
@@ -165,6 +170,7 @@ class AuthService extends GetxService {
         rol: userData.user.rol,
         nombreCompleto: nombreCompleto ?? userData.user.nombreCompleto,
         telefono: telefono ?? userData.user.telefono,
+        stripeId: userData.user.stripeId,
       );
 
       final updatedLoginResponse = LoginResponseModel(
@@ -178,4 +184,6 @@ class AuthService extends GetxService {
       return false;
     }
   }
+  // Agregar este método a tu AuthService
+
 }

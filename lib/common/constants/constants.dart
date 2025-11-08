@@ -7,5 +7,6 @@ class AppConstants {
   static const String wishlistKey = 'wishlist_Key';
   static  String stripePublishableKey = dotenv.env['STRIPE_PUBLISHABLE_KEY'].toString();
   static  String stripeSecretKey = dotenv.env['STRIPE_SECRET_KEY'].toString();
+  static String serverBaseStripe = dotenv.env['STRIPE_API_BASE'].toString();
   
 }

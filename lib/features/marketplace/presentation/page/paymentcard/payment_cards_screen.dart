@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/add_card_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,7 @@ class PaymentCardsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(PaymentCartController());
+    final controller = Get.find<PaymentCartController>();
     
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorFondo,
@@ -176,44 +177,54 @@ class PaymentCardsScreen extends StatelessWidget {
     );
   }
 
- Widget _buildAddCardButton(BuildContext context, PaymentCartController controller) {
-  return GestureDetector(
-    onTap: () {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (context) => AddCardModal(),
-      );
-    },
-    child: Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: GerenaColors.textSecondaryColor.withOpacity(0.3),
-          width: 1.5,
-        ),
+  Widget _buildAddCardButton(BuildContext context, PaymentCartController controller) {
+    return GestureDetector(
+      onTap: () {
+      // Donde llamas al modal, cambia de showModalBottomSheet a showDialog:
+showDialog(
+  context: context,
+  builder: (context) => Dialog(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: 500, // Ancho máximo para escritorio
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Center(
-        child: Text(
-          '+Agregar tarjeta',
-          style: GerenaColors.bodyMedium.copyWith(
-            color: GerenaColors.textTertiaryColor,
-            fontWeight: FontWeight.w500,
+      child: AddCardModal(),
+    ),
+  ),
+);
+      },
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: GerenaColors.backgroundColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: GerenaColors.textSecondaryColor.withOpacity(0.3),
+            width: 1.5,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Center(
+          child: Text(
+            '+Agregar tarjeta',
+            style: GerenaColors.bodyMedium.copyWith(
+              color: GerenaColors.textTertiaryColor,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
   
   void _showEditOptions(
     BuildContext context,
     PaymentCartController controller,
-    PaymentMethod pm,
+    PaymentMethodEntity pm,
   ) {
     showModalBottomSheet(
       context: context,
