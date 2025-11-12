@@ -1,0 +1,46 @@
+import 'package:flutter_stripe/flutter_stripe.dart' as stripe;
+import 'package:gerena/features/marketplace/data/model/address/address_model.dart';
+import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
+import 'package:gerena/common/constants/constants.dart';
+import 'package:gerena/common/errors/api_errors.dart';
+
+class AddressesDataSourcesImp {
+  String defaultApiServer = AppConstants.serverBase;
+
+  Future<List<AddressesEntity>> getAddresses(String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/doctores/direcciones');
+
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List medications = responseDecode;
+
+        return medications.map((json) => AddressModel.fromJson(json)).toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+    }
+  }
+}

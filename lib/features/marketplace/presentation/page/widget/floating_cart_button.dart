@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 

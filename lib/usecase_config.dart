@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gerena/features/appointment/data/datasources/appointment_data_sources_imp.dart';
 import 'package:gerena/features/appointment/data/repositories/appointment_repository_imp.dart';
 import 'package:gerena/features/appointment/domain/usecase/get_appointments_usecase.dart';
@@ -14,15 +15,21 @@ import 'package:gerena/features/doctors/data/repositories/doctor_repository_imp.
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/get_doctor_availability_usecase.dart';
 import 'package:gerena/features/marketplace/data/datasources/Payment_data_sources_imp.dart';
+import 'package:gerena/features/marketplace/data/datasources/addresses_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
+import 'package:gerena/features/marketplace/data/repositories/addresses_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/payment_repository_imp.dart';
+import 'package:gerena/features/marketplace/domain/usecase/addresses/get_addresses_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/create_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicine_by_id_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicines_on_sale_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_my_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_order_by_id_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/pay_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/attach_payment_method_to_customer_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/payment_methods_defaul_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/create_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_methods_usecase.dart';
@@ -34,12 +41,14 @@ class UsecaseConfig {
    MarketplaceRepositoryImp? marketplaceRepositoryImp;
    PaymentRepositoryImpl? paymentRepositoryImp;
    BannersRepositoryImp? bannersRepositoryImp;
+   AddressesRepositoryImp? addressesRepositoryImp;
 
 
    AuthDataSourcesImp? authDataSources;
    MarketplaceDataSourcesImp?marketplaceDataSourcesImp;
    PaymentDataSourcesImp? paymentDataSourcesImp;
    BannersDataSourcesImp? bannersDataSourcesImp;
+   AddressesDataSourcesImp? addressesDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -62,12 +71,17 @@ class UsecaseConfig {
    GetMedicinesOnSaleUsecase? getMedicinesOnSaleUsecase;
    ShoppingCartUsecase? shoppingCartUsecase;
    PostAppointmentUsecase? postAppointmentUsecase;
+   CreateOrderUsecase? createOrderUsecase;
+   PayOrderUsecase? payOrderUsecase;
+
+   GetAddressesUsecase ? getAddressesUsecase;
 
 
    AttachPaymentMethodToCustomerUsecase? attachPaymentMethodToCustomerUsecase;
    CreatePaymentMethodUsecase? createPaymentMethodUsecase;
    DeletePaymentMethodUsecase? deletePaymentMethodUsecase;
    GetPaymentMethodsUsecase? getPaymentMethodsUsecase;
+   PaymentMethodsDefaulUsecase? paymentMethodsDefaulUsecase;
 
    GetBannersUsecase? getBannersUsecase;
 
@@ -81,6 +95,7 @@ class UsecaseConfig {
       marketplaceDataSourcesImp = MarketplaceDataSourcesImp();
       paymentDataSourcesImp = PaymentDataSourcesImp();
       bannersDataSourcesImp = BannersDataSourcesImp();
+      addressesDataSourcesImp = AddressesDataSourcesImp();
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
      authRepositoryImp = AuthRepositoryImp(authDataSources: authDataSources!);
@@ -88,6 +103,7 @@ class UsecaseConfig {
       marketplaceRepositoryImp = MarketplaceRepositoryImp(marketplaceDataSourcesImp: marketplaceDataSourcesImp!);
       paymentRepositoryImp = PaymentRepositoryImpl( paymentDataSourcesImp: paymentDataSourcesImp!, );
       bannersRepositoryImp = BannersRepositoryImp(bannersDataSourcesImp: bannersDataSourcesImp!);
+      addressesRepositoryImp = AddressesRepositoryImp(addressesDataSourcesImp: addressesDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -103,12 +119,17 @@ class UsecaseConfig {
      getOrderByIdUsecase = GetOrderByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getMedicinesOnSaleUsecase = GetMedicinesOnSaleUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      shoppingCartUsecase = ShoppingCartUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+     createOrderUsecase = CreateOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+     payOrderUsecase = PayOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+
+     getAddressesUsecase = GetAddressesUsecase(addressesRepository: addressesRepositoryImp!);
 
 
       attachPaymentMethodToCustomerUsecase = AttachPaymentMethodToCustomerUsecase(repository: paymentRepositoryImp!);
       createPaymentMethodUsecase = CreatePaymentMethodUsecase(repository: paymentRepositoryImp!);
       deletePaymentMethodUsecase = DeletePaymentMethodUsecase(repository: paymentRepositoryImp!);
       getPaymentMethodsUsecase = GetPaymentMethodsUsecase(repository: paymentRepositoryImp!);
+      paymentMethodsDefaulUsecase = PaymentMethodsDefaulUsecase(repository: paymentRepositoryImp!);
       
       getBannersUsecase = GetBannersUsecase(repository: bannersRepositoryImp!);
       

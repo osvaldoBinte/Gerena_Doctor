@@ -3,7 +3,7 @@ import 'package:gerena/features/marketplace/domain/entities/payment/customer_ent
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
 
 abstract class PaymentRepository {
-  Future<List<PaymentMethodEntity>> getPaymentMethods(String customerId);
+  Future<List<PaymentMethodEntity>> getPaymentMethods();
 
   Future<PaymentMethodEntity> createPaymentMethod({
     String? cardholderName,
@@ -23,4 +23,7 @@ abstract class PaymentRepository {
     String? name,
     String? phone,
   });
+    Future<void> confirmpayment(int id);
+
+  
 }

@@ -107,7 +107,7 @@ class PaymentCartController extends GetxController {
           (throw Exception('No se encontró el ID de cliente de Stripe.'));
       print('👤 Customer ID: ${customerId.value}');
 
-      final methods = await getPaymentMethodsUsecase.execute(customerId.value);
+      final methods = await getPaymentMethodsUsecase.execute();
       paymentMethods.value = methods;
       print('✅ ${methods.length} tarjetas cargadas');
     } catch (e) {

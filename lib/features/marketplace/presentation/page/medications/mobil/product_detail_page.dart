@@ -6,7 +6,7 @@ import 'package:gerena/features/marketplace/presentation/page/medications/get_me
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_datail_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/widget/product_card_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/carousel_indicators_widget.dart';
-import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart';
 import 'package:get/get.dart';

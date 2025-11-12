@@ -4,7 +4,7 @@ import 'package:gerena/features/marketplace/domain/repositories/payment_reposito
 class GetPaymentMethodsUsecase {
   final PaymentRepository repository;
   GetPaymentMethodsUsecase({required this.repository});
-  Future<List<PaymentMethodEntity>> execute(String customerId) async {
-    return await repository.getPaymentMethods(customerId);
+  Future<List<PaymentMethodEntity>> execute() async {
+    return await repository.getPaymentMethods();
   }
 }

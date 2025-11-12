@@ -118,7 +118,8 @@ class WishlistController extends GetxController {
       
       await saveWishlistToPreferences();
       await validateWishlist();
-      
+            showSuccessSnackbar('agregado a wishlist correctamente');
+
     //  showSuccessSnackbar('💝 Producto agregado a tu lista de deseos'); // ⭐ Cambiado
       
     } catch (e, stackTrace) {

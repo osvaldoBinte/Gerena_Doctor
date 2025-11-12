@@ -8,15 +8,15 @@ import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/api_errors.dart';
 
 class PaymentDataSourcesImp {
- late final http.Client client; // Ahora es una propiedad, no parámetro
+ late final http.Client client; 
    String defaultApiServer = AppConstants.serverBase;
 
   String defaultApiServerStripe = AppConstants.serverBaseStripe;
   String stripeSecretKey = AppConstants.stripeSecretKey;
   String stripePublishableKey = AppConstants.stripePublishableKey;
 
-  PaymentDataSourcesImp() { // Sin parámetros
-    client = http.Client(); // Crear el client aquí
+  PaymentDataSourcesImp() { 
+    client = http.Client(); 
     _initializeStripe();
   }
 
@@ -35,48 +35,46 @@ class PaymentDataSourcesImp {
       print('❌ Error al inicializar Stripe: $e');
       throw Exception('Error al inicializar Stripe');
     }
-  }
-  Future<List<PaymentMethodModel>> getPaymentMethods(String customerId) async {
-    try {
-      print('📥 Obteniendo payment methods para customer: $customerId');
+  }Future<List<PaymentMethodModel>> getPaymentMethods( String token) async {
+  try {
+     Uri url = Uri.parse(
+        '$defaultApiServer/doctores/payment-methods');
+    
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    });
 
-      final response = await client.get(
-        Uri.parse('$defaultApiServerStripe/customers/$customerId/payment_methods?type=card'),
-        headers: _stripeHeaders,
-      );
 
-      print('📡 Response status: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      final dataUTF8 = utf8.decode(response.bodyBytes);
+      final responseDecode = jsonDecode(dataUTF8);
 
-      if (response.statusCode == 200) {
-        final dataUTF8 = utf8.decode(response.bodyBytes);
-        final responseDecode = jsonDecode(dataUTF8);
-        final List paymentMethodsData = responseDecode['data'];
+      final List paymentMethodsData = responseDecode;
 
-        final List<PaymentMethodModel> paymentMethods = paymentMethodsData
-            .map((json) => PaymentMethodModel.fromJson(json))
-            .toList();
+      final List<PaymentMethodModel> paymentMethods = paymentMethodsData
+          .map((json) => PaymentMethodModel.fromJson(json))
+          .toList();
 
-        print('✅ ${paymentMethods.length} tarjetas obtenidas');
-        return paymentMethods;
-      }
-
-      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
-      exception.validateMesage();
-      throw exception;
-    } catch (e) {
-      if (e is SocketException ||
-          e is http.ClientException ||
-          e is TimeoutException) {
-        throw Exception(convertMessageException(error: e));
-      }
-      print('❌ Error: $e');
-      throw Exception('$e');
+      print('✅ ${paymentMethods.length} tarjetas obtenidas');
+      return paymentMethods;
     }
-  }
 
-  /// Crear payment method usando CardFormField de Stripe
-  /// RETORNA PaymentMethodModel (no stripe.PaymentMethod)
-/// Crear payment method usando CardFormField de Stripe
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+    print('❌ Error: $e');
+    throw Exception('$e');
+  }
+}
+
+
 Future<PaymentMethodModel> createPaymentMethod({
   String? cardholderName,
 }) async {
@@ -273,4 +271,40 @@ Future<PaymentMethodModel> createPaymentMethod({
       throw Exception('$e');
     }
   }
+Future<void> confirmpayment(int id, String token) async {
+  try {
+    Uri url = Uri.parse('$defaultApiServer/doctores/payment-methods/default');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: jsonEncode({'paymentMethodId': id}),
+    );
+    
+    if (response.statusCode == 200) {
+      return;
+    }
+
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+    
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+    
+    // ✅ Si es ApiExceptionCustom, re-lanzarla sin envolver
+    if (e is ApiExceptionCustom) {
+      rethrow;
+    }
+    
+    print('error: $e');
+    throw Exception('$e');
+  }
+}
 }

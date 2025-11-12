@@ -10,7 +10,8 @@ import 'package:gerena/features/auth/presentacion/page/login/login_controller.da
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
-import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_datail_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
@@ -63,6 +64,10 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getPaymentMethodsUsecase!,permanent:  true);
         Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
         Get.put(usecaseConfig.getBannersUsecase!, permanent: true);
+        Get.put(usecaseConfig.paymentMethodsDefaulUsecase!, permanent: true);
+        Get.put(usecaseConfig.payOrderUsecase!, permanent: true);
+        Get.put(usecaseConfig.getAddressesUsecase!, permanent: true);
+        Get.put(usecaseConfig.createOrderUsecase!, permanent: true);
 
 
 
@@ -73,10 +78,11 @@ class App extends StatelessWidget {
         Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find()), fenix:  true);
         Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => ProductDetailController(getMedicineByIdUsecase: Get.find(),), fenix:  true);
-        Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(),), fenix:  true,);
+        Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), payOrderUsecase:  Get.find(), paymentMethodsDefaulUsecase:  Get.find(), ), fenix:  true,);
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(),), fenix: true,);
+        Get.lazyPut(() => AddressesController(getAddressesUsecase:  Get.find()), fenix: true,);
         Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());

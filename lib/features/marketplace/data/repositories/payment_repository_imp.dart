@@ -13,8 +13,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
   });
 
   @override
-  Future<List<PaymentMethodEntity>> getPaymentMethods(String customerId) async {
-    return await paymentDataSourcesImp.getPaymentMethods(customerId);
+  Future<List<PaymentMethodEntity>> getPaymentMethods() async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.')); 
+    return await paymentDataSourcesImp.getPaymentMethods(token);
   }
 
   @override
@@ -69,5 +70,12 @@ class PaymentRepositoryImpl implements PaymentRepository {
   Future<void> createPayment(String paymentMethodId) async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return paymentDataSourcesImp.createPayment(token, paymentMethodId);
+  }
+  
+  @override
+  Future<void> confirmpayment(int id) async {
+        final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    
+    return paymentDataSourcesImp.confirmpayment(id,token);  
   }
 }

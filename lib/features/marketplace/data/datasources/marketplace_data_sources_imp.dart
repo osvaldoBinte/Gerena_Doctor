@@ -1,6 +1,8 @@
 import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/api_errors.dart';
 import 'package:gerena/features/marketplace/data/model/category/category_model.dart';
+import 'package:gerena/features/marketplace/data/model/ordes/create/create_new_order_model.dart';
+import 'package:gerena/features/marketplace/data/model/ordes/create/response_new_order_model.dart';
 import 'package:gerena/features/marketplace/data/model/ordes/order_entity.dart';
 import 'package:gerena/features/marketplace/data/model/searchingformedications/searching_for_medications_model.dart';
 import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_items_model.dart';
@@ -8,6 +10,8 @@ import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_car
 import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_response_model.dart';
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/orders/create/create_new_order_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/orders/create/ressponse_new_order_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/orders_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
@@ -231,6 +235,79 @@ Future<List<MedicationsEntity>> searchingformedications(
       throw Exception('$e');
     }
   }
+
+  Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Marketplace/pedidos');
+
+      final response = await http.post( url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+        },
+        body:
+            jsonEncode(CreateNewOrderModel.fromEntity(createaneworder).toJson()),
+      );
+
+      if (response.statusCode == 201) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        if (responseDecode is Map<String, dynamic>) {
+          ResponseNewOrderModel order =
+              ResponseNewOrderModel.fromJson(responseDecode);
+          return order;
+        } else {
+          throw Exception('Respuesta vacía o formato incorrecto');
+        }
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+    }
+  }
+
+  Future<void> payorder(int id, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Marketplace/pedidos/$id/pagar');
+
+      final response = await http.post( url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+        },
+       
+      );
+
+      if (response.statusCode == 200) {
+        return;
+
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+    }
+  }
+
+
   Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity, String token) async{
      try {
       Uri url = Uri.parse('$defaultApiServer/Marketplace/carrito/validar');

@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
-import 'package:gerena/features/marketplace/presentation/page/cartPage/shopping_cart_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
@@ -21,7 +21,7 @@ import 'package:gerena/page/store/store_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:gerena/features/marketplace/presentation/page/cartPage/cart_page.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
 import 'productDetail/product_detail_byid_page.dart';
 
 class ShopNavigationController extends GetxController {

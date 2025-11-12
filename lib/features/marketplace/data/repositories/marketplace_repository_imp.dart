@@ -2,6 +2,8 @@ import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/orders/create/create_new_order_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/orders/create/ressponse_new_order_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/orders_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
@@ -50,11 +52,7 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
     return await marketplaceDataSourcesImp.medicinesonsale(token);
   }
   
-  @override
-  Future<void> createaneworder() {
-    // TODO: implement createaneworder
-    throw UnimplementedError();
-  }
+
 
   @override
   Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity) async {
@@ -62,4 +60,17 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
 
     return await marketplaceDataSourcesImp.validatecart(shoppingcartpostentity, token);
   }
+
+  @override
+  Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await marketplaceDataSourcesImp.createaneworder(createaneworder,token);
+  }
+  
+  @override
+  Future<void> payorder(int orderId) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await marketplaceDataSourcesImp.payorder(orderId, token);
+  }
+ 
 }
