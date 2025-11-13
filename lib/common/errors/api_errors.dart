@@ -56,9 +56,10 @@ class ApiExceptionCustom implements Exception {
     message = errorMessage;
   }
 
-  @override
+ @override
   String toString() {
-    return "ApiException: $message (Status Code: ${response?.statusCode.toString()})";
+    // Retornar solo el mensaje sin el prefijo "ApiException:"
+    return message;
   }
 }
 

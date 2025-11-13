@@ -91,7 +91,7 @@ class SidebarWidget extends StatelessWidget {
                               ),
                             ),
                             _buildSearchField(),
-                            StatusCardWidget(),
+                         //   StatusCardWidget(),
                             SizedBox(height: 10),
                             buildWishlistButton(
                               onTap: () {

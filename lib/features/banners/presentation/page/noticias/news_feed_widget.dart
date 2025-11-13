@@ -73,7 +73,7 @@ class NewsFeedWidget extends StatelessWidget {
                       },
                     ),
           
-          GerenaColors.createArticleCard(
+         /* GerenaColors.createArticleCard(
             title: 'Revoluciona tus aplicaciones de tóxina botulínica siguiendo los consejos del Dr. Juan Pérez',
             content: 'Aplicar toxina botulínica no es solo una técnica, es un arte que se perfecciona con conocimiento, práctica y paciencia. Sigue estos consejos del Dr. Juan Pérez y podrás dar un paso más en la excelencia de tus tratamientos y ofrecer...',
             date: 'Blog Gerena | Lun 31 de Marzo',
@@ -93,7 +93,7 @@ class NewsFeedWidget extends StatelessWidget {
             onReadMorePressed: () {
               _navigateToForum();
             },
-          ),
+          ),*/
         ],
       );
     });

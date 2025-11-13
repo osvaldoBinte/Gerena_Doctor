@@ -171,7 +171,7 @@ class SavedProductsContent extends StatelessWidget {
                 horizontal: MediaQuery.of(context).size.width > 600 ? 80.0 : 16.0,
                 vertical: 20,
               ),
-              child: 
+             /* child: 
               /*isProgrammed
                   ? Row(
                       children: [
@@ -201,7 +201,7 @@ class SavedProductsContent extends StatelessWidget {
                   );
                 },
                 customShadow: GerenaColors.mediumShadow,
-              ),
+              ),*/
             )
           ],
         ),

@@ -58,7 +58,7 @@ import 'package:get/get.dart';
                               ? MediaQuery.of(context).size.width * 0.85
                               : 400, 
                         ),
-                        child: StatusCardWidget(),
+                       // child: StatusCardWidget(),
                       ),
                     ),
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/page/dashboard/widget/membresia/membresia.dart';
+import 'package:gerena/features/subscription/presentation/page/membresia/membresia.dart';
 import 'package:google_fonts/google_fonts.dart';
 class MembresiaPage extends StatelessWidget {
   const MembresiaPage({Key? key}) : super(key: key);

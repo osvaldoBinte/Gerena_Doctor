@@ -17,13 +17,13 @@ class AppointmentDataSourcesImp {
     String token,
   ) async {
     try {
-      Uri url = Uri.parse('$defaultApiServer/Citas');
+      Uri url = Uri.parse('$defaultApiServer/doctor/citas');
 
       final response = await http.post(
         url,
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization': token
+          'Authorization':'Bearer $token'
         },
         body:
             jsonEncode(AddAppointmentModel.fromEntity(addAppointment).toJson()),

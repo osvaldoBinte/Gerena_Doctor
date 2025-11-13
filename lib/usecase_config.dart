@@ -35,6 +35,14 @@ import 'package:gerena/features/marketplace/domain/usecase/payment/delete_paymen
 import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_methods_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
+import 'package:gerena/features/subscription/data/datasources/subscription_data_sources_imp.dart';
+import 'package:gerena/features/subscription/data/repositories/subscription_repository_imp.dart';
+import 'package:gerena/features/subscription/domain/usecase/change_subscription_plan_usecase.dart';
+import 'package:gerena/features/subscription/domain/usecase/get_all_plans_usecase.dart';
+import 'package:gerena/features/subscription/domain/usecase/get_my_subscription_usecase.dart';
+import 'package:gerena/features/subscription/domain/usecase/post_cancel_subcription_usecase.dart';
+import 'package:gerena/features/subscription/domain/usecase/post_reactivate_subscription_usecase.dart';
+import 'package:gerena/features/subscription/domain/usecase/post_subscribe_to_plan_usecase.dart';
 
 class UsecaseConfig {
    AuthRepositoryImp? authRepositoryImp;
@@ -42,6 +50,7 @@ class UsecaseConfig {
    PaymentRepositoryImpl? paymentRepositoryImp;
    BannersRepositoryImp? bannersRepositoryImp;
    AddressesRepositoryImp? addressesRepositoryImp;
+   SubscriptionRepositoryImp? subscriptionRepositoryImp;
 
 
    AuthDataSourcesImp? authDataSources;
@@ -49,6 +58,7 @@ class UsecaseConfig {
    PaymentDataSourcesImp? paymentDataSourcesImp;
    BannersDataSourcesImp? bannersDataSourcesImp;
    AddressesDataSourcesImp? addressesDataSourcesImp;
+   SubscriptionDataSourcesImp? subscriptionDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -86,6 +96,15 @@ class UsecaseConfig {
    GetBannersUsecase? getBannersUsecase;
 
 
+   ChangeSubscriptionPlanUsecase? changeSubscriptionPlanUsecase;
+   PostCancelSubcriptionUsecase? postCancelSubcriptionUsecase;
+   PostReactivateSubscriptionUsecase? postReactivateSubscriptionUsecase;
+   PostSubscribeToPlanUsecase? postSubscribeToPlanUsecase;
+   GetAllPlansUsecase? getAllPlansUsecase;
+   GetMySubscriptionUsecase? getMySubscriptionUsecase;
+
+
+
 
 
   UsecaseConfig(){
@@ -96,6 +115,7 @@ class UsecaseConfig {
       paymentDataSourcesImp = PaymentDataSourcesImp();
       bannersDataSourcesImp = BannersDataSourcesImp();
       addressesDataSourcesImp = AddressesDataSourcesImp();
+      subscriptionDataSourcesImp = SubscriptionDataSourcesImp();
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
      authRepositoryImp = AuthRepositoryImp(authDataSources: authDataSources!);
@@ -104,6 +124,7 @@ class UsecaseConfig {
       paymentRepositoryImp = PaymentRepositoryImpl( paymentDataSourcesImp: paymentDataSourcesImp!, );
       bannersRepositoryImp = BannersRepositoryImp(bannersDataSourcesImp: bannersDataSourcesImp!);
       addressesRepositoryImp = AddressesRepositoryImp(addressesDataSourcesImp: addressesDataSourcesImp!);
+      subscriptionRepositoryImp = SubscriptionRepositoryImp(subscriptionDataSourcesImp: subscriptionDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -132,6 +153,13 @@ class UsecaseConfig {
       paymentMethodsDefaulUsecase = PaymentMethodsDefaulUsecase(repository: paymentRepositoryImp!);
       
       getBannersUsecase = GetBannersUsecase(repository: bannersRepositoryImp!);
+
+      changeSubscriptionPlanUsecase = ChangeSubscriptionPlanUsecase(subscriptionRepository: subscriptionRepositoryImp!);
+      postCancelSubcriptionUsecase = PostCancelSubcriptionUsecase(subscriptionRepository: subscriptionRepositoryImp!);
+      postReactivateSubscriptionUsecase = PostReactivateSubscriptionUsecase(subscriptionRepository: subscriptionRepositoryImp!);
+      postSubscribeToPlanUsecase = PostSubscribeToPlanUsecase(subscriptionRepository: subscriptionRepositoryImp!);
+      getAllPlansUsecase = GetAllPlansUsecase(subscriptionRepository: subscriptionRepositoryImp!);
+      getMySubscriptionUsecase = GetMySubscriptionUsecase(subscriptionRepository: subscriptionRepositoryImp!);
       
 
     

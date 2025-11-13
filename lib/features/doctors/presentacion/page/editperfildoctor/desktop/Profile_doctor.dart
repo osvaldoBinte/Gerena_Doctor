@@ -367,7 +367,8 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         ),
                       ),
                       const Spacer(),
-                      SizedBox(
+                      
+                      /*SizedBox(
                         width: 100,
                         child: GerenaColors.widgetButton(
                           onPressed: () {
@@ -377,7 +378,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                           borderRadius: 5,
                           showShadow: false,
                         ),
-                      ),
+                      ),*/
                     ],
                   );
                 },
@@ -467,6 +468,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     ),
                   ),
                   const SizedBox(width: 15),
+                  
                   Flexible(
                     flex: 3,
                     child: Align(
@@ -475,7 +477,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         padding: const EdgeInsets.only(bottom: 2.0),
                         child: SizedBox(
                           width: 100,
-                          child: GerenaColors.widgetButton(
+                          /*child: GerenaColors.widgetButton(
                             onPressed: () {
                               print('Guardando formación académica 1');
                               // Aquí puedes implementar la lógica de guardado
@@ -483,7 +485,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                             text: 'GUARDAR',
                             showShadow: false,
                             borderRadius: 5,
-                          ),
+                          ),*/
                         ),
                       ),
                     ),
@@ -511,7 +513,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         padding: const EdgeInsets.only(bottom: 2.0),
                         child: SizedBox(
                           width: 100,
-                          child: GerenaColors.widgetButton(
+                         /* child: GerenaColors.widgetButton(
                             onPressed: () {
                               print('Guardando certificaciones');
                               // Aquí puedes implementar la lógica de guardado
@@ -519,7 +521,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                             text: 'GUARDAR',
                             showShadow: false,
                             borderRadius: 5,
-                          ),
+                          ),*/
                         ),
                       ),
                     ),

@@ -56,7 +56,7 @@ class DoctosDataSourcesImp {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
         
-        final List doctores = responseDecode['disponibilidad'];
+        final List doctores = responseDecode;
         return doctores.map((json) => DoctorAvailabilityModel.fromJson(json)).toList();
       }
       
@@ -68,5 +68,6 @@ class DoctosDataSourcesImp {
       throw Exception('$e');
     }
   }
+  
 
 }

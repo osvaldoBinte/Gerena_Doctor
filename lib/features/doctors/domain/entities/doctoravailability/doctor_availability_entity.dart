@@ -1,19 +1,17 @@
 class DoctorAvailabilityEntity {
-  final String fecha;
-  final String diaNombre;
-  final List<HorariosDisponiblesEntity> horariosDisponibles;
-  
-  DoctorAvailabilityEntity({
-    required this.fecha,
-    required this.diaNombre,
-    required this.horariosDisponibles,
-  });
-}
+   final int id;
+  final int doctorId;
+  final String diaSemana;
+  final String horaInicio;
+  final String horaFin;
+  final bool activo;
 
-class HorariosDisponiblesEntity {
-  final String hora;
-  
-  HorariosDisponiblesEntity({
-    required this.hora,
+  DoctorAvailabilityEntity({
+    required this.id,
+    required this.doctorId,
+    required this.diaSemana,
+    required this.horaInicio,
+    required this.horaFin,
+    required this.activo,
   });
 }

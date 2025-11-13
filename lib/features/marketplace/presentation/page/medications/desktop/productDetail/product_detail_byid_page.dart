@@ -299,76 +299,105 @@ class _ProductInfoSectionState extends State<ProductInfoSection> {
               ),
             ),
             const SizedBox(height: 24),
+       Column(
+  children: [
+    // Botón "Agregar al Carrito" - ocultar en modo buyNow
+    Obx(() {
+      if (cartController.isBuyNowModeActive.value) {
+        // Si estamos en modo buyNow, mostrar botón para volver al carrito normal
+        return GerenaColors.widgetButton(
+          text: 'VOLVER AL CARRITO',
+          onPressed: () async {
+            // Cancelar buyNow y volver al carrito
+            await cartController.clearBuyNow();
+            cartController.isBuyNowModeActive.value = false;
+            await cartController.loadCartFromPreferences();
             
-            Column(
-              children: [
-                GerenaColors.widgetButton(
-                  text: 'AGREGAR AL CARRITO',
-                  onPressed: () async {
-                    final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
-                    final precio = double.tryParse(
-                      widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
-                    );
-                    
-                    if (medicamentoId != null && precio != null && medicamentoId > 0) {
-                      await cartController.addToCart(
-                        medicamentoId: medicamentoId,
-                        precio: precio,
-                        cantidad: 1,
-                      );
-                    } else {
-                      Get.snackbar(
-                        'Error',
-                        'No se pudo agregar el producto al carrito',
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    }
-                  },
-                  backgroundColor: GerenaColors.secondaryColor,
-                  textColor: GerenaColors.textLightColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  borderRadius: 25,
-                  showShadow: false,
-                ),
-                const SizedBox(height: 12),
-                GerenaColors.widgetButton(
-                  text: 'COMPRAR AHORA',
-                  onPressed: () async {
-                    final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
-                    final precio = double.tryParse(
-                      widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
-                    );
-                    
-                    if (medicamentoId != null && precio != null && medicamentoId > 0) {
-                      await cartController.addToCart(
-                        medicamentoId: medicamentoId,
-                        precio: precio,
-                        cantidad: 1,
-                      );
-                           final navigationController = Get.find<ShopNavigationController>();
-
-                                    navigationController.navigateToCart();
-                                Get.to(() => GlobalShopInterface());
-                    } else {
-                      Get.snackbar(
-                        'Error',
-                        'No se pudo agregar el producto al carrito',
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    }
-                  },
-                  backgroundColor: GerenaColors.primaryColor,
-                  textColor: GerenaColors.textLightColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  padding: const EdgeInsets.symmetric(vertical: 2),
-                  borderRadius: 25,
-                  showShadow: false,
-                ),
-              ],
-            ),
+            Get.snackbar(
+              'Carrito restaurado',
+              'Has vuelto a tu carrito normal',
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          },
+          backgroundColor: Colors.grey,
+          textColor: GerenaColors.textLightColor,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          borderRadius: 25,
+          showShadow: false,
+        );
+      } else {
+        // Modo normal - mostrar botón de agregar al carrito
+        return GerenaColors.widgetButton(
+          text: 'AGREGAR AL CARRITO',
+          onPressed: () async {
+            final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
+            final precio = double.tryParse(
+              widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
+            );
+            
+            if (medicamentoId != null && precio != null && medicamentoId > 0) {
+              await cartController.addToCart(
+                medicamentoId: medicamentoId,
+                precio: precio,
+                cantidad: 1,
+              );
+            } else {
+              Get.snackbar(
+                'Error',
+                'No se pudo agregar el producto al carrito',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+            }
+          },
+          backgroundColor: GerenaColors.secondaryColor,
+          textColor: GerenaColors.textLightColor,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          padding: const EdgeInsets.symmetric(vertical: 2),
+          borderRadius: 25,
+          showShadow: false,
+        );
+      }
+    }),
+    const SizedBox(height: 12),
+    GerenaColors.widgetButton(
+      text: 'COMPRAR AHORA',
+      onPressed: () async {
+        final medicamentoId = int.tryParse(widget.product['id'] ?? '0');
+        final precio = double.tryParse(
+          widget.product['price']?.replaceAll(' MXN', '').replaceAll(',', '') ?? '0'
+        );
+        
+        if (medicamentoId != null && precio != null && medicamentoId > 0) {
+          await cartController.buyNow(
+            medicamentoId: medicamentoId,
+            precio: precio,
+            cantidad: 1,
+          );
+          
+          final navigationController = Get.find<ShopNavigationController>();
+          navigationController.navigateToCart();
+          Get.to(() => GlobalShopInterface());
+        } else {
+          Get.snackbar(
+            'Error',
+            'No se pudo preparar la compra',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+      },
+      backgroundColor: GerenaColors.primaryColor,
+      textColor: GerenaColors.textLightColor,
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      borderRadius: 25,
+      showShadow: false,
+    ),
+  ],
+),
             const SizedBox(height: 16),
           ],
         ),

@@ -11,6 +11,7 @@ import 'package:gerena/features/marketplace/domain/usecase/pay_order_usecase.dar
 import 'package:gerena/features/marketplace/domain/usecase/payment/payment_methods_defaul_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:gerena/framework/preferences_service.dart';
 import 'package:get/get.dart';
 
@@ -19,13 +20,13 @@ class ShoppingCartController extends GetxController {
   final CreateOrderUsecase createOrderUsecase;
   final PayOrderUsecase payOrderUsecase;
   final PreferencesUser _prefs = PreferencesUser();
-    final PaymentMethodsDefaulUsecase paymentMethodsDefaulUsecase; // ✅ AGREGAR
+  final PaymentMethodsDefaulUsecase paymentMethodsDefaulUsecase;
 
   ShoppingCartController({
     required this.shoppingCartUsecase,
     required this.createOrderUsecase,
     required this.payOrderUsecase,
-    required this.paymentMethodsDefaulUsecase, // ✅ AGREGAR
+    required this.paymentMethodsDefaulUsecase,
   });
   
   final RxList<ShoppingCartPostEntity> cartItems = <ShoppingCartPostEntity>[].obs;
@@ -33,128 +34,165 @@ class ShoppingCartController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   
-  // Gestión del método de pago y dirección seleccionados
   final RxString selectedPaymentMethodId = ''.obs;
   final RxString selectedAddressId = ''.obs;
   final RxBool isProcessingPayment = false.obs;
   
+  // 👇 Agregar esta variable para saber en qué modo estamos
+  final RxBool isBuyNowModeActive = false.obs;
+  
   @override
   void onInit() {
     super.onInit();
-    loadCartFromPreferences();
+    _checkAndLoadCart();
   }
   
-  // Seleccionar método de pago
+  // 👇 Nuevo método que decide qué cargar
+  Future<void> _checkAndLoadCart() async {
+    // Primero verificar si hay un buyNow activo
+    final buyNowJson = await _prefs.loadPrefs(
+      type: String, 
+      key: AppConstants.buynowKey
+    );
+    
+    if (buyNowJson != null && buyNowJson.isNotEmpty) {
+      isBuyNowModeActive.value = true;
+      await loadBuyNowFromPreferences();
+    } else {
+      isBuyNowModeActive.value = false;
+      await loadCartFromPreferences();
+    }
+  }
+  
   void selectPaymentMethod(String paymentMethodId) {
     selectedPaymentMethodId.value = paymentMethodId;
     print('💳 Método de pago seleccionado: $paymentMethodId');
   }
   
- // Seleccionar dirección
-void selectAddress(String? addressId) {
-  if (addressId == null || addressId.isEmpty) {
-    selectedAddressId.value = '';
-    print('⚠️ Dirección vacía o nula');
+  void selectAddress(String? addressId) {
+    if (addressId == null || addressId.isEmpty) {
+      selectedAddressId.value = '';
+      print('⚠️ Dirección vacía o nula');
+      return;
+    }
+    
+    selectedAddressId.value = addressId;
+    print('📍 Dirección seleccionada en controller: $addressId');
+  }
+Future<void> confirmPurchase() async {
+  if (selectedPaymentMethodId.value.isEmpty) {
+    showErrorSnackbar('Por favor selecciona un método de pago');
     return;
   }
   
-  selectedAddressId.value = addressId;
-  print('📍 Dirección seleccionada en controller: $addressId');
-}
+  if (selectedAddressId.value.isEmpty) {
+    showErrorSnackbar('Por favor selecciona una dirección de entrega');
+    return;
+  }
   
-
-  // Confirmar compra
-  Future<void> confirmPurchase() async {
-    if (selectedPaymentMethodId.value.isEmpty) {
-      showErrorSnackbar('Por favor selecciona un método de pago');
+  if (cartItems.isEmpty) {
+    showErrorSnackbar('El carrito está vacío');
+    return;
+  }
+  
+  final response = cartResponse.value;
+  if (response != null) {
+    final hasOutOfStock = response.itenms.any((item) => item.sinStock);
+    if (hasOutOfStock) {
+      showErrorSnackbar('Hay productos sin stock en tu carrito');
       return;
-    }
-    
-    if (selectedAddressId.value.isEmpty) {
-      showErrorSnackbar('Por favor selecciona una dirección de entrega');
-      return;
-    }
-    
-    if (cartItems.isEmpty) {
-      showErrorSnackbar('El carrito está vacío');
-      return;
-    }
-    
-    // Verificar que no haya productos sin stock
-    final response = cartResponse.value;
-    if (response != null) {
-      final hasOutOfStock = response.itenms.any((item) => item.sinStock);
-      if (hasOutOfStock) {
-        showErrorSnackbar('Hay productos sin stock en tu carrito');
-        return;
-      }
-    }
-    
-    try {
-      isProcessingPayment.value = true;
-      
-      print('🛒 Confirmando compra...');
-      print('💳 Payment Method ID: ${selectedPaymentMethodId.value}');
-      print('📍 Address ID: ${selectedAddressId.value}');
-      
-      // ✅ PASO 0: Establecer la tarjeta seleccionada como predeterminada
-      try {
-        final paymentMethodId = int.parse(selectedPaymentMethodId.value);
-        await paymentMethodsDefaulUsecase.execute(paymentMethodId);
-        print('✅ Tarjeta establecida como predeterminada: $paymentMethodId');
-      } catch (e) {
-        print('⚠️ Error al establecer tarjeta predeterminada: $e');
-        // Continuar aunque falle, ya que el pago puede proceder de todos modos
-      }
-      
-      // PASO 1: Obtener la dirección del AddressesController
-      final addressesController = Get.find<AddressesController>();
-      final selectedAddress = addressesController.selectedAddress.value;
-      
-      if (selectedAddress == null) {
-        showErrorSnackbar('No se encontró la dirección seleccionada');
-        return;
-      }
-      
-      // PASO 2: Crear la orden
-      final fullAddress = '${selectedAddress.street} ${selectedAddress.exteriorNumber}'
-          '${selectedAddress.interiorNumber.isNotEmpty ? ', Int. ${selectedAddress.interiorNumber}' : ''}, '
-          '${selectedAddress.neighborhood}';
-      
-      final items = cartItems.map((item) => ItemEntity(
-        medicamentoId: item.medicamentoId,
-        quantity: item.cantidad,
-      )).toList();
-      
-      final orderEntity = CreateNewOrderEntity(
-        items: items,
-        direccionEnvio: fullAddress,
-        ciudad: selectedAddress.city,
-        codigoPostal: int.parse(selectedAddress.postalCode),
-      );
-      
-      final orderResponse = await createOrderUsecase.createaneworder(orderEntity);
-      print('✅ Orden creada: ${orderResponse.orderId}');
-      
-      // PASO 3: Procesar el pago
-      await payOrderUsecase.execute(orderResponse.orderId);
-      print('✅ Pago procesado exitosamente');
-      
-      showSuccessSnackbar('¡Compra confirmada exitosamente!');
-      
-      // Limpiar carrito después de compra exitosa
-      await clearCart();
-      
-      // TODO: Navegar a página de confirmación
-      // Get.offAllNamed('/order-confirmation', arguments: orderResponse.orderId);
-      
-    } catch (e, stackTrace) {
-      print('❌ Error al confirmar compra: $e\n$stackTrace');
-      showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
-    } finally {
-      isProcessingPayment.value = false;
     }
   }
+  
+  try {
+    isProcessingPayment.value = true;
+    
+    print('🛒 Confirmando compra...');
+    print('💳 Payment Method ID: ${selectedPaymentMethodId.value}');
+    print('📍 Address ID: ${selectedAddressId.value}');
+    
+    try {
+      final paymentMethodId = int.parse(selectedPaymentMethodId.value);
+      await paymentMethodsDefaulUsecase.execute(paymentMethodId);
+      print('✅ Tarjeta establecida como predeterminada: $paymentMethodId');
+    } catch (e) {
+      print('⚠️ Error al establecer tarjeta predeterminada: $e');
+    }
+    
+    final addressesController = Get.find<AddressesController>();
+    final selectedAddress = addressesController.selectedAddress.value;
+    
+    if (selectedAddress == null) {
+      showErrorSnackbar('No se encontró la dirección seleccionada');
+      return;
+    }
+    
+    final fullAddress = '${selectedAddress.street} ${selectedAddress.exteriorNumber}'
+        '${selectedAddress.interiorNumber.isNotEmpty ? ', Int. ${selectedAddress.interiorNumber}' : ''}, '
+        '${selectedAddress.neighborhood}';
+    
+    final items = cartItems.map((item) => ItemEntity(
+      medicamentoId: item.medicamentoId,
+      quantity: item.cantidad,
+    )).toList();
+    
+    final orderEntity = CreateNewOrderEntity(
+      items: items,
+      direccionEnvio: fullAddress,
+      ciudad: selectedAddress.city,
+      codigoPostal: int.parse(selectedAddress.postalCode),
+    );
+    
+    final orderResponse = await createOrderUsecase.createaneworder(orderEntity);
+    print('✅ Orden creada: ${orderResponse.orderId}');
+    
+    await payOrderUsecase.execute(orderResponse.orderId);
+    print('✅ Pago procesado exitosamente');
+    
+    showSuccessSnackbar('¡Compra confirmada exitosamente!');
+    
+    // 👇 AQUÍ ES DONDE VA LA NAVEGACIÓN
+    // Guardar si estábamos en modo buyNow antes de limpiar
+    final wasBuyNowMode = isBuyNowModeActive.value;
+    
+    // Limpiar según el modo
+    if (isBuyNowModeActive.value) {
+      await clearBuyNow();
+      isBuyNowModeActive.value = false;
+      await loadCartFromPreferences();
+    } else {
+      await clearCart();
+    }
+    
+    // 👇 NAVEGACIÓN SEGÚN EL MODO
+    if (wasBuyNowMode) {
+      // Si fue "Comprar Ahora", ir a la tienda/ofertas
+      print('🎉 Navegando a tienda después de Comprar Ahora');
+      
+      Get.find<ShopNavigationController>().navigateToStore();
+      Get.to(
+        () => GlobalShopInterface(),
+        arguments: {
+          'categoryName': '',
+          'showOffers': true,
+        },
+      );
+    } else {
+      // Si fue carrito normal, puedes ir a otra página o quedarte
+      print('🎉 Compra desde carrito normal completada');
+      
+      // Opcional: navegar a pedidos o quedarse en la misma página
+      // Get.find<ShopNavigationController>().navigateToOrders();
+      // O simplemente no hacer nada y quedarse donde está
+    }
+    
+  } catch (e, stackTrace) {
+    print('❌ Error al confirmar compra: $e\n$stackTrace');
+    showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
+  } finally {
+    isProcessingPayment.value = false;
+  }
+}
   
   Future<void> loadCartFromPreferences() async {
     try {
@@ -174,6 +212,10 @@ void selectAddress(String? addressId) {
         }).toList();
         
         await validateCart();
+      } else {
+        // Si no hay carrito, limpiar items
+        cartItems.clear();
+        cartResponse.value = null;
       }
     } catch (e, stackTrace) {
       error.value = 'Error al cargar el carrito: $e';
@@ -208,6 +250,13 @@ void selectAddress(String? addressId) {
     int cantidad = 1,
   }) async {
     try {
+      // 👇 Si estamos en modo buyNow, salir de él primero
+      if (isBuyNowModeActive.value) {
+        await clearBuyNow();
+        isBuyNowModeActive.value = false;
+        await loadCartFromPreferences();
+      }
+      
       final existingIndex = cartItems.indexWhere(
         (item) => item.medicamentoId == medicamentoId
       );
@@ -226,7 +275,8 @@ void selectAddress(String? addressId) {
           precioGuardado: precio,
         ));
       }
-            showSuccessSnackbar('AGREGADO AL CARRITO EXITOSAMENTE');
+      
+      showSuccessSnackbar('AGREGADO AL CARRITO EXITOSAMENTE');
 
       await saveCartToPreferences();
       await validateCart();
@@ -257,7 +307,13 @@ void selectAddress(String? addressId) {
           precioGuardado: cartItems[index].precioGuardado,
         );
         
-        await saveCartToPreferences();
+        // 👇 Guardar según el modo
+        if (isBuyNowModeActive.value) {
+          await _saveBuyNowToPreferences();
+        } else {
+          await saveCartToPreferences();
+        }
+        
         await validateCart();
       } else {
         print('⚠️ Producto no encontrado en el carrito');
@@ -273,7 +329,14 @@ void selectAddress(String? addressId) {
     try {
       cartItems.removeWhere((item) => item.medicamentoId == medicamentoId);
       
-      await saveCartToPreferences();
+      // 👇 Guardar según el modo
+      if (isBuyNowModeActive.value) {
+        await clearBuyNow();
+        isBuyNowModeActive.value = false;
+      } else {
+        await saveCartToPreferences();
+      }
+      
       await validateCart();
       
       showSuccessSnackbar('Producto removido del carrito');
@@ -334,7 +397,6 @@ void selectAddress(String? addressId) {
     return item?.cantidad ?? 0;
   }
   
-  // Verificar si se puede confirmar la compra
   bool get canConfirmPurchase {
     return cartItems.isNotEmpty &&
            selectedPaymentMethodId.value.isNotEmpty &&
@@ -343,14 +405,10 @@ void selectAddress(String? addressId) {
            !isLoading.value;
   }
 
-
-
-  // ✅ NUEVO MÉTODO: Establecer tarjeta como predeterminada
   Future<void> setDefaultPaymentMethod(String paymentMethodId) async {
     try {
       isLoading.value = true;
       
-      // Convertir String ID a int
       final int id = int.parse(paymentMethodId);
       
       print('💳 Estableciendo tarjeta predeterminada: $id');
@@ -358,7 +416,6 @@ void selectAddress(String? addressId) {
       await paymentMethodsDefaulUsecase.execute(id);
       
       print('✅ Tarjeta predeterminada actualizada');
-      
       
       showSuccessSnackbar('Tarjeta predeterminada actualizada');
       
@@ -370,4 +427,116 @@ void selectAddress(String? addressId) {
     }
   }
   
+  // 👇 Sistema de "Comprar Ahora"
+  Future<void> buyNow({
+    required int medicamentoId,
+    required double precio,
+    int cantidad = 1,
+  }) async {
+    try {
+      // Activar modo buyNow
+      isBuyNowModeActive.value = true;
+      
+      // Limpiar cualquier buyNow anterior
+      await clearBuyNow();
+      
+      // Crear el item temporal
+      final buyNowItem = ShoppingCartPostEntity(
+        medicamentoId: medicamentoId,
+        cantidad: cantidad,
+        precioGuardado: precio,
+      );
+      
+      // Reemplazar cartItems con el producto de buyNow
+      cartItems.clear();
+      cartItems.add(buyNowItem);
+      
+      // Guardar en buyNowKey
+      await _saveBuyNowToPreferences();
+      
+      await validateCart();
+      
+      showSuccessSnackbar('¡PRODUCTO LISTO PARA COMPRAR!');
+      
+      print('🛍️ Comprar Ahora: producto $medicamentoId preparado');
+      
+    } catch (e, stackTrace) {
+      error.value = 'Error al preparar compra: $e';
+      print('❌ Error en buyNow: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo preparar la compra');
+    }
+  }
+
+  // 👇 Método privado para guardar buyNow
+  Future<void> _saveBuyNowToPreferences() async {
+    try {
+      if (cartItems.isEmpty) return;
+      
+      final item = cartItems.first;
+      final itemJson = json.encode({
+        'medicamentoId': item.medicamentoId,
+        'cantidad': item.cantidad,
+        'precioGuardado': item.precioGuardado,
+      });
+      
+      _prefs.savePrefs(
+        type: String, 
+        key: AppConstants.buynowKey, 
+        value: itemJson
+      );
+      
+      print('💾 BuyNow guardado');
+    } catch (e) {
+      print('❌ Error al guardar buyNow: $e');
+    }
+  }
+
+  Future<void> loadBuyNowFromPreferences() async {
+    try {
+      final buyNowJson = await _prefs.loadPrefs(
+        type: String, 
+        key: AppConstants.buynowKey
+      );
+      
+      if (buyNowJson != null && buyNowJson.isNotEmpty) {
+        final Map<String, dynamic> decoded = json.decode(buyNowJson);
+        
+        final buyNowItem = ShoppingCartPostEntity(
+          medicamentoId: decoded['medicamentoId'],
+          cantidad: decoded['cantidad'],
+          precioGuardado: decoded['precioGuardado'].toDouble(),
+        );
+        
+        cartItems.clear();
+        cartItems.add(buyNowItem);
+        
+        await validateCart();
+        
+        print('🛍️ Producto "Comprar Ahora" cargado');
+      }
+    } catch (e, stackTrace) {
+      print('⚠️ Error al cargar buyNow: $e\n$stackTrace');
+    }
+  }
+
+  Future<void> clearBuyNow() async {
+    try {
+      await _prefs.clearOnePreference(key: AppConstants.buynowKey);
+      print('🧹 BuyNow limpiado');
+    } catch (e) {
+      print('⚠️ Error al limpiar buyNow: $e');
+    }
+  }
+
+  Future<bool> isBuyNowMode() async {
+    try {
+      final buyNowJson = await _prefs.loadPrefs(
+        type: String, 
+        key: AppConstants.buynowKey
+      );
+      return buyNowJson != null && buyNowJson.isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
 }

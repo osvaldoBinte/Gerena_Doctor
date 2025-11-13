@@ -1249,12 +1249,15 @@ static Widget createSearchContainer({
       ),
     ),
   );
-}
-
-static Widget buildLabeledTextField(
+}static Widget buildLabeledTextField(
   String label, 
   String initialValue,
-  {TextEditingController? controller, String? hintText}
+  {
+    TextEditingController? controller, 
+    String? hintText,
+    String? errorText, // ✅ Nuevo parámetro para mostrar error
+    bool showError = false, // ✅ Para controlar si se muestra el error
+  }
 ) {
   final textController = controller ?? TextEditingController(text: initialValue);
   
@@ -1277,10 +1280,16 @@ static Widget buildLabeledTextField(
           color: Colors.black,
         ),
         decoration: InputDecoration(
-          hintText: initialValue.isEmpty ? hintText : null, // Solo muestra hint si está vacío
+          hintText: initialValue.isEmpty ? hintText : null,
           hintStyle: GoogleFonts.rubik(
             color: GerenaColors.textSecondaryColor.withOpacity(0.6),
             fontSize: 16,
+          ),
+          // ✅ Mensaje de error
+          errorText: showError ? errorText : null,
+          errorStyle: GoogleFonts.rubik(
+            color: GerenaColors.errorColor,
+            fontSize: 12,
           ),
           filled: true,
           fillColor: Colors.transparent,
@@ -1288,13 +1297,37 @@ static Widget buildLabeledTextField(
             horizontal: 20,
             vertical: 9,
           ),
+          // ✅ Borde normal
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(0),
-            borderSide: BorderSide(color: GerenaColors.colorinput),
+            borderSide: BorderSide(
+              color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
+              width: showError ? 1.5 : 1,
+            ),
           ),
+          // ✅ Borde enfocado
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(0),
-            borderSide: BorderSide(color: GerenaColors.colorinput),
+            borderSide: BorderSide(
+              color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
+              width: showError ? 1.5 : 1,
+            ),
+          ),
+          // ✅ Borde de error
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0),
+            borderSide: BorderSide(
+              color: GerenaColors.errorColor,
+              width: 1.5,
+            ),
+          ),
+          // ✅ Borde de error enfocado
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0),
+            borderSide: BorderSide(
+              color: GerenaColors.errorColor,
+              width: 1.5,
+            ),
           ),
           isDense: true,
         ),

@@ -16,6 +16,7 @@ import 'package:gerena/features/marketplace/presentation/page/medications/get_me
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_datail_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
+import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:gerena/movil/perfil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
@@ -68,6 +69,12 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.payOrderUsecase!, permanent: true);
         Get.put(usecaseConfig.getAddressesUsecase!, permanent: true);
         Get.put(usecaseConfig.createOrderUsecase!, permanent: true);
+        Get.put(usecaseConfig.changeSubscriptionPlanUsecase!, permanent: true);
+        Get.put(usecaseConfig.postCancelSubcriptionUsecase!, permanent: true);
+        Get.put(usecaseConfig.postReactivateSubscriptionUsecase!, permanent: true);
+        Get.put(usecaseConfig.postSubscribeToPlanUsecase!, permanent: true);
+        Get.put(usecaseConfig.getAllPlansUsecase!, permanent: true);
+        Get.put(usecaseConfig.getMySubscriptionUsecase!, permanent: true);
 
 
 
@@ -84,6 +91,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => AddressesController(getAddressesUsecase:  Get.find()), fenix: true,);
         Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
+        Get.lazyPut(() => SubscriptionController( getAllPlansUsecase: Get.find(), postSubscribeToPlanUsecase: Get.find(), getMySubscriptionUsecase: Get.find(), changeSubscriptionPlanUsecase: Get.find(), postCancelSubcriptionUsecase: Get.find(), ), fenix: true,);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

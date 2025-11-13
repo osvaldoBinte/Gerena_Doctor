@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
+import 'package:gerena/features/subscription/presentation/page/membresia/membresia.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
-import 'package:gerena/page/dashboard/widget/membresia/membresia.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
 import 'package:gerena/page/portafolio/doctor_profile_page.dart';
 import 'package:gerena/page/dashboard/widget/preguntasFrecuentes/preguntas_frecuentes.dart';
