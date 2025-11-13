@@ -307,4 +307,34 @@ Future<void> confirmpayment(int id, String token) async {
     throw Exception('$e');
   }
 }
+
+
+  Future<void> savecard( String paymentMethodId, String token) async {
+    try {
+      Uri url = Uri.parse('${AppConstants.serverBase}/doctores/payment-methods');
+      final response = await http.post(url,
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token'
+          },
+          body: jsonEncode(<String, dynamic>{
+            'paymentMethodId': paymentMethodId,
+          }));
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+      
+    }
+  } 
 }

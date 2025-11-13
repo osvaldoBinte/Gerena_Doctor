@@ -8,6 +8,7 @@ import 'package:gerena/features/marketplace/domain/usecase/payment/attach_paymen
 import 'package:gerena/features/marketplace/domain/usecase/payment/create_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_methods_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/savecard_usecase.dart';
 import 'package:get/get.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -17,6 +18,7 @@ class PaymentCartController extends GetxController {
   final CreatePaymentMethodUsecase createPaymentMethodUsecase;
   final AttachPaymentMethodToCustomerUsecase attachPaymentMethodToCustomerUsecase;
   final DeletePaymentMethodUsecase deletePaymentMethodUsecase;
+  final SavecardUsecase savecardUsecase;
   final AuthService authService = AuthService();
 
   PaymentCartController({
@@ -24,6 +26,7 @@ class PaymentCartController extends GetxController {
     required this.createPaymentMethodUsecase,
     required this.attachPaymentMethodToCustomerUsecase,
     required this.deletePaymentMethodUsecase,
+    required this.savecardUsecase,
   });
 
   // Observables
@@ -178,6 +181,10 @@ class PaymentCartController extends GetxController {
       );
       print('✅ Payment method adjuntado');
 
+      print('💾 Paso 3: Guardando tarjeta en backend...');
+      await savecardUsecase.execute(paymentMethod.id);
+      print('✅ Tarjeta guardada en backend');
+
       paymentMethods.add(paymentMethod);
       showSuccessSnackbar('Tarjeta agregada correctamente');
     } catch (e) {
@@ -189,65 +196,69 @@ class PaymentCartController extends GetxController {
     }
   }
 
- /// Agregar payment method manualmente (escritorio)
-Future<void> addPaymentMethodManual({String? cardholderName}) async {
-  try {
-    isLoading.value = true;
+  /// Agregar payment method manualmente (escritorio)
+  Future<void> addPaymentMethodManual({String? cardholderName}) async {
+    try {
+      isLoading.value = true;
 
-    // Parsear datos
-    final cardNumber = cardNumberController.text.replaceAll(' ', '');
-    final expiryParts = expiryController.text.split('/');
-    final expMonth = int.parse(expiryParts[0].trim());
-    final expYear = int.parse('20${expiryParts[1].trim()}');
-    final cvc = cvcController.text;
+      // Parsear datos
+      final cardNumber = cardNumberController.text.replaceAll(' ', '');
+      final expiryParts = expiryController.text.split('/');
+      final expMonth = int.parse(expiryParts[0].trim());
+      final expYear = int.parse('20${expiryParts[1].trim()}');
+      final cvc = cvcController.text;
 
-    print('💳 Paso 1: Creando payment method con datos manuales...');
-    
-    // Crear PaymentMethod usando Stripe SDK
-    final billingDetails = BillingDetails(
-      name: cardholderName,
-    );
+      print('💳 Paso 1: Creando payment method con datos manuales...');
+      
+      // Crear PaymentMethod usando Stripe SDK
+      final billingDetails = BillingDetails(
+        name: cardholderName,
+      );
 
-    final paymentMethodParams = PaymentMethodParams.card(
-      paymentMethodData: PaymentMethodData(
-        billingDetails: billingDetails,
-      ),
-    );
+      final paymentMethodParams = PaymentMethodParams.card(
+        paymentMethodData: PaymentMethodData(
+          billingDetails: billingDetails,
+        ),
+      );
 
-    // Crear el payment method
-    final paymentMethodResult = await Stripe.instance.createPaymentMethod(
-      params: paymentMethodParams,
-    );
+      // Crear el payment method
+      final paymentMethodResult = await Stripe.instance.createPaymentMethod(
+        params: paymentMethodParams,
+      );
 
-    print('✅ Payment method creado: ${paymentMethodResult.id}');
+      print('✅ Payment method creado: ${paymentMethodResult.id}');
 
-    print('🔗 Paso 2: Adjuntando al customer...');
-    await attachPaymentMethodToCustomerUsecase.execute(
-      paymentMethodId: paymentMethodResult.id,
-      customerId: customerId.value,
-    );
-    print('✅ Payment method adjuntado');
+      print('🔗 Paso 2: Adjuntando al customer...');
+      await attachPaymentMethodToCustomerUsecase.execute(
+        paymentMethodId: paymentMethodResult.id,
+        customerId: customerId.value,
+      );
+      print('✅ Payment method adjuntado');
 
-    // Convertir a entidad y agregar a la lista
-    final paymentMethodEntity = PaymentMethodEntity(
-      id: paymentMethodResult.id,
-      last4: paymentMethodResult.card.last4 ?? '',
-      brand: paymentMethodResult.card.brand ?? 'unknown', // ✅ Cambiado aquí
-      expMonth: paymentMethodResult.card.expMonth ?? 0,
-      expYear: paymentMethodResult.card.expYear ?? 0,
-      cardholderName: cardholderName,
-    );
+      print('💾 Paso 3: Guardando tarjeta en backend...');
+      await savecardUsecase.execute(paymentMethodResult.id);
+      print('✅ Tarjeta guardada en backend');
 
-    paymentMethods.add(paymentMethodEntity);
-    showSuccessSnackbar('Tarjeta agregada correctamente');
-  } catch (e) {
-    print('❌ Error: $e');
-    showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
-    rethrow;
-  } finally {
-    isLoading.value = false;
+      // Convertir a entidad y agregar a la lista
+      final paymentMethodEntity = PaymentMethodEntity(
+        id: paymentMethodResult.id,
+        last4: paymentMethodResult.card.last4 ?? '',
+        brand: paymentMethodResult.card.brand ?? 'unknown',
+        expMonth: paymentMethodResult.card.expMonth ?? 0,
+        expYear: paymentMethodResult.card.expYear ?? 0,
+        cardholderName: cardholderName,
+      );
+
+      paymentMethods.add(paymentMethodEntity);
+      showSuccessSnackbar('Tarjeta agregada correctamente');
+    } catch (e) {
+      print('❌ Error: $e');
+      showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
   }
-}
 
   /// Eliminar payment method
   Future<void> deletePaymentMethod(String paymentMethodId) async {

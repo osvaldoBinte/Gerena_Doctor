@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:get/get.dart';
@@ -55,145 +56,183 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
     );
   }
 
-  Widget _buildDoctorInfoCard() {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: GerenaColors.cardDecoration,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 100,
-              height: 120,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: GerenaColors.backgroundColorfondo,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/perfil.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: GerenaColors.backgroundColorfondo,
-                      child: const Icon(
-                        Icons.person,
-                        size: 50,
-                        color: GerenaColors.primaryColor,
-                      ),
-                    );
-                  },
+Widget _buildDoctorInfoCard() {
+  final PrefilDortorController controller = Get.find<PrefilDortorController>();
+  
+  // Usa Obx para reaccionar a cambios y verificar si hay datos
+  return Obx(() {
+    final doctor = controller.doctorProfile.value;
+    
+    // Muestra loading mientras carga
+    if (controller.isLoading.value) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: GerenaColors.cardDecoration,
+        child: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    
+    // Muestra error si no hay datos
+    if (doctor == null) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: GerenaColors.cardDecoration,
+        child: const Center(
+          child: Text('No se pudo cargar la información del doctor'),
+        ),
+      );
+    }
+    
+    // Muestra los datos del doctor
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: GerenaColors.cardDecoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 100,
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: GerenaColors.backgroundColorfondo,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            
-            const SizedBox(width: 16),
-            
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Juan Pedro González Pérez',
-                          style: GerenaColors.headingMedium.copyWith(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: doctor.foto != null && doctor.foto!.isNotEmpty
+                      ? Image.network(
+                          doctor.foto!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: GerenaColors.backgroundColorfondo,
+                              child: const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: GerenaColors.primaryColor,
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: GerenaColors.backgroundColorfondo,
+                          child: const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: GerenaColors.primaryColor,
                           ),
                         ),
-                      ),
-                     
-                    GestureDetector(
-                      onTap: () {
-                        print('Editando perfil');
-                        appBarController.navigateToProfile(); 
-                      },
-                        child: Image.asset(
-                        'assets/icons/edit.png',
-                        width: 30,
-                        height: 30,
-                        color: GerenaColors.accentColor,
-                        fit: BoxFit.contain,
-                        ),
-                    ),
-
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 6),
-                  
-                  Text(
-                    'Cirujano estético',
-                    style: GerenaColors.subtitleMedium.copyWith(
-                      color: GerenaColors.colorSubsCardSecondaryText,
-                      fontSize: 14,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 8),
-                  
-                  Text(
-                    'Clínica estética Gerena. Col. Providencia, Av. Lorem ipsum #3050, Guadalajara, Jalisco, México.',
-                    style: GerenaColors.bodySmall.copyWith(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                      height: 1.3,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  
-                  const SizedBox(height: 8),
-                  
-                  Text(
-                    'Cédula: 010101 10101 0101041',
-                    style: GerenaColors.bodySmall.copyWith(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 8),
-                  
-                  Row(
-                    children: [
-                      _buildStarRating(5.0), 
-                      const SizedBox(width: 8),
-                      Text(
-                        '404 Reseñas',
-                        style: GerenaColors.bodySmall.copyWith(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
-        ),
-        
-        const SizedBox(height: 20),
-        
-        
-      ],
-    ),
-  );
+              
+              const SizedBox(width: 16),
+              
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            doctor.nombreCompleto,
+                            style: GerenaColors.headingMedium.copyWith(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                       
+                        GestureDetector(
+                          onTap: () {
+                            print('Editando perfil');
+                            appBarController.navigateToProfile(); 
+                          },
+                          child: Image.asset(
+                            'assets/icons/edit.png',
+                            width: 30,
+                            height: 30,
+                            color: GerenaColors.accentColor,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 6),
+                    
+                    Text(
+                      doctor.especialidad,
+                      style: GerenaColors.subtitleMedium.copyWith(
+                        color: GerenaColors.colorSubsCardSecondaryText,
+                        fontSize: 14,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    Text(
+                      doctor.direccion,
+                      style: GerenaColors.bodySmall.copyWith(
+                        fontSize: 12,
+                        color: Colors.grey[700],
+                        height: 1.3,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    Text(
+                      'Cédula: ${doctor.numeroLicencia}',
+                      style: GerenaColors.bodySmall.copyWith(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // Comentado: rating y reseñas no están en la entidad
+                    // Row(
+                    //   children: [
+                    //     _buildStarRating(doctor.rating ?? 5.0), 
+                    //     const SizedBox(width: 8),
+                    //     Text(
+                    //       '${doctor.totalReviews ?? 0} Reseñas',
+                    //       style: GerenaColors.bodySmall.copyWith(
+                    //         fontSize: 12,
+                    //         color: Colors.grey[600],
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 20),
+          
+        ],
+      ),
+    );
+  });
 }
 
   Widget _buildBeforeAfterSection() {

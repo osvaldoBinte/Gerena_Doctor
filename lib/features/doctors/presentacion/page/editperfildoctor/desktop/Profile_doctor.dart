@@ -217,11 +217,11 @@ class _UserProfileContentState extends State<UserProfileContent> {
                 children: [
                   buildProfileMenuItem('Historial de pedidos'),
                   buildProfileMenuItem('Membresía'),
-                  buildProfileMenuItem('Facturación'),
+               //   buildProfileMenuItem('Facturación'),
                   buildProfileMenuItem('Cédula profesional',
                       icon: 'assets/icons/headset_mic.png'),
                   buildProfileMenuItem('Contáctanos'),
-                  buildProfileMenuItem('Sugerencias'),
+                //  buildProfileMenuItem('Sugerencias'),
                   buildProfileMenuItem('Preguntas frecuentes'),
                   GestureDetector(
                     onTap: () {

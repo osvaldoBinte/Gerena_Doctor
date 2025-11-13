@@ -7,8 +7,9 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
-import 'package:gerena/movil/perfil/procedure_Widget.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/procedure_Widget.dart';
 import 'package:gerena/movil/widgets/review_widget.dart';
 import 'package:gerena/page/dashboard/widget/estatusdepedido/estatus_de_pedido.dart';
 import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
@@ -24,8 +25,8 @@ class DoctorProfilePage extends StatefulWidget {
 class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final StartController controller = Get.find<StartController>();
   final MediaController mediaController = Get.put(MediaController());
-  final PromotionController promotionController =
-      Get.put(PromotionController());
+  final PromotionController promotionController = Get.put(PromotionController());
+  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
 
   @override
   Widget build(BuildContext context) {
@@ -202,19 +203,18 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start, 
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   MouseRegion(
                     child: Column(
                       children: [
                         buildProfileMenuItem('Historial de pedidos'),
                         buildProfileMenuItem('Membresía'),
-                        buildProfileMenuItem('Facturación'),
+                    //    buildProfileMenuItem('Facturación'),
                         buildProfileMenuItem('Cédula profesional',
                             icon: 'assets/icons/headset_mic.png'),
                         buildProfileMenuItem('Contáctanos'),
-                        buildProfileMenuItem('Sugerencias'),
+                      //  buildProfileMenuItem('Sugerencias'),
                         buildProfileMenuItem('Preguntas frecuentes'),
                         GestureDetector(
                           onTap: () {
@@ -304,119 +304,178 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
   }
 
   Widget _buildDoctorHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: GerenaColors.cardDecoration,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/perfil.png'),
-                        fit: BoxFit.fitWidth,
-                        alignment: Alignment.topCenter,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: GerenaColors.paddingExtraLarge),
-                  GerenaColors.createStarRating(rating: 5),
-                  const SizedBox(width: 4),
-                  Text(
-                    '404 reseñas',
-                    style: GoogleFonts.rubik(
-                      fontSize: 12,
-                      color: GerenaColors.primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: GerenaColors.paddingSmall),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Dr. Juan González',
-                        style: GoogleFonts.rubik(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: GerenaColors.textPrimaryColor,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Cirujano estético',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: GerenaColors.textDarkColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Ubicación: ',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          color: GerenaColors.textTertiaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: GerenaColors.paddingSmall),
-                      Text(
-                        'Clínica estética Gerena, Col. Providencia, Av. Atenas #3050, Guadalajara, Jalisco, México.',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          color: GerenaColors.textTertiaryColor,
-                        ),
-                      ),
-                      SizedBox(height: GerenaColors.paddingLarge),
-                      SizedBox(height: GerenaColors.paddingSmall),
-                      Text(
-                        'Cédula: 010101 10101 0101041',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          color: GerenaColors.textTertiaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+    return Obx(() {
+      final doctor = doctorController.doctorProfile.value;
+      
+      // Mostrar loading
+      if (doctorController.isLoading.value) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: GerenaColors.cardDecoration,
+          child: const Center(
+            child: CircularProgressIndicator(),
           ),
-          SizedBox(height: GerenaColors.paddingMedium),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        );
+      }
+      
+      // Mostrar error si no hay datos
+      if (doctor == null) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: GerenaColors.cardDecoration,
+          child: const Center(
+            child: Text('No se pudo cargar la información del doctor'),
+          ),
+        );
+      }
+      
+      // Mostrar datos del doctor
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: GerenaColors.cardDecoration,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GerenaColors.widgetButton(
-                  showShadow: false,
-                  text: 'VER COMO PACIENTE',
-                  borderRadius: 30,
+                Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: GerenaColors.backgroundColorfondo,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: doctor.foto != null && doctor.foto!.isNotEmpty
+                            ? Image.network(
+                                doctor.foto!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: GerenaColors.backgroundColorfondo,
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 50,
+                                      color: GerenaColors.primaryColor,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(
+                                color: GerenaColors.backgroundColorfondo,
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: GerenaColors.primaryColor,
+                                ),
+                              ),
+                      ),
+                    ),
+                    SizedBox(height: GerenaColors.paddingExtraLarge),
+                    // Comentado: rating no está en la entidad
+                    // GerenaColors.createStarRating(rating: doctor.rating ?? 5),
+                    GerenaColors.createStarRating(rating: 5),
+                    const SizedBox(width: 4),
+                    // Comentado: totalReviews no está en la entidad
+                    // Text(
+                    //   '${doctor.totalReviews ?? 0} reseñas',
+                    //   style: GoogleFonts.rubik(
+                    //     fontSize: 12,
+                    //     color: GerenaColors.primaryColor,
+                    //   ),
+                    // ),
+                    Text(
+                      '404 reseñas',
+                      style: GoogleFonts.rubik(
+                        fontSize: 12,
+                        color: GerenaColors.primaryColor,
+                      ),
+                    ),
+                  ],
                 ),
-                GerenaColors.widgetButton(
-                  showShadow: false,
-                  text: 'EDITAR PERFIL',
-                  borderRadius: 30,
+                const SizedBox(height: GerenaColors.paddingSmall),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          doctor.nombreCompleto,
+                          style: GoogleFonts.rubik(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: GerenaColors.textPrimaryColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          doctor.especialidad,
+                          style: GoogleFonts.rubik(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: GerenaColors.textDarkColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Ubicación: ',
+                          style: GoogleFonts.rubik(
+                            fontSize: 14,
+                            color: GerenaColors.textTertiaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: GerenaColors.paddingSmall),
+                        Text(
+                          doctor.direccion,
+                          style: GoogleFonts.rubik(
+                            fontSize: 14,
+                            color: GerenaColors.textTertiaryColor,
+                          ),
+                        ),
+                        SizedBox(height: GerenaColors.paddingLarge),
+                        SizedBox(height: GerenaColors.paddingSmall),
+                        Text(
+                          'Cédula: ${doctor.numeroLicencia}',
+                          style: GoogleFonts.rubik(
+                            fontSize: 14,
+                            color: GerenaColors.textTertiaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+            SizedBox(height: GerenaColors.paddingMedium),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GerenaColors.widgetButton(
+                    showShadow: false,
+                    text: 'VER COMO PACIENTE',
+                    borderRadius: 30,
+                  ),
+                  GerenaColors.widgetButton(
+                    showShadow: false,
+                    text: 'EDITAR PERFIL',
+                    borderRadius: 30,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildWishlistButton() {
@@ -468,7 +527,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
             Expanded(
               child: _buildProcedureCard(
                 'Prevención y Suavización de Líneas de Expresión',
-                'En este procedimiento, utilizamos Kiara Reju, un innovador tratamiento de bioestimulación dérmica, para mejorar la calidad de la piel, proporcionando hidratación profunda y un efecto rejuvenecedor visible. Beneficios del tratamiento: Hidratación intensa y mejora de la elasticidad cutánea. Reducción de líneas finas y signos de envejecimiento. Estimulación de la regeneración celular para una piel más luminosa y uniforme. Gracias a su combinación de polinucleótidos y ácido hialurónico, Kiara Reju es una solución eficaz para revitalizar la piel y restaurar su frescura de manera natural.',
+                'En este procedimiento, utilizamos Kiara Reju, un innovador tratamiento de bioestimulación dérmica, para mejorar la calidad de la piel, proporcionando hidratación profunda y un efecto rejuvenecedor visible. Beneficios del tratamiento: Hidratación intensa y mejora de la elasticidad cutánea. Reducción de líneas finas y signos de envejecimiento. Estimulación de la regeneración celular para una piel más luminosa y uniforme. Gracias a su combinación de polinucleótidos y ácido hialurónico, Kiara Reju es una solución eficaz para revitalizar la piel y restaurar su frescura de manera natural.',
                 'assets/before/beforeAndAfter.jpg',
               ),
             ),
@@ -515,14 +574,17 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
               borderRadius: GerenaColors.mediumBorderRadius,
             ),
             child: SingleChildScrollView(
-              child: ProcedureWidget(
-                title: title,
-                description: description,
-                authorName: 'Juan González',
-                imagePath: imagePath,
-                isFullView: true,
-                onClose: () => Navigator.of(context).pop(),
-              ),
+              child: Obx(() {
+                final doctor = doctorController.doctorProfile.value;
+                return ProcedureWidget(
+                  title: title,
+                  description: description,
+                  authorName: doctor?.nombreCompleto ?? 'Doctor',
+                  imagePath: imagePath,
+                  isFullView: true,
+                  onClose: () => Navigator.of(context).pop(),
+                );
+              }),
             ),
           ),
         );

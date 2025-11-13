@@ -122,7 +122,7 @@ class HistorialDePedidosContent extends StatelessWidget {
             ),
             
             const SizedBox(height: 16),
-            
+            /*
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -164,7 +164,7 @@ class HistorialDePedidosContent extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
+            ),*/
           ],
         ),
       ),

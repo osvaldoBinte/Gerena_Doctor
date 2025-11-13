@@ -18,7 +18,7 @@ import 'package:gerena/features/marketplace/presentation/page/paymentcard/paymen
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
-import 'package:gerena/movil/perfil/perfil_controller.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
@@ -75,6 +75,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.postSubscribeToPlanUsecase!, permanent: true);
         Get.put(usecaseConfig.getAllPlansUsecase!, permanent: true);
         Get.put(usecaseConfig.getMySubscriptionUsecase!, permanent: true);
+        Get.put(usecaseConfig.savecardUsecase!, permanent: true);
 
 
 
@@ -88,7 +89,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), payOrderUsecase:  Get.find(), paymentMethodsDefaulUsecase:  Get.find(), ), fenix:  true,);
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
-        Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(),), fenix: true,);
+        Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(), savecardUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => AddressesController(getAddressesUsecase:  Get.find()), fenix: true,);
         Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
         Get.lazyPut(() => SubscriptionController( getAllPlansUsecase: Get.find(), postSubscribeToPlanUsecase: Get.find(), getMySubscriptionUsecase: Get.find(), changeSubscriptionPlanUsecase: Get.find(), postCancelSubcriptionUsecase: Get.find(), ), fenix: true,);

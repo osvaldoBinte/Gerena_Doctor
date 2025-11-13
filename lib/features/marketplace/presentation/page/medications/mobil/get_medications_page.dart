@@ -59,6 +59,7 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                         onTap: () {
                           controller.clearSearch();
                           Get.back();
+                          Get.offAllNamed(RoutesNames.homePage);
                         },
                         child: Row(
                           mainAxisSize: MainAxisSize.min,

@@ -3,6 +3,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,15 +17,18 @@ class HomePageMovil extends StatefulWidget {
 
 class _GerenaFeedScreenState extends State<HomePageMovil> {
   // Obtener el controlador del calendario
-  final CalendarControllerGetx calendarController = Get.find<CalendarControllerGetx>();
+  final CalendarControllerGetx calendarController =
+      Get.find<CalendarControllerGetx>();
+  
+  // Obtener el controlador del doctor
+  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
 
-@override
-void initState() {
-  super.initState();
-  final fechaInicial = DateTime(2025, 9, 1);
-  calendarController.loadAppointmentsForDate(fechaInicial);
-}
-
+  @override
+  void initState() {
+    super.initState();
+    final fechaInicial = DateTime(2025, 9, 1);
+    calendarController.loadAppointmentsForDate(fechaInicial);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +47,8 @@ void initState() {
       ];
       return userImages[index];
     }
- List<Widget> allItems = [
+
+    List<Widget> allItems = [
       Container(
         height: availableHeight,
         child: Column(
@@ -58,40 +63,74 @@ void initState() {
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return Container(
-                      margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                      margin:
+                          const EdgeInsets.only(right: 12, top: 8, bottom: 8),
                       child: Column(
                         children: [
                           GestureDetector(
                             onTap: () {
                               print("Agregar mi historia");
                             },
-                            child: Stack(
-                              children: [
-                                GerenaColors.createStoryRing(
-                                  child: Image.asset(
-                                    'assets/perfil.png',
-                                    fit: BoxFit.cover,
+                            child: Obx(() {
+                              final doctor = doctorController.doctorProfile.value;
+                              
+                              // Determinar qué imagen mostrar
+                              Widget imageWidget;
+                              if (doctorController.isLoading.value) {
+                                // Mostrar loading
+                                imageWidget = Container(
+                                  color: GerenaColors.backgroundColorfondo,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   ),
-                                  hasStory: false,
-                                  size: 80,
-                                ),
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: SizedBox(
-                                    width: 29,
-                                    height: 29,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Image.asset(
-                                        'assets/icons/aadHistory.png',
-                                        fit: BoxFit.contain,
+                                );
+                              } else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+                                // Mostrar foto del doctor desde la red
+                                imageWidget = Image.network(
+                                  doctor.foto!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/perfil.png',
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                );
+                              } else {
+                                // Mostrar imagen por defecto
+                                imageWidget = Image.asset(
+                                  'assets/perfil.png',
+                                  fit: BoxFit.cover,
+                                );
+                              }
+                              
+                              return Stack(
+                                children: [
+                                  GerenaColors.createStoryRing(
+                                    child: imageWidget,
+                                    hasStory: false,
+                                    size: 80,
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: SizedBox(
+                                      width: 29,
+                                      height: 29,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Image.asset(
+                                          'assets/icons/aadHistory.png',
+                                          fit: BoxFit.contain,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              );
+                            }),
                           ),
                         ],
                       ),
@@ -128,7 +167,7 @@ void initState() {
                     SizedBox(height: GerenaColors.paddingMedium),
                     _buildCitasSection(),
                     SizedBox(height: GerenaColors.paddingMedium),
-                    
+
                     // ✅ Usar el widget reutilizable de banners
                     BannersListWidget(
                       height: 200,
@@ -228,11 +267,11 @@ void initState() {
             ],
           ),
           SizedBox(height: GerenaColors.paddingSmall),
-          
+
           // Usa Obx para reactividad
           Obx(() {
             // Mostrar loading
-            if (calendarController.isLoading.value && 
+            if (calendarController.isLoading.value &&
                 calendarController.appointments.isEmpty) {
               return Container(
                 height: 200,
@@ -243,10 +282,10 @@ void initState() {
                 ),
               );
             }
-            
+
             // Obtener citas futuras ordenadas
             final upcomingAppointments = _getUpcomingAppointments();
-            
+
             // Mostrar mensaje si no hay citas
             if (upcomingAppointments.isEmpty) {
               return Container(
@@ -293,7 +332,7 @@ void initState() {
                 ),
               );
             }
-            
+
             // Mostrar las citas
             return Column(
               children: [
@@ -324,193 +363,196 @@ void initState() {
   }
 
 // Obtener citas del mes actual cargado en el controller
-List<dynamic> _getUpcomingAppointments() {
-  // Obtener todas las citas del mes cargado
-  final allAppointments = calendarController.appointments.toList();
-  
-  if (allAppointments.isEmpty) {
-    return [];
+  List<dynamic> _getUpcomingAppointments() {
+    // Obtener todas las citas del mes cargado
+    final allAppointments = calendarController.appointments.toList();
+
+    if (allAppointments.isEmpty) {
+      return [];
+    }
+
+    // Ordenar por fecha
+    allAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    // Limitar a las primeras 5 citas
+    return allAppointments.take(5).toList();
   }
-  
-  // Ordenar por fecha
-  allAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
-  
-  // Limitar a las primeras 5 citas
-  return allAppointments.take(5).toList();
-}
 
   Widget _buildCitaCard(dynamic appointment) {
-  // Formatear fechas
-  final String formattedTime = _formatTime(appointment.startTime);
-  final String formattedDate = _formatDate(appointment.startTime);
-  
-  // Extraer información
-  final String doctorName = appointment.subject ?? 'Sin nombre';
-  final String appointmentType = appointment.location ?? 'Cita general';
-  final String treatment = appointment.notes ?? 'Sin descripción';
-  
-  return Container(
-    decoration: BoxDecoration(
-      color: GerenaColors.backgroundColor,
-      borderRadius: GerenaColors.mediumBorderRadius,
-      boxShadow: [GerenaColors.lightShadow],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    // Formatear fechas
+    final String formattedTime = _formatTime(appointment.startTime);
+    final String formattedDate = _formatDate(appointment.startTime);
+
+    // Extraer información
+    final String doctorName = appointment.subject ?? 'Sin nombre';
+    final String appointmentType = appointment.location ?? 'Cita general';
+    final String treatment = appointment.notes ?? 'Sin descripción';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: GerenaColors.backgroundColor,
+        borderRadius: GerenaColors.mediumBorderRadius,
+        boxShadow: [GerenaColors.lightShadow],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        doctorName,
+                        style: GoogleFonts.rubik(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: GerenaColors.textPrimaryColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        appointmentType,
+                        style: GoogleFonts.rubik(
+                          fontSize: 12,
+                          color: GerenaColors.textSecondaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        treatment,
+                        style: GoogleFonts.rubik(
+                          fontSize: 11,
+                          color: GerenaColors.textTertiaryColor,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      doctorName,
-                      style: GoogleFonts.rubik(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: GerenaColors.textPrimaryColor,
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [GerenaColors.lightShadow],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: ClipOval(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: GerenaColors.primaryColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.person,
+                            color: GerenaColors.textLightColor,
+                            size: 30,
+                          ),
+                        ),
+                      ),
                     ),
                     SizedBox(height: 20),
                     Text(
-                      appointmentType,
+                      formattedTime,
                       style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: GerenaColors.textSecondaryColor,
+                        fontSize: 13,
+                        color: GerenaColors.textQuaternary,
                       ),
                     ),
                     SizedBox(height: 20),
                     Text(
-                      treatment,
+                      formattedDate,
                       style: GoogleFonts.rubik(
-                        fontSize: 11,
+                        fontSize: 10,
                         color: GerenaColors.textTertiaryColor,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ),
-              SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [GerenaColors.lightShadow],
-                    ),
-                    child: ClipOval(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: GerenaColors.primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.person,
-                          color: GerenaColors.textLightColor,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    formattedTime,
-                    style: GoogleFonts.rubik(
-                      fontSize: 13,
-                      color: GerenaColors.textQuaternary,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    formattedDate,
-                    style: GoogleFonts.rubik(
-                      fontSize: 10,
-                      color: GerenaColors.textTertiaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Center(
-            child: IntrinsicWidth(
-              child: GerenaColors.widgetButton(
-                onPressed: () {
-                  _navigateToAppointmentDetails(appointment);
-                },
-                text: 'Ver Ficha',
-                showShadow: false,
-                borderRadius: 20,
+              ],
+            ),
+            SizedBox(height: 12),
+            Center(
+              child: IntrinsicWidth(
+                child: GerenaColors.widgetButton(
+                  onPressed: () {
+                    _navigateToAppointmentDetails(appointment);
+                  },
+                  text: 'Ver Ficha',
+                  showShadow: false,
+                  borderRadius: 20,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Widget _buildPageIndicators(int count) {
     if (count <= 1) return SizedBox.shrink();
-    
-    return  Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 30,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: GerenaColors.backgroundColor,
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: [GerenaColors.mediumShadow],
-                ),
-              ),
-              SizedBox(width: 6),
-              Container(
-                width: 80,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: GerenaColors.backgroundColor,
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: [GerenaColors.mediumShadow],
-                ),
-              ),
-              SizedBox(width: 6),
-              Container(
-                width: 30,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: GerenaColors.backgroundColor,
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: [GerenaColors.mediumShadow],
-                ),
-              ),
-              SizedBox(width: 6),
-              Container(
-                width: 20,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: GerenaColors.backgroundColor,
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: [GerenaColors.mediumShadow],
-                ),
-              ),
-            ],
-          );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 30,
+          height: 5,
+          decoration: BoxDecoration(
+            color: GerenaColors.backgroundColor,
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: [GerenaColors.mediumShadow],
+          ),
+        ),
+        SizedBox(width: 6),
+        Container(
+          width: 80,
+          height: 5,
+          decoration: BoxDecoration(
+            color: GerenaColors.backgroundColor,
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: [GerenaColors.mediumShadow],
+          ),
+        ),
+        SizedBox(width: 6),
+        Container(
+          width: 30,
+          height: 5,
+          decoration: BoxDecoration(
+            color: GerenaColors.backgroundColor,
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: [GerenaColors.mediumShadow],
+          ),
+        ),
+        SizedBox(width: 6),
+        Container(
+          width: 20,
+          height: 5,
+          decoration: BoxDecoration(
+            color: GerenaColors.backgroundColor,
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: [GerenaColors.mediumShadow],
+          ),
+        ),
+      ],
+    );
   }
 
   // Métodos auxiliares para formatear fechas
   String _formatTime(DateTime dateTime) {
-    final hour = dateTime.hour > 12 ? dateTime.hour - 12 : (dateTime.hour == 0 ? 12 : dateTime.hour);
+    final hour = dateTime.hour > 12
+        ? dateTime.hour - 12
+        : (dateTime.hour == 0 ? 12 : dateTime.hour);
     final minute = dateTime.minute.toString().padLeft(2, '0');
     final period = dateTime.hour >= 12 ? 'P.M.' : 'A.M.';
     return '$hour:$minute $period';
@@ -526,7 +568,7 @@ List<dynamic> _getUpcomingAppointments() {
   void _navigateToAppointmentDetails(dynamic appointment) {
     // Implementa la navegación a los detalles
     print('Ver detalles de cita ID: ${appointment.id}');
-    
+
     // Ejemplo de navegación (descomenta cuando tengas la pantalla):
     // Get.to(() => AppointmentDetailsPage(appointmentId: appointment.id));
   }

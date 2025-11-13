@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/simple_counter.dart';
 import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_entity.dart';
@@ -104,9 +105,10 @@ class CartPageContent extends StatelessWidget {
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(25),
-                      onTap: GetPlatform.isMobile
-                          ? Get.back
-                          : navigationController.navigateToStore,
+                    onTap: GetPlatform.isMobile
+    ? () => Get.offAllNamed(RoutesNames.categoryById)
+    : () => navigationController.navigateToStore(),
+
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -354,8 +356,13 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
                                       const SizedBox(height: 10),
                                       TextButton.icon(
                                         onPressed: () {
-                                          navigationController
+                                         if (GetPlatform.isMobile) {
+                                                    Get.offAllNamed(RoutesNames.paymentCardsPage,);
+
+                                          } else {
+                                            navigationController
                                               .navigateToPaymentCards();
+                                          }
                                         },
                                         icon: Icon(Icons.add_card),
                                         label: Text('Agregar tarjeta'),
@@ -1250,7 +1257,13 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
             OutlinedButton.icon(
               onPressed: () {
                 Get.back();
-                Get.find<ShopNavigationController>().navigateToPaymentCards();
+                if (GetPlatform.isMobile) {
+                                                    Get.offAllNamed(RoutesNames.paymentCardsPage,);
+
+                                          } else {
+                                                          Get.find<ShopNavigationController>().navigateToPaymentCards();
+
+                                          }
               },
               icon: Icon(Icons.add_card),
               label: Text('Agregar nueva tarjeta'),

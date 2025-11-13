@@ -33,6 +33,7 @@ import 'package:gerena/features/marketplace/domain/usecase/payment/payment_metho
 import 'package:gerena/features/marketplace/domain/usecase/payment/create_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_methods_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/savecard_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
 import 'package:gerena/features/subscription/data/datasources/subscription_data_sources_imp.dart';
@@ -92,6 +93,7 @@ class UsecaseConfig {
    DeletePaymentMethodUsecase? deletePaymentMethodUsecase;
    GetPaymentMethodsUsecase? getPaymentMethodsUsecase;
    PaymentMethodsDefaulUsecase? paymentMethodsDefaulUsecase;
+   SavecardUsecase? savecardUsecase;
 
    GetBannersUsecase? getBannersUsecase;
 
@@ -151,6 +153,7 @@ class UsecaseConfig {
       deletePaymentMethodUsecase = DeletePaymentMethodUsecase(repository: paymentRepositoryImp!);
       getPaymentMethodsUsecase = GetPaymentMethodsUsecase(repository: paymentRepositoryImp!);
       paymentMethodsDefaulUsecase = PaymentMethodsDefaulUsecase(repository: paymentRepositoryImp!);
+      savecardUsecase = SavecardUsecase(paymentRepository: paymentRepositoryImp!);
       
       getBannersUsecase = GetBannersUsecase(repository: bannersRepositoryImp!);
 

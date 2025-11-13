@@ -78,4 +78,12 @@ class PaymentRepositoryImpl implements PaymentRepository {
     
     return paymentDataSourcesImp.confirmpayment(id,token);  
   }
+  
+  @override
+  Future<void> createPaymentMethodback(String paymentMethodId) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await paymentDataSourcesImp.savecard( paymentMethodId,token);
+  }
+  
+ 
 }

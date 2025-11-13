@@ -22,6 +22,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'productDetail/product_detail_byid_page.dart';
 
 class ShopNavigationController extends GetxController {
@@ -408,6 +409,8 @@ Widget _buildLeftSidebar() {
           tooltip: 'Buscar',
           onPressed: () {
             navigationController.toggleSearchBar();
+                        navigationController.navigateToStore();
+
           },
         ),
         _buildSidebarIcon(
@@ -444,12 +447,7 @@ Widget _buildLeftSidebar() {
           imagePath: 'assets/icons/headset_mic.png',
           tooltip: 'Soporte',
           onPressed: () {
-            showDialog(
-              context: Get.context!,
-              builder: (BuildContext context) {
-                return const GerenaModalBot();
-              },
-            );
+           openWhatsApp();
           },
         ),
         const SizedBox(height: 20),
@@ -457,6 +455,38 @@ Widget _buildLeftSidebar() {
     ),
   );
 }
+  // Función para abrir WhatsApp
+  Future<void> openWhatsApp() async {
+    final Uri whatsappUrl = Uri.parse(
+        'https://api.whatsapp.com/send/?phone=%E2%80%AA%E2%80%AA5213321642470&text=Hola+necesito+m%C3%A1s+informaci%C3%B3n.&type=phone_number&app_absent=0');
+
+    try {
+      if (await canLaunchUrl(whatsappUrl)) {
+        await launchUrl(
+          whatsappUrl,
+          mode: LaunchMode.externalApplication, // Abre en la app externa
+        );
+      } else {
+        // Si no puede abrir WhatsApp, muestra un mensaje
+        Get.snackbar(
+          'Error',
+          'No se pudo abrir WhatsApp. Por favor, verifica que esté instalado.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
+      print('Error al abrir WhatsApp: $e');
+      Get.snackbar(
+        'Error',
+        'Ocurrió un error al intentar abrir WhatsApp',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
 
 Widget _buildSidebarIcon({
   IconData? icon,

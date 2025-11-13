@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/movil/perfil/perfil_controller.dart';
+import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/perfil_controller.dart';
 import 'package:get/get.dart';
 
 Widget buildImageGallery(List<String> images) {

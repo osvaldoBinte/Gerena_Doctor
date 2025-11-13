@@ -8,7 +8,9 @@ abstract class PaymentRepository {
   Future<PaymentMethodEntity> createPaymentMethod({
     String? cardholderName,
   });
-
+  Future<void> createPaymentMethodback(
+    String paymentMethodId,
+  );
   Future<void> attachPaymentMethodToCustomer({
     required String paymentMethodId,
     required String customerId,

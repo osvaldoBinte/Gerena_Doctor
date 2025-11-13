@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/add_card_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,13 +14,62 @@ class PaymentCardsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PaymentCartController>();
-    
+        final navigationController = Get.find<ShopNavigationController>();
+
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorFondo,
+       appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          backgroundColor: GerenaColors.backgroundColorFondo,
+          elevation: 4,
+          shadowColor: GerenaColors.shadowColor,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+             Row(
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(25),
+                      onTap: () {
+                        if (GetPlatform.isMobile) {
+                          Get.offAllNamed(RoutesNames.shoppdingcart);
+                        } else {
+                          navigationController.navigateToStore();
+                        }
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: GerenaColors.secondaryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(8.0),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: GerenaColors.textLightColor,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'BILLETERA',
+                            style: GoogleFonts.rubik(
+                              color: GerenaColors.textPrimaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {

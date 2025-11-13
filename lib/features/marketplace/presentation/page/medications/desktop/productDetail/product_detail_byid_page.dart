@@ -99,10 +99,7 @@ class ProductImageSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<String> productImages = [
       if (product['image'] != null && product['image']!.isNotEmpty) product['image']!,
-      'assets/images/celosome_1.png',
-      'assets/images/celosome_2.png',
-      'assets/images/celosome_3.png',
-      'assets/images/celosome_4.png',
+     
     ];
 
     return Container(

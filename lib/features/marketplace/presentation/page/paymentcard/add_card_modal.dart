@@ -215,11 +215,11 @@ class AddCardModal extends StatelessWidget {
           child: CardFormField(
             onCardChanged: (details) => controller.updateCardDetails(details),
             style: CardFormStyle(
-              borderColor: Colors.transparent,
+              borderColor: Colors.black,
               textColor: Colors.black,
               fontSize: 16,
               placeholderColor: Colors.grey.shade600,
-              backgroundColor: Colors.white,
+              backgroundColor:  GerenaColors.secondaryColor,
               cursorColor: Colors.black,
             ),
             enablePostalCode: false,

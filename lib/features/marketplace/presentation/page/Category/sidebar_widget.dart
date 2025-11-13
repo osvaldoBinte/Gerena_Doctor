@@ -16,11 +16,10 @@ class SidebarWidget extends StatelessWidget {
   }) : super(key: key);
 
   // Función para abrir WhatsApp
-  Future<void> _openWhatsApp() async {
+  Future<void> openWhatsApp() async {
     final Uri whatsappUrl = Uri.parse(
-      'https://api.whatsapp.com/send/?phone=%E2%80%AA%E2%80%AA5213321642470&text=Hola+necesito+m%C3%A1s+informaci%C3%B3n.&type=phone_number&app_absent=0'
-    );
-    
+        'https://api.whatsapp.com/send/?phone=%E2%80%AA%E2%80%AA5213321642470&text=Hola+necesito+m%C3%A1s+informaci%C3%B3n.&type=phone_number&app_absent=0');
+
     try {
       if (await canLaunchUrl(whatsappUrl)) {
         await launchUrl(
@@ -91,13 +90,14 @@ class SidebarWidget extends StatelessWidget {
                               ),
                             ),
                             _buildSearchField(),
-                         //   StatusCardWidget(),
+                            //   StatusCardWidget(),
                             SizedBox(height: 10),
                             buildWishlistButton(
                               onTap: () {
-                                  final navigationController = Get.find<ShopNavigationController>();
+                                final navigationController =
+                                    Get.find<ShopNavigationController>();
 
-                                      navigationController.navigateToWishlist();
+                                navigationController.navigateToWishlist();
                                 Get.to(() => GlobalShopInterface());
                               },
                             ),
@@ -160,7 +160,7 @@ class SidebarWidget extends StatelessWidget {
               ),
             ),
             GestureDetector(
-              onTap: _openWhatsApp, // Cambio aquí: ahora llama a _openWhatsApp
+              onTap: openWhatsApp, // Cambio aquí: ahora llama a _openWhatsApp
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20.0),
                 padding:
@@ -375,13 +375,13 @@ class SidebarWidget extends StatelessWidget {
         children: [
           PhysicalShape(
             clipper: BottomFlatClipper(),
-            color: GerenaColors.backgroundproductcategory,
+            color: GerenaColors.backgroundColor,
             elevation: 4,
             shadowColor: Colors.black,
             child: Container(
               width: 80,
               height: 80,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(15),
               child: imageAssetPath.startsWith('http')
                   ? Image.network(
                       imageAssetPath,
