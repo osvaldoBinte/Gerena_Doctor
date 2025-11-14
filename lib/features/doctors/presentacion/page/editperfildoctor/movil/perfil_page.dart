@@ -7,7 +7,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/procedure_Widget.dart';
 import 'package:gerena/movil/widgets/review_widget.dart';
@@ -405,7 +405,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          doctor.nombreCompleto,
+                          doctor.nombreCompleto ?? '',
                           style: GoogleFonts.rubik(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

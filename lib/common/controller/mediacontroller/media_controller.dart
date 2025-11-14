@@ -11,6 +11,7 @@ class MediaController extends GetxController {
   
   final RxBool isLoading = false.obs;
   
+  final RxString procedureTitle = ''.obs; // ⬅️ NUEVO
   final RxString procedureDescription = ''.obs;
   
   bool get hasImages => selectedImages.isNotEmpty;
@@ -131,6 +132,10 @@ class MediaController extends GetxController {
     selectedVideos.clear();
   }
   
+  void updateTitle(String title) {
+    procedureTitle.value = title;
+  }
+  
   void updateDescription(String description) {
     procedureDescription.value = description;
   }
@@ -138,6 +143,11 @@ class MediaController extends GetxController {
   Future<void> saveProcedure() async {
     try {
       isLoading.value = true;
+      
+      if (procedureTitle.value.trim().isEmpty) {
+        _showWarningMessage('Agrega un título del procedimiento');
+        return;
+      }
       
       if (!hasFiles) {
         _showWarningMessage('Agrega al menos una imagen o video antes de guardar');
@@ -151,13 +161,12 @@ class MediaController extends GetxController {
       
       await Future.delayed(const Duration(seconds: 2));
       
-      
       print('Guardando procedimiento:');
+      print('- Título: ${procedureTitle.value}');
       print('- Descripción: ${procedureDescription.value}');
       print('- Imágenes: ${selectedImages.length}');
       print('- Videos: ${selectedVideos.length}');
      
-      
       // _clearAfterSave();
       
     } catch (e) {
@@ -170,6 +179,7 @@ class MediaController extends GetxController {
   void _clearAfterSave() {
     selectedImages.clear();
     selectedVideos.clear();
+    procedureTitle.value = '';
     procedureDescription.value = '';
   }
   
@@ -194,7 +204,6 @@ class MediaController extends GetxController {
     }
   }
   
-  
   void _showErrorMessage(String message) {
     Get.snackbar(
       'Error',
@@ -218,8 +227,6 @@ class MediaController extends GetxController {
       duration: const Duration(seconds: 4),
     );
   }
-  
- 
   
   String _getReadableErrorMessage(PlatformException e) {
     switch (e.code) {

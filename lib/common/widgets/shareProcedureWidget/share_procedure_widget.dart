@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
+import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 
@@ -14,6 +15,9 @@ class ShareProcedureWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Obtener el ProceduresController
+    final proceduresController = Get.find<ProceduresController>();
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: GerenaColors.cardDecoration,
@@ -27,55 +31,61 @@ class ShareProcedureWidget extends StatelessWidget {
               if (isSmallScreen) {
                 return Column(
                   children: [
+                    _buildTitleField(),
+                    const SizedBox(height: 12),
                     _buildDescriptionContainer(),
                     const SizedBox(height: 12),
                     _buildMediaContainer(mediaController),
                     const SizedBox(height: 16),
-                    SizedBox(
+                    Obx(() => SizedBox(
                       width: double.infinity,
-                      child: GerenaColors.widgetButton(
-                        onPressed: () {
-                          print('Guardando certificaciones');
-                        },
-                        text: 'GUARDAR',
-                        showShadow: false, 
-                        borderRadius: 5,
-                      ),
-                    ),
+                      child: proceduresController.isCreating.value
+                          ? const Center(child: CircularProgressIndicator())
+                          : GerenaColors.widgetButton(
+                              onPressed: () => _handleSave(
+                                mediaController,
+                                proceduresController,
+                              ),
+                              text: 'GUARDAR',
+                              showShadow: false,
+                              borderRadius: 5,
+                            ),
+                    )),
                   ],
                 );
               } else {
                 return Column(
                   children: [
+                    _buildTitleField(),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
                           flex: 1,
                           child: _buildDescriptionContainer(),
                         ),
-                        
                         const SizedBox(width: 16),
-                        
                         Expanded(
                           flex: 1,
                           child: _buildMediaContainer(mediaController),
                         ),
                       ],
                     ),
-                    
                     const SizedBox(height: 4),
-                    
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        GerenaColors.widgetButton(
-                          onPressed: () {
-                            print('Guardando certificaciones');
-                          },
-                          text: 'GUARDAR',
-                          showShadow: false, 
-                          borderRadius: 5,
-                        ),
+                        Obx(() => proceduresController.isCreating.value
+                            ? const CircularProgressIndicator()
+                            : GerenaColors.widgetButton(
+                                onPressed: () => _handleSave(
+                                  mediaController,
+                                  proceduresController,
+                                ),
+                                text: 'GUARDAR',
+                                showShadow: false,
+                                borderRadius: 5,
+                              )),
                       ],
                     ),
                   ],
@@ -88,6 +98,30 @@ class ShareProcedureWidget extends StatelessWidget {
     );
   }
 
+  // Campo para el título
+  Widget _buildTitleField() {
+    return TextField(
+      onChanged: (value) => mediaController.procedureTitle.value = value,
+      decoration: InputDecoration(
+        hintText: 'Título del procedimiento...',
+        hintStyle: GerenaColors.bodySmall.copyWith(
+          color: GerenaColors.textSecondaryColor.withOpacity(0.7),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: GerenaColors.smallBorderRadius,
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: GerenaColors.smallBorderRadius,
+          borderSide: BorderSide(color: GerenaColors.accentColor, width: 1.5),
+        ),
+        contentPadding: const EdgeInsets.all(12),
+      ),
+    );
+  }
+
   Widget _buildDescriptionContainer() {
     return Container(
       width: double.infinity,
@@ -95,6 +129,7 @@ class ShareProcedureWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
+            onChanged: (value) => mediaController.procedureDescription.value = value,
             maxLines: 5,
             decoration: InputDecoration(
               hintText: 'Escribe aquí los detalles del procedimiento...',
@@ -117,6 +152,31 @@ class ShareProcedureWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Manejar el guardado
+  Future<void> _handleSave(
+    MediaController mediaController,
+    ProceduresController proceduresController,
+  ) async {
+    // Obtener las rutas de las imágenes
+    final List<String> imagesPaths = mediaController.selectedImages
+        .map((file) => file.path)
+        .toList();
+
+    // Crear el procedimiento
+    final success = await proceduresController.createProcedure(
+      titulo: mediaController.procedureTitle.value,
+      description: mediaController.procedureDescription.value,
+      fotos: imagesPaths,
+    );
+
+    // Limpiar si fue exitoso
+    if (success) {
+      mediaController.clearAllFiles();
+      mediaController.procedureTitle.value = '';
+      mediaController.procedureDescription.value = '';
+    }
   }
 
   Widget _buildMediaContainer(MediaController controller) {
@@ -150,21 +210,21 @@ class ShareProcedureWidget extends StatelessWidget {
           
           const SizedBox(height: 8),
           
-         Row(
-  mainAxisAlignment: MainAxisAlignment.center,
-  children: [
-    Expanded(
-      child: Text(
-        'Agregar fotos / videos',
-        style: GerenaColors.bodyMedium.copyWith(
-          fontWeight: FontWeight.w600,
-          color: GerenaColors.textTertiaryColor,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    ),
-  ],
-),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  'Agregar fotos / videos',
+                  style: GerenaColors.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: GerenaColors.textTertiaryColor,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ],
       )),
     );
@@ -173,7 +233,7 @@ class ShareProcedureWidget extends StatelessWidget {
   Widget _buildAddButton(MediaController controller) {
     return GestureDetector(
       onTap: controller.pickFiles,
-      child: Icon(
+      child: const Icon(
         Icons.add_box_rounded,
         size: 50,
       ),
@@ -255,8 +315,8 @@ class ShareProcedureWidget extends StatelessWidget {
           itemCount: controller.selectedImages.length,
           itemBuilder: (context, index) {
             return _buildImagePreviewItem(
-              controller.selectedImages[index], 
-              index, 
+              controller.selectedImages[index],
+              index,
               controller,
             );
           },
@@ -289,8 +349,8 @@ class ShareProcedureWidget extends StatelessWidget {
           itemCount: controller.selectedVideos.length,
           itemBuilder: (context, index) {
             return _buildVideoPreviewItem(
-              controller.selectedVideos[index], 
-              index, 
+              controller.selectedVideos[index],
+              index,
               controller,
             );
           },
@@ -333,9 +393,10 @@ class ShareProcedureWidget extends StatelessWidget {
                   color: Colors.red,
                   shape: BoxShape.circle,
                 ),
-                child: Image.asset(
-                  'assets/icons/close.png',
-                  fit: BoxFit.contain,
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 16,
                 ),
               ),
             ),

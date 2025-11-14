@@ -4,5 +4,7 @@ import 'package:gerena/features/doctors/domain/entities/doctoravailability/docto
 abstract class DoctorRepository {
   Future<DoctorEntity> getDoctorProfile();
     Future<List<DoctorAvailabilityEntity>> getDoctorAvailability();
+  Future<void> updateDoctorProfile(DoctorEntity doctor);
+  Future<void> updatefotoDoctorProfile(String fotoPath);
 
 }

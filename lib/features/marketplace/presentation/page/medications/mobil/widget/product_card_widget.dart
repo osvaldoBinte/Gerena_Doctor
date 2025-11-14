@@ -29,7 +29,6 @@ class ProductCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el WishlistController
     final wishlistController = Get.find<WishlistController>();
 
     return GestureDetector(
@@ -37,7 +36,7 @@ class ProductCardWidget extends StatelessWidget {
           () {
             Get.toNamed(
               RoutesNames.productDetail,
-              arguments: {'id': medication.id},
+              arguments: medication.id, // ⭐ Solo envía el ID como int
             );
           },
       child: Container(
@@ -99,7 +98,7 @@ class ProductCardWidget extends StatelessWidget {
                   onTap: () {
                     wishlistController.toggleWishlist(
                       medicamentoId: medication.id,
-                      precio: medication.price,
+                      precio: medication.price ?? 0.0, // ⭐ Usa price de la entity
                     );
                   },
                   child: Container(
@@ -143,10 +142,9 @@ class ProductCardWidget extends StatelessWidget {
                   onPressed: () {
                     wishlistController.toggleWishlist(
                       medicamentoId: medication.id,
-                      precio: medication.price,
+                      precio: medication.price ?? 0.0, // ⭐ Usa price de la entity
                     );
                     
-                    // Si existe el callback original, también lo ejecuta
                     if (onFavoritePressed != null) {
                       onFavoritePressed!();
                     }
@@ -158,8 +156,30 @@ class ProductCardWidget extends StatelessWidget {
               }),
             ),
 
+          // Badge de descuento (top left)
+          if (_hasDiscount())
+            Positioned(
+              top: 5,
+              left: 5,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: GerenaColors.errorColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'OFERTA',
+                  style: GoogleFonts.rubik(
+                    fontSize: 10,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
           // Badge de stock agotado
-          if (medication.stock <= 0)
+          if ((medication.stock ?? 0) <= 0)
             Positioned(
               top: 5,
               left: 5,
@@ -185,9 +205,14 @@ class ProductCardWidget extends StatelessWidget {
   }
 
   Widget _buildProductImage() {
-    if (medication.imagen != null && medication.imagen!.isNotEmpty) {
+    // ⭐ Usa el array de imágenes de la nueva entity
+    final imageUrl = medication.images?.isNotEmpty == true 
+        ? medication.images!.first 
+        : null;
+
+    if (imageUrl != null && imageUrl.isNotEmpty) {
       return Image.network(
-        medication.imagen!,
+        imageUrl,
         height: 100,
         fit: BoxFit.contain,
         loadingBuilder: (context, child, loadingProgress) {
@@ -221,15 +246,14 @@ class ProductCardWidget extends StatelessWidget {
   }
 
   Widget _buildProductInfo() {
-    final bool hasDiscount = medication.previousprice != null &&
-        medication.previousprice! > medication.price;
+    final bool hasDiscount = _hasDiscount();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Nombre del producto
         Text(
-          medication.name,
+          medication.name ?? 'Sin nombre', // ⭐ Null safety
           style: GoogleFonts.rubik(
             fontSize: 13,
             fontWeight: FontWeight.w400,
@@ -247,7 +271,7 @@ class ProductCardWidget extends StatelessWidget {
           children: [
             // Precio actual
             Text(
-              '\$${medication.price.toStringAsFixed(2)} MXN',
+              '\$${(medication.price ?? 0.0).toStringAsFixed(2)} MXN', // ⭐ Usa price
               style: GoogleFonts.rubik(
                 fontSize: 14,
                 color: GerenaColors.textTertiaryColor,
@@ -261,7 +285,7 @@ class ProductCardWidget extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    '\$${medication.previousprice!.toStringAsFixed(2)} MXN',
+                    '\$${medication.previousPrice!.toStringAsFixed(2)} MXN', // ⭐ Usa previousPrice
                     style: GoogleFonts.rubik(
                       fontSize: 14,
                       color: GerenaColors.textpreviousprice,
@@ -272,7 +296,7 @@ class ProductCardWidget extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                //  _buildDiscountBadge(),
+                  _buildDiscountBadge(),
                 ],
               ),
             ],
@@ -282,14 +306,19 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
+  // ⭐ Helper para verificar si hay descuento
+  bool _hasDiscount() {
+    return medication.previousPrice != null &&
+        medication.previousPrice! > (medication.price ?? 0);
+  }
+
   Widget _buildDiscountBadge() {
-    if (medication.previousprice == null ||
-        medication.previousprice! <= medication.price) {
+    if (!_hasDiscount()) {
       return const SizedBox.shrink();
     }
 
-    final discount = ((medication.previousprice! - medication.price) /
-            medication.previousprice! *
+    final discount = ((medication.previousPrice! - (medication.price ?? 0)) /
+            medication.previousPrice! *
             100)
         .round();
 

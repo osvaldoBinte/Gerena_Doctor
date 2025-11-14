@@ -1,20 +1,17 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/product_card_widget.dart';
-import 'package:gerena/features/marketplace/presentation/page/wishlist/ejemplo/ejemplo_%20saved_products_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar.dart';
-import 'package:gerena/page/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/page/dashboard/widget/estatusdepedido/status_card_modal.dart';
-import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
 import 'package:gerena/page/dashboard/widget/facturacion/facturacion.dart';
-import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
 import 'package:gerena/page/store/historialDePedidos/historial_de_pedidos_content.dart';
 import 'package:gerena/page/store/store_controller.dart';
@@ -24,52 +21,51 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'productDetail/product_detail_byid_page.dart';
-
 class ShopNavigationController extends GetxController {
   final RxInt currentView = 0.obs;
-  final Rx<Map<String, String>?> selectedProduct = Rx<Map<String, String>?>(null);
-  
-  // NUEVO: Variable para controlar visibilidad del buscador
+  final Rx<int?> selectedProductId = Rx<int?>(null); 
   final RxBool showSearchBar = false.obs;
 
   void navigateToStore() {
     currentView.value = 0;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
 
   void navigateToCart() {
     currentView.value = 1;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
 
   void navigateToWishlist() {
     currentView.value = 3;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
 
-  void navigateToProductDetail(Map<String, String> product) {
-    selectedProduct.value = product;
+  void navigateToProductDetail(int productId) {
+    selectedProductId.value = productId;
     currentView.value = 2;
   }
 
   void navigateToHistorialDePedidos() {
     currentView.value = 4;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
 
   void navigateFacturacion() {
     currentView.value = 5;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
 
   void navigateToBlogGerena() {
     currentView.value = 6;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
-void navigateToPaymentCards() {
+
+  void navigateToPaymentCards() {
     currentView.value = 7;
-    selectedProduct.value = null;
+    selectedProductId.value = null;
   }
+
   void navigateBackToUserProfile() {
     Get.offAll(() => const DashboardPage(), arguments: {
       'showUserProfile': true,
@@ -125,67 +121,60 @@ class GlobalShopInterface extends StatelessWidget {
                               1) {
                             return  Expanded(
                                     child: CartPageContent(
-                                     // onBackPressed: navigationController.navigateToStore,
+                                    
                                     ),
                                   );
-                          } else if (navigationController.currentView.value ==
-                                  2 &&
-                              navigationController.selectedProduct.value !=
-                                  null) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 60),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                        borderRadius: BorderRadius.circular(25),
-                                        onTap: navigationController
-                                            .navigateToStore,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    GerenaColors.secondaryColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              padding: EdgeInsets.all(8.0),
-                                              child: const Icon(
-                                                Icons.arrow_back,
-                                                color:
-                                                    GerenaColors.textLightColor,
-                                                size: 24,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              'VOLVER A LA TIENDA',
-                                              style: GoogleFonts.rubik(
-                                                color: GerenaColors
-                                                    .textPrimaryColor,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Expanded(
-                                    child: ProductDetailPage(
-                                      product: navigationController
-                                          .selectedProduct.value!,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else if (navigationController.currentView.value ==
+                          } 
+else if (navigationController.currentView.value == 2 &&
+    navigationController.selectedProductId.value != null) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 60),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(25),
+              onTap: navigationController.navigateToStore,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: GerenaColors.secondaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: EdgeInsets.all(8.0),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      color: GerenaColors.textLightColor,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'VOLVER A LA TIENDA',
+                    style: GoogleFonts.rubik(
+                      color: GerenaColors.textPrimaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Expanded(
+          child: ProductDetailPage(
+            productId: navigationController.selectedProductId.value!, // ⭐ Cambiado
+          ),
+        ),
+      ],
+    ),
+  );
+} else if (navigationController.currentView.value ==
                               3) {
                             return Padding(
                               padding:
@@ -701,6 +690,7 @@ Widget _buildMainContent() {
     ),
   );
 }
+
 Widget _buildOffersSection() {
   return Obx(() {
     if (!medicationsController.showOffers.value) {
@@ -803,21 +793,8 @@ Widget _buildOffersSection() {
                     scrollDirection: Axis.horizontal,
                   ),
                   items: medicationsController.medicationsOnSale.map((medication) {
-                    final productData = {
-                      'name': medication.name,
-                      'price': '${medication.price.toStringAsFixed(2)} MXN',
-                      'image': medication.imagen ?? '',
-                      'description': medication.description,
-                      'stock': medication.stock.toString(),
-                      'id': medication.id.toString(),
-                      'category': medication.categoria ?? '',
-                    };
-
-                    if (medication.previousprice != null && 
-                        medication.previousprice! > medication.price) {
-                      productData['hasDiscount'] = 'true';
-                      productData['oldPrice'] = '${medication.previousprice!.toStringAsFixed(2)} MXN';
-                    }
+                    // ⭐ Convertir MedicationsEntity a Map para ProductCardWidget
+                    final productData = _medicationToMap(medication);
 
                     return Builder(
                       builder: (BuildContext context) {
@@ -826,9 +803,8 @@ Widget _buildOffersSection() {
                           margin: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: ProductCardWidget(
                             product: productData,
-                            onTap: () => navigationController.navigateToProductDetail(productData),
+                            onTap: () => navigationController.navigateToProductDetail(medication.id), // ⭐ Solo pasa el ID
                             onFavoritePressed: () {
-                              // Lógica para añadir a favoritos
                               print('Añadido a favoritos: ${medication.name}');
                             },
                           ),
@@ -883,6 +859,8 @@ Widget _buildOffersSection() {
     );
   });
 }
+
+
 Widget _buildCatalogSection() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -980,28 +958,13 @@ Widget _buildCatalogSection() {
                 itemBuilder: (context, index) {
                   final medication = medicationsController.medications[index];
 
-                  final productData = {
-                    'name': medication.name,
-                    'price': '${medication.price.toStringAsFixed(2)} MXN',
-                    'image': medication.imagen ?? '',
-                    'description': medication.description,
-                    'stock': medication.stock.toString(),
-                    'id': medication.id.toString(),
-                    'category': medication.categoria ?? '',
-                  };
-
-                  if (medication.previousprice != null &&
-                      medication.previousprice! > medication.price) {
-                    productData['hasDiscount'] = 'true';
-                    productData['oldPrice'] =
-                        '${medication.previousprice!.toStringAsFixed(2)} MXN';
-                  }
+                  // ⭐ Convertir MedicationsEntity a Map para ProductCardWidget
+                  final productData = _medicationToMap(medication);
 
                   return ProductCardWidget(
                     product: productData,
-                    onTap: () => navigationController.navigateToProductDetail(productData),
+                    onTap: () => navigationController.navigateToProductDetail(medication.id), // ⭐ Solo pasa el ID
                     onFavoritePressed: () {
-                      // Lógica para añadir a favoritos
                       print('Añadido a favoritos: ${medication.name}');
                     },
                   );
@@ -1014,8 +977,26 @@ Widget _buildCatalogSection() {
     ],
   );
 }
+// ⭐ Método auxiliar para convertir MedicationsEntity a Map
+Map<String, String> _medicationToMap(MedicationsEntity medication) {
+  final productData = {
+    'name': medication.name ?? '',
+    'price': '${(medication.price ?? 0.0).toStringAsFixed(2)} MXN',
+    'image': medication.images?.isNotEmpty == true ? medication.images!.first : '',
+    'description': medication.description ?? '',
+    'stock': (medication.stock ?? 0).toString(),
+    'id': medication.id.toString(),
+    'category': medication.category ?? '',
+  };
 
+  if (medication.previousPrice != null && 
+      medication.previousPrice! > (medication.price ?? 0)) {
+    productData['hasDiscount'] = 'true';
+    productData['oldPrice'] = '${medication.previousPrice!.toStringAsFixed(2)} MXN';
+  }
 
+  return productData;
+}
 Widget _buildCategoriesSidebar() {
   return Container(
     width: 240,

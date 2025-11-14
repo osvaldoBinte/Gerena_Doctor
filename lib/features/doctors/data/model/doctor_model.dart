@@ -2,9 +2,9 @@ import 'package:gerena/features/doctors/domain/entities/doctor/doctor_entity.dar
 
 class DoctorModel extends DoctorEntity {
   DoctorModel({
-    required super.userId,
+     super.userId,
     required super.nombreCompleto,
-    required super.email,
+     super.email,
     required super.numeroLicencia,
     required super.especialidad,
     required super.experienciaTiempo,
@@ -12,7 +12,7 @@ class DoctorModel extends DoctorEntity {
     required super.telefono,
     required super.direccion,
     required super.biografia,
-    required super.educacion,
+     super.educacion,
      super.foto,
      super.nombre,
      super.apellidos,
@@ -43,27 +43,44 @@ class DoctorModel extends DoctorEntity {
       institucionCertificacion: json['institucionCertificacion']??'',
     );
   }
-  Map<String, dynamic> toJson() {
-    return {
-      'userId': userId,
-      'nombreCompleto': nombreCompleto,
-      'email': email,
-      'numeroLicencia': numeroLicencia,
-      'especialidad': especialidad,
-      'experienciaTiempo': experienciaTiempo,
-      'fechaNacimiento': fechaNacimiento,
-      'telefono': telefono,
-      'direccion': direccion,
-      'biografia': biografia,
-      'educacion': educacion,
-      'foto': foto,
-      'nombre': nombre,
-      'apellidos': apellidos,
-      'titulo': titulo,
-      'institucion': institucion,
-      'certificacion': certificacion,
-      'institucionCertificacion': institucionCertificacion,
-    };
-  }
+factory DoctorModel.fromEntity(DoctorEntity entity) {
+  return DoctorModel(
+    nombreCompleto: entity.nombreCompleto,
+    nombre: entity.nombre,
+    apellidos: entity.apellidos,
+    numeroLicencia: entity.numeroLicencia,
+    especialidad: entity.especialidad,
+    experienciaTiempo: entity.experienciaTiempo,
+    fechaNacimiento: entity.fechaNacimiento,
+    telefono: entity.telefono,
+    direccion: entity.direccion,
+    biografia: entity.biografia,
+    titulo: entity.titulo,
+    institucion: entity.institucion,
+    certificacion: entity.certificacion,
+    institucionCertificacion: entity.institucionCertificacion,
+  
+  );
+}
+
+Map<String, dynamic> toJson() {
+  return {
+    'nombreCompleto': nombreCompleto,
+    'nombre': nombre,
+    'apellidos': apellidos,
+    'numeroLicencia': numeroLicencia,
+    'especialidad': especialidad,
+    'experienciaTiempo': experienciaTiempo,
+    'fechaNacimiento': fechaNacimiento,
+    'telefono': telefono,
+    'direccion': direccion,
+    'biografia': biografia,
+    'titulo': titulo,
+    'institucion': institucion,
+    'certificacion': certificacion,
+    'institucionCertificacion': institucionCertificacion,
+  };
+}
+
   
 }

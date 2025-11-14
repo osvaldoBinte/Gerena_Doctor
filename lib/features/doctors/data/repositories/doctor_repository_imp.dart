@@ -11,11 +11,10 @@ class DoctorRepositoryImp implements DoctorRepository {
   DoctorRepositoryImp({required this.doctosDataSources});
   @override
   Future<DoctorEntity> getDoctorProfile() async {
-      final session = await authService.getToken();
-     if (session == null) {
-        throw Exception('No hay sesión activa. El usuario debe iniciar sesión.');
-      }
-    return await doctosDataSources.getDoctorProfile(token: session);
+     final token = await authService.getToken() 
+    ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+
+    return await doctosDataSources.getDoctorProfile(token: token);
   }
 
   @override
@@ -26,5 +25,19 @@ class DoctorRepositoryImp implements DoctorRepository {
     return await doctosDataSources.getDoctorAvailability(
       token: token,
     );
+  }
+  
+  @override
+  Future<void> updateDoctorProfile(DoctorEntity doctor) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await doctosDataSources.updateDoctorProfile( doctor,token);
+
+  }
+  
+  @override
+  Future<void> updatefotoDoctorProfile(String fotoPath) async {
+        final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await doctosDataSources.updatefotoDoctorProfile(fotoPath,token);
+
   }
 }

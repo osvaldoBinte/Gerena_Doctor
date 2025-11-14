@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
-import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_datail_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/widget/product_card_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/carousel_indicators_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
@@ -11,6 +11,7 @@ import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_
 import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProductDetailPage extends GetView<ProductDetailController> {
   const ProductDetailPage({Key? key}) : super(key: key);
@@ -24,7 +25,6 @@ class ProductDetailPage extends GetView<ProductDetailController> {
         elevation: 4,
         shadowColor: GerenaColors.shadowColor,
         automaticallyImplyLeading: false,
-
         title: Row(
           children: [
             Text(
@@ -118,20 +118,14 @@ class _ProductDetailContent extends StatefulWidget {
 }
 
 class _ProductDetailContentState extends State<_ProductDetailContent> {
-
   ShoppingCartController get cartController =>
       Get.find<ShoppingCartController>();
   WishlistController get wishlistController => Get.find<WishlistController>();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   List<String> get _productImages {
-    if (widget.medication.imagen != null &&
-        widget.medication.imagen!.isNotEmpty) {
-      return [widget.medication.imagen!];
+    if (widget.medication.images != null &&
+        widget.medication.images!.isNotEmpty) {
+      return widget.medication.images!;
     }
     return [
       'assets/images/celosome_1.png',
@@ -139,6 +133,87 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
       'assets/images/celosome_3.png',
       'assets/images/celosome_4.png',
     ];
+  }
+
+  // Método para abrir PDFs en WebView dentro de la app
+  Future<void> _openPdfUrl(String url, String title) async {
+    try {
+      if (url.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'URL no disponible',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      print('Intentando abrir documento: $url');
+
+      final uri = Uri.parse(url);
+
+      // Intenta abrir en navegador in-app con barra de navegación
+      bool launched = await launchUrl(
+        uri,
+        mode: LaunchMode.inAppBrowserView,
+        webViewConfiguration: const WebViewConfiguration(
+          enableJavaScript: true,
+          enableDomStorage: true,
+        ),
+      );
+
+      if (!launched) {
+        print('Intento 1 fallido (inAppBrowserView), probando con inAppWebView');
+
+        // Segundo intento: WebView embebido
+        launched = await launchUrl(
+          uri,
+          mode: LaunchMode.inAppWebView,
+          webViewConfiguration: const WebViewConfiguration(
+            enableJavaScript: true,
+            enableDomStorage: true,
+          ),
+        );
+
+        if (!launched) {
+          print('Intento 2 fallido, probando con platformDefault');
+
+          // Tercer intento: comportamiento por defecto de la plataforma
+          launched = await launchUrl(
+            uri,
+            mode: LaunchMode.platformDefault,
+          );
+
+          if (!launched) {
+            print('Intento 3 fallido, probando con externalApplication');
+
+            // Último intento: navegador externo
+            launched = await launchUrl(
+              uri,
+              mode: LaunchMode.externalApplication,
+            );
+
+            if (!launched) {
+              print('Todos los intentos fallaron');
+              throw 'No se pudo abrir el documento';
+            }
+          }
+        }
+      }
+
+      print('✅ Documento abierto exitosamente');
+    } catch (e) {
+      print('❌ Error al abrir documento: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo abrir el documento',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
   }
 
   @override
@@ -205,7 +280,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.medication.name.toUpperCase(),
+                  (widget.medication.name ?? 'Sin nombre').toUpperCase(),
                   style: GoogleFonts.rubik(
                     fontSize: 14,
                     color: GerenaColors.textTertiaryColor,
@@ -214,19 +289,19 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '\$${widget.medication.price.toStringAsFixed(2)} MXN',
+                  '\$${(widget.medication.price ?? 0.0).toStringAsFixed(2)} MXN',
                   style: GoogleFonts.rubik(
                     fontSize: 14,
                     color: GerenaColors.textTertiaryColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                if (widget.medication.previousprice != null &&
-                    widget.medication.previousprice! >
-                        widget.medication.price) ...[
+                if (widget.medication.previousPrice != null &&
+                    widget.medication.previousPrice! >
+                        (widget.medication.price ?? 0)) ...[
                   const SizedBox(height: 3),
                   Text(
-                    '\$${widget.medication.previousprice!.toStringAsFixed(2)} MXN',
+                    '\$${widget.medication.previousPrice!.toStringAsFixed(2)} MXN',
                     style: GoogleFonts.rubik(
                       fontSize: 14,
                       color: GerenaColors.textpreviousprice,
@@ -238,50 +313,62 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                   ),
                 ],
                 const SizedBox(height: 8),
-                /*  Row(
-                  children: [
-                    Icon(
-                      widget.medication.stock > 0
-                          ? Icons.check_circle
-                          : Icons.cancel,
-                      color: widget.medication.stock > 0
-                          ? Colors.green
-                          : Colors.red,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      widget.medication.stock > 0
-                          ? 'Disponible (${widget.medication.stock} en stock)'
-                          : 'Agotado',
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: widget.medication.stock > 0
-                            ? Colors.green
-                            : Colors.red,
+                if ((widget.medication.stock ?? 0) > 0) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle,
+                        color: Colors.green,
+                        size: 16,
                       ),
-                    ),
-                  ],
-                ),
-                  
-                 */
-              
+                      const SizedBox(width: 4),
+                      Text(
+                        'Disponible (${widget.medication.stock} en stock)',
+                        style: GoogleFonts.rubik(
+                          fontSize: 12,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.cancel,
+                        color: Colors.red,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Agotado',
+                        style: GoogleFonts.rubik(
+                          fontSize: 12,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
           Obx(() {
-            final isInWishlist = wishlistController.isInWishlist(widget.medication.id);
-            
+            final isInWishlist =
+                wishlistController.isInWishlist(widget.medication.id);
+
             return GestureDetector(
               onTap: () {
                 wishlistController.toggleWishlist(
                   medicamentoId: widget.medication.id,
-                  precio: widget.medication.price,
+                  precio: widget.medication.price ?? 0.0,
                 );
               },
               child: Icon(
                 isInWishlist ? Icons.favorite : Icons.favorite_border,
-                color: isInWishlist ? GerenaColors.errorColor : Colors.grey[400],
+                color: isInWishlist
+                    ? GerenaColors.errorColor
+                    : Colors.grey[400],
                 size: 40,
               ),
             );
@@ -292,7 +379,8 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
   }
 
   Widget _buildActionButtons() {
-    final isAvailable = widget.medication.stock > 0 && widget.medication.activo;
+    final isAvailable = (widget.medication.stock ?? 0) > 0 &&
+        (widget.medication.isActive ?? false);
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -308,7 +396,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                     ? () async {
                         await cartController.addToCart(
                           medicamentoId: widget.medication.id,
-                          precio: widget.medication.price,
+                          precio: widget.medication.price ?? 0.0,
                           cantidad: 1,
                         );
                       }
@@ -330,7 +418,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                     ? () async {
                         await cartController.addToCart(
                           medicamentoId: widget.medication.id,
-                          precio: widget.medication.price,
+                          precio: widget.medication.price ?? 0.0,
                           cantidad: 1,
                         );
 
@@ -400,7 +488,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                     TextButton(
                       onPressed: () {
                         getMedicationsController.fetchMedicationsByCategory(
-                          widget.medication.categoria,
+                          widget.medication.category ?? '',
                         );
                       },
                       child: Text('Reintentar'),
@@ -454,14 +542,15 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
   }
 
   Widget _buildCharacteristics() {
-    final List<String> characteristics = [
-      'Zona a aplicar: Capa subcutánea',
-      'Duración: 12 – 24 meses',
-      'Concentración: HA 24 mg/ml',
-      'Mentón, pómulos y marcaje mandibular',
-      'Gran viscoelasticidad y larga duración',
-      'Lidocaína: 0.3%',
-    ];
+    final characteristics = widget.medication.features ??
+        [
+          'Zona a aplicar: Capa subcutánea',
+          'Duración: 12 – 24 meses',
+          'Concentración: HA 24 mg/ml',
+          'Mentón, pómulos y marcaje mandibular',
+          'Gran viscoelasticidad y larga duración',
+          'Lidocaína: 0.3%',
+        ];
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -518,7 +607,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
           ),
           const SizedBox(height: 8),
           Text(
-            widget.medication.description,
+            widget.medication.description ?? 'Sin descripción disponible',
             style: GoogleFonts.rubik(
               fontSize: 14,
               color: GerenaColors.textTertiaryColor,
@@ -535,22 +624,22 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          _buildLinkItem(
-            text: 'Consulta términos y condiciones de la venta',
-            onTap: () {},
-          ),
-          _buildLinkItem(
-            text: 'Descargar Ficha Técnica',
-            onTap: () {
-              Get.snackbar(
-                'Descarga',
-                'Descargando ficha técnica...',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: GerenaColors.primaryColor,
-                colorText: Colors.white,
-              );
-            },
-          ),
+          if (widget.medication.termsUrl != null)
+            _buildLinkItem(
+              text: 'Consulta términos y condiciones de la venta',
+              onTap: () => _openPdfUrl(
+                widget.medication.termsUrl!,
+                'Términos y Condiciones',
+              ),
+            ),
+          if (widget.medication.technicalSheetUrl != null)
+            _buildLinkItem(
+              text: 'Descargar Ficha Técnica',
+              onTap: () => _openPdfUrl(
+                widget.medication.technicalSheetUrl!,
+                'Ficha Técnica',
+              ),
+            ),
         ],
       ),
     );

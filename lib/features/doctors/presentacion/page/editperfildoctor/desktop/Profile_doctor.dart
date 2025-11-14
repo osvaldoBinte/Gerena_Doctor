@@ -4,7 +4,7 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/dashboard/dashboard_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
@@ -108,27 +108,110 @@ class _UserProfileContentState extends State<UserProfileContent> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    Container(
-                      width: double.infinity,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: GerenaColors.backgroundColorfondo,
-                        boxShadow: [GerenaColors.mediumShadow],
-                      ),
-                      child: ClipRRect(
-                        child: Image.network(
-                          doctor.foto!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.person,
-                              size: 80,
-                              color: GerenaColors.primaryColor,
-                            );
-                          },
+                   Obx(() => Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          color: GerenaColors.backgroundColorfondo,
+                          boxShadow: [GerenaColors.mediumShadow],
+                        ),
+                        child: ClipRRect(
+                          child: controller.selectedImageFile.value != null
+                              ? Image.file(
+                                  controller.selectedImageFile.value!,
+                                  fit: BoxFit.cover,
+                                )
+                              : controller.doctorProfile.value?.foto != null
+                                  ? Image.network(
+                                      controller.doctorProfile.value!.foto!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Icon(
+                                          Icons.person,
+                                          size: 80,
+                                          color: GerenaColors.primaryColor,
+                                        );
+                                      },
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded /
+                                                    loadingProgress.expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                    )
+                                  : Icon(
+                                      Icons.person,
+                                      size: 80,
+                                      color: GerenaColors.primaryColor,
+                                    ),
                         ),
                       ),
-                    ),
+                      // Botón de edición
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: controller.isUploadingPhoto.value
+                            ? Container(
+                                padding: EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      GerenaColors.primaryColor,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => controller.pickAndUploadProfilePhoto(),
+                                  borderRadius: BorderRadius.circular(25),
+                                  child: Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 8,
+                                          offset: Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Image.asset(
+                                      'assets/icons/edit.png',
+                                      width: 20,
+                                      height: 20,
+                                      color: GerenaColors.primaryColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ],
+                  )),
                     const SizedBox(height: 15),
                     Container(
                       padding: const EdgeInsets.all(10),
@@ -251,8 +334,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
     );
   }
 
-  Widget _buildAccountSettingsSection() {
-  final doctor = controller.doctorProfile.value!;
+ Widget _buildAccountSettingsSection() {
   return Card(
     elevation: GerenaColors.elevationSmall,
     shape: RoundedRectangleBorder(
@@ -299,8 +381,9 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         widthFactor: 0.8,
                         child: GerenaColors.buildLabeledTextField(
                           'Nombre/s*',
-                          doctor.nombre ?? '',
+                          controller.nombreController.text,
                           hintText: 'Juan Pedro',
+                          controller: controller.nombreController,
                         ),
                       ),
                     ),
@@ -311,8 +394,9 @@ class _UserProfileContentState extends State<UserProfileContent> {
                       widthFactor: 0.8,
                       child: GerenaColors.buildLabeledTextField(
                         'Apellidos*',
-                        doctor.apellidos?? '',
+                        controller.apellidosController.text,
                         hintText: 'González Pérez',
+                        controller: controller.apellidosController,
                       ),
                     ),
                   ),
@@ -327,26 +411,30 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     children: [
                       GerenaColors.buildLabeledTextField(
                         'Profesión*',
-                        doctor.especialidad,
+                        controller.especialidadController.text,
                         hintText: 'Cirujano estético',
+                        controller: controller.especialidadController,
                       ),
                       const SizedBox(height: 15),
                       GerenaColors.buildLabeledTextField(
                         'Dirección',
-                        doctor.direccion,
+                        controller.direccionController.text,
                         hintText: 'Col. Providencia, Av. Lorem ipsum #3050',
+                        controller: controller.direccionController,
                       ),
                       const SizedBox(height: 15),
                       GerenaColors.buildLabeledTextField(
                         'Email',
-                        doctor.email,
+                        controller.emailController.text,
                         hintText: 'doctor@ejemplo.com',
+                        controller: controller.emailController,
                       ),
                       const SizedBox(height: 15),
                       GerenaColors.buildLabeledTextField(
                         'Teléfono',
-                        doctor.telefono,
+                        controller.telefonoController.text,
                         hintText: '33 1234 5678',
+                        controller: controller.telefonoController,
                       ),
                       const SizedBox(height: 15),
                     ],
@@ -362,23 +450,23 @@ class _UserProfileContentState extends State<UserProfileContent> {
                         width: constraints.maxWidth * 0.64,
                         child: GerenaColors.buildLabeledTextField(
                           'Licencia Profesional',
-                          doctor.numeroLicencia,
+                          controller.numeroLicenciaController.text,
                           hintText: '1234567',
+                          controller: controller.numeroLicenciaController,
                         ),
                       ),
                       const Spacer(),
-                      
-                      /*SizedBox(
+                      Obx(() => SizedBox(
                         width: 100,
-                        child: GerenaColors.widgetButton(
-                          onPressed: () {
-                            print('Guardando configuración de cuenta');
-                          },
-                          text: 'GUARDAR',
-                          borderRadius: 5,
-                          showShadow: false,
-                        ),
-                      ),*/
+                        child: controller.isUpdating.value
+                            ? Center(child: CircularProgressIndicator())
+                            : GerenaColors.widgetButton(
+                                onPressed: () => controller.updateAccountSettings(),
+                                text: 'GUARDAR',
+                                borderRadius: 5,
+                                showShadow: false,
+                              ),
+                      )),
                     ],
                   );
                 },
@@ -390,9 +478,8 @@ class _UserProfileContentState extends State<UserProfileContent> {
     ),
   );
 }
-  Widget _buildAcademicFormationSection() {
-  final doctor = controller.doctorProfile.value!;
 
+Widget _buildAcademicFormationSection() {
   return Card(
     elevation: GerenaColors.elevationSmall,
     shape: RoundedRectangleBorder(
@@ -428,8 +515,9 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     flex: 5,
                     child: GerenaColors.buildLabeledTextField(
                       'Título',
-                      doctor.titulo ?? '',
+                      controller.tituloController.text,
                       hintText: 'Ej. Rinomodelación',
+                      controller: controller.tituloController,
                     ),
                   ),
                   Flexible(
@@ -445,8 +533,9 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     flex: 5,
                     child: GerenaColors.buildLabeledTextField(
                       'Disciplina académica',
-                      doctor.especialidad,
+                      controller.disciplinaController.text,
                       hintText: 'Ej. Medicina estética',
+                      controller: controller.disciplinaController,
                     ),
                   ),
                   Flexible(
@@ -463,32 +552,15 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     flex: 5,
                     child: GerenaColors.buildLabeledTextField(
                       'Institución',
-                      doctor.institucion ?? '',
+                      controller.institucionController.text,
                       hintText: 'Ej. Universidad de Guadalajara',
+                      controller: controller.institucionController,
                     ),
                   ),
                   const SizedBox(width: 15),
-                  
                   Flexible(
                     flex: 3,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 2.0),
-                        child: SizedBox(
-                          width: 100,
-                          /*child: GerenaColors.widgetButton(
-                            onPressed: () {
-                              print('Guardando formación académica 1');
-                              // Aquí puedes implementar la lógica de guardado
-                            },
-                            text: 'GUARDAR',
-                            showShadow: false,
-                            borderRadius: 5,
-                          ),*/
-                        ),
-                      ),
-                    ),
+                    child: Container(),
                   ),
                 ],
               ),
@@ -500,8 +572,9 @@ class _UserProfileContentState extends State<UserProfileContent> {
                     flex: 5,
                     child: GerenaColors.buildLabeledTextField(
                       'Certificaciones',
-                      doctor.certificacion ?? '',
+                      controller.certificacionController.text,
                       hintText: 'Ej. Certificación en Botox Avanzado',
+                      controller: controller.certificacionController,
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -511,144 +584,17 @@ class _UserProfileContentState extends State<UserProfileContent> {
                       alignment: Alignment.bottomRight,
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 2.0),
-                        child: SizedBox(
+                        child: Obx(() => SizedBox(
                           width: 100,
-                         /* child: GerenaColors.widgetButton(
-                            onPressed: () {
-                              print('Guardando certificaciones');
-                              // Aquí puedes implementar la lógica de guardado
-                            },
-                            text: 'GUARDAR',
-                            showShadow: false,
-                            borderRadius: 5,
-                          ),*/
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
-}
-Widget _buildAcademicFormationSectio2n() {
-  final doctor = controller.doctorProfile.value!;
-
-  return Card(
-    elevation: GerenaColors.elevationSmall,
-    shape: RoundedRectangleBorder(
-      borderRadius: GerenaColors.mediumBorderRadius,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Formación académica',
-            style: GoogleFonts.rubik(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: GerenaColors.textPrimaryColor,
-            ),
-          ),
-          Text(
-            'La información presentada en los siguientes apartados será mostrada según sea llenada en la aplicación para clientes de Gerena.',
-            style: GoogleFonts.rubik(
-              fontSize: 14,
-              color: GerenaColors.textSecondaryColor,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: GerenaColors.buildLabeledTextField(
-                      'Educación',
-                      doctor.educacion,
-                      hintText: 'Ej. Universidad de Guadalajara - Medicina',
-                    ),
-                  ),
-                  Flexible(
-                    flex: 3,
-                    child: Container(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: GerenaColors.buildLabeledTextField(
-                      'Especialidad',
-                      doctor.especialidad,
-                      hintText: 'Ej. Medicina estética',
-                    ),
-                  ),
-                  Flexible(
-                    flex: 3,
-                    child: Container(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: GerenaColors.buildLabeledTextField(
-                      'Experiencia (años)',
-                      doctor.experienciaTiempo > 0 
-                        ? doctor.experienciaTiempo.toString() 
-                        : '',
-                      hintText: 'Ej. 5',
-                    ),
-                  ),
-                  Flexible(
-                    flex: 3,
-                    child: Container(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Flexible(
-                    flex: 5,
-                    child: GerenaColors.buildLabeledTextField(
-                      'Biografía',
-                      doctor.biografia,
-                      hintText: 'Describe tu experiencia profesional',
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  Flexible(
-                    flex: 3,
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 2.0),
-                        child: SizedBox(
-                          width: 100,
-                          child: GerenaColors.widgetButton(
-                            onPressed: () {
-                              print('Guardando formación académica');
-                            },
-                            text: 'GUARDAR',
-                            showShadow: false,
-                            borderRadius: 5,
-                          ),
-                        ),
+                          child: controller.isUpdating.value
+                              ? Center(child: CircularProgressIndicator())
+                              : GerenaColors.widgetButton(
+                                  onPressed: () => controller.updateAcademicFormation(),
+                                  text: 'GUARDAR',
+                                  showShadow: false,
+                                  borderRadius: 5,
+                                ),
+                        )),
                       ),
                     ),
                   ),
