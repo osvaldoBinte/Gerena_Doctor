@@ -68,9 +68,9 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   }
   
   @override
-  Future<void> payorder(int orderId) async {
+  Future<void> payorder(int orderId,String paymentMethodId) async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
-    return await marketplaceDataSourcesImp.payorder(orderId, token);
+    return await marketplaceDataSourcesImp.payorder(orderId, token,paymentMethodId);
   }
  
 }

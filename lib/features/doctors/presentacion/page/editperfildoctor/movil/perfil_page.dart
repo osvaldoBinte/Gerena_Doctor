@@ -7,12 +7,12 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/procedure_Widget.dart';
 import 'package:gerena/movil/widgets/review_widget.dart';
-import 'package:gerena/page/dashboard/widget/estatusdepedido/estatus_de_pedido.dart';
-import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
+import 'package:gerena/features/home/dashboard/widget/estatusdepedido/estatus_de_pedido.dart';
+import 'package:gerena/features/home/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -405,7 +405,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          doctor.nombreCompleto,
+                          doctor.nombreCompleto ?? '',
                           style: GoogleFonts.rubik(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -414,7 +414,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          doctor.especialidad,
+                          doctor.especialidad ?? '',
                           style: GoogleFonts.rubik(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -432,7 +432,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                         ),
                         SizedBox(height: GerenaColors.paddingSmall),
                         Text(
-                          doctor.direccion,
+                          doctor.direccion?? '',
                           style: GoogleFonts.rubik(
                             fontSize: 14,
                             color: GerenaColors.textTertiaryColor,

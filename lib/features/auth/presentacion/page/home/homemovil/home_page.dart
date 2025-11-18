@@ -3,7 +3,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

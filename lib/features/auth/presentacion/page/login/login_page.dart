@@ -118,7 +118,7 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     children: [
                       _buildLoginForm(controller, isMobile: false),
-                      
+                      /*
                       const SizedBox(height: 30),
                       
                       Center(
@@ -126,7 +126,7 @@ class LoginPage extends StatelessWidget {
                           text: 'Iniciar con código QR',
                           onPressed: () {},
                         ),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),

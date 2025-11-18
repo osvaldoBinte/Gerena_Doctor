@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/widgets/simple_counter.dart';
-import 'package:gerena/page/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
+import 'package:gerena/features/home/dashboard/widget/sidebar/modalbot/gerena_%20modal_bot.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
 import 'package:gerena/common/theme/App_Theme.dart';

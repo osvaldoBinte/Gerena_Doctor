@@ -4,6 +4,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/simple_counter.dart';
 import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
+import 'package:gerena/features/marketplace/presentation/page/addresses/add_address_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
@@ -250,10 +251,12 @@ class CartPageContent extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               TextButton.icon(
-                onPressed: () {
-                  // TODO: Navegar a agregar dirección
-                  // navigationController.navigateToAddAddress();
-                },
+               onPressed: () {
+    Get.dialog(
+      AddAddressModal(),
+      barrierDismissible: false,
+    );
+  },
                 icon: Icon(Icons.add_location),
                 label: Text('Agregar dirección'),
                 style: TextButton.styleFrom(
@@ -270,7 +273,6 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
   WidgetsBinding.instance.addPostFrameCallback((_) {
     final firstAddress = addressesController.addresses.first;
     addressesController.selectAddress(firstAddress);
-    // ✅ Esperar a que se actualice antes de notificar al cart controller
     Future.delayed(Duration(milliseconds: 50), () {
       cartController.selectAddress(firstAddress.id.toString());
     });
@@ -394,7 +396,7 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
                                   WidgetsBinding.instance
                                       .addPostFrameCallback((_) {
                                     cartController
-                                        .selectPaymentMethod(displayCard.id);
+                                        .selectPaymentMethod(displayCard.paymentMethodId??'');
                                   });
                                 }
 
@@ -621,8 +623,10 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
               OutlinedButton.icon(
                 onPressed: () {
                   Get.back();
-                  // TODO: Navegar a agregar dirección
-                  // navigationController.navigateToAddAddress();
+                  Get.dialog(
+      AddAddressModal(),
+      barrierDismissible: false,
+    );
                 },
                 icon: Icon(Icons.add_location),
                 label: Text('Agregar nueva dirección'),
@@ -727,7 +731,6 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
       ),
     );
   }
-  // ✅ NUEVO WIDGET: Construir dirección seleccionada desde AddressesEntity
   Widget _buildSelectedAddressFromEntity(
     AddressesEntity address, {
     VoidCallback? onEdit,
@@ -958,109 +961,6 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: GerenaColors.textTertiaryColor,
-      ),
-    );
-  }
-
-  Widget _buildSelectedAddress(String name, String address,
-      {bool isSelected = false}) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Colors.grey[300]!,
-        ),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        children: [
-          if (isSelected)
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Image.asset(
-                'assets/icons/check.png',
-                width: 30,
-                height: 30,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(Icons.check_circle,
-                      color: GerenaColors.primaryColor, size: 30);
-                },
-              ),
-            ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.bold,
-                    color: GerenaColors.textPrimaryColor,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  address,
-                  style: GoogleFonts.rubik(
-                    fontSize: 13,
-                    color: GerenaColors.textSecondaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(right: 20),
-            child: Image.asset(
-              'assets/icons/edit.png',
-              width: 30,
-              height: 30,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.edit, color: Colors.grey, size: 30);
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddressSelector(String title, String address) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        children: [
-          const SizedBox(width: 70),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.bold,
-                    color: GerenaColors.textPrimaryColor,
-                  ),
-                ),
-                Text(
-                  address,
-                  style: GoogleFonts.rubik(
-                    fontSize: 13,
-                    color: GerenaColors.textSecondaryColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            color: Colors.grey,
-          ),
-        ],
       ),
     );
   }

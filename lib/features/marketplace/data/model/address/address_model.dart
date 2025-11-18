@@ -48,18 +48,19 @@ factory AddressModel.fromJson(Map<String, dynamic> json) {
       references: entity.references,
     );
   }
-   Map<String, dynamic> toJson() {
-    return {
-      'fullName': fullName,
-      'phone': phone,
-      'street': street,
-      'exteriorNumber': exteriorNumber,
-      'interiorNumber': interiorNumber,
-      'neighborhood': neighborhood,
-      'city': city,
-      'state': state,
-      'postalCode': postalCode,
-      'referencias': references,
-    };
-  }
+Map<String, dynamic> toJson() {
+  return {
+    'nombreCompleto': fullName,
+    'telefono': phone,
+    'calle': street,
+    'numeroExterior': exteriorNumber,
+    'numeroInterior': interiorNumber,
+    'colonia': neighborhood,
+    'ciudad': city,
+    'estado': state,
+    'codigoPostal': postalCode,
+    'referencias': references,
+  };
+}
+
 }

@@ -9,34 +9,47 @@ class PaymentMethodModel extends PaymentMethodEntity {
     required super.expMonth,
     required super.expYear,
     super.cardholderName,
+     super.paymentMethodId,
   });
 
-  // Este método es para cuando recibes datos de TU API (backend)
+  // ✅ Cuando recibes datos de TU API (backend)
   factory PaymentMethodModel.fromJson(Map<String, dynamic> json) {
-    return PaymentMethodModel(id: json['id'] is int 
-    ? json['id'].toString() 
-    : json['id'] as String, // Cambiado de 'id' a 'paymentMethodId'
+    final String cardId = json['id'] is int 
+        ? json['id'].toString() 
+        : json['id'] as String;
+    
+    // ✅ Usar paymentMethodId si existe, sino usar id
+    final String methodId = json['paymentMethodId'] is int
+        ? json['paymentMethodId'].toString()
+        : (json['paymentMethodId'] as String? ?? cardId);
+
+    return PaymentMethodModel(
+      id: cardId,
       brand: (json['brand'] as String?) ?? 'unknown',
       last4: json['last4'] as String,
-      expMonth: (json['expMonth'] as int?) ?? 0, // Cambiado de 'exp_month' a 'expMonth'
-      expYear: (json['expYear'] as int?) ?? 0, // Cambiado de 'exp_year' a 'expYear'
-      cardholderName: null, // Tu API no devuelve este campo
+      expMonth: (json['expMonth'] as int?) ?? 0,
+      expYear: (json['expYear'] as int?) ?? 0,
+      cardholderName: json['cardholderName'] as String?,
+      paymentMethodId: methodId, // ✅ Agregar paymentMethodId
     );
   }
 
-  // Este método es para cuando recibes datos directamente de Stripe
+  // ✅ Cuando recibes datos directamente de Stripe API
   factory PaymentMethodModel.fromStripeApi(Map<String, dynamic> json) {
+    final String stripeId = json['id'] as String;
+    
     return PaymentMethodModel(
-      id: json['id'] as String,
+      id: stripeId,
       brand: (json['card']['brand'] as String?) ?? 'unknown',
       last4: json['card']['last4'] as String,
       expMonth: (json['card']['exp_month'] as int?) ?? 0,
       expYear: (json['card']['exp_year'] as int?) ?? 0,
       cardholderName: json['billing_details']?['name'] as String?,
+      paymentMethodId: stripeId, // ✅ En Stripe API, el id ES el paymentMethodId
     );
   }
 
-  // Este método es para cuando usas flutter_stripe
+  // ✅ Cuando usas flutter_stripe
   factory PaymentMethodModel.fromStripe(
     stripe.PaymentMethod stripePaymentMethod,
     String? cardholderName,
@@ -48,9 +61,11 @@ class PaymentMethodModel extends PaymentMethodEntity {
       expMonth: stripePaymentMethod.card.expMonth ?? 0,
       expYear: stripePaymentMethod.card.expYear ?? 0,
       cardholderName: cardholderName,
+      paymentMethodId: stripePaymentMethod.id, // ✅ El ID de Stripe es el paymentMethodId
     );
   }
 
+  // ✅ Desde una entidad
   factory PaymentMethodModel.fromEntity(PaymentMethodEntity entity) {
     return PaymentMethodModel(
       id: entity.id,
@@ -59,17 +74,20 @@ class PaymentMethodModel extends PaymentMethodEntity {
       expMonth: entity.expMonth,
       expYear: entity.expYear,
       cardholderName: entity.cardholderName,
+      paymentMethodId: entity.paymentMethodId,
     );
   }
 
+  // ✅ Convertir a JSON
   Map<String, dynamic> toJson() {
     return {
-      'paymentMethodId': id,
+      'id': id,
       'brand': brand,
       'last4': last4,
       'expMonth': expMonth,
       'expYear': expYear,
       'cardholderName': cardholderName,
+      'paymentMethodId': paymentMethodId, // ✅ Incluir paymentMethodId
     };
   }
 }

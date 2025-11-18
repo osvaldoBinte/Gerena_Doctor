@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
-import 'package:gerena/page/dashboard/dashboard_controller.dart';
-import 'package:gerena/page/dashboard/widget/half_cut_circle.dart';
+import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
+import 'package:gerena/features/home/dashboard/widget/half_cut_circle.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
-import 'package:gerena/page/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
+import 'package:gerena/features/home/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart'; // Importa url_launcher

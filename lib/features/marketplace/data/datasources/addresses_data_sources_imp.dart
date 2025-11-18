@@ -43,4 +43,37 @@ class AddressesDataSourcesImp {
       throw Exception('$e');
     }
   }
+
+    Future<void> postAddresses(
+    AddressesEntity entity,
+    String token,
+  ) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/doctores/direcciones');
+
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer $token'
+        },
+        body:
+            jsonEncode(AddressModel.fromEntity(entity).toJson()),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
 }

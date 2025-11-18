@@ -10,10 +10,20 @@ import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
 import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
 import 'package:gerena/features/banners/domain/usecase/get_banners_usecase.dart';
+import 'package:gerena/features/doctorprocedures/data/datasources/procedures_data_sources_imp.dart';
+import 'package:gerena/features/doctorprocedures/data/repositories/procedure_repository_imp.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/add_imagenes_usecase.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/create_procedure_usecase.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/delete_img_usecase.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/delete_procedure_usecase.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/get_procedures_usecase.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/update_procedure_usecase.dart';
 import 'package:gerena/features/doctors/data/datasources/doctos_data_sources_imp.dart';
 import 'package:gerena/features/doctors/data/repositories/doctor_repository_imp.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/get_doctor_availability_usecase.dart';
+import 'package:gerena/features/doctors/domain/usecase/update_doctor_profile_usecase.dart';
+import 'package:gerena/features/doctors/domain/usecase/updatefoto_doctor_profile_usecase.dart';
 import 'package:gerena/features/marketplace/data/datasources/Payment_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/addresses_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
@@ -21,6 +31,7 @@ import 'package:gerena/features/marketplace/data/repositories/addresses_reposito
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/payment_repository_imp.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/get_addresses_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/addresses/post_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/create_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicine_by_id_usecase.dart';
@@ -36,6 +47,9 @@ import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_m
 import 'package:gerena/features/marketplace/domain/usecase/payment/savecard_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
+import 'package:gerena/features/review/data/datasources/review_data_sources_imp.dart';
+import 'package:gerena/features/review/data/repositories/review_repository_imp.dart';
+import 'package:gerena/features/review/domain/usecase/my_review_usecase.dart';
 import 'package:gerena/features/subscription/data/datasources/subscription_data_sources_imp.dart';
 import 'package:gerena/features/subscription/data/repositories/subscription_repository_imp.dart';
 import 'package:gerena/features/subscription/domain/usecase/change_subscription_plan_usecase.dart';
@@ -52,6 +66,8 @@ class UsecaseConfig {
    BannersRepositoryImp? bannersRepositoryImp;
    AddressesRepositoryImp? addressesRepositoryImp;
    SubscriptionRepositoryImp? subscriptionRepositoryImp;
+   ProcedureRepositoryImp? procedureRepositoryImp;
+   ReviewRepositoryImp? reviewRepositoryImp;
 
 
    AuthDataSourcesImp? authDataSources;
@@ -60,6 +76,8 @@ class UsecaseConfig {
    BannersDataSourcesImp? bannersDataSourcesImp;
    AddressesDataSourcesImp? addressesDataSourcesImp;
    SubscriptionDataSourcesImp? subscriptionDataSourcesImp;
+   ProceduresDataSourcesImp? proceduresDataSourcesImp;
+   ReviewDataSourcesImp? reviewDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -68,6 +86,8 @@ class UsecaseConfig {
    DoctosDataSourcesImp? doctosDataSources;
    DoctorProfileUsecase? doctorProfileUsecase;
    GetDoctorAvailabilityUsecase? getDoctorAvailabilityUsecase;
+   UpdateDoctorProfileUsecase? updateDoctorProfileUsecase;
+   UpdatefotoDoctorProfileUsecase? updatefotoDoctorProfileUsecase;
 
    AppointmentRepositoryImp? appointmentRepositoryImp;
    AppointmentDataSourcesImp? appointmentDataSourcesImp;
@@ -86,6 +106,7 @@ class UsecaseConfig {
    PayOrderUsecase? payOrderUsecase;
 
    GetAddressesUsecase ? getAddressesUsecase;
+   PostAddressesUsecase? postAddressesUsecase;
 
 
    AttachPaymentMethodToCustomerUsecase? attachPaymentMethodToCustomerUsecase;
@@ -106,6 +127,16 @@ class UsecaseConfig {
    GetMySubscriptionUsecase? getMySubscriptionUsecase;
 
 
+   AddImagenesUsecase? addImagenesUsecase;
+   CreateProcedureUsecase? createProcedureUsecase;
+   GetProceduresUsecase? getProceduresUsecase;
+   UpdateProcedureUsecase? updateProcedureUsecase;
+   DeleteImgUsecase? deleteImgUsecase;
+   DeleteProcedureUsecase? deleteProcedureUsecase;
+
+
+   MyReviewUsecase?myReviewUsecase;
+
 
 
 
@@ -118,6 +149,9 @@ class UsecaseConfig {
       bannersDataSourcesImp = BannersDataSourcesImp();
       addressesDataSourcesImp = AddressesDataSourcesImp();
       subscriptionDataSourcesImp = SubscriptionDataSourcesImp();
+      proceduresDataSourcesImp = ProceduresDataSourcesImp();
+      reviewDataSourcesImp = ReviewDataSourcesImp();
+      
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
      authRepositoryImp = AuthRepositoryImp(authDataSources: authDataSources!);
@@ -127,12 +161,17 @@ class UsecaseConfig {
       bannersRepositoryImp = BannersRepositoryImp(bannersDataSourcesImp: bannersDataSourcesImp!);
       addressesRepositoryImp = AddressesRepositoryImp(addressesDataSourcesImp: addressesDataSourcesImp!);
       subscriptionRepositoryImp = SubscriptionRepositoryImp(subscriptionDataSourcesImp: subscriptionDataSourcesImp!);
+      procedureRepositoryImp = ProcedureRepositoryImp(proceduresDataSourcesImp: proceduresDataSourcesImp!);
+      reviewRepositoryImp = ReviewRepositoryImp(reviewDataSourcesImp: reviewDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
+
      getAppointmentsUsecase = GetAppointmentsUsecase(appointmentRepository: appointmentRepositoryImp!);
      getDoctorAvailabilityUsecase = GetDoctorAvailabilityUsecase(doctorRepository: doctorRepositoryImp!);
      postAppointmentUsecase = PostAppointmentUsecase(appointmentRepository: appointmentRepositoryImp!);
+     updateDoctorProfileUsecase = UpdateDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
+     updatefotoDoctorProfileUsecase = UpdatefotoDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
 
      getMedicineByIdUsecase = GetMedicineByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getMyOrderUsecase = GetMyOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
@@ -146,6 +185,7 @@ class UsecaseConfig {
      payOrderUsecase = PayOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
 
      getAddressesUsecase = GetAddressesUsecase(addressesRepository: addressesRepositoryImp!);
+     postAddressesUsecase = PostAddressesUsecase(addressesRepository: addressesRepositoryImp!);
 
 
       attachPaymentMethodToCustomerUsecase = AttachPaymentMethodToCustomerUsecase(repository: paymentRepositoryImp!);
@@ -163,7 +203,18 @@ class UsecaseConfig {
       postSubscribeToPlanUsecase = PostSubscribeToPlanUsecase(subscriptionRepository: subscriptionRepositoryImp!);
       getAllPlansUsecase = GetAllPlansUsecase(subscriptionRepository: subscriptionRepositoryImp!);
       getMySubscriptionUsecase = GetMySubscriptionUsecase(subscriptionRepository: subscriptionRepositoryImp!);
-      
+
+
+
+      addImagenesUsecase = AddImagenesUsecase(proceduresRepository: procedureRepositoryImp!);
+      createProcedureUsecase = CreateProcedureUsecase(proceduresRepository: procedureRepositoryImp!);
+      getProceduresUsecase = GetProceduresUsecase(proceduresRepository: procedureRepositoryImp!);
+      updateProcedureUsecase = UpdateProcedureUsecase(proceduresRepository: procedureRepositoryImp!);
+      deleteImgUsecase = DeleteImgUsecase(proceduresRepository: procedureRepositoryImp!);        
+      deleteProcedureUsecase = DeleteProcedureUsecase(proceduresRepository: procedureRepositoryImp!) ;
+
+
+      myReviewUsecase = MyReviewUsecase(reviewRepository: reviewRepositoryImp!);
 
     
   }

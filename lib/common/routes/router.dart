@@ -8,7 +8,7 @@ import 'package:gerena/features/marketplace/presentation/page/medications/mobil/
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_detail_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
 import 'package:gerena/movil/home/start_page.dart';
-import 'package:gerena/page/dashboard/dashboard_page.dart';
+import 'package:gerena/features/home/dashboard/dashboard_page.dart';
 import 'package:get/get.dart';
 class AppPages {
   static final routes = [

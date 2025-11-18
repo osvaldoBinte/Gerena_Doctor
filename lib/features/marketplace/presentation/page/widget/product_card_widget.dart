@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,7 +25,8 @@ class ProductCardWidget extends StatelessWidget {
     final bool hasDiscount = product['hasDiscount'] == 'true';
     
     final wishlistController = Get.find<WishlistController>();
-    
+   final cartController = Get.find<ShoppingCartController>();
+
     final medicamentoId = int.tryParse(product['id'] ?? '0') ?? 0;
     final precio = _extractPrice(product['price'] ?? '0.00');
 
@@ -49,8 +51,10 @@ class ProductCardWidget extends StatelessWidget {
               child: _buildImageSection(
                 hasDiscount, 
                 wishlistController, 
+                cartController,
                 medicamentoId, 
-                precio
+                precio,
+                
               ),
             ),
             _buildProductInfo(
@@ -68,6 +72,7 @@ class ProductCardWidget extends StatelessWidget {
   Widget _buildImageSection(
     bool hasDiscount, 
     WishlistController wishlistController,
+    ShoppingCartController cartController,
     int medicamentoId,
     double precio,
   ) {
@@ -97,11 +102,14 @@ class ProductCardWidget extends StatelessWidget {
               final isInWishlist = wishlistController.isInWishlist(medicamentoId);
               
               return InkWell(
-                onTap: () {
-                  wishlistController.toggleWishlist(
-                    medicamentoId: medicamentoId,
-                    precio: precio,
-                  );
+                onTap: ()async {
+                  if (medicamentoId > 0 && precio > 0) {
+                          await cartController.addToCart(
+                            medicamentoId: medicamentoId,
+                            precio: precio,
+                            cantidad: 1,
+                          );
+                        }
                 },
                 child: Container(
                   width: 24,
@@ -128,7 +136,7 @@ class ProductCardWidget extends StatelessWidget {
     if (product['image']?.isNotEmpty ?? false) {
       return Image.network(
         product['image']!,
-        height: 120,
+        height: 300,
         fit: BoxFit.contain,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
@@ -202,13 +210,11 @@ class ProductCardWidget extends StatelessWidget {
                       color: isInWishlist ? Colors.red : Colors.grey,
                     ),
                     onPressed: () {
-                      // Llama al controller para guardar/eliminar
                       wishlistController.toggleWishlist(
                         medicamentoId: medicamentoId,
                         precio: precio,
                       );
                       
-                      // Si existe el callback original, también lo ejecuta
                       if (onFavoritePressed != null) {
                         onFavoritePressed!();
                       }
@@ -276,10 +282,8 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  // Método auxiliar para extraer el precio numérico del string
   double _extractPrice(String priceString) {
     try {
-      // Elimina "MXN" y espacios, luego convierte a double
       final cleanPrice = priceString
           .replaceAll('MXN', '')
           .replaceAll('\$', '')

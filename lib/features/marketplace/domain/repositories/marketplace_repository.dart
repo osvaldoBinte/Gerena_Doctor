@@ -18,5 +18,5 @@ abstract class MarketplaceRepository {
     Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder);
 
   Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity);
-  Future<void> payorder(int orderId);
+  Future<void> payorder(int orderId,String paymentMethodId);
 }

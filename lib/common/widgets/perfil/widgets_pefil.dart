@@ -1,52 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/subscription/presentation/page/menbresia/menbreria_movil.dart';
-import 'package:gerena/page/dashboard/dashboard_controller.dart';
+import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 Widget buildProfileMenuItem(String title, {String? icon}) {
-  return GestureDetector(
-    onTap: () {
-      _handleMenuNavigation(title);
-    },
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Row(
-        children: [
-          Text(
-            title,
-            style: GoogleFonts.rubik(
-              fontSize: 14,
-              color: GerenaColors.textTertiaryColor,
-            ),
-          ),
-          SizedBox(width: 10),
-          if (icon != null) ...[
-            Image.asset(
-              icon,
-              width: 20,
-              height: 20,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.image_not_supported,
-                  size: 20,
-                  color: GerenaColors.textSecondaryColor,
-                );
-              },
+  return MouseRegion(
+    cursor: SystemMouseCursors.click, 
+    child: GestureDetector(
+      onTap: () {
+        _handleMenuNavigation(title);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.rubik(
+                fontSize: 14,
+                color: GerenaColors.textTertiaryColor,
+              ),
             ),
             const SizedBox(width: 10),
+            if (icon != null) ...[
+              Image.asset(
+                icon,
+                width: 20,
+                height: 20,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.image_not_supported,
+                    size: 20,
+                    color: GerenaColors.textSecondaryColor,
+                  );
+                },
+              ),
+              const SizedBox(width: 10),
+            ],
           ],
-        ],
+        ),
       ),
     ),
   );
 }
 
-// Función para detectar si es móvil
+
 bool _isMobile(BuildContext context) {
-  return MediaQuery.of(context).size.width < 768; // Considera móvil si es menor a 768px
+  return MediaQuery.of(context).size.width < 768; 
 }
 
 void _handleMenuNavigation(String menuTitle) {
@@ -58,14 +61,11 @@ void _handleMenuNavigation(String menuTitle) {
       
     case 'Membresía':
       try {
-        // Detectar si es móvil usando el contexto actual
         final context = Get.context;
         if (context != null && _isMobile(context)) {
-          // Es móvil - navegar a MembresiaPage
           Get.to(() => const MembresiaPage());
           print('Navegación exitosa a MembresiaPage (móvil)');
         } else {
-          // Es escritorio/tablet - usar DashboardController
           if (!Get.isRegistered<DashboardController>()) {
             Get.put(DashboardController());
           }
@@ -76,7 +76,6 @@ void _handleMenuNavigation(String menuTitle) {
         }
       } catch (e) {
         print('Error en navegación a membresía: $e');
-        // Fallback - intentar con DashboardController
         try {
           if (!Get.isRegistered<DashboardController>()) {
             Get.put(DashboardController());
@@ -132,6 +131,10 @@ void _handleMenuNavigation(String menuTitle) {
       } catch (e) {
         print('Error en navegación a preguntas frecuentes: $e');
       }
+      break;
+      case 'Cerrar sesión':
+                                Get.toNamed(RoutesNames.loginPage);
+
       break;
       
     default:

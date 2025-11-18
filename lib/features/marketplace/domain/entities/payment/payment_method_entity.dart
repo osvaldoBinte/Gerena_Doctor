@@ -5,6 +5,7 @@ class PaymentMethodEntity {
   final int expMonth;
   final int expYear;
   final String? cardholderName;
+   String? paymentMethodId;
 
   PaymentMethodEntity({
     required this.id,
@@ -13,6 +14,7 @@ class PaymentMethodEntity {
     required this.expMonth,
     required this.expYear,
     this.cardholderName,
+     this.paymentMethodId
   });
 
   String get formattedCardNumber {

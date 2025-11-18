@@ -276,7 +276,7 @@ Future<List<MedicationsEntity>> searchingformedications(
     }
   }
 
-  Future<void> payorder(int id, String token) async {
+  Future<void> payorder(int id, String token,String paymentMethodId) async {
     try {
       Uri url = Uri.parse('$defaultApiServer/Marketplace/pedidos/$id/pagar');
 
@@ -285,6 +285,9 @@ Future<List<MedicationsEntity>> searchingformedications(
           'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
         },
+          body: jsonEncode({
+        'paymentMethodId': paymentMethodId,
+      }),
        
       );
 

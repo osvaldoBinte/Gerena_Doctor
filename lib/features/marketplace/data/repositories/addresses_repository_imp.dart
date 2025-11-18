@@ -16,9 +16,9 @@ class AddressesRepositoryImp implements AddressesRepository {
 
 
   @override
-  Future<void> postAddresses(int paymentIntentId) {
-    // TODO: implement postAddresses
-    throw UnimplementedError();
+  Future<void> postAddresses(AddressesEntity entity) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await addressesDataSourcesImp.postAddresses(entity, token);
   }
 
   @override

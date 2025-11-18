@@ -14,7 +14,6 @@ class CalendarControllerGetx extends GetxController {
   final GetAppointmentsUsecase getAppointmentsUsecase;
   CalendarControllerGetx({required this.getAppointmentsUsecase});
 
-  // Inicializar con el día 1 del mes actual
   final Rx<DateTime> focusedDate = DateTime(DateTime.now().year, DateTime.now().month, 1).obs;  
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime(DateTime.now().year, DateTime.now().month, 1));
   final Rx<DateTime?> lastTappedDate = Rx<DateTime?>(null);
@@ -41,7 +40,6 @@ class CalendarControllerGetx extends GetxController {
       viewportFraction: 0.55, 
     );
     
-    // Cargar citas de la fecha inicial
     loadAppointmentsForDate(focusedDate.value);
   }
 
@@ -84,7 +82,6 @@ class CalendarControllerGetx extends GetxController {
     
     resetCarouselIndex();
     
-    // Cargar citas para la nueva fecha
     loadAppointmentsForDate(date);
     
     if (currentViewType.value == CalendarViewType.day) {
@@ -98,23 +95,18 @@ class CalendarControllerGetx extends GetxController {
     showAppointmentDetails.value = false;
   }
 
-  // Cargar citas desde el usecase
   Future<void> loadAppointmentsForDate(DateTime date) async {
     try {
       isLoading.value = true;
       
-      // Formatear fecha como string (formato: YYYY-MM-DD)
       final dateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       
-      // Calcular el número de días del mes
       final daysInMonth = _getDaysInMonth(date.year, date.month);
       
       print('Cargando citas para: $dateString con $daysInMonth días en el mes');
       
-      // Obtener citas del usecase pasando la fecha y los días del mes
       final appointmentEntities = await getAppointmentsUsecase.execute(dateString, daysInMonth.toString());
       
-      // Convertir entidades a objetos Appointment
       final appointmentsList = appointmentEntities.map((entity) {
         return _convertEntityToAppointment(entity);
       }).toList();
@@ -131,17 +123,14 @@ class CalendarControllerGetx extends GetxController {
     }
   }
 
-  // Obtener el número de días en un mes específico
   int _getDaysInMonth(int year, int month) {
-    // Crear una fecha del primer día del siguiente mes y restar un día
     final firstDayNextMonth = DateTime(year, month + 1, 1);
     final lastDayCurrentMonth = firstDayNextMonth.subtract(const Duration(days: 1));
     return lastDayCurrentMonth.day;
   }
 
-  // Convertir GetApppointmentEntity a Appointment
   Appointment _convertEntityToAppointment(GetApppointmentEntity entity) {
-    // Parsear las fechas
+
     final startDateTime = DateTime.parse(entity.startDateTime);
     final endDateTime = DateTime.parse(entity.endDateTime);
     
@@ -280,7 +269,6 @@ class CalendarControllerGetx extends GetxController {
       
       resetCarouselIndex();
       
-      // Cargar citas para el nuevo período
       loadAppointmentsForDate(focusedDate.value);
       
       try {
@@ -302,12 +290,10 @@ class CalendarControllerGetx extends GetxController {
       
       final newFocusedDate = visibleDates[visibleDates.length ~/ 2];
       
-      // Solo actualizar y cargar si el mes cambió
       if (focusedDate.value.month != newFocusedDate.month || 
           focusedDate.value.year != newFocusedDate.year) {
         focusedDate.value = newFocusedDate;
         
-        // Cargar citas para el nuevo mes
         loadAppointmentsForDate(newFocusedDate);
       }
       

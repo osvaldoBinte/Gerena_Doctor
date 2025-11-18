@@ -68,6 +68,62 @@ class DoctosDataSourcesImp {
       throw Exception('$e');
     }
   }
-  
+  Future<void> updateDoctorProfile(DoctorEntity doctor, String token) async {
+ try {
+      Uri url = Uri.parse('$defaultApiServer/Doctores/mi-perfil');
+
+      final response = await http.put( url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+        },
+       body:
+            jsonEncode(DoctorModel.fromEntity(doctor).toJson()),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+    }
+  }
+Future<void> updatefotoDoctorProfile(String fotoPath, String token) async {
+  try {
+    Uri url = Uri.parse('$defaultApiServer/Doctores/mi-perfil/foto');
+
+    var request = http.MultipartRequest('POST', url)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..files.add(await http.MultipartFile.fromPath('foto', fotoPath));
+
+    var response = await request.send();
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return;
+    }
+
+    final res = await http.Response.fromStream(response);
+    ApiExceptionCustom exception = ApiExceptionCustom(response: res);
+    exception.validateMesage();
+    throw exception;
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+    print('error: $e');
+    throw Exception('$e');
+  }
+}
+
 
 }

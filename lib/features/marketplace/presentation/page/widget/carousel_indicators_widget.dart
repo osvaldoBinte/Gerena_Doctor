@@ -1,12 +1,10 @@
-// lib/common/widgets/product_carousel_widget.dart
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 
 enum IndicatorStyle {
-  customLines, // 3 líneas personalizadas
-  dots, // Puntos normales
+  customLines, 
+  dots, 
 }
 
 class ProductCarouselWidget extends StatefulWidget {
@@ -21,8 +19,8 @@ class ProductCarouselWidget extends StatefulWidget {
   final String? backgroundImage;
   final double? imagePadding;
   final BoxFit imageFit;
-  final double? containerWidth; // ⭐ NUEVO
-  final double? containerHeight; // ⭐ NUEVO
+  final double? containerWidth; 
+  final double? containerHeight;
 
   const ProductCarouselWidget({
     Key? key,
@@ -37,8 +35,8 @@ class ProductCarouselWidget extends StatefulWidget {
     this.backgroundImage = 'assets/tienda-producto.png',
     this.imagePadding = 40,
     this.imageFit = BoxFit.contain,
-    this.containerWidth, // ⭐ NUEVO - null = usa 350 por defecto
-    this.containerHeight, // ⭐ NUEVO - null = usa 350 por defecto
+    this.containerWidth,
+    this.containerHeight, 
   }) : super(key: key);
 
   @override
@@ -49,6 +47,14 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
   int _currentIndex = 0;
   final CarouselSliderController _carouselController = CarouselSliderController();
 
+  // Obtener las imágenes a mostrar, con fallback a imagen por defecto
+  List<String> get _displayImages {
+    if (widget.images.isEmpty) {
+      return ['assets/tienda-producto.png'];
+    }
+    return widget.images;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,15 +63,14 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
         children: [
           Column(
             children: [
-              // Carrusel de imágenes
               CarouselSlider.builder(
                 carouselController: _carouselController,
-                itemCount: widget.images.length,
+                itemCount: _displayImages.length,
                 options: CarouselOptions(
                   height: widget.height,
                   viewportFraction: 1.0,
-                  enableInfiniteScroll: widget.images.length > 1,
-                  autoPlay: widget.autoPlay,
+                  enableInfiniteScroll: _displayImages.length > 1,
+                  autoPlay: widget.autoPlay && _displayImages.length > 1, // No autoplay si solo hay una imagen
                   autoPlayInterval: widget.autoPlayInterval,
                   autoPlayAnimationDuration: const Duration(milliseconds: 800),
                   autoPlayCurve: Curves.fastOutSlowIn,
@@ -78,12 +83,12 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
                   },
                 ),
                 itemBuilder: (context, index, realIndex) {
-                  return _buildCarouselItem(widget.images[index]);
+                  return _buildCarouselItem(_displayImages[index]);
                 },
               ),
 
-              // Indicadores
-              if (widget.images.length > 1)
+              // Solo mostrar indicadores si hay más de una imagen
+              if (_displayImages.length > 1)
                 Padding(
                   padding: const EdgeInsets.only(top: 10, bottom: 20),
                   child: widget.indicatorStyle == IndicatorStyle.customLines
@@ -93,8 +98,8 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
             ],
           ),
 
-          // Botones de navegación
-          if (widget.showNavigationButtons && widget.images.length > 1) ...[
+          // Solo mostrar botones de navegación si hay más de una imagen
+          if (widget.showNavigationButtons && _displayImages.length > 1) ...[
             Positioned(
               left: 10,
               top: widget.height / 2 - 20,
@@ -127,17 +132,19 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
     );
   }
 
-  // Item del carrusel
   Widget _buildCarouselItem(String imageUrl) {
+    // Si la imagen es la imagen por defecto y viene de images vacío
+    final bool isDefaultImage = widget.images.isEmpty && 
+                                 imageUrl == 'assets/tienda-producto.png';
+    
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Imagen de fondo decorativa
-        if (widget.backgroundImage != null)
+        if (widget.backgroundImage != null && !isDefaultImage)
           Center(
             child: Container(
-              width: widget.containerWidth ?? 350, // ⭐ MODIFICADO
-              height: widget.containerHeight ?? 350, // ⭐ MODIFICADO
+              width: widget.containerWidth ?? 350, 
+              height: widget.containerHeight ?? 350, 
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [GerenaColors.lightShadow],
@@ -157,16 +164,58 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
             ),
           ),
 
-        // Imagen del producto
-        Container(
-          padding: EdgeInsets.all(widget.imagePadding ?? 40),
-          child: _buildImage(imageUrl),
-        ),
+        // Si es la imagen por defecto, mostrarla directamente sin padding
+        isDefaultImage
+            ? Center(
+                child: Container(
+                  width: widget.containerWidth ?? 350, 
+                  height: widget.containerHeight ?? 350, 
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [GerenaColors.lightShadow],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.image_not_supported,
+                                  size: 60,
+                                  color: Colors.grey[400],
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Imagen no disponible',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              )
+            : Container(
+                padding: EdgeInsets.all(widget.imagePadding ?? 40),
+                child: _buildImage(imageUrl),
+              ),
       ],
     );
   }
 
-  // Construir imagen (red o asset)
   Widget _buildImage(String imageUrl) {
     if (imageUrl.startsWith('http')) {
       return Image.network(
@@ -185,10 +234,25 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
           );
         },
         errorBuilder: (context, error, stackTrace) {
-          return Icon(
-            Icons.image,
-            size: 100,
-            color: Colors.grey[400],
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.broken_image,
+                  size: 60,
+                  color: Colors.grey[400],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Error al cargar imagen',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       );
@@ -197,10 +261,25 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
         imageUrl,
         fit: widget.imageFit,
         errorBuilder: (context, error, stackTrace) {
-          return Icon(
-            Icons.image,
-            size: 100,
-            color: Colors.grey[400],
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.image_not_supported,
+                  size: 60,
+                  color: Colors.grey[400],
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Imagen no disponible',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       );
@@ -227,7 +306,6 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
     );
   }
 
-  // ⭐ INDICADORES PERSONALIZADOS (3 líneas)
   Widget _buildCustomIndicators() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -241,12 +319,11 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
     );
   }
 
-  // ⭐ INDICADORES CON PUNTOS
   Widget _buildDotIndicators() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
-        widget.images.length,
+        _displayImages.length,
         (index) => AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -275,7 +352,6 @@ class _ProductCarouselWidgetState extends State<ProductCarouselWidget> {
     );
   }
 
-  // ⭐ Indicador animado para las 3 líneas personalizadas
   Widget _buildAnimatedIndicator(int indicatorIndex, double baseWidth) {
     final isActive = _currentIndex == indicatorIndex;
 

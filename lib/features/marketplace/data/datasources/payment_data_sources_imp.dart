@@ -217,7 +217,6 @@ Future<PaymentMethodModel> createPaymentMethod({
     }
   }
 
-  // ==================== MÉTODOS DE TU BACKEND ====================
 
  Future<void> createPayment(String token, String paymentMethodId) async {
   try {
@@ -251,7 +250,6 @@ Future<PaymentMethodModel> createPaymentMethod({
   }
 }
 
-  /// Guardar customer ID en tu backend
   Future<void> saveCustomerIdToBackend({
     required String customerId,
     required String token,
@@ -259,7 +257,6 @@ Future<PaymentMethodModel> createPaymentMethod({
     try {
       print('💾 Guardando customer ID en backend...');
 
-      // TODO: Implementar con tu endpoint real
       print('⚠️ Método saveCustomerIdToBackend no implementado');
     } catch (e) {
       if (e is SocketException ||
@@ -271,7 +268,7 @@ Future<PaymentMethodModel> createPaymentMethod({
       throw Exception('$e');
     }
   }
-Future<void> confirmpayment(int id, String token) async {
+Future<void> confirmpayment(int id, String token, ) async {
   try {
     Uri url = Uri.parse('$defaultApiServer/doctores/payment-methods/default');
     final response = await http.put(
