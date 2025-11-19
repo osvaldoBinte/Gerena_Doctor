@@ -1250,6 +1250,7 @@ static Widget createSearchContainer({
     ),
   );
 }
+
 static Widget buildLabeledTextField(
   String label, 
   String initialValue,
@@ -1258,7 +1259,7 @@ static Widget buildLabeledTextField(
     String? hintText,
     String? errorText, 
     bool showError = false,
-    bool readOnly = false, // ✅ Nuevo parámetro
+    bool readOnly = false,
   }
 ) {
   return Column(
@@ -1274,14 +1275,17 @@ static Widget buildLabeledTextField(
       ),
       const SizedBox(height: 5),
       TextField(
+        key: ValueKey('textfield_$label'),
         controller: controller,
-        readOnly: readOnly, // ✅ Hace el campo de solo lectura
+        readOnly: readOnly,
+        enabled: !readOnly && controller != null, // ✅ Solo habilitar si hay controller válido
         style: GoogleFonts.rubik(
           fontSize: 16,
-          color: Colors.black,
+          color: readOnly ? Colors.grey.shade700 : Colors.black,
         ),
         decoration: InputDecoration(
-          hintText: initialValue.isEmpty ? hintText : null,
+          // ✅ Usar initialValue como fallback si el controller está vacío
+          hintText: (controller?.text.isEmpty ?? true) ? (hintText ?? initialValue) : null,
           hintStyle: GoogleFonts.rubik(
             color: GerenaColors.textSecondaryColor.withOpacity(0.6),
             fontSize: 16,
@@ -1292,10 +1296,17 @@ static Widget buildLabeledTextField(
             fontSize: 12,
           ),
           filled: true,
-          fillColor: readOnly ? Colors.grey.shade100 : Colors.transparent, // ✅ Fondo diferente si es readonly
+          fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 9,
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(0),
+            borderSide: BorderSide(
+              color: GerenaColors.colorinput.withOpacity(0.5),
+              width: 1,
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(0),

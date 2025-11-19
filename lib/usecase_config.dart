@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gerena/features/appointment/data/datasources/appointment_data_sources_imp.dart';
 import 'package:gerena/features/appointment/data/repositories/appointment_repository_imp.dart';
+import 'package:gerena/features/appointment/domain/usecase/add_availability_usecase.dart';
+import 'package:gerena/features/appointment/domain/usecase/delete_availability_usecase.dart';
 import 'package:gerena/features/appointment/domain/usecase/get_appointments_usecase.dart';
 import 'package:gerena/features/appointment/domain/usecase/post_appointment_usecase.dart';
 import 'package:gerena/features/auth/data/datasources/auth_data_sources_imp.dart';
@@ -100,6 +102,8 @@ class UsecaseConfig {
    AppointmentRepositoryImp? appointmentRepositoryImp;
    AppointmentDataSourcesImp? appointmentDataSourcesImp;
    GetAppointmentsUsecase? getAppointmentsUsecase;
+   DeleteAvailabilityUsecase? deleteAvailabilityUsecase;
+   AddAvailabilityUsecase? addAvailabilityUsecase;
 
 
    GetMyOrderUsecase? getMyOrderUsecase;
@@ -182,6 +186,8 @@ class UsecaseConfig {
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
 
      getAppointmentsUsecase = GetAppointmentsUsecase(appointmentRepository: appointmentRepositoryImp!);
+     deleteAvailabilityUsecase = DeleteAvailabilityUsecase(appointmentRepository: appointmentRepositoryImp!);
+     addAvailabilityUsecase = AddAvailabilityUsecase(appointmentRepository: appointmentRepositoryImp!);
      getDoctorAvailabilityUsecase = GetDoctorAvailabilityUsecase(doctorRepository: doctorRepositoryImp!);
      postAppointmentUsecase = PostAppointmentUsecase(appointmentRepository: appointmentRepositoryImp!);
      updateDoctorProfileUsecase = UpdateDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);

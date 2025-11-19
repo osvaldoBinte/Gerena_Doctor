@@ -1,8 +1,10 @@
 import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/api_errors.dart';
 import 'package:gerena/features/appointment/data/model/addappointment/add_appointment_model.dart';
+import 'package:gerena/features/appointment/data/model/availability/add_availability_model.dart';
 import 'package:gerena/features/appointment/data/model/getappointment/get_appointment_model.dart';
 import 'package:gerena/features/appointment/domain/entities/addappointment/add_appointment_entity.dart';
+import 'package:gerena/features/appointment/domain/entities/availability/add_availability_entity.dart';
 import 'package:gerena/features/appointment/domain/entities/getappointment/get_apppointment_entity.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
@@ -44,6 +46,44 @@ class AppointmentDataSourcesImp {
       throw Exception('$e');
     }
   }
+Future<void> addAvailability(
+  List<AddAvailabilityEntity> entities,
+  String token,
+) async {
+  try {
+    Uri url = Uri.parse('$defaultApiServer/doctor/citas/disponibilidad');
+
+    final body = jsonEncode({
+      "disponibilidades": entities
+          .map((e) => AddAvailabilityModel.fromEntity(e).toJson())
+          .toList(),
+    });
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: body,
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return;
+    }
+
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+    throw Exception('$e');
+  }
+}
 
   Future<List<GetApppointmentEntity>> getAppointments(
       String token, String date,String day) async {
@@ -75,6 +115,38 @@ class AppointmentDataSourcesImp {
         throw Exception(convertMessageException(error: e));
       }
       print('error: $e');
+      throw Exception('$e');
+    }
+  }
+
+    Future<void> deleteAvailability(
+    int id,
+    String token,
+  ) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/doctor/citas/disponibilidad/$id');
+
+      final response = await http.delete(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer $token'
+        },
+       
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
       throw Exception('$e');
     }
   }

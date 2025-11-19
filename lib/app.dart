@@ -5,6 +5,7 @@ import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/add_appointment_controller.dart';
+import 'package:gerena/features/appointment/presentation/page/calendar/availability_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
@@ -93,6 +94,8 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getnotificationUsecase!, permanent: true);
         Get.put(usecaseConfig.putAddressesUsecase!,permanent: true);
         Get.put(usecaseConfig.deleteAddressesUsecase!,permanent: true);
+        Get.put(usecaseConfig.addAvailabilityUsecase!, permanent: true);
+        Get.put(usecaseConfig.deleteAvailabilityUsecase!, permanent: true);
 
 
 
@@ -114,6 +117,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => GetMedicationsByIdController(  getMedicineByIdUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => ProceduresController(getProceduresUsecase:  Get.find(), createProcedureUsecase:  Get.find(), updateProcedureUsecase: Get.find(), addImagenesUsecase: Get.find(), deleteProcedureUsecase: Get.find(), deleteImgUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => NotificationController(getNotificationUsecase: Get.find()), fenix:  true);
+        Get.lazyPut(() => AvailabilityController(addAvailabilityUsecase:  Get.find(), deleteAvailabilityUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

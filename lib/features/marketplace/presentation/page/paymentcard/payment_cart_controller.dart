@@ -201,15 +201,7 @@ class PaymentCartController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Parsear datos
-      final cardNumber = cardNumberController.text.replaceAll(' ', '');
-      final expiryParts = expiryController.text.split('/');
-      final expMonth = int.parse(expiryParts[0].trim());
-      final expYear = int.parse('20${expiryParts[1].trim()}');
-      final cvc = cvcController.text;
-
-      print('💳 Paso 1: Creando payment method con datos manuales...');
-      
+    
       // Crear PaymentMethod usando Stripe SDK
       final billingDetails = BillingDetails(
         name: cardholderName,

@@ -668,7 +668,7 @@ return Container(
       ),
       
       const SizedBox(width: 16), 
-      
+      /*
       Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center, 
@@ -688,7 +688,7 @@ return Container(
             onPressed: () {},
           ),
         ],
-      ),
+      ),*/
     ],
   ),
 );

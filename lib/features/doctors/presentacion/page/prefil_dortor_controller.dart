@@ -71,13 +71,12 @@ class PrefilDortorController extends GetxController {
     facebookController = TextEditingController();
     twitterController = TextEditingController();
     instagramController = TextEditingController();
-  }
-
-  void _populateControllers() {
-    if (doctorProfile.value != null) {
-      final doctor = doctorProfile.value!;
-      
-      // Controllers existentes
+  }void _populateControllers() {
+  if (doctorProfile.value != null) {
+    final doctor = doctorProfile.value!;
+    
+    // ✅ Verifica que los controllers existan antes de usarlos
+    try {
       nombreController.text = doctor.nombre ?? '';
       apellidosController.text = doctor.apellidos ?? '';
       especialidadController.text = doctor.especialidad ?? '';
@@ -90,13 +89,17 @@ class PrefilDortorController extends GetxController {
       institucionController.text = doctor.institucion ?? '';
       certificacionController.text = doctor.certificacion ?? '';
       
-      // Nuevos controllers para redes sociales
       linkedinController.text = doctor.linkedIn ?? '';
       facebookController.text = doctor.facebook ?? '';
       twitterController.text = doctor.x ?? '';
       instagramController.text = doctor.instagram ?? '';
+    } catch (e) {
+      print('Error al poblar controllers: $e');
+      // Los controllers ya fueron disposed, reinicializar
+      _initializeControllers();
     }
   }
+}
 // Método para obtener el valor de redes sociales por clave
 String? getValueForSocial(String socialKey) {
   if (doctorProfile.value == null) return null;
@@ -292,6 +295,10 @@ void openWhatsApp() async {
   }
 
   String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+  if (!cleanPhone.startsWith('+')) {
+    cleanPhone = '+52$cleanPhone'; // Agregar código de país si no lo tiene
+  }
 
   String message = '¡Hola! Me gustaría obtener más información.';
 
