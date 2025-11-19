@@ -62,9 +62,9 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   }
 
   @override
-  Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder) async {
+  Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder,int idAddresse,) async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
-    return await marketplaceDataSourcesImp.createaneworder(createaneworder,token);
+    return await marketplaceDataSourcesImp.createaneworder(createaneworder,idAddresse,token);
   }
   
   @override

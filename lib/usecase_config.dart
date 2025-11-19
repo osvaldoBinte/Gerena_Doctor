@@ -30,8 +30,10 @@ import 'package:gerena/features/marketplace/data/datasources/marketplace_data_so
 import 'package:gerena/features/marketplace/data/repositories/addresses_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/payment_repository_imp.dart';
+import 'package:gerena/features/marketplace/domain/usecase/addresses/delete_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/get_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/post_addresses_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/addresses/put_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/create_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicine_by_id_usecase.dart';
@@ -47,6 +49,9 @@ import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_m
 import 'package:gerena/features/marketplace/domain/usecase/payment/savecard_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/searching_for_medications_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
+import 'package:gerena/features/notification/data/datasources/notification_data_sources_imp.dart';
+import 'package:gerena/features/notification/data/repositories/notification_repository_imp.dart';
+import 'package:gerena/features/notification/domain/usecase/get_notification_usecase.dart';
 import 'package:gerena/features/review/data/datasources/review_data_sources_imp.dart';
 import 'package:gerena/features/review/data/repositories/review_repository_imp.dart';
 import 'package:gerena/features/review/domain/usecase/my_review_usecase.dart';
@@ -68,6 +73,8 @@ class UsecaseConfig {
    SubscriptionRepositoryImp? subscriptionRepositoryImp;
    ProcedureRepositoryImp? procedureRepositoryImp;
    ReviewRepositoryImp? reviewRepositoryImp;
+   NotificationRepositoryImp? notificationRepositoryImp;
+
 
 
    AuthDataSourcesImp? authDataSources;
@@ -78,6 +85,7 @@ class UsecaseConfig {
    SubscriptionDataSourcesImp? subscriptionDataSourcesImp;
    ProceduresDataSourcesImp? proceduresDataSourcesImp;
    ReviewDataSourcesImp? reviewDataSourcesImp;
+   NotificationDataSourcesImp? notificationDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -107,6 +115,8 @@ class UsecaseConfig {
 
    GetAddressesUsecase ? getAddressesUsecase;
    PostAddressesUsecase? postAddressesUsecase;
+   PutAddressesUsecase? putAddressesUsecase;
+   DeleteAddressesUsecase? deleteAddressesUsecase;
 
 
    AttachPaymentMethodToCustomerUsecase? attachPaymentMethodToCustomerUsecase;
@@ -137,6 +147,8 @@ class UsecaseConfig {
 
    MyReviewUsecase?myReviewUsecase;
 
+   GetNotificationUsecase? getnotificationUsecase;
+
 
 
 
@@ -151,6 +163,7 @@ class UsecaseConfig {
       subscriptionDataSourcesImp = SubscriptionDataSourcesImp();
       proceduresDataSourcesImp = ProceduresDataSourcesImp();
       reviewDataSourcesImp = ReviewDataSourcesImp();
+      notificationDataSourcesImp = NotificationDataSourcesImp();
       
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
@@ -163,6 +176,7 @@ class UsecaseConfig {
       subscriptionRepositoryImp = SubscriptionRepositoryImp(subscriptionDataSourcesImp: subscriptionDataSourcesImp!);
       procedureRepositoryImp = ProcedureRepositoryImp(proceduresDataSourcesImp: proceduresDataSourcesImp!);
       reviewRepositoryImp = ReviewRepositoryImp(reviewDataSourcesImp: reviewDataSourcesImp!);
+      notificationRepositoryImp =NotificationRepositoryImp(notificationDataSourcesImp: notificationDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -186,6 +200,9 @@ class UsecaseConfig {
 
      getAddressesUsecase = GetAddressesUsecase(addressesRepository: addressesRepositoryImp!);
      postAddressesUsecase = PostAddressesUsecase(addressesRepository: addressesRepositoryImp!);
+     putAddressesUsecase = PutAddressesUsecase(addressesRepository: addressesRepositoryImp!);
+     deleteAddressesUsecase = DeleteAddressesUsecase(addressesRepository: addressesRepositoryImp!);
+     
 
 
       attachPaymentMethodToCustomerUsecase = AttachPaymentMethodToCustomerUsecase(repository: paymentRepositoryImp!);
@@ -215,6 +232,8 @@ class UsecaseConfig {
 
 
       myReviewUsecase = MyReviewUsecase(reviewRepository: reviewRepositoryImp!);
+
+      getnotificationUsecase = GetNotificationUsecase(notificationRepository: notificationRepositoryImp!);
 
     
   }

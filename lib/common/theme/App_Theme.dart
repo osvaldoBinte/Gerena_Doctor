@@ -1330,8 +1330,7 @@ static Widget buildLabeledTextField(
       ),
     ],
   );
-}
-static Widget widgetButton({
+}static Widget widgetButton({
   VoidCallback? onPressed,
   String text = 'AGENDAR CITA',
   Color? backgroundColor,
@@ -1345,12 +1344,10 @@ static Widget widgetButton({
   double? borderWidth,
   FontWeight? fontWeight,
   BoxShadow? customShadow,
-  bool isLoading = false, // ✅ Nuevo parámetro
+  bool isLoading = false,
 }) {
   VoidCallback defaultOnPressed = () {
-    try {
-     
-    } catch (e) {
+    try {} catch (e) {
       print('Error: StartController no encontrado');
     }
   };
@@ -1358,50 +1355,54 @@ static Widget widgetButton({
   VoidCallback finalOnPressed = onPressed ??
       (text == 'AGENDAR CITA' ? defaultOnPressed : () {});
 
-  return GestureDetector(
-    onTap: isLoading ? null : finalOnPressed, // ✅ Deshabilitar cuando está cargando
-    child: Container(
-      padding: padding ?? EdgeInsets.symmetric(horizontal: 13, vertical: 2),
-      decoration: BoxDecoration(
-        color: isLoading 
-            ? (backgroundColor ?? GerenaColors.secondaryColor).withOpacity(0.7) // ✅ Color más opaco cuando carga
-            : (backgroundColor ?? GerenaColors.secondaryColor),
-        borderRadius: BorderRadius.circular(borderRadius ?? 5),
-        border: borderColor != null
-            ? Border.all(
-                color: borderColor,
-                width: borderWidth ?? 1.0,
-              )
-            : null,
-        boxShadow: showShadow 
-            ? [customShadow ?? darkShadow] 
-            : null,
-      ),
-      child: Center(
-        child: isLoading 
-            ? SizedBox(
-                height: (fontSize ?? 12) + 8, // ✅ Altura basada en el tamaño del texto
-                width: (fontSize ?? 12) + 8,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    textColor ?? Colors.white,
+  return MouseRegion(               // ⬅️ Nuevo
+    cursor: SystemMouseCursors.click,  // ⬅️ Cambia el cursor al pasar el mouse
+    child: GestureDetector(
+      onTap: isLoading ? null : finalOnPressed,
+      child: Container(
+        padding: padding ?? EdgeInsets.symmetric(horizontal: 13, vertical: 2),
+        decoration: BoxDecoration(
+          color: isLoading
+              ? (backgroundColor ?? GerenaColors.secondaryColor).withOpacity(0.7)
+              : (backgroundColor ?? GerenaColors.secondaryColor),
+          borderRadius: BorderRadius.circular(borderRadius ?? 5),
+          border: borderColor != null
+              ? Border.all(
+                  color: borderColor,
+                  width: borderWidth ?? 1.0,
+                )
+              : null,
+          boxShadow: showShadow
+              ? [customShadow ?? darkShadow]
+              : null,
+        ),
+        child: Center(
+          child: isLoading
+              ? SizedBox(
+                  height: (fontSize ?? 12) + 8,
+                  width: (fontSize ?? 12) + 8,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      textColor ?? Colors.white,
+                    ),
                   ),
+                )
+              : Text(
+                  text,
+                  style: GoogleFonts.rubik(
+                    color: textColor ?? Colors.white,
+                    fontSize: fontSize ?? 12,
+                    fontWeight: fontWeight ?? FontWeight.w500,
+                    letterSpacing: 0.5,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              )
-            : Text(
-                text,
-                style: GoogleFonts.rubik(
-                  color: textColor ?? Colors.white,
-                  fontSize: fontSize ?? 12,
-                  fontWeight: fontWeight ?? FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
+        ),
       ),
     ),
   );
 }
+
 
 }

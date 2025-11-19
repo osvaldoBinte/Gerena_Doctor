@@ -285,7 +285,7 @@ Widget buildProfileSection() {
                           children: [
                             GerenaColors.widgetButton(
                               onPressed: () {
-                                controller.openWhatsApp(doctor.whatsAppVendedor);
+                                controller.openWhatsApp();
                               },
                               text: 'CONTACTAR',
                               showShadow: true,

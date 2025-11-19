@@ -109,12 +109,13 @@ class SavedProductsContent extends StatelessWidget {
                   );
                 }
                 
+                // ✅ Agrupa por categoria
                 final Map<String, List<dynamic>> productsByCategory = {};
-                
+
                 for (var item in response.itenms) {
-                  final category = item.descripcion?.isNotEmpty == true 
-                      ? item.descripcion! 
-                      : 'Favoritos';
+                  final category = item.categoria?.isNotEmpty == true 
+                      ? item.categoria! 
+                      : 'Sin Categoría';
                   
                   if (!productsByCategory.containsKey(category)) {
                     productsByCategory[category] = [];
@@ -157,52 +158,16 @@ class SavedProductsContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: Text(
-              '-$categoryName ',
-              style: GoogleFonts.rubik(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: GerenaColors.textTertiaryColor,
+            Expanded(
+              child: Text(
+                '-$categoryName ',
+                style: GoogleFonts.rubik(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: GerenaColors.textTertiaryColor,
+                ),
               ),
-            ),),
-            
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width > 600 ? 80.0 : 16.0,
-                vertical: 20,
-              ),
-             /* child: 
-              /*isProgrammed
-                  ? Row(
-                      children: [
-                        Text(
-                          'Programado',
-                          style: GoogleFonts.rubik(
-                            fontSize: 14,
-                            color: GerenaColors.textTertiaryColor,
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        GerenaColors.widgetButton(
-                          text: 'EDITAR',
-                          showShadow: false,
-                        ),
-                      ],
-                    )
-                  :*/ 
-              GerenaColors.widgetButton(
-                text: 'PROGRAMAR PEDIDO',
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const ModalGuardarProducto();
-                    },
-                  );
-                },
-                customShadow: GerenaColors.mediumShadow,
-              ),*/
-            )
+            ),
           ],
         ),
         
@@ -246,22 +211,8 @@ class SavedProductsContent extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(4),
-                bottomLeft: Radius.circular(4),
-              ),
-            ),
-            child: Icon(
-              Icons.medical_services,
-              size: 40,
-              color: Colors.grey[400],
-            ),
-          ),
+          // ✅ IMAGEN DEL PRODUCTO
+          _buildProductImage(item.imagen),
           
           Expanded(
             child: Padding(
@@ -277,6 +228,7 @@ class SavedProductsContent extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 4),
+                  
                   Row(
                     children: [
                       Text(
@@ -300,26 +252,69 @@ class SavedProductsContent extends StatelessWidget {
                       ],
                     ],
                   ),
+                  
                   SizedBox(height: 8),
-                  if (item.descripcion != null && item.descripcion!.isNotEmpty)
-                    Text(
-                      item.nombreMedicamento,
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: GerenaColors.textTertiaryColor,
+                  
+                  // ✅ MOSTRAR ALERTA SI EXISTE
+                  if (item.alerta != null && item.alerta!.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                      decoration: BoxDecoration(
+                        color: item.sinStock 
+                            ? Colors.red.withOpacity(0.1) 
+                            : Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: item.sinStock 
+                              ? Colors.red.withOpacity(0.3) 
+                              : Colors.orange.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            item.sinStock ? Icons.error_outline : Icons.warning_amber,
+                            size: 14,
+                            color: item.sinStock ? Colors.red : Colors.orange[700],
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item.alerta!,
+                              style: GoogleFonts.rubik(
+                                fontSize: 11,
+                                color: item.sinStock ? Colors.red : Colors.orange[900],
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                  
+                  // Badge adicional de sin stock
                   if (item.sinStock)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                       child: Text(
-                        'Sin stock',
+                        'SIN STOCK',
                         style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -362,16 +357,120 @@ class SavedProductsContent extends StatelessWidget {
                 ),
                 
                 SizedBox(height: 40),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width > 600 ? 40.0 : 16.0,
-                  ),
-                  child: simpleCounter(),
-                ),
+                simpleCounter(),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ✅ Método para construir la imagen del producto
+  Widget _buildProductImage(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) {
+      return Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(4),
+            bottomLeft: Radius.circular(4),
+          ),
+        ),
+        child: Icon(
+          Icons.medical_services,
+          size: 40,
+          color: Colors.grey[400],
+        ),
+      );
+    }
+
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(4),
+          bottomLeft: Radius.circular(4),
+        ),
+        child: Image.network(
+          imagePath,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                  bottomLeft: Radius.circular(4),
+                ),
+              ),
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                  bottomLeft: Radius.circular(4),
+                ),
+              ),
+              child: Icon(
+                Icons.medical_services,
+                size: 40,
+                color: Colors.grey[400],
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.only(
+        topLeft: Radius.circular(4),
+        bottomLeft: Radius.circular(4),
+      ),
+      child: Image.asset(
+        imagePath,
+        width: 100,
+        height: 100,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(4),
+                bottomLeft: Radius.circular(4),
+              ),
+            ),
+            child: Icon(
+              Icons.medical_services,
+              size: 40,
+              color: Colors.grey[400],
+            ),
+          );
+        },
       ),
     );
   }

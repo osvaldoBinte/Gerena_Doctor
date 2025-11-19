@@ -76,4 +76,71 @@ class AddressesDataSourcesImp {
       throw Exception('$e');
     }
   }
+
+
+    Future<void> putAddresses(
+    AddressesEntity entity,
+    int idAddresse,
+    String token,
+  ) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/doctores/direcciones/$idAddresse');
+
+      final response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer $token'
+        },
+        body:
+            jsonEncode(AddressModel.fromEntity(entity).toJson()),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+
+    Future<void> deleteAddresses(
+    int idAddresse,
+    String token,
+  ) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/doctores/direcciones/$idAddresse');
+
+      final response = await http.delete(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization':'Bearer $token'
+        },
+       
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
 }

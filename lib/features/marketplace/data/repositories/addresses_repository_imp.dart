@@ -8,9 +8,9 @@ class AddressesRepositoryImp implements AddressesRepository {
   AddressesRepositoryImp({required this.addressesDataSourcesImp});
   final AuthService authService = AuthService();
   @override
-  Future<void> deliteAddresses(int id) {
-    // TODO: implement deliteAddresses
-    throw UnimplementedError();
+  Future<void> deleteAddresses(int id) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return addressesDataSourcesImp.deleteAddresses(id, token);
   }
 
 
@@ -21,15 +21,17 @@ class AddressesRepositoryImp implements AddressesRepository {
     return await addressesDataSourcesImp.postAddresses(entity, token);
   }
 
-  @override
-  Future<void> putAddresses(int paymentIntentId) {
-    // TODO: implement putAddresses
-    throw UnimplementedError();
-  }
+
 
   @override
   Future<List<AddressesEntity>> getAddresses() async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await addressesDataSourcesImp.getAddresses(token);
+  }
+  
+  @override
+  Future<void> putAddresses(AddressesEntity entity, int idAddresse) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await addressesDataSourcesImp.putAddresses(entity, idAddresse, token);
   }
 }

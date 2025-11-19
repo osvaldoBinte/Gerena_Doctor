@@ -6,6 +6,7 @@ import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/add_address_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/addresses/getaddress_/address_selector_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
@@ -166,34 +167,27 @@ class CartPageContent extends StatelessWidget {
                               Column(
                                 children: [
                                   if (response != null)
-                                    ...response.itenms
-                                        .map((item) => Column(
-                                              children: [
-                                                _buildCartItem(
-                                                  item.nombreMedicamento,
-                                                  item.descripcion ?? '',
-                                                  "",
-                                                  "${item.precioActual.toStringAsFixed(2)} MXN",
-                                                  medicamentoId:
-                                                      item.medicamentoId,
-                                                  cantidad:
-                                                      item.cantidadSolicitada,
-                                                  hasDiscount:
-                                                      item.precioAnterior >
-                                                          item.precioActual,
-                                                  originalPrice: item
-                                                              .precioAnterior >
-                                                          item.precioActual
-                                                      ? "${item.precioAnterior.toStringAsFixed(2)} MXN"
-                                                      : null,
-                                                  sinStock: item.sinStock,
-                                                  cartController:
-                                                      cartController,
-                                                ),
-                                                SizedBox(height: 10),
-                                              ],
-                                            ))
-                                        .toList(),
+  ...response.itenms
+      .map((item) => Column(
+            children: [
+              _buildCartItem(
+                item.nombreMedicamento,
+                item.alerta ?? '',
+                item.imagen ?? "", 
+                "${item.precioActual.toStringAsFixed(2)} MXN",
+                medicamentoId: item.medicamentoId,
+                cantidad: item.cantidadSolicitada,
+                hasDiscount: item.precioAnterior > item.precioActual,
+                originalPrice: item.precioAnterior > item.precioActual
+                    ? "${item.precioAnterior.toStringAsFixed(2)} MXN"
+                    : null,
+                sinStock: item.sinStock,
+                cartController: cartController,
+              ),
+              SizedBox(height: 10),
+            ],
+          ))
+      .toList(),
                                   const Divider(),
                                 ],
                               ),
@@ -201,138 +195,23 @@ class CartPageContent extends StatelessWidget {
                               const SizedBox(height: 30),
 
                              
-      _buildSection("DIRECCIÓN DE ENTREGA"),
-      
-      const SizedBox(height: 15),
+     _buildSection("DIRECCIÓN DE ENTREGA"),
 
-      // ✅ INTEGRACIÓN DEL SELECTOR DE DIRECCIONES
-      Obx(() {
-        if (addressesController.isLoading.value) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: CircularProgressIndicator(
-                color: GerenaColors.primaryColor,
-              ),
-            ),
-          );
-        }
+const SizedBox(height: 15),
 
-        if (addressesController.errorMessage.value.isNotEmpty) {
-          return Column(
-            children: [
-              Text(
-                addressesController.errorMessage.value,
-                style: GoogleFonts.rubik(
-                  color: Colors.red,
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              TextButton.icon(
-                onPressed: () => addressesController.getAddresses(),
-                icon: Icon(Icons.refresh),
-                label: Text('Reintentar'),
-              ),
-            ],
-          );
-        }
-
-        if (addressesController.addresses.isEmpty) {
-          return Column(
-            children: [
-              Text(
-                'No tienes direcciones guardadas',
-                style: GoogleFonts.rubik(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextButton.icon(
-               onPressed: () {
-    Get.dialog(
-      AddAddressModal(),
-      barrierDismissible: false,
-    );
+AddressSelectorWidget(
+  addressesController: addressesController,
+  onAddressSelected: (address) {
+    cartController.selectAddress(address.id.toString());
+    print('📍 Dirección sincronizada: ${address.id}');
   },
-                icon: Icon(Icons.add_location),
-                label: Text('Agregar dirección'),
-                style: TextButton.styleFrom(
-                  foregroundColor: GerenaColors.primaryColor,
-                ),
-              ),
-            ],
-          );
-        }
-
-        final selectedAddress = addressesController.selectedAddress.value;
-        
-if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    final firstAddress = addressesController.addresses.first;
-    addressesController.selectAddress(firstAddress);
-    Future.delayed(Duration(milliseconds: 50), () {
-      cartController.selectAddress(firstAddress.id.toString());
-    });
-  });
-}
-
-        return Column(
-          children: [
-            // Dirección seleccionada
-            if (selectedAddress != null)
-              _buildSelectedAddressFromEntity(
-                selectedAddress,
-                onEdit: () {
-                  _showAddressSelector(context, addressesController);
-                },
-              ),
-
-            const SizedBox(height: 10),
-
-            // Botón para cambiar dirección
-            if (addressesController.addresses.length > 1)
-              InkWell(
-                onTap: () => _showAddressSelector(context, addressesController),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.location_on_outlined, color: Colors.grey[600]),
-                      const SizedBox(width: 15),
-                      Expanded(
-                        child: Text(
-                          'Cambiar dirección de entrega',
-                          style: GoogleFonts.rubik(
-                            fontWeight: FontWeight.w500,
-                            color: GerenaColors.textPrimaryColor,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.grey,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        );
-      }),
+),
                               const SizedBox(height: 30),
 
                               _buildSection("MÉTODO DE PAGO"),
 
                               const SizedBox(height: 15),
 
-                              // ✅ SECCIÓN DE MÉTODO DE PAGO CON SELECTOR
                               Obx(() {
                                 if (paymentController.isLoading.value) {
                                   return Center(
@@ -543,7 +422,6 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
     );
   }
 
-  // ✅ NUEVO: Selector de direcciones (similar al de métodos de pago)
   void _showAddressSelector(
     BuildContext context,
     AddressesController addressesController,
@@ -805,155 +683,250 @@ if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
       ),
     );
   }
-  Widget _buildCartItem(
-    String title,
-    String description,
-    String imagePath,
-    String price, {
-    required int medicamentoId,
-    required int cantidad,
-    bool hasDiscount = false,
-    String? originalPrice,
-    bool sinStock = false,
-    required ShoppingCartController cartController,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
-      child: Opacity(
-        opacity: sinStock ? 0.5 : 1.0,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Image.asset(
-                imagePath,
-                width: 80,
-                height: 120,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 80,
-                    height: 120,
-                    color: Colors.grey[200],
-                    child: Icon(Icons.image_not_supported, color: Colors.grey),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(width: 15),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: GoogleFonts.rubik(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: GerenaColors.primaryColor,
+Widget _buildCartItem(
+  String title,
+  String description, // Ahora será la alerta
+  String imagePath,
+  String price, {
+  required int medicamentoId,
+  required int cantidad,
+  bool hasDiscount = false,
+  String? originalPrice,
+  bool sinStock = false,
+  required ShoppingCartController cartController,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(right: 16.0),
+    child: Opacity(
+      opacity: sinStock ? 0.5 : 1.0,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: _buildProductImage(imagePath),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: GoogleFonts.rubik(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: GerenaColors.primaryColor,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () =>
+                          cartController.removeFromCart(medicamentoId),
+                      tooltip: 'Eliminar producto',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+
+                // ✅ MOSTRAR ALERTA SI EXISTE
+                if (description.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: sinStock 
+                          ? Colors.red.withOpacity(0.1) 
+                          : Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: sinStock 
+                            ? Colors.red.withOpacity(0.3) 
+                            : Colors.orange.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          sinStock ? Icons.error_outline : Icons.warning_amber,
+                          size: 16,
+                          color: sinStock ? Colors.red : Colors.orange[700],
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            description,
+                            style: GoogleFonts.rubik(
+                              fontSize: 12,
+                              color: sinStock ? Colors.red : Colors.orange[900],
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: Colors.red),
-                        onPressed: () =>
-                            cartController.removeFromCart(medicamentoId),
-                        tooltip: 'Eliminar producto',
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 5),
 
-                  if (description.isNotEmpty)
-                    Text(
-                      description,
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: Colors.grey[700],
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                const SizedBox(height: 8),
 
-                  if (sinStock)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Text(
-                        'SIN STOCK',
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-
-                  const SizedBox(height: 5),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (hasDiscount && originalPrice != null)
-                            Row(
-                              children: [
-                                Text(
-                                  originalPrice,
-                                  style: GoogleFonts.rubik(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.grey[500],
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  price,
-                                  style: GoogleFonts.rubik(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            )
-                          else
-                            Text(
-                              price,
-                              style: GoogleFonts.rubik(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: GerenaColors.primaryColor,
-                              ),
+                // Indicador adicional de sin stock
+                if (sinStock)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'SIN STOCK',
+                            style: GoogleFonts.rubik(
+                              fontSize: 10,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
-                        ],
-                      ),
-
-                      simpleCounter(
-                        initialValue: cantidad,
-                        onChanged: (newValue) {
-                          cartController.updateQuantity(
-                              medicamentoId, newValue);
-                        },
-                        enabled: !sinStock,
-                      ),
-                    ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (hasDiscount && originalPrice != null)
+                          Row(
+                            children: [
+                              Text(
+                                originalPrice,
+                                style: GoogleFonts.rubik(
+                                  decoration: TextDecoration.lineThrough,
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                price,
+                                style: GoogleFonts.rubik(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          Text(
+                            price,
+                            style: GoogleFonts.rubik(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: GerenaColors.primaryColor,
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    simpleCounter(
+                      initialValue: cantidad,
+                      onChanged: (newValue) {
+                        cartController.updateQuantity(
+                            medicamentoId, newValue);
+                      },
+                      enabled: !sinStock,
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    ),
+  );
+}
+
+// ✅ NUEVO: Método helper para manejar imágenes de red o assets
+Widget _buildProductImage(String imagePath) {
+  // Si la imagen está vacía o es null, mostrar placeholder
+  if (imagePath.isEmpty) {
+    return Container(
+      width: 80,
+      height: 120,
+      color: Colors.grey[200],
+      child: Icon(Icons.image_not_supported, color: Colors.grey),
     );
   }
 
+  // Si es una URL (comienza con http:// o https://), usar Image.network
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return Image.network(
+      imagePath,
+      width: 80,
+      height: 120,
+      fit: BoxFit.contain,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          width: 80,
+          height: 120,
+          color: Colors.grey[200],
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: 80,
+          height: 120,
+          color: Colors.grey[200],
+          child: Icon(Icons.image_not_supported, color: Colors.grey),
+        );
+      },
+    );
+  }
+
+  // Si no es una URL, asumir que es un asset
+  return Image.asset(
+    imagePath,
+    width: 80,
+    height: 120,
+    fit: BoxFit.contain,
+    errorBuilder: (context, error, stackTrace) {
+      return Container(
+        width: 80,
+        height: 120,
+        color: Colors.grey[200],
+        child: Icon(Icons.image_not_supported, color: Colors.grey),
+      );
+    },
+  );
+}
   Widget _buildSection(String title) {
     return Text(
       title,

@@ -1,13 +1,14 @@
 import 'dart:convert';
 
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart';
+
 class ShoppingCartResponseModel extends ShoppingCartResponseEntity {
   ShoppingCartResponseModel(
       {required super.totalActual, required super.itenms});
 
   factory ShoppingCartResponseModel.fromJson(Map<String, dynamic> json) {
-   return ShoppingCartResponseModel(
-      totalActual: (json['totalActual'] ?? 0).toDouble(), // Convertir a double
+    return ShoppingCartResponseModel(
+      totalActual: (json['totalActual'] ?? 0).toDouble(),
       itenms: (json['items'] as List?)
               ?.map((order) => ItemModel.fromJson(order))
               .toList() ??
@@ -15,27 +16,51 @@ class ShoppingCartResponseModel extends ShoppingCartResponseEntity {
     );
   }
 }
-
 class ItemModel extends ItemEntity {
-  ItemModel(
-      {required super.medicamentoId,
-      required super.nombreMedicamento,
-      required super.cantidadSolicitada,
-      required super.precioActual,
-      required super.precioAnterior,
-      required super.sinStock,
-      super.descripcion,
-      });
-  
+  ItemModel({
+    required super.medicamentoId,
+    required super.nombreMedicamento,
+    required super.cantidadSolicitada,
+    required super.precioActual,
+    required super.precioAnterior,
+    required super.sinStock,
+    super.alerta,
+    super.categoria,
+    super.imagen,
+  });
+
   factory ItemModel.fromJson(Map<String, dynamic> json) {
+    String? imageUrl;
+    if (json['imagen'] != null) {
+      try {
+        if (json['imagen'] is String) {
+          final List<dynamic> imageList = jsonDecode(json['imagen']);
+          if (imageList.isNotEmpty) {
+            imageUrl = imageList[0].toString();
+          }
+        } 
+        else if (json['imagen'] is List) {
+          final List<dynamic> imageList = json['imagen'];
+          if (imageList.isNotEmpty) {
+            imageUrl = imageList[0].toString();
+          }
+        }
+      } catch (e) {
+        print('❌ Error parseando imagen: $e');
+        imageUrl = null;
+      }
+    }
+
     return ItemModel(
-        medicamentoId: json['medicamentoId'],
-        nombreMedicamento: json['nombreMedicamento'],
-        cantidadSolicitada: json['cantidadSolicitada'],
-        precioActual: (json['precioActual'] ?? 0).toDouble(), // Convertir a double
-        precioAnterior: (json['precioAnterior'] ?? 0).toDouble(), // Convertir a double
-        sinStock: json['sinStock'] ?? false,
-        descripcion: json['alerta']
+      medicamentoId: json['medicamentoId'],
+      nombreMedicamento: json['nombreMedicamento'],
+      cantidadSolicitada: json['cantidadSolicitada'],
+      precioActual: (json['precioActual'] ?? 0).toDouble(),
+      precioAnterior: (json['precioAnterior'] ?? 0).toDouble(),
+      sinStock: json['sinStock'] ?? false,
+      alerta: json['alerta'],
+      categoria: json['categoria'],
+      imagen: imageUrl, 
     );
   }
 }

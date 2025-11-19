@@ -15,7 +15,7 @@ abstract class MarketplaceRepository {
   Future<MedicationsEntity> getmedicineByID(int id);
    Future<OrderEntity> myorders();
   Future<OrderEntity> orderbyID(int id);
-    Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder);
+    Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder,int idAddresse,);
 
   Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity);
   Future<void> payorder(int orderId,String paymentMethodId);

@@ -122,7 +122,6 @@ class ProductCardWidget extends StatelessWidget {
                     width: 16,
                     height: 16,
                     fit: BoxFit.contain,
-                    color: isInWishlist ? GerenaColors.primaryColor : null,
                   ),
                 ),
               );

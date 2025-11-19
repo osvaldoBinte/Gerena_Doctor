@@ -285,7 +285,6 @@ Future<void> _openUrl(String url, ) async {
                           width: 30,
                           height: 30,
                           fit: BoxFit.contain,
-                          color: isInWishlist ? GerenaColors.primaryColor : null,
                         ),
                       );
                     }),

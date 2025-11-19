@@ -1,27 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // ✅ Importar para FilteringTextInputFormatter
+import 'package:flutter/services.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/common/widgets/custom_alert_type.dart';
+import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_entity.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/get_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/post_addresses_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/addresses/put_addresses_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/addresses/delete_addresses_usecase.dart';
 import 'package:get/get.dart';
 
 class AddressesController extends GetxController {
   final GetAddressesUsecase getAddressesUsecase;
   final PostAddressesUsecase postAddressesUsecase;
+  final PutAddressesUsecase putAddressesUsecase;
+  final DeleteAddressesUsecase deleteAddressesUsecase;
   
   AddressesController({
     required this.getAddressesUsecase,
     required this.postAddressesUsecase,
+    required this.putAddressesUsecase,
+    required this.deleteAddressesUsecase,
   });
 
   final RxList<AddressesEntity> addresses = <AddressesEntity>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isSaving = false.obs;
+  final RxBool isDeleting = false.obs;
   final RxString errorMessage = ''.obs;
   final Rxn<AddressesEntity> selectedAddress = Rxn<AddressesEntity>();
+  
+  final RxBool isEditing = false.obs;
+  final Rxn<int> editingAddressId = Rxn<int>();
 
-  // Controllers para el formulario
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController streetController = TextEditingController();
@@ -33,20 +44,19 @@ class AddressesController extends GetxController {
   final TextEditingController postalCodeController = TextEditingController();
   final TextEditingController referencesController = TextEditingController();
 
-  // ✅ Input formatters para campos numéricos
   final List<TextInputFormatter> phoneFormatters = [
     FilteringTextInputFormatter.digitsOnly,
-    LengthLimitingTextInputFormatter(10), // Máximo 10 dígitos
+    LengthLimitingTextInputFormatter(10),
   ];
 
   final List<TextInputFormatter> postalCodeFormatters = [
     FilteringTextInputFormatter.digitsOnly,
-    LengthLimitingTextInputFormatter(5), // Máximo 5 dígitos
+    LengthLimitingTextInputFormatter(5),
   ];
 
   final List<TextInputFormatter> numberFormatters = [
     FilteringTextInputFormatter.digitsOnly,
-    LengthLimitingTextInputFormatter(10), // Máximo 10 dígitos para números de casa
+    LengthLimitingTextInputFormatter(10),
   ];
 
   @override
@@ -89,11 +99,27 @@ class AddressesController extends GetxController {
     }
   }
 
+  void prepareForEdit(AddressesEntity address) {
+    isEditing.value = true;
+    editingAddressId.value = address.id;
+    
+    fullNameController.text = address.fullName;
+    phoneController.text = address.phone;
+    streetController.text = address.street;
+    exteriorNumberController.text = address.exteriorNumber;
+    interiorNumberController.text = address.interiorNumber;
+    neighborhoodController.text = address.neighborhood;
+    cityController.text = address.city;
+    stateController.text = address.state;
+    postalCodeController.text = address.postalCode;
+    referencesController.text = address.references;
+  }
+
   Future<void> saveAddress() async {
     try {
       isSaving.value = true;
 
-      final newAddress = AddressesEntity(
+      final addressData = AddressesEntity(
         fullName: fullNameController.text.trim(),
         phone: phoneController.text.trim(),
         street: streetController.text.trim(),
@@ -106,31 +132,107 @@ class AddressesController extends GetxController {
         references: referencesController.text.trim(),
       );
 
-      await postAddressesUsecase.postAddresses(newAddress);
-      await refreshAddresses();
-      clearForm();
-
-      Get.back();
-      Get.snackbar(
-        'Éxito',
-        'Dirección guardada correctamente',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: GerenaColors.successColor,
-        colorText: GerenaColors.textLightColor,
-        duration: Duration(seconds: 2),
-      );
+      if (isEditing.value && editingAddressId.value != null) {
+        // ✅ Guardar el ID que estamos editando
+        final editedAddressId = editingAddressId.value!;
+        
+        await putAddressesUsecase.execute(addressData, editedAddressId);
+        
+        await refreshAddresses();
+        
+        // ✅ Actualizar selectedAddress si es la que se editó
+        if (selectedAddress.value?.id == editedAddressId) {
+          // Buscar la dirección actualizada en la lista
+          final updatedAddress = addresses.firstWhereOrNull(
+            (addr) => addr.id == editedAddressId
+          );
+          if (updatedAddress != null) {
+            selectedAddress.value = updatedAddress;
+          }
+        }
+        
+        clearForm();
+        
+        Get.back();
+        
+        await Future.delayed(Duration(milliseconds: 100));
+        showSuccessSnackbar('Dirección actualizada correctamente');
+     
+      } else {
+        await postAddressesUsecase.postAddresses(addressData);
+        
+        await refreshAddresses();
+        clearForm();
+        
+        Get.back();
+        
+        await Future.delayed(Duration(milliseconds: 100));
+        showSuccessSnackbar('Dirección guardada correctamente');
+      }
+      
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'No se pudo guardar la dirección',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: GerenaColors.errorColor,
-        colorText: GerenaColors.textLightColor,
-        duration: Duration(seconds: 3),
+      Get.back();
+      
+      await Future.delayed(Duration(milliseconds: 100));
+      showErrorSnackbar(
+        isEditing.value 
+            ? 'No se pudo actualizar la dirección' 
+            : 'No se pudo guardar la dirección'
       );
-      print('Error al guardar dirección: $e');
+   
+      print('❌ Error al guardar dirección: $e');
     } finally {
       isSaving.value = false;
+    }
+  }
+
+  // ✅ MÉTODO ACTUALIZADO: Ahora cierra el selector después de eliminar
+  Future<void> deleteAddress(int addressId, {bool closeSelector = false}) async {
+    final confirmed = await Get.dialog<bool>(
+      CustomAlertDialog(
+        title: '¿Eliminar dirección?',
+        message: '¿Estás seguro de que deseas eliminar esta dirección? Esta acción no se puede deshacer.',
+        confirmText: 'ELIMINAR',
+        cancelText: 'CANCELAR',
+        type: CustomAlertType.error,
+        onConfirm: () => Get.back(result: true),
+        onCancel: () => Get.back(result: false),
+      ),
+      barrierDismissible: false,
+    );
+
+    if (confirmed == true) {
+      try {
+        isDeleting.value = true;
+        
+        await deleteAddressesUsecase.execute(addressId);
+        
+        if (selectedAddress.value?.id == addressId) {
+          selectedAddress.value = null;
+        }
+        
+        await refreshAddresses();
+        
+        if (addresses.isNotEmpty && selectedAddress.value == null) {
+          selectedAddress.value = addresses.first;
+        }
+        
+        // ✅ Si closeSelector es true, cerrar el diálogo selector
+        if (closeSelector) {
+          Get.back();
+        }
+        
+        // ✅ Pequeño delay para asegurar que la UI se actualizó
+        await Future.delayed(Duration(milliseconds: 150));
+        
+        showSuccessSnackbar('Dirección eliminada correctamente');
+        
+      } catch (e) {
+        showErrorSnackbar('No se pudo eliminar la dirección');
+        print('❌ Error al eliminar dirección: $e');
+      } finally {
+        isDeleting.value = false;
+      }
     }
   }
 
@@ -145,6 +247,9 @@ class AddressesController extends GetxController {
     stateController.clear();
     postalCodeController.clear();
     referencesController.clear();
+    
+    isEditing.value = false;
+    editingAddressId.value = null;
   }
 
   void selectAddress(AddressesEntity address) {
@@ -175,7 +280,6 @@ class AddressesController extends GetxController {
     errorMessage.value = '';
   }
 
-  // Validaciones
   String? validateRequired(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName es requerido';
@@ -190,7 +294,6 @@ class AddressesController extends GetxController {
     if (value.trim().length != 10) {
       return 'Teléfono debe tener 10 dígitos';
     }
-    // ✅ Validar que solo contenga números
     if (!RegExp(r'^[0-9]+$').hasMatch(value.trim())) {
       return 'Teléfono solo puede contener números';
     }
@@ -204,32 +307,26 @@ class AddressesController extends GetxController {
     if (value.trim().length != 5) {
       return 'Código postal debe tener 5 dígitos';
     }
-    // ✅ Validar que solo contenga números
     if (!RegExp(r'^[0-9]+$').hasMatch(value.trim())) {
       return 'Código postal solo puede contener números';
     }
     return null;
   }
 
-  // ✅ Nueva validación para número exterior
   String? validateExteriorNumber(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Número exterior es requerido';
     }
-    // ✅ Validar que solo contenga números
     if (!RegExp(r'^[0-9]+$').hasMatch(value.trim())) {
       return 'Número exterior solo puede contener números';
     }
     return null;
   }
 
-  // ✅ Validación opcional para número interior (puede tener letras y números)
   String? validateInteriorNumber(String? value) {
-    // Interior es opcional, así que si está vacío es válido
     if (value == null || value.trim().isEmpty) {
       return null;
     }
-    // Permitir números y letras para interior (ej: 4B, 101A)
     if (!RegExp(r'^[0-9A-Za-z]+$').hasMatch(value.trim())) {
       return 'Número interior solo puede contener letras y números';
     }

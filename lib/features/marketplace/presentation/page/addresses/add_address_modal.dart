@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
 import 'package:get/get.dart';
@@ -28,6 +29,7 @@ class AddAddressModal extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // ✅ Header dinámico según si es crear o editar
             Container(
               padding: EdgeInsets.all(GerenaColors.paddingMedium),
               decoration: BoxDecoration(
@@ -39,21 +41,25 @@ class AddAddressModal extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.add_location_alt,
+                  Obx(() => Icon(
+                    controller.isEditing.value 
+                        ? Icons.edit_location_alt 
+                        : Icons.add_location_alt,
                     color: GerenaColors.textLightColor,
                     size: 24,
-                  ),
+                  )),
                   SizedBox(width: GerenaColors.paddingSmall),
                   Expanded(
-                    child: Text(
-                      'Agregar Nueva Dirección',
+                    child: Obx(() => Text(
+                      controller.isEditing.value 
+                          ? 'Editar Dirección' 
+                          : 'Agregar Nueva Dirección',
                       style: GoogleFonts.rubik(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: GerenaColors.textLightColor,
                       ),
-                    ),
+                    )),
                   ),
                   IconButton(
                     icon: Icon(
@@ -93,6 +99,7 @@ class AddAddressModal extends StatelessWidget {
                         controller: controller.phoneController,
                         hintText: 'Ej. 3312345678',
                         keyboardType: TextInputType.phone,
+                        inputFormatters: controller.phoneFormatters,
                         validator: controller.validatePhone,
                       ),
                       SizedBox(height: GerenaColors.paddingLarge),
@@ -115,6 +122,8 @@ class AddAddressModal extends StatelessWidget {
                               label: 'Número Exterior *',
                               controller: controller.exteriorNumberController,
                               hintText: 'Ej. 123',
+                              keyboardType: TextInputType.number,
+                              inputFormatters: controller.numberFormatters,
                               validator: (value) => controller.validateRequired(value, 'Número exterior'),
                             ),
                           ),
@@ -166,6 +175,7 @@ class AddAddressModal extends StatelessWidget {
                         controller: controller.postalCodeController,
                         hintText: 'Ej. 44100',
                         keyboardType: TextInputType.number,
+                        inputFormatters: controller.postalCodeFormatters,
                         validator: controller.validatePostalCode,
                       ),
                       SizedBox(height: GerenaColors.paddingMedium),
@@ -221,12 +231,14 @@ class AddAddressModal extends StatelessWidget {
                   ),
                   SizedBox(width: GerenaColors.paddingMedium),
                   Obx(() => GerenaColors.widgetButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        controller.saveAddress();
-                      }
-                    },
-                    text: 'GUARDAR',
+                    onPressed: controller.isSaving.value 
+                        ? null 
+                        : () async {
+                            if (_formKey.currentState!.validate()) {
+                              await controller.saveAddress();
+                            }
+                          },
+                    text: controller.isEditing.value ? 'ACTUALIZAR' : 'GUARDAR',
                     backgroundColor: GerenaColors.secondaryColor,
                     textColor: GerenaColors.textLightColor,
                     borderRadius: GerenaColors.smallRadius,
@@ -275,6 +287,7 @@ class AddAddressModal extends StatelessWidget {
     required TextEditingController controller,
     String? hintText,
     TextInputType? keyboardType,
+    List<TextInputFormatter>? inputFormatters,
     String? Function(String?)? validator,
     int maxLines = 1,
   }) {
@@ -293,6 +306,7 @@ class AddAddressModal extends StatelessWidget {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           maxLines: maxLines,
           validator: validator,
           style: GoogleFonts.rubik(

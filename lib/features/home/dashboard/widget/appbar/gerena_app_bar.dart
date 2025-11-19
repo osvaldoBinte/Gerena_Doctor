@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart'; 
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/home/dashboard/widget/appbar/gerena_app_bar_controller.dart';
-import 'package:gerena/features/home/dashboard/widget/notificasiones/notification_modal.dart';
+import 'package:gerena/features/notification/presentation/page/notificasiones/notification_modal.dart';
 import 'package:get/get.dart'; 
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;

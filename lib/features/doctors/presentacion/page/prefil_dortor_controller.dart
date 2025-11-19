@@ -283,40 +283,37 @@ void openSocialMediaProfile(String platform, String username) async {
       isUpdating.value = false;
     }
   }
-
-  void openWhatsApp(String? phoneNumber) async {
-    if (phoneNumber == null || phoneNumber.isEmpty) {
-      showErrorSnackbar('No hay número de WhatsApp disponible');
-      return;
-    }
-
-    String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-
-    if (!cleanPhone.startsWith('+')) {
-      cleanPhone = '+52$cleanPhone'; // Agregar código de país si no lo tiene
-    }
-
-    String message = '¡Hola! Me gustaría obtener más información.';
-
-    final whatsappUrl = Uri.parse(
-        'https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}');
-
-    try {
-      if (await canLaunchUrl(whatsappUrl)) {
-        await launchUrl(
-          whatsappUrl,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        showErrorSnackbar(
-          'No se pudo abrir WhatsApp. Asegúrate de tenerlo instalado.',
-        );
-      }
-    } catch (e) {
-      print('Error al abrir WhatsApp: $e');
-      showErrorSnackbar('Ocurrió un error al intentar abrir WhatsApp');
-    }
+void openWhatsApp() async {
+  final phoneNumber = doctorProfile.value?.whatsAppVendedor;
+  
+  if (phoneNumber == null || phoneNumber.isEmpty) {
+    showErrorSnackbar('No hay número de WhatsApp disponible');
+    return;
   }
+
+  String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+  String message = '¡Hola! Me gustaría obtener más información.';
+
+  final whatsappUrl = Uri.parse(
+      'https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}');
+
+  try {
+    if (await canLaunchUrl(whatsappUrl)) {
+      await launchUrl(
+        whatsappUrl,
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      showErrorSnackbar(
+        'No se pudo abrir WhatsApp. Asegúrate de tenerlo instalado.',
+      );
+    }
+  } catch (e) {
+    print('Error al abrir WhatsApp: $e');
+    showErrorSnackbar('Ocurrió un error al intentar abrir WhatsApp');
+  }
+}
   @override
   void onClose() {
     // Controllers existentes

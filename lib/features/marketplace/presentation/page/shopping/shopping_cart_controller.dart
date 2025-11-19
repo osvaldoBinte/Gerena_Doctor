@@ -74,106 +74,93 @@ class ShoppingCartController extends GetxController {
     print('📍 Dirección seleccionada en controller: $addressId');
   }
 
-  Future<void> confirmPurchase() async {
-    if (selectedPaymentMethodId.value.isEmpty) {
-      showErrorSnackbar('Por favor selecciona un método de pago');
+ Future<void> confirmPurchase() async {
+  if (selectedPaymentMethodId.value.isEmpty) {
+    showErrorSnackbar('Por favor selecciona un método de pago');
+    return;
+  }
+  
+  if (selectedAddressId.value.isEmpty) {
+    showErrorSnackbar('Por favor selecciona una dirección de entrega');
+    return;
+  }
+  
+  if (cartItems.isEmpty) {
+    showErrorSnackbar('El carrito está vacío');
+    return;
+  }
+  
+  final response = cartResponse.value;
+  if (response != null) {
+    final hasOutOfStock = response.itenms.any((item) => item.sinStock);
+    if (hasOutOfStock) {
+      showErrorSnackbar('Hay productos sin stock en tu carrito');
       return;
-    }
-    
-    if (selectedAddressId.value.isEmpty) {
-      showErrorSnackbar('Por favor selecciona una dirección de entrega');
-      return;
-    }
-    
-    if (cartItems.isEmpty) {
-      showErrorSnackbar('El carrito está vacío');
-      return;
-    }
-    
-    final response = cartResponse.value;
-    if (response != null) {
-      final hasOutOfStock = response.itenms.any((item) => item.sinStock);
-      if (hasOutOfStock) {
-        showErrorSnackbar('Hay productos sin stock en tu carrito');
-        return;
-      }
-    }
-    
-    try {
-      isProcessingPayment.value = true;
-      
-      print('🛒 Confirmando compra...');
-      print('💳 Payment Method ID: ${selectedPaymentMethodId.value}');
-      print('📍 Address ID: ${selectedAddressId.value}');
-      
-      final addressesController = Get.find<AddressesController>();
-      final selectedAddress = addressesController.selectedAddress.value;
-      
-      if (selectedAddress == null) {
-        showErrorSnackbar('No se encontró la dirección seleccionada');
-        return;
-      }
-      
-      final fullAddress = '${selectedAddress.street} ${selectedAddress.exteriorNumber}'
-          '${selectedAddress.interiorNumber.isNotEmpty ? ', Int. ${selectedAddress.interiorNumber}' : ''}, '
-          '${selectedAddress.neighborhood}';
-      
-      final items = cartItems.map((item) => ItemEntity(
-        medicamentoId: item.medicamentoId,
-        quantity: item.cantidad,
-      )).toList();
-      
-      final orderEntity = CreateNewOrderEntity(
-        items: items,
-        direccionEnvio: fullAddress,
-        ciudad: selectedAddress.city,
-        codigoPostal: int.parse(selectedAddress.postalCode),
-      );
-      
-      final orderResponse = await createOrderUsecase.createaneworder(orderEntity);
-      print('✅ Orden creada: ${orderResponse.orderId}');
-            print('✅ Orden creada: ${ selectedPaymentMethodId.value}');
-
-      await payOrderUsecase.execute(
-        orderResponse.orderId,
-        selectedPaymentMethodId.value, 
-      );
-      print('✅ Pago procesado exitosamente con método: ${selectedPaymentMethodId.value}');
-      
-      showSuccessSnackbar('¡Compra confirmada exitosamente!');
-      
-      final wasBuyNowMode = isBuyNowModeActive.value;
-      
-      if (isBuyNowModeActive.value) {
-        await clearBuyNow();
-        isBuyNowModeActive.value = false;
-        await loadCartFromPreferences();
-      } else {
-        await clearCart();
-      }
-      
-      if (wasBuyNowMode) {
-        print('🎉 Navegando a tienda después de Comprar Ahora');
-        
-        Get.find<ShopNavigationController>().navigateToStore();
-        Get.to(
-          () => GlobalShopInterface(),
-          arguments: {
-            'categoryName': '',
-            'showOffers': true,
-          },
-        );
-      } else {
-        print('🎉 Compra desde carrito normal completada');
-      }
-      
-    } catch (e, stackTrace) {
-      print('❌ Error al confirmar compra: $e\n$stackTrace');
-      showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
-    } finally {
-      isProcessingPayment.value = false;
     }
   }
+  
+  try {
+    isProcessingPayment.value = true;
+    
+    
+    final addressId = int.parse(selectedAddressId.value);
+    
+    final items = cartItems.map((item) => ItemEntity(
+      medicamentoId: item.medicamentoId,
+      quantity: item.cantidad,
+    )).toList();
+    
+    final orderEntity = CreateNewOrderEntity(
+      items: items,
+    );
+    
+    final orderResponse = await createOrderUsecase.createaneworder(
+      orderEntity,
+      addressId,
+    );
+    
+
+    await payOrderUsecase.execute(
+      orderResponse.orderId,
+      selectedPaymentMethodId.value, 
+    );
+    
+    print('✅ Pago procesado exitosamente con método: ${selectedPaymentMethodId.value}');
+    
+    showSuccessSnackbar('¡Compra confirmada exitosamente!');
+    
+    final wasBuyNowMode = isBuyNowModeActive.value;
+    
+    if (isBuyNowModeActive.value) {
+      await clearBuyNow();
+      isBuyNowModeActive.value = false;
+      await loadCartFromPreferences();
+    } else {
+      await clearCart();
+    }
+    
+    if (wasBuyNowMode) {
+      print('🎉 Navegando a tienda después de Comprar Ahora');
+      
+      Get.find<ShopNavigationController>().navigateToStore();
+      Get.to(
+        () => GlobalShopInterface(),
+        arguments: {
+          'categoryName': '',
+          'showOffers': true,
+        },
+      );
+    } else {
+      print('🎉 Compra desde carrito normal completada');
+    }
+    
+  } catch (e, stackTrace) {
+    print('❌ Error al confirmar compra: $e\n$stackTrace');
+    showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
+  } finally {
+    isProcessingPayment.value = false;
+  }
+}
   
   Future<void> loadCartFromPreferences() async {
     try {

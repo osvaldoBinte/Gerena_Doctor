@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
+import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/home/dashboard/widget/half_cut_circle.dart';
@@ -15,38 +16,6 @@ class SidebarWidget extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  // Función para abrir WhatsApp
-  Future<void> openWhatsApp() async {
-    final Uri whatsappUrl = Uri.parse(
-        'https://api.whatsapp.com/send/?phone=%E2%80%AA%E2%80%AA5213321642470&text=Hola+necesito+m%C3%A1s+informaci%C3%B3n.&type=phone_number&app_absent=0');
-
-    try {
-      if (await canLaunchUrl(whatsappUrl)) {
-        await launchUrl(
-          whatsappUrl,
-          mode: LaunchMode.externalApplication, // Abre en la app externa
-        );
-      } else {
-        // Si no puede abrir WhatsApp, muestra un mensaje
-        Get.snackbar(
-          'Error',
-          'No se pudo abrir WhatsApp. Por favor, verifica que esté instalado.',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      }
-    } catch (e) {
-      print('Error al abrir WhatsApp: $e');
-      Get.snackbar(
-        'Error',
-        'Ocurrió un error al intentar abrir WhatsApp',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +23,7 @@ class SidebarWidget extends StatelessWidget {
         Get.find<DashboardController>();
     final CategoryController categoryController =
         Get.find<CategoryController>();
+     final PrefilDortorController controller= Get.find<PrefilDortorController>();
 
     return Container(
       width: 350,
@@ -106,24 +76,27 @@ class SidebarWidget extends StatelessWidget {
                                   horizontal: 16.0, vertical: 8.0),
                               child: Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Get.find<ShopNavigationController>()
-                                          .navigateToStore();
-                                      Get.to(
-                                        () => GlobalShopInterface(),
-                                        arguments: {
-                                          'categoryName': '',
-                                          'showOffers': true,
-                                        },
-                                      );
-                                    },
-                                    child: Text(
-                                      'CATÁLOGO',
-                                      style: TextStyle(
-                                        color: GerenaColors.textLightColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                  MouseRegion(
+                                    cursor: SystemMouseCursors.click,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Get.find<ShopNavigationController>()
+                                            .navigateToStore();
+                                        Get.to(
+                                          () => GlobalShopInterface(),
+                                          arguments: {
+                                            'categoryName': '',
+                                            'showOffers': true,
+                                          },
+                                        );
+                                      },
+                                      child: Text(
+                                        'CATÁLOGO',
+                                        style: TextStyle(
+                                          color: GerenaColors.textLightColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -132,6 +105,7 @@ class SidebarWidget extends StatelessWidget {
                             ),
 
                             _buildCatalogGrid(categoryController),
+                            SizedBox(height: 50,),
 
                             Obx(() => (dashboardController
                                         .isCalendarFullScreen.value ||
@@ -159,50 +133,53 @@ class SidebarWidget extends StatelessWidget {
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: openWhatsApp, // Cambio aquí: ahora llama a _openWhatsApp
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: GerenaColors.surfaceColor,
-                  borderRadius: GerenaColors.smallBorderRadius,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: GerenaColors.surfaceColor,
-                      ),
-                      child: Image.asset(
-                        'assets/icons/headset_mic.png',
-                        width: 24,
-                        height: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: GerenaColors.primaryColor,
-                          borderRadius: BorderRadius.circular(8.0),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: controller.openWhatsApp,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: GerenaColors.surfaceColor,
+                    borderRadius: GerenaColors.smallBorderRadius,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: GerenaColors.surfaceColor,
                         ),
-                        child: Text(
-                          'Gerena',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            color: GerenaColors.surfaceColor,
-                            fontWeight: FontWeight.w500,
+                        child: Image.asset(
+                          'assets/icons/headset_mic.png',
+                          width: 24,
+                          height: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: GerenaColors.primaryColor,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Text(
+                            'Gerena',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              color: GerenaColors.surfaceColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -222,59 +199,62 @@ class SidebarWidget extends StatelessWidget {
   }
 
   Widget _buildSearchField() {
-    return GestureDetector(
-      onTap: () {
-        Get.find<ShopNavigationController>().navigateToStore();
-        Get.to(() => GlobalShopInterface());
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(13),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8, right: 12),
-              child: Image.asset(
-                'assets/icons/search.png',
-                width: 28,
-                height: 28,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          Get.find<ShopNavigationController>().navigateToStore();
+          Get.to(() => GlobalShopInterface());
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(13),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: Offset(0, 2),
               ),
-            ),
-            Expanded(
-              child: Container(
-                height: 20,
-                decoration: BoxDecoration(
-                  color: Color(0xFF00332E),
-                  borderRadius: BorderRadius.circular(20),
+            ],
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 12),
+                child: Image.asset(
+                  'assets/icons/search.png',
+                  width: 28,
+                  height: 28,
                 ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Text(
-                      'Buscar Producto',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+              ),
+              Expanded(
+                child: Container(
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF00332E),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: Text(
+                        'Buscar Producto',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

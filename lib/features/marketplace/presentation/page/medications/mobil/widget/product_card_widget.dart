@@ -112,7 +112,7 @@ class ProductCardWidget extends StatelessWidget {
                       width: 16,
                       height: 16,
                       fit: BoxFit.contain,
-                      color: isInWishlist ? GerenaColors.primaryColor : null,
+                    //  color: isInWishlist ? GerenaColors.primaryColor : null,
                       errorBuilder: (context, error, stackTrace) {
                         return Icon(
                           isInWishlist ? Icons.bookmark : Icons.bookmark_border,

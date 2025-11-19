@@ -6,14 +6,17 @@ class ShoppingCartResponseEntity {
     required this.itenms
   });
 }
-class ItemEntity{
+
+class ItemEntity {
   final int medicamentoId;
   final String nombreMedicamento;
   final int cantidadSolicitada;
   final double precioActual;
   final double precioAnterior;
   final bool sinStock;
-  String ? descripcion;
+  String? alerta;
+  String? imagen;
+  String? categoria;
 
   ItemEntity({
     required this.medicamentoId,
@@ -22,6 +25,8 @@ class ItemEntity{
     required this.precioActual,
     required this.precioAnterior,
     required this.sinStock,
-    this.descripcion
+    this.alerta,
+    this.categoria,
+    this.imagen,
   });
 }

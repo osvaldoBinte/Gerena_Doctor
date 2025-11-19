@@ -236,9 +236,9 @@ Future<List<MedicationsEntity>> searchingformedications(
     }
   }
 
-  Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder, String token) async {
+  Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder, int idAddresse,String token) async {
     try {
-      Uri url = Uri.parse('$defaultApiServer/Marketplace/pedidos');
+      Uri url = Uri.parse('$defaultApiServer/Marketplace/pedidos?direccionid=$idAddresse');
 
       final response = await http.post( url,
         headers: <String, String>{

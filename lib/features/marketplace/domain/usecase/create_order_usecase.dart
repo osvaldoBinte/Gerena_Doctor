@@ -5,7 +5,7 @@ import 'package:gerena/features/marketplace/domain/repositories/marketplace_repo
 class CreateOrderUsecase {
   final MarketplaceRepository marketplaceRepository;
   CreateOrderUsecase({required this.marketplaceRepository});
-   Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder) async {
-     return await marketplaceRepository.createaneworder(createaneworder);
+   Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder,int idAddresse,) async {
+     return await marketplaceRepository.createaneworder(createaneworder,idAddresse);
    }
 }
