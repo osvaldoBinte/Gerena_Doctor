@@ -16,28 +16,33 @@ class PrefilDortorController extends GetxController {
   final Rx<DoctorEntity?> doctorProfile = Rx<DoctorEntity?>(null);
   final Rx<File?> selectedImageFile = Rx<File?>(null);
 
+  final RxMap<String, bool> editingModes = <String, bool>{
+    'linkedin': false,
+    'facebook': false,
+    'twitter': false,
+    'instagram': false,
+  }.obs;
+
   final DoctorProfileUsecase doctorProfileUsecase;
   final UpdateDoctorProfileUsecase updateDoctorProfileUsecase;
   final UpdatefotoDoctorProfileUsecase updatefotoDoctorProfileUsecase;
 
-  // Controllers existentes
-  late TextEditingController nombreController;
-  late TextEditingController apellidosController;
-  late TextEditingController especialidadController;
-  late TextEditingController direccionController;
-  late TextEditingController emailController;
-  late TextEditingController telefonoController;
-  late TextEditingController numeroLicenciaController;
-  late TextEditingController tituloController;
-  late TextEditingController disciplinaController;
-  late TextEditingController institucionController;
-  late TextEditingController certificacionController;
+  late final TextEditingController nombreController;
+  late final TextEditingController apellidosController;
+  late final TextEditingController especialidadController;
+  late final TextEditingController direccionController;
+  late final TextEditingController emailController;
+  late final TextEditingController telefonoController;
+  late final TextEditingController numeroLicenciaController;
+  late final TextEditingController tituloController;
+  late final TextEditingController disciplinaController;
+  late final TextEditingController institucionController;
+  late final TextEditingController certificacionController;
   
-  // Nuevos controllers para redes sociales
-  late TextEditingController linkedinController;
-  late TextEditingController facebookController;
-  late TextEditingController twitterController;
-  late TextEditingController instagramController;
+  late final TextEditingController linkedinController;
+  late final TextEditingController facebookController;
+  late final TextEditingController twitterController;
+  late final TextEditingController instagramController;
 
   PrefilDortorController({
     required this.doctorProfileUsecase,
@@ -53,7 +58,6 @@ class PrefilDortorController extends GetxController {
   }
 
   void _initializeControllers() {
-    // Controllers existentes
     nombreController = TextEditingController();
     apellidosController = TextEditingController();
     especialidadController = TextEditingController();
@@ -66,16 +70,17 @@ class PrefilDortorController extends GetxController {
     institucionController = TextEditingController();
     certificacionController = TextEditingController();
     
-    // Nuevos controllers para redes sociales
     linkedinController = TextEditingController();
     facebookController = TextEditingController();
     twitterController = TextEditingController();
     instagramController = TextEditingController();
-  }void _populateControllers() {
-  if (doctorProfile.value != null) {
+  }
+
+  void _populateControllers() {
+    if (doctorProfile.value == null) return;
+    
     final doctor = doctorProfile.value!;
     
-    // ✅ Verifica que los controllers existan antes de usarlos
     try {
       nombreController.text = doctor.nombre ?? '';
       apellidosController.text = doctor.apellidos ?? '';
@@ -95,68 +100,62 @@ class PrefilDortorController extends GetxController {
       instagramController.text = doctor.instagram ?? '';
     } catch (e) {
       print('Error al poblar controllers: $e');
-      // Los controllers ya fueron disposed, reinicializar
-      _initializeControllers();
     }
   }
-}
-// Método para obtener el valor de redes sociales por clave
-String? getValueForSocial(String socialKey) {
-  if (doctorProfile.value == null) return null;
-  
-  switch (socialKey) {
-    case 'linkedin':
-      return doctorProfile.value!.linkedIn;
-    case 'facebook':
-      return doctorProfile.value!.facebook;
-    case 'twitter':
-      return doctorProfile.value!.x;
-    case 'instagram':
-      return doctorProfile.value!.instagram;
-    default:
-      return null;
-  }
-}
 
-void openSocialMediaProfile(String platform, String username) async {
-  if (username.isEmpty) return;
-
-  String cleanUsername = username.replaceAll('@', '');
-
-  String url;
-  switch (platform.toLowerCase()) {
-    case 'linkedin':
-      url = 'https://www.linkedin.com/in/$cleanUsername';
-      break;
-    case 'facebook':
-      url = 'https://www.facebook.com/$cleanUsername';
-      break;
-    case 'x':
-      url = 'https://twitter.com/$cleanUsername';
-      break;
-    case 'instagram':
-      url = 'https://www.instagram.com/$cleanUsername';
-      break;
-    default:
-    showErrorSnackbar('Plataforma no reconocida',);
-     
-      return;
-  }
-
-  try {
-    final uri = Uri.parse(url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-          showErrorSnackbar( 'No se pudo abrir el enlace',);
-
+  String? getValueForSocial(String socialKey) {
+    if (doctorProfile.value == null) return null;
     
+    switch (socialKey) {
+      case 'linkedin':
+        return doctorProfile.value!.linkedIn;
+      case 'facebook':
+        return doctorProfile.value!.facebook;
+      case 'twitter':
+        return doctorProfile.value!.x;
+      case 'instagram':
+        return doctorProfile.value!.instagram;
+      default:
+        return null;
     }
-  } catch (e) {
-              showErrorSnackbar( 'URL inválida',);
-
   }
-}
+
+  void openSocialMediaProfile(String platform, String username) async {
+    if (username.isEmpty) return;
+
+    String cleanUsername = username.replaceAll('@', '');
+
+    String url;
+    switch (platform.toLowerCase()) {
+      case 'linkedin':
+        url = 'https://www.linkedin.com/in/$cleanUsername';
+        break;
+      case 'facebook':
+        url = 'https://www.facebook.com/$cleanUsername';
+        break;
+      case 'x':
+        url = 'https://twitter.com/$cleanUsername';
+        break;
+      case 'instagram':
+        url = 'https://www.instagram.com/$cleanUsername';
+        break;
+      default:
+        showErrorSnackbar('Plataforma no reconocida');
+        return;
+    }
+
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        showErrorSnackbar('No se pudo abrir el enlace');
+      }
+    } catch (e) {
+      showErrorSnackbar('URL inválida');
+    }
+  }
+
   Future<void> loadProfile() async {
     try {
       isLoading.value = true;
@@ -223,12 +222,12 @@ void openSocialMediaProfile(String platform, String username) async {
         institucion: doctorProfile.value?.institucion,
         certificacion: doctorProfile.value?.certificacion,
         institucionCertificacion: doctorProfile.value?.institucionCertificacion,
-        // Redes sociales
+    
         linkedIn: linkedinController.text.isEmpty ? null : linkedinController.text,
         facebook: facebookController.text.isEmpty ? null : facebookController.text,
         x: twitterController.text.isEmpty ? null : twitterController.text,
         instagram: instagramController.text.isEmpty ? null : instagramController.text,
-        // Mantener datos del vendedor
+       
         nombreVendedor: doctorProfile.value?.nombreVendedor,
         whatsAppVendedor: doctorProfile.value?.whatsAppVendedor,
         correoVendedor: doctorProfile.value?.correoVendedor,
@@ -269,12 +268,11 @@ void openSocialMediaProfile(String platform, String username) async {
         institucion: institucionController.text,
         certificacion: certificacionController.text,
         institucionCertificacion: doctorProfile.value?.institucionCertificacion,
-        // Mantener redes sociales
+      
         linkedIn: doctorProfile.value?.linkedIn,
         facebook: doctorProfile.value?.facebook,
         x: doctorProfile.value?.x,
         instagram: doctorProfile.value?.instagram,
-        // Mantener datos del vendedor
       );
 
       await updateDoctorProfileUsecase.execute(updatedDoctor);
@@ -286,62 +284,46 @@ void openSocialMediaProfile(String platform, String username) async {
       isUpdating.value = false;
     }
   }
-void openWhatsApp() async {
-  final phoneNumber = doctorProfile.value?.whatsAppVendedor;
-  
-  if (phoneNumber == null || phoneNumber.isEmpty) {
-    showErrorSnackbar('No hay número de WhatsApp disponible');
-    return;
-  }
 
-  String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-
-  if (!cleanPhone.startsWith('+')) {
-    cleanPhone = '+52$cleanPhone'; // Agregar código de país si no lo tiene
-  }
-
-  String message = '¡Hola! Me gustaría obtener más información.';
-
-  final whatsappUrl = Uri.parse(
-      'https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}');
-
-  try {
-    if (await canLaunchUrl(whatsappUrl)) {
-      await launchUrl(
-        whatsappUrl,
-        mode: LaunchMode.externalApplication,
-      );
-    } else {
-      showErrorSnackbar(
-        'No se pudo abrir WhatsApp. Asegúrate de tenerlo instalado.',
-      );
+  void openWhatsApp() async {
+    final phoneNumber = doctorProfile.value?.whatsAppVendedor;
+    
+    if (phoneNumber == null || phoneNumber.isEmpty) {
+      showErrorSnackbar('No hay número de WhatsApp disponible');
+      return;
     }
-  } catch (e) {
-    print('Error al abrir WhatsApp: $e');
-    showErrorSnackbar('Ocurrió un error al intentar abrir WhatsApp');
+
+    String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+
+    if (!cleanPhone.startsWith('+')) {
+      cleanPhone = '+52$cleanPhone';
+    }
+
+    String message = '¡Hola! Me gustaría obtener más información.';
+
+    final whatsappUrl = Uri.parse(
+        'https://wa.me/$cleanPhone?text=${Uri.encodeComponent(message)}');
+
+    try {
+      if (await canLaunchUrl(whatsappUrl)) {
+        await launchUrl(
+          whatsappUrl,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        showErrorSnackbar(
+          'No se pudo abrir WhatsApp. Asegúrate de tenerlo instalado.',
+        );
+      }
+    } catch (e) {
+      print('Error al abrir WhatsApp: $e');
+      showErrorSnackbar('Ocurrió un error al intentar abrir WhatsApp');
+    }
   }
-}
+
   @override
-  void onClose() {
-    // Controllers existentes
-    nombreController.dispose();
-    apellidosController.dispose();
-    especialidadController.dispose();
-    direccionController.dispose();
-    emailController.dispose();
-    telefonoController.dispose();
-    numeroLicenciaController.dispose();
-    tituloController.dispose();
-    disciplinaController.dispose();
-    institucionController.dispose();
-    certificacionController.dispose();
-    
-    // Nuevos controllers de redes sociales
-    linkedinController.dispose();
-    facebookController.dispose();
-    twitterController.dispose();
-    instagramController.dispose();
-    
-    super.onClose();
-  }
+@override
+void onClose() {
+  super.onClose();
+}
 }

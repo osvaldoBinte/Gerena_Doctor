@@ -11,8 +11,8 @@ import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controll
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/procedure_Widget.dart';
 import 'package:gerena/movil/widgets/review_widget.dart';
-import 'package:gerena/features/home/dashboard/widget/estatusdepedido/estatus_de_pedido.dart';
-import 'package:gerena/features/home/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/estatusdepedido/estatus_de_pedido.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widgets_status_pedido.dart';
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

@@ -3,7 +3,7 @@ import 'package:gerena/common/errors/api_errors.dart';
 import 'package:gerena/features/marketplace/data/model/category/category_model.dart';
 import 'package:gerena/features/marketplace/data/model/ordes/create/create_new_order_model.dart';
 import 'package:gerena/features/marketplace/data/model/ordes/create/response_new_order_model.dart';
-import 'package:gerena/features/marketplace/data/model/ordes/order_entity.dart';
+import 'package:gerena/features/marketplace/data/model/ordes/order_model.dart';
 import 'package:gerena/features/marketplace/data/model/searchingformedications/searching_for_medications_model.dart';
 import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_items_model.dart';
 import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_cart_post_model.dart';
@@ -23,6 +23,9 @@ import 'dart:io';
 
 class MarketplaceDataSourcesImp {
   String defaultApiServer = AppConstants.serverBase;
+
+
+
 Future<List<MedicationsEntity>> searchingformedications(
     String categoria, String busqueda, String token) async {
   try {
@@ -160,44 +163,44 @@ Future<List<MedicationsEntity>> searchingformedications(
       throw Exception('$e');
     }
   }
+Future<List<OrderEntity>> myorders(String token) async {
+  try {
+    Uri url = Uri.parse('$defaultApiServer/Marketplace/mis-pedidos');
 
-
-  Future<OrderEntity> myorders( String token) async {
-    try {
-      Uri url = Uri.parse('$defaultApiServer/Marketplace/mis-pedidos?estado=');
-
-      final response = await http.get(url, headers: <String, String>{
+    final response = await http.get(
+      url,
+      headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
-      });
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final dataUTF8 = utf8.decode(response.bodyBytes);
-        final responseDecode = jsonDecode(dataUTF8);
+    if (response.statusCode == 200) {
+      final dataUTF8 = utf8.decode(response.bodyBytes);
+      final responseDecode = jsonDecode(dataUTF8);
 
-        final  category = responseDecode['pedidos'];
-        if (category is Map<String, dynamic>) {
-          OrderModel order =
-              OrderModel.fromJson(responseDecode);
-          return order;
-        } else {
-          throw Exception('Respuesta vacía o formato incorrecto');
-        }
-      }
+      final List pedidos = responseDecode["pedidos"];
 
-      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
-      exception.validateMesage();
-      throw exception;
-    } catch (e) {
-      if (e is SocketException ||
-          e is http.ClientException ||
-          e is TimeoutException) {
-        throw Exception(convertMessageException(error: e));
-      }
-      print('error: $e');
-      throw Exception('$e');
+      return pedidos
+          .map((json) => OrderModel.fromJson(json))
+          .toList();
     }
+
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+    print('error: $e');
+    throw Exception('$e');
   }
+}
+
 
   Future<OrderEntity> getordersbyid( String token,int id) async {
     try {
@@ -332,6 +335,43 @@ Future<List<MedicationsEntity>> searchingformedications(
           ShoppingCartResponseModel shopping =
               ShoppingCartResponseModel.fromJson(responseDecode);
           return shopping;
+        } else {
+          throw Exception('Respuesta vacía o formato incorrecto');
+        }
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      print('error: $e');
+      throw Exception('$e');
+    }
+  }
+
+
+
+  Future<OrderEntity> getMylastpaidorder(String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Marketplace/mi-ultimo-pedido');
+
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+        if (responseDecode is Map<String, dynamic>) {
+          OrderModel medication =
+              OrderModel.fromJson(responseDecode);
+          return medication;
         } else {
           throw Exception('Respuesta vacía o formato incorrecto');
         }

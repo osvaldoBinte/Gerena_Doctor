@@ -67,10 +67,7 @@ class NewsFeedWidget extends StatelessWidget {
             BannersListWidget(
                       height: 200,
                       maxBanners: 2, // Mostrar máximo 2 banners
-                      onBannerTap: () {
-                        print('Banner tapped');
-                        // Navegar a donde necesites
-                      },
+                      
                     ),
           
          /* GerenaColors.createArticleCard(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/widgets/simple_counter.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/modalGuardarProducto/modal_guardar_producto.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:get/get.dart';
@@ -15,7 +16,7 @@ class SavedProductsContent extends StatelessWidget {
   }) : super(key: key);
   
   final wishlistController = Get.find<WishlistController>();
-  
+  final shoppingCartController = Get.find<ShoppingCartController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -329,32 +330,59 @@ class SavedProductsContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+
                 InkWell(
-                  onTap: () {
-                    wishlistController.removeFromWishlist(item.medicamentoId);
-                  },
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Image.asset(
-                      'assets/icons/guardar.png',
-                      width: 16,
-                      height: 16,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.close,
-                          size: 16,
-                          color: Colors.grey[600],
-                        );
-                      },
-                    ),
-                  ),
-                ),
+  onTap: () {
+    wishlistController.removeFromWishlist(item.medicamentoId);
+  },
+  child: Container(
+    width: 24,
+    height: 24,
+    decoration: BoxDecoration(
+      color: Colors.grey[200],
+      shape: BoxShape.circle,
+    ),
+    child: Icon(
+      Icons.favorite,       // Ícono de corazón
+      size: 18,
+      color: Colors.red,    // Cambia el color si quieres
+    ),
+  ),
+)
+,
+                SizedBox(height: 20,),
+
+               InkWell(
+  onTap: () async {
+    // Agregar al carrito
+    await shoppingCartController.addToCart(
+      medicamentoId: item.medicamentoId,
+      precio: item.precioActual,
+      cantidad: 1, // o usa el valor del contador si lo tienes
+    );
+  },
+  child: Container(
+    width: 24,
+    height: 24,
+    decoration: BoxDecoration(
+      color: Colors.grey[200],
+      shape: BoxShape.circle,
+    ),
+    child: Image.asset(
+      'assets/icons/guardar.png',
+      width: 16,
+      height: 16,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        return Icon(
+          Icons.shopping_cart,
+          size: 16,
+          color: Colors.grey[600],
+        );
+      },
+    ),
+  ),
+),
                 
                 SizedBox(height: 40),
                 simpleCounter(),

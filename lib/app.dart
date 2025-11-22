@@ -13,6 +13,8 @@ import 'package:gerena/features/doctorprocedures/presentation/page/procedures_co
 import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/history_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_by_id_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
@@ -96,10 +98,13 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.deleteAddressesUsecase!,permanent: true);
         Get.put(usecaseConfig.addAvailabilityUsecase!, permanent: true);
         Get.put(usecaseConfig.deleteAvailabilityUsecase!, permanent: true);
+        Get.put(usecaseConfig.getMyLastPaidOrderUsecase!, permanent: true);
 
 
 
         Get.lazyPut(() => LoginController(loginUsecase: Get.find()), fenix: true);
+        Get.lazyPut(() => HistoryController(getMyOrderUsecase: Get.find()), fenix: true);
+        Get.lazyPut(() => GetMyLastPaidOrderController(getMyLastPaidOrderUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => ReviewController(myReviewUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => SplashController(doctorProfileUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => PrefilDortorController(doctorProfileUsecase:  Get.find(), updateDoctorProfileUsecase:  Get.find(), updatefotoDoctorProfileUsecase:  Get.find(), ), fenix: true);

@@ -172,10 +172,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                     BannersListWidget(
                       height: 200,
                       maxBanners: 2, // Mostrar máximo 2 banners
-                      onBannerTap: () {
-                        print('Banner tapped');
-                        // Navegar a donde necesites
-                      },
+                   
                     ),
                   ],
                 ),

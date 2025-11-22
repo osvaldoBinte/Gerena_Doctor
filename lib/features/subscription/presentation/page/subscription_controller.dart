@@ -30,6 +30,7 @@ class SubscriptionController extends GetxController {
   var plans = <ViewAllPlansEntity>[].obs;
   var errorMessage = ''.obs;
   var selectedPaymentMethodId = ''.obs;
+  var isCancelling = false.obs; // 👈 NUEVO: Estado para cancelación
   
   // Suscripción actual
   Rx<MySubscriptionEntity?> currentSubscription = Rx<MySubscriptionEntity?>(null);
@@ -106,10 +107,7 @@ class SubscriptionController extends GetxController {
       
       showSuccessSnackbar('Suscripción realizada correctamente');
       
-      // Recargar datos
       await loadSubscriptionData();
-      
-      // Limpiar selección
       selectedPaymentMethodId.value = '';
       
     } catch (e) {
@@ -143,7 +141,6 @@ class SubscriptionController extends GetxController {
             : 'El cambio se aplicará al final del período actual'
       );
       
-      // Recargar datos
       await loadSubscriptionData();
       
     } catch (e) {
@@ -154,7 +151,7 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  // Cancelar suscripción
+  // 👇 ACTUALIZADO: Cancelar suscripción con mejor manejo
   Future<void> cancelSubscription(bool cancelImmediately, String reason) async {
     try {
       if (!hasActiveSubscription.value) {
@@ -162,7 +159,12 @@ class SubscriptionController extends GetxController {
         return;
       }
 
-      isLoading.value = true;
+      if (reason.trim().isEmpty) {
+        showErrorSnackbar('Por favor indica el motivo de la cancelación');
+        return;
+      }
+
+      isCancelling.value = true;
       
       await postCancelSubcriptionUsecase.execute(cancelImmediately, reason);
       
@@ -172,14 +174,13 @@ class SubscriptionController extends GetxController {
             : 'Tu suscripción se cancelará al final del período actual'
       );
       
-      // Recargar datos
       await loadSubscriptionData();
       
     } catch (e) {
       showErrorSnackbar('Error al cancelar la suscripción: ${e.toString().replaceAll('Exception: ', '')}');
       print('Error cancelling subscription: $e');
     } finally {
-      isLoading.value = false;
+      isCancelling.value = false;
     }
   }
 

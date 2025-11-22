@@ -1250,7 +1250,6 @@ static Widget createSearchContainer({
     ),
   );
 }
-
 static Widget buildLabeledTextField(
   String label, 
   String initialValue,
@@ -1262,6 +1261,45 @@ static Widget buildLabeledTextField(
     bool readOnly = false,
   }
 ) {
+  // ✅ Si no hay controller, no mostrar el TextField
+  if (controller == null) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.rubik(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: GerenaColors.textPrimaryColor,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          height: 45,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            border: Border.all(
+              color: GerenaColors.colorinput.withOpacity(0.5),
+              width: 1,
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              initialValue.isEmpty ? (hintText ?? '') : initialValue,
+              style: GoogleFonts.rubik(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -1275,17 +1313,15 @@ static Widget buildLabeledTextField(
       ),
       const SizedBox(height: 5),
       TextField(
-        key: ValueKey('textfield_$label'),
+        key: ObjectKey(controller), // ✅ Usar ObjectKey con el controller
         controller: controller,
         readOnly: readOnly,
-        enabled: !readOnly && controller != null, // ✅ Solo habilitar si hay controller válido
         style: GoogleFonts.rubik(
           fontSize: 16,
           color: readOnly ? Colors.grey.shade700 : Colors.black,
         ),
         decoration: InputDecoration(
-          // ✅ Usar initialValue como fallback si el controller está vacío
-          hintText: (controller?.text.isEmpty ?? true) ? (hintText ?? initialValue) : null,
+          hintText: controller.text.isEmpty ? (hintText ?? initialValue) : null,
           hintStyle: GoogleFonts.rubik(
             color: GerenaColors.textSecondaryColor.withOpacity(0.6),
             fontSize: 16,
@@ -1341,7 +1377,10 @@ static Widget buildLabeledTextField(
       ),
     ],
   );
-}static Widget widgetButton({
+}
+
+
+static Widget widgetButton({
   VoidCallback? onPressed,
   String text = 'AGENDAR CITA',
   Color? backgroundColor,

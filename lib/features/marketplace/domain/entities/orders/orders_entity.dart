@@ -1,4 +1,4 @@
- class OrdersResponseEntity {
+class OrdersResponseEntity {
   final int total;
   final List<OrderEntity> orders;
 
@@ -10,8 +10,12 @@
 
 class OrderEntity {
   final int id;
+  final String? folio;
   final int doctorId;
   final String doctorName;
+  final double totalOriginal;
+  final double discountByPoints;
+  final int pointsUsed;
   final double total;
   final String status;
   final String shippingAddress;
@@ -19,13 +23,18 @@ class OrderEntity {
   final int postalCode;
   final List<OrderDetailEntity> details;
   final DateTime createdAt;
+  final String? shippingStatus;
   final DateTime? shippingDate;
   final DateTime? deliveryDate;
 
   OrderEntity({
     required this.id,
+    this.folio,
     required this.doctorId,
     required this.doctorName,
+    required this.totalOriginal,
+    required this.discountByPoints,
+    required this.pointsUsed,
     required this.total,
     required this.status,
     required this.shippingAddress,
@@ -33,9 +42,14 @@ class OrderEntity {
     required this.postalCode,
     required this.details,
     required this.createdAt,
+    this.shippingStatus,
     this.shippingDate,
     this.deliveryDate,
   });
+
+  bool get hasFolio => folio != null && folio!.isNotEmpty;
+  
+  bool get hasDiscount => discountByPoints > 0;
 }
 
 class OrderDetailEntity {

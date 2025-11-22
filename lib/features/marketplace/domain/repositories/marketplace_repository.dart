@@ -13,10 +13,13 @@ abstract class MarketplaceRepository {
     Future<List<MedicationsEntity>> medicinesonsale();
 
   Future<MedicationsEntity> getmedicineByID(int id);
-   Future<OrderEntity> myorders();
+   Future<List< OrderEntity>> myorders();
   Future<OrderEntity> orderbyID(int id);
     Future<RessponseNewOrderEntity> createaneworder(CreateNewOrderEntity createaneworder,int idAddresse,);
 
   Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity);
   Future<void> payorder(int orderId,String paymentMethodId);
+
+
+  Future<OrderEntity> getMylastpaidorder() ;
 }

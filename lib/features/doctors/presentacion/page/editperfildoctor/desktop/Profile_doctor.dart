@@ -280,8 +280,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
                       children: [
                         buildProfileMenuItem('Historial de pedidos'),
                         buildProfileMenuItem('Membresía'),
-                        buildProfileMenuItem('Cédula profesional', icon: 'assets/icons/headset_mic.png'),
-                        buildProfileMenuItem('Contáctanos'),
+                      
                         buildProfileMenuItem('Preguntas frecuentes'),
                         buildProfileMenuItem('Cerrar sesión'),
                       ],
@@ -348,7 +347,7 @@ Widget _buildAccountSettingsSection() {
                             widthFactor: 0.8,
                             child:GerenaColors.buildLabeledTextField(
                             'Nombre/s*',
-                            doctor.nombre ?? '', // ✅ Usa el valor del doctor, no del controller
+                            doctor.nombre ?? '', 
                             hintText: 'Juan Pedro',
                             controller: controller.nombreController,
                             readOnly: true,
@@ -362,7 +361,7 @@ Widget _buildAccountSettingsSection() {
                           widthFactor: 0.8,
                           child:  GerenaColors.buildLabeledTextField(
                           'Apellidos*',
-                          doctor.apellidos ?? '', // ✅ Usa el valor del doctor
+                          doctor.apellidos ?? '',
                           hintText: 'González Pérez',
                           controller: controller.apellidosController,
                           readOnly: true,

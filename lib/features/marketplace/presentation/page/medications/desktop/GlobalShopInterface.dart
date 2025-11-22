@@ -10,10 +10,10 @@ import 'package:gerena/features/marketplace/presentation/page/widget/product_car
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
 import 'package:gerena/features/home/dashboard/dashboard_page.dart';
 import 'package:gerena/features/home/dashboard/widget/appbar/gerena_app_bar.dart';
-import 'package:gerena/features/home/dashboard/widget/estatusdepedido/status_card_modal.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/estatusdepedido/status_card_modal.dart';
 import 'package:gerena/features/home/dashboard/widget/facturacion/facturacion.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
-import 'package:gerena/page/store/historialDePedidos/historial_de_pedidos_content.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/historial_de_pedidos_content.dart';
 import 'package:gerena/page/store/store_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

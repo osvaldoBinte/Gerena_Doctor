@@ -80,7 +80,6 @@ class AvailabilityController extends GetxController {
     try {
       isLoading.value = true;
       
-      // Obtener el día en el formato correcto (índice 0 = Lunes)
       final dayOfWeek = daysOfWeek[selectedDay.value!.weekday - 1];
       
       final entity = AddAvailabilityEntity(

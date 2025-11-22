@@ -28,7 +28,7 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   }
 
   @override
-   Future<OrderEntity> myorders() async {
+   Future<List< OrderEntity>> myorders() async {
      final session = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
      return await marketplaceDataSourcesImp.myorders(session);
   }
@@ -71,6 +71,12 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   Future<void> payorder(int orderId,String paymentMethodId) async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await marketplaceDataSourcesImp.payorder(orderId, token,paymentMethodId);
+  }
+  
+  @override
+  Future<OrderEntity> getMylastpaidorder() async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await marketplaceDataSourcesImp.getMylastpaidorder(token);
   }
  
 }

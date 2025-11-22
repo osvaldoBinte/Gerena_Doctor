@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/features/home/dashboard/widget/estatusdepedido/estatus_de_pedido.dart';
-import 'package:gerena/features/home/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/estatusdepedido/estatus_de_pedido.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widgets_status_pedido.dart';
 import 'package:get/get.dart';
  class StatusCardModal extends StatelessWidget {
   const StatusCardModal({Key? key}) : super(key: key);
@@ -58,7 +58,7 @@ import 'package:get/get.dart';
                               ? MediaQuery.of(context).size.width * 0.85
                               : 400, 
                         ),
-                       // child: StatusCardWidget(),
+                        child: StatusCardWidget(),
                       ),
                     ),
                   ),

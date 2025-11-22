@@ -5,13 +5,45 @@ import 'package:gerena/features/doctorprocedures/presentation/page/procedures_co
 import 'package:get/get.dart';
 import 'dart:io';
 
-class ShareProcedureWidget extends StatelessWidget {
+class ShareProcedureWidget extends StatefulWidget {
   final MediaController mediaController;
 
   const ShareProcedureWidget({
     Key? key,
     required this.mediaController,
   }) : super(key: key);
+
+  @override
+  State<ShareProcedureWidget> createState() => _ShareProcedureWidgetState();
+}
+
+class _ShareProcedureWidgetState extends State<ShareProcedureWidget> {
+  // Controladores para los campos de texto
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  // Método para limpiar todos los campos
+  void _clearAllFields() {
+    _titleController.clear();
+    _descriptionController.clear();
+    widget.mediaController.clearAllFiles();
+    widget.mediaController.procedureTitle.value = '';
+    widget.mediaController.procedureDescription.value = '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +67,7 @@ class ShareProcedureWidget extends StatelessWidget {
                     const SizedBox(height: 12),
                     _buildDescriptionContainer(),
                     const SizedBox(height: 12),
-                    _buildMediaContainer(mediaController),
+                    _buildMediaContainer(widget.mediaController),
                     const SizedBox(height: 16),
                     Obx(() => SizedBox(
                       width: double.infinity,
@@ -43,7 +75,7 @@ class ShareProcedureWidget extends StatelessWidget {
                           ? const Center(child: CircularProgressIndicator())
                           : GerenaColors.widgetButton(
                               onPressed: () => _handleSave(
-                                mediaController,
+                                widget.mediaController,
                                 proceduresController,
                               ),
                               text: 'GUARDAR',
@@ -67,7 +99,7 @@ class ShareProcedureWidget extends StatelessWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           flex: 1,
-                          child: _buildMediaContainer(mediaController),
+                          child: _buildMediaContainer(widget.mediaController),
                         ),
                       ],
                     ),
@@ -79,7 +111,7 @@ class ShareProcedureWidget extends StatelessWidget {
                             ? const CircularProgressIndicator()
                             : GerenaColors.widgetButton(
                                 onPressed: () => _handleSave(
-                                  mediaController,
+                                  widget.mediaController,
                                   proceduresController,
                                 ),
                                 text: 'GUARDAR',
@@ -101,7 +133,8 @@ class ShareProcedureWidget extends StatelessWidget {
   // Campo para el título
   Widget _buildTitleField() {
     return TextField(
-      onChanged: (value) => mediaController.procedureTitle.value = value,
+      controller: _titleController,
+      onChanged: (value) => widget.mediaController.procedureTitle.value = value,
       decoration: InputDecoration(
         hintText: 'Título del procedimiento...',
         hintStyle: GerenaColors.bodySmall.copyWith(
@@ -129,7 +162,8 @@ class ShareProcedureWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
-            onChanged: (value) => mediaController.procedureDescription.value = value,
+            controller: _descriptionController,
+            onChanged: (value) => widget.mediaController.procedureDescription.value = value,
             maxLines: 5,
             decoration: InputDecoration(
               hintText: 'Escribe aquí los detalles del procedimiento...',
@@ -171,11 +205,8 @@ class ShareProcedureWidget extends StatelessWidget {
       fotos: imagesPaths,
     );
 
-    // Limpiar si fue exitoso
     if (success) {
-      mediaController.clearAllFiles();
-      mediaController.procedureTitle.value = '';
-      mediaController.procedureDescription.value = '';
+      _clearAllFields();
     }
   }
 

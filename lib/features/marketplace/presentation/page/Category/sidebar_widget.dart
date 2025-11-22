@@ -6,16 +6,15 @@ import 'package:gerena/features/marketplace/presentation/page/Category/category_
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/home/dashboard/widget/half_cut_circle.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
-import 'package:gerena/features/home/dashboard/widget/estatusdepedido/widgets_status_pedido.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widgets_status_pedido.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart'; // Importa url_launcher
 
 class SidebarWidget extends StatelessWidget {
   const SidebarWidget({
     Key? key,
   }) : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +22,9 @@ class SidebarWidget extends StatelessWidget {
         Get.find<DashboardController>();
     final CategoryController categoryController =
         Get.find<CategoryController>();
-     final PrefilDortorController controller= Get.find<PrefilDortorController>();
+    final PrefilDortorController controller = Get.find<PrefilDortorController>();
+    final GetMyLastPaidOrderController orderController = 
+        Get.find<GetMyLastPaidOrderController>(); 
 
     return Container(
       width: 350,
@@ -60,7 +61,28 @@ class SidebarWidget extends StatelessWidget {
                               ),
                             ),
                             _buildSearchField(),
-                            //   StatusCardWidget(),
+                            
+                            // ⬇️ SOLO MOSTRAR SI HAY PEDIDO Y NO HAY ERROR
+                            Obx(() {
+                              // No mostrar si está cargando
+                              if (orderController.isLoading.value) {
+                                return const SizedBox.shrink();
+                              }
+                              
+                              // No mostrar si hay error
+                              if (orderController.errorMessage.isNotEmpty) {
+                                return const SizedBox.shrink();
+                              }
+                              
+                              // No mostrar si no hay pedido
+                              if (!orderController.hasOrder) {
+                                return const SizedBox.shrink();
+                              }
+                              
+                              // Mostrar el widget solo si hay un pedido válido
+                              return const StatusCardWidget();
+                            }),
+                            
                             SizedBox(height: 10),
                             buildWishlistButton(
                               onTap: () {
@@ -105,7 +127,7 @@ class SidebarWidget extends StatelessWidget {
                             ),
 
                             _buildCatalogGrid(categoryController),
-                            SizedBox(height: 50,),
+                            SizedBox(height: 50),
 
                             Obx(() => (dashboardController
                                         .isCalendarFullScreen.value ||
@@ -198,6 +220,7 @@ class SidebarWidget extends StatelessWidget {
     );
   }
 
+  // ... resto de los métodos sin cambios
   Widget _buildSearchField() {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
