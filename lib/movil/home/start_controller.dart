@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gerena/features/auth/presentacion/page/home/homemovil/home_page.dart';
+import 'package:gerena/features/home/homemovil/home_page.dart';
 import 'package:gerena/features/notification/presentation/page/notificasiones/notification_page.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/perfil_page.dart';
+import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
 import 'package:gerena/features/notification/presentation/page/notificasiones/notification_modal.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';

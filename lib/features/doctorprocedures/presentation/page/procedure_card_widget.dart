@@ -5,13 +5,14 @@ import 'package:gerena/features/doctorprocedures/presentation/page/procedures_co
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProcedureCardWidget extends StatelessWidget {
   final GetProceduresEntity procedure;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
-  final bool showActions; // Mostrar botones de editar/eliminar
-  final bool showAddImageButton; // Mostrar botón de agregar imágenes
+  final bool showActions;
+  final bool showAddImageButton;
 
   const ProcedureCardWidget({
     Key? key,
@@ -80,13 +81,9 @@ class ProcedureCardWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Descripción
-          Text(
-            procedure.description,
-            style: GerenaColors.bodySmall,
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
-          ),
+          // Descripción con límite de líneas y "Continuar leyendo"
+          _buildDescriptionSection(context),
+
           const SizedBox(height: 12),
 
           // Galería de imágenes
@@ -141,6 +138,164 @@ class ProcedureCardWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // Widget para la descripción con "Continuar leyendo"
+  Widget _buildDescriptionSection(BuildContext context) {
+    final bool isLongDescription = procedure.description.length > 150; // Ajusta este valor según necesites
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          procedure.description,
+          style: GerenaColors.bodySmall,
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (isLongDescription) ...[
+          const SizedBox(height: 4),
+          GestureDetector(
+            onTap: () => _showFullDescriptionDialog(context),
+            child: Text(
+              'Continuar leyendo',
+              style: GoogleFonts.rubik(
+                fontSize: 14,
+                color: GerenaColors.accentColor,
+                fontWeight: FontWeight.w500,
+                decoration: TextDecoration.underline,
+                decorationColor: GerenaColors.accentColor,
+                decorationThickness: 1.0,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // Diálogo para mostrar la descripción completa
+  void _showFullDescriptionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: GerenaColors.backgroundColor,
+              borderRadius: GerenaColors.mediumBorderRadius,
+            ),
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header con título y botón cerrar
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            procedure.titulo,
+                            style: GoogleFonts.rubik(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: GerenaColors.textSecondary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Icon(
+                            Icons.close,
+                            color: GerenaColors.textTertiary,
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Descripción completa
+                    Text(
+                      procedure.description,
+                      style: GoogleFonts.rubik(
+                        color: GerenaColors.textSecondary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    
+                    // Galería de imágenes en el diálogo
+                    if (procedure.img.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Text(
+                        'Imágenes del procedimiento',
+                        style: GoogleFonts.rubik(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: GerenaColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: procedure.img.map((imagen) {
+                          return ClipRRect(
+                            borderRadius: GerenaColors.smallBorderRadius,
+                            child: Image.network(
+                              imagen.urlImagen,
+                              width: 150,
+                              height: 150,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 150,
+                                  height: 150,
+                                  color: GerenaColors.backgroundColorfondo,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.broken_image,
+                                        color: Colors.grey[400],
+                                        size: 40,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Imagen no disponible',
+                                        style: TextStyle(
+                                          color: Colors.grey[400],
+                                          fontSize: 12,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
+import 'package:gerena/features/appointment/presentation/page/perfil/PatientProfileScreen.dart';
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
-import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
+import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,12 +18,12 @@ class HomePageMovil extends StatefulWidget {
 }
 
 class _GerenaFeedScreenState extends State<HomePageMovil> {
-  // Obtener el controlador del calendario
+
   final CalendarControllerGetx calendarController =
       Get.find<CalendarControllerGetx>();
   
-  // Obtener el controlador del doctor
   final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
+  final ControllerPerfilConfiguration profileController = Get.put(ControllerPerfilConfiguration());
 
   @override
   void initState() {
@@ -74,10 +76,10 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                             child: Obx(() {
                               final doctor = doctorController.doctorProfile.value;
                               
-                              // Determinar qué imagen mostrar
+                           
                               Widget imageWidget;
                               if (doctorController.isLoading.value) {
-                                // Mostrar loading
+                              
                                 imageWidget = Container(
                                   color: GerenaColors.backgroundColorfondo,
                                   child: const Center(
@@ -87,7 +89,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                                   ),
                                 );
                               } else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-                                // Mostrar foto del doctor desde la red
+                              
                                 imageWidget = Image.network(
                                   doctor.foto!,
                                   fit: BoxFit.cover,
@@ -99,7 +101,6 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                                   },
                                 );
                               } else {
-                                // Mostrar imagen por defecto
                                 imageWidget = Image.asset(
                                   'assets/perfil.png',
                                   fit: BoxFit.cover,
@@ -168,10 +169,9 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                     _buildCitasSection(),
                     SizedBox(height: GerenaColors.paddingMedium),
 
-                    // ✅ Usar el widget reutilizable de banners
                     BannersListWidget(
                       height: 200,
-                      maxBanners: 2, // Mostrar máximo 2 banners
+                      maxBanners: 2, 
                    
                     ),
                   ],
@@ -200,6 +200,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 letterSpacing: 1.5,
               ),
             ),
+            /*
             const Spacer(),
             Container(
               width: 140,
@@ -209,21 +210,33 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 iconSize: 18,
                 onTap: () {},
               ),
-            ),
+            ),*/
           ],
         ),
       ),
-      body: PageView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: allItems.length,
-        itemBuilder: (context, index) {
-          return allItems[index];
-        },
-        physics: const BouncingScrollPhysics(),
-      ),
+   body: Obx(() {
+        // Si showPatientProfile es true, muestra el PatientProfileScreen
+        if (profileController.showPatientProfile.value) {
+          return PatientProfileScreen(
+            appointment: profileController.selectedAppointment.value,
+            onClose: () {
+              profileController.hidePatientProfileView();
+            },
+          );
+        }
+        
+        // Si no, muestra el contenido normal
+        return PageView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: allItems.length,
+          itemBuilder: (context, index) {
+            return allItems[index];
+          },
+          physics: const BouncingScrollPhysics(),
+        );
+      }),
     );
   }
-
   Widget _buildCitasSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -241,7 +254,6 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                   color: GerenaColors.textPrimaryColor,
                 ),
               ),
-              // Botón para recargar citas
               Obx(() => calendarController.isLoading.value
                   ? SizedBox(
                       width: 20,
@@ -265,9 +277,9 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
           ),
           SizedBox(height: GerenaColors.paddingSmall),
 
-          // Usa Obx para reactividad
+        
           Obx(() {
-            // Mostrar loading
+         
             if (calendarController.isLoading.value &&
                 calendarController.appointments.isEmpty) {
               return Container(
@@ -280,10 +292,10 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
               );
             }
 
-            // Obtener citas futuras ordenadas
+           
             final upcomingAppointments = _getUpcomingAppointments();
 
-            // Mostrar mensaje si no hay citas
+     
             if (upcomingAppointments.isEmpty) {
               return Container(
                 height: 200,
@@ -312,7 +324,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                       SizedBox(height: 8),
                       TextButton(
                         onPressed: () {
-                          // Navegar a pantalla de crear cita
+                         
                           print('Ir a crear cita');
                         },
                         child: Text(
@@ -330,7 +342,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
               );
             }
 
-            // Mostrar las citas
+          
             return Column(
               children: [
                 Container(
@@ -359,28 +371,23 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     );
   }
 
-// Obtener citas del mes actual cargado en el controller
   List<dynamic> _getUpcomingAppointments() {
-    // Obtener todas las citas del mes cargado
     final allAppointments = calendarController.appointments.toList();
 
     if (allAppointments.isEmpty) {
       return [];
     }
 
-    // Ordenar por fecha
     allAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
 
-    // Limitar a las primeras 5 citas
     return allAppointments.take(5).toList();
   }
 
   Widget _buildCitaCard(dynamic appointment) {
-    // Formatear fechas
     final String formattedTime = _formatTime(appointment.startTime);
     final String formattedDate = _formatDate(appointment.startTime);
 
-    // Extraer información
+
     final String doctorName = appointment.subject ?? 'Sin nombre';
     final String appointmentType = appointment.location ?? 'Cita general';
     final String treatment = appointment.notes ?? 'Sin descripción';
@@ -482,7 +489,8 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
               child: IntrinsicWidth(
                 child: GerenaColors.widgetButton(
                   onPressed: () {
-                    _navigateToAppointmentDetails(appointment);
+                       profileController.showPatientProfileView(appointment);
+
                   },
                   text: 'Ver Ficha',
                   showShadow: false,
@@ -545,7 +553,6 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     );
   }
 
-  // Métodos auxiliares para formatear fechas
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour > 12
         ? dateTime.hour - 12
@@ -563,10 +570,8 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
   }
 
   void _navigateToAppointmentDetails(dynamic appointment) {
-    // Implementa la navegación a los detalles
     print('Ver detalles de cita ID: ${appointment.id}');
 
-    // Ejemplo de navegación (descomenta cuando tengas la pantalla):
     // Get.to(() => AppointmentDetailsPage(appointmentId: appointment.id));
   }
 

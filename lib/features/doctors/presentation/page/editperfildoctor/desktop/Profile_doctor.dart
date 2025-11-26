@@ -5,7 +5,8 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
-import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/widget/social_networks_widget.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/home/dashboard/dashboard_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
@@ -63,22 +64,19 @@ class _UserProfileContentState extends State<UserProfileContent> {
     });
   }
 
-  Widget _buildRightSections() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildAccountSettingsSection(),
-        const SizedBox(height: 20),
-        _buildAcademicFormationSection(),
-        const SizedBox(height: 20),
-        _buildConnectedAccountsSection(),
-        const SizedBox(height: 20),
-        //   _buildLinksSection(),
-        //  const SizedBox(height: 20),
-        //   _buildPromocionSection(),
-      ],
-    );
-  }
+Widget _buildRightSections() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildAccountSettingsSection(),
+      const SizedBox(height: 20),
+      _buildAcademicFormationSection(),
+      const SizedBox(height: 20),
+      SocialNetworksWidget(), // ← Llamada simple sin parámetros
+      const SizedBox(height: 20),
+    ],
+  );
+}
 
   Widget buildProfileSection() {
     final doctor = controller.doctorProfile.value!;

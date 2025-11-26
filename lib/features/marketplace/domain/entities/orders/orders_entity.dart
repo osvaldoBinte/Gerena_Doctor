@@ -26,6 +26,7 @@ class OrderEntity {
   final String? shippingStatus;
   final DateTime? shippingDate;
   final DateTime? deliveryDate;
+  
 
   OrderEntity({
     required this.id,
@@ -58,6 +59,7 @@ class OrderDetailEntity {
   final int quantity;
   final double unitPrice;
   final double subtotal;
+  final List<String>? fotos; 
 
   OrderDetailEntity({
     required this.medicationId,
@@ -65,5 +67,6 @@ class OrderDetailEntity {
     required this.quantity,
     required this.unitPrice,
     required this.subtotal,
+    this.fotos,
   });
 }

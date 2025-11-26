@@ -54,10 +54,14 @@ bool _isMobile(BuildContext context) {
 
 void _handleMenuNavigation(String menuTitle) {
   switch (menuTitle) {
-    case 'Historial de pedidos':
+   case 'Historial de pedidos':
+    if (GetPlatform.isMobile) {
+      Get.offAllNamed(RoutesNames.historia);
+    } else {
       Get.find<ShopNavigationController>().navigateToHistorialDePedidos();
       Get.to(() => GlobalShopInterface());
-      break;
+    }
+    break;
       
     case 'Membresía':
       try {

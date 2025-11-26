@@ -1,5 +1,5 @@
 import 'package:gerena/features/marketplace/domain/entities/orders/orders_entity.dart';
-
+import 'dart:convert';
 class OrdersResponseModel extends OrdersResponseEntity {
   OrdersResponseModel({
     required super.total,
@@ -73,6 +73,7 @@ class OrderModel extends OrderEntity {
       deliveryDate: json['fechaEntrega'] != null
           ? DateTime.parse(json['fechaEntrega'])
           : null,
+          
     );
   }
 
@@ -152,15 +153,19 @@ class OrderDetailModel extends OrderDetailEntity {
     required super.quantity,
     required super.unitPrice,
     required super.subtotal,
+    super.fotos,
   });
 
   factory OrderDetailModel.fromJson(Map<String, dynamic> json) {
+
+
     return OrderDetailModel(
       medicationId: json['medicamentoId'] ?? 0,
       medicationName: json['medicamentoNombre'] ?? '',
       quantity: json['cantidad'] ?? 0,
       unitPrice: (json['precioUnitario'] ?? 0).toDouble(),
       subtotal: (json['subtotal'] ?? 0).toDouble(),
+      fotos: _parseStringList(json['foto']), // ⭐ Usar el array procesado
     );
   }
 
@@ -171,6 +176,7 @@ class OrderDetailModel extends OrderDetailEntity {
       'cantidad': quantity,
       'precioUnitario': unitPrice,
       'subtotal': subtotal,
+      'foto': fotos, // ⭐ Guardar como 'foto' para consistencia
     };
   }
 
@@ -180,6 +186,7 @@ class OrderDetailModel extends OrderDetailEntity {
     int? quantity,
     double? unitPrice,
     double? subtotal,
+    List<String>? fotos,
   }) {
     return OrderDetailModel(
       medicationId: medicationId ?? this.medicationId,
@@ -187,6 +194,23 @@ class OrderDetailModel extends OrderDetailEntity {
       quantity: quantity ?? this.quantity,
       unitPrice: unitPrice ?? this.unitPrice,
       subtotal: subtotal ?? this.subtotal,
+      fotos: fotos ?? this.fotos,
     );
+  }
+   static List<String> _parseStringList(dynamic value) {
+    if (value == null) return [];
+    if (value is List) {
+      return value.map((e) => e.toString()).toList();
+    }
+    if (value is String) {
+      try {
+        final decoded = value.replaceAll("\\", "");
+        final list = List<String>.from(jsonDecode(decoded));
+        return list;
+      } catch (_) {
+        return [value];
+      }
+    }
+    return [];
   }
 }

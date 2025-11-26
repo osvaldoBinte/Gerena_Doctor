@@ -9,4 +9,7 @@ class RoutesNames {
   static const String productDetail = '/product-detail';
   static const String shoppdingcart = '/CartPageContent';
   static const String paymentCardsPage = '/payment-cards-page';
+
+  static const String calendar = '/calendar-page';
+  static const String historia = '/historia-page';
 }

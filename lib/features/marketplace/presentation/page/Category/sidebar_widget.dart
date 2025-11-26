@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
-import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/home/dashboard/widget/half_cut_circle.dart';

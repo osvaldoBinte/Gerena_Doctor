@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/history_controller.dart';
 import 'package:get/get.dart';
@@ -11,9 +12,30 @@ class HistorialDePedidosContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HistoryController>();
 
-    return Container(
-      color: GerenaColors.backgroundColor,
-      child: Obx(() {
+    return Scaffold(
+      backgroundColor: GerenaColors.backgroundColor,
+     appBar: GetPlatform.isMobile
+    ? AppBar(
+        backgroundColor: GerenaColors.backgroundColorFondo,
+        elevation: 4,
+        shadowColor: GerenaColors.shadowColor,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: GerenaColors.textPrimaryColor,
+          ),
+          onPressed: () {
+                                      Get.offAllNamed(RoutesNames.homePage);
+
+          },
+        ),
+        title: Text(
+          'Historial de Pedidos',
+          style: GerenaColors.headingMedium.copyWith(fontSize: 18),
+        ),
+      )
+    : null,
+      body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
             child: CircularProgressIndicator(),
@@ -87,7 +109,7 @@ class HistorialDePedidosContent extends StatelessWidget {
 
                 const SizedBox(height: 30),
 
-                _buildResumenDelMes(controller),
+             //   _buildResumenDelMes(controller),
               ],
             ),
           ),
@@ -179,12 +201,12 @@ class HistorialDePedidosContent extends StatelessWidget {
             const SizedBox(height: 20),
 
             ...order.details.map((detail) => _buildProductoItem(
-              nombre: detail.medicationName,
-              precio: currencyFormat.format(detail.unitPrice),
-              cantidad: 'x${detail.quantity}',
-              subtotal: currencyFormat.format(detail.subtotal),
-            )),
-
+            nombre: detail.medicationName,
+            precio: currencyFormat.format(detail.unitPrice),
+            cantidad: 'x${detail.quantity}',
+            subtotal: currencyFormat.format(detail.subtotal),
+            fotos: detail.fotos, 
+          )),
             const SizedBox(height: 16),
 
             if (order.hasDiscount) ...[
@@ -214,86 +236,115 @@ class HistorialDePedidosContent extends StatelessWidget {
     );
   }
 
-  Widget _buildProductoItem({
-    required String nombre,
-    required String precio,
-    required String cantidad,
-    required String subtotal,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: GerenaColors.backgroundColorfondo,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [GerenaColors.lightShadow],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                'assets/productoenventa.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: GerenaColors.backgroundColorfondo,
-                    child: Icon(
-                      Icons.inventory,
-                      color: GerenaColors.textSecondaryColor,
-                      size: 30,
-                    ),
-                  );
-                },
+ Widget _buildProductoItem({
+  required String nombre,
+  required String precio,
+  required String cantidad,
+  required String subtotal,
+  List<String>? fotos,
+}) {
+  final fotoUrl = fotos != null && fotos.isNotEmpty ? fotos.first : null;
+
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 16.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: GerenaColors.backgroundColorfondo,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [GerenaColors.lightShadow],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: fotoUrl != null && fotoUrl.isNotEmpty
+                ? Image.network(
+                    fotoUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                          strokeWidth: 2,
+                          color: GerenaColors.primaryColor,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return _buildPlaceholderImage();
+                    },
+                  )
+                : _buildPlaceholderImage(),
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                nombre,
+                style: GerenaColors.headingSmall.copyWith(fontSize: 14),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  nombre,
-                  style: GerenaColors.headingSmall.copyWith(fontSize: 14),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              const SizedBox(height: 4),
+              Text(
+                'Precio unitario: $precio',
+                style: GerenaColors.bodySmall.copyWith(
+                  fontSize: 11,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Precio unitario: $precio',
-                  style: GerenaColors.bodySmall.copyWith(
-                    fontSize: 11,
-                  ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Subtotal: $subtotal',
+                style: GerenaColors.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Subtotal: $subtotal',
-                  style: GerenaColors.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
 
-          const SizedBox(width: 8),
+        const SizedBox(width: 8),
 
-          Text(
-            cantidad,
-            style: GerenaColors.bodyMedium.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+        Text(
+          cantidad,
+          style: GerenaColors.bodyMedium.copyWith(
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+// ⭐ Agregar widget helper para placeholder
+Widget _buildPlaceholderImage() {
+  return Image.asset(
+    '',
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+      return Container(
+        color: GerenaColors.backgroundColorfondo,
+        child: Icon(
+          Icons.inventory,
+          color: GerenaColors.textSecondaryColor,
+          size: 30,
+        ),
+      );
+    },
+  );
+}
 
   Widget _buildTotalRow(String label, String amount, {
     bool isTotal = false,

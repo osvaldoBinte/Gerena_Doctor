@@ -4,6 +4,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
+import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart'; // ⭐ Agregar import
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -42,57 +43,64 @@ class CategoryPage extends GetView<CategoryController> {
           ],
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Obx(() => Container(
-              padding: EdgeInsets.all(GerenaColors.paddingMedium),
-              color: showWishlist.value
-                  ? GerenaColors.backgroundColor
-                  : GerenaColors.backgroundColorfondo,
-              child: Row(
-                children: [
-                  if (showWishlist.value) ...[
-                    InkWell(
-                      borderRadius: BorderRadius.circular(25),
-                      onTap: () {
-                        showWishlist.value = false;
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: GerenaColors.secondaryColor,
-                          shape: BoxShape.circle,
+      body: Stack( // ⭐ Cambiar de SafeArea a Stack
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                Obx(() => Container(
+                  padding: EdgeInsets.all(GerenaColors.paddingMedium),
+                  color: showWishlist.value
+                      ? GerenaColors.backgroundColor
+                      : GerenaColors.backgroundColorfondo,
+                  child: Row(
+                    children: [
+                      if (showWishlist.value) ...[
+                        InkWell(
+                          borderRadius: BorderRadius.circular(25),
+                          onTap: () {
+                            showWishlist.value = false;
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: GerenaColors.secondaryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(8.0),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: GerenaColors.textLightColor,
+                              size: 24,
+                            ),
+                          ),
                         ),
-                        padding: EdgeInsets.all(8.0),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: GerenaColors.textLightColor,
-                          size: 24,
+                        const SizedBox(width: 12),
+                      ],
+                      Expanded(
+                        child: buildWishlistButton(
+                          onTap: () {
+                            showWishlist.toggle();
+                          },
+                          showShadow: showWishlist.value ? false : true,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  Expanded(
-                    child: buildWishlistButton(
-                      onTap: () {
-                        showWishlist.toggle();
-                      },
-                      showShadow: showWishlist.value ? false : true,
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            )),
-            Expanded(
-              child: Obx(() => showWishlist.value
-                  ? SavedProductsContent(
-                      onBackPressed: () => showWishlist.value = false,
-                    )
-                  : _buildCategoriesView()),
+                )),
+                Expanded(
+                  child: Obx(() => showWishlist.value
+                      ? SavedProductsContent(
+                          onBackPressed: () => showWishlist.value = false,
+                        )
+                      : _buildCategoriesView()),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          
+          // ⭐ Agregar el FloatingCartButton aquí
+          FloatingCartButton(),
+        ],
       ),
     );
   }

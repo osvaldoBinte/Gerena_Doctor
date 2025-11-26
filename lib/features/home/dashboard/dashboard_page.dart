@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
-import 'package:gerena/features/doctors/presentacion/page/portafolio/doctor_profile_page.dart';
+import 'package:gerena/features/doctors/presentation/page/portafolio/doctor_profile_page.dart';
 import 'package:gerena/features/subscription/presentation/page/membresia/membresia.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/home/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
 import 'package:gerena/features/home/dashboard/widget/preguntasFrecuentes/preguntas_frecuentes.dart';
 import 'package:gerena/features/home/dashboard/widget/sugerencia/sugerencia.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/desktop/Profile_doctor.dart';
+import 'package:gerena/features/doctors/presentation/page/editperfildoctor/desktop/Profile_doctor.dart';
 import 'package:get/get.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_widget.dart';
 import 'package:gerena/features/home/dashboard/widget/appbar/gerena_app_bar.dart';
@@ -766,15 +766,9 @@ return Container(
   }
 
   
-  Widget _buildCalendarAndAppointments(DashboardController controller) {
-    return Column(
-      children: [
-        CalendarWidget(
-          onDateSelected: controller.onDateSelected,
-        ),
-        
-        const SizedBox(height: 16),
-      ],
-    );
-  }
+Widget _buildCalendarAndAppointments(DashboardController controller) {
+  return CalendarWidget(  // ✅ Elimina la Column innecesaria
+    onDateSelected: controller.onDateSelected,
+  );
+}
 }

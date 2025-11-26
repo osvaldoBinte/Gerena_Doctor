@@ -188,6 +188,7 @@ flutter:
       - assets/icons/payment_card.png
       - assets/icons/arrow_forward_ios.png
       - assets/icons/arrow_back_ios.png
+      - assets/icons/camera_alt.png
       - assets/logo/logo_ios.png
       - assets/example/promocion.png
 

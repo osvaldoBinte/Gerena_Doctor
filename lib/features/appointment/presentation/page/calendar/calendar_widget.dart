@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/availability_controller.dart';
@@ -28,9 +29,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   int _tapCount = 0;
   late ScrollController _scrollController;
 
-  late CalendarControllerGetx calendarController = Get.find<CalendarControllerGetx>();
-  late DashboardController dashboardController = Get.find<DashboardController>();
-  late AvailabilityController availabilityController = Get.find<AvailabilityController>();
+  late CalendarControllerGetx calendarController =
+      Get.find<CalendarControllerGetx>();
+  late DashboardController dashboardController =
+      Get.find<DashboardController>();
+  late AvailabilityController availabilityController =
+      Get.find<AvailabilityController>();
 
   @override
   void initState() {
@@ -43,141 +47,281 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     final screenHeight = MediaQuery.of(context).size.height;
     final availableHeight = screenHeight - 120;
 
-    return Container(
-      height: availableHeight,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColorfondo,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Header con botón de toggle
-          _buildCalendarHeaderWithToggle(calendarController),
-          
-          // Contenido que cambia según la vista actual
-          Expanded(
-            child: Obx(() {
-              // Si la vista actual es 'availability', mostrar gestión de disponibilidad
-              if (availabilityController.currentView.value == 'availability') {
-                return _buildAvailabilityView();
-              }
-              
-              // Si la vista es 'appointments', mostrar el calendario normal
-              return Column(
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: _buildCalendarView(),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Obx(() => _buildDayAppointments(
-                        calendarController, dashboardController)),
-                  ),
-                ],
-              );
-            }),
+    return Scaffold(
+          appBar: GetPlatform.isMobile
+    ? AppBar(
+        backgroundColor: GerenaColors.backgroundColorFondo,
+        elevation: 4,
+        shadowColor: GerenaColors.shadowColor,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: GerenaColors.textPrimaryColor,
           ),
-        ],
+          onPressed: () {
+                                      Get.offAllNamed(RoutesNames.homePage);
+
+          },
+        ),
+        title: Text(
+          'Calendario ',
+          style: GerenaColors.headingMedium.copyWith(fontSize: 18),
+        ),
+      )
+          : null,
+      body: Container(
+        height: availableHeight,
+        decoration: BoxDecoration(
+          color: GerenaColors.backgroundColorfondo,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header con botón de toggle
+            _buildCalendarHeaderWithToggle(calendarController),
+
+            // Contenido que cambia según la vista actual
+            Expanded(
+              child: Obx(() {
+                // Vista de disponibilidad
+                if (availabilityController.currentView.value ==
+                    'availability') {
+                  return _buildAvailabilityView();
+                }
+
+                // Vista de citas normales
+                return Column(
+                  children: [
+                    Expanded(
+                      flex: 6,
+                      child: _buildCalendarView(),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: Obx(() => _buildDayAppointments(
+                          calendarController, dashboardController)),
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildCalendarHeaderWithToggle(CalendarControllerGetx controller) {
-    return Container(
-      height: 80,
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Navegación del calendario
-          Obx(() => Row(
+ Widget _buildCalendarHeaderWithToggle(CalendarControllerGetx controller) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      // Detectar si es pantalla pequeña
+      final isSmallScreen = constraints.maxWidth < 600;
+
+      return Container(
+        height: isSmallScreen ? 140 : 80,
+        padding: const EdgeInsets.all(16.0),
+        child: isSmallScreen
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.chevron_left,
-                      color: GerenaColors.primaryColor,
-                      size: 40,
-                    ),
-                    onPressed: controller.previousPeriod,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  SizedBox(width: 18),
-                  Text(
-                    controller.getFormattedDate(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 27,
-                      color: GerenaColors.textPrimaryColor,
-                    ),
-                  ),
-                  SizedBox(width: 18),
-                  IconButton(
-                    icon: Icon(
-                      Icons.chevron_right,
-                      color: GerenaColors.primaryColor,
-                      size: 40,
-                    ),
-                    onPressed: controller.nextPeriod,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              )),
-          
-          // Botón de toggle
-          Obx(() => Container(
-                decoration: BoxDecoration(
-                  color: availabilityController.currentView.value == 'availability'
-                      ? GerenaColors.secondaryColor
-                      : GerenaColors.primaryColor,
-                  borderRadius: GerenaColors.smallBorderRadius,
-                  boxShadow: [GerenaColors.lightShadow],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      availabilityController.toggleView();
-                    },
-                    borderRadius: GerenaColors.smallBorderRadius,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                  // Navegación del calendario (arriba) - CORREGIDO
+                  Obx(() => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            availabilityController.currentView.value == 'availability'
-                                ? Icons.calendar_month
-                                : Icons.schedule,
-                            color: GerenaColors.textLightColor,
-                            size: 20,
+                          IconButton(
+                            icon: Icon(
+                              Icons.chevron_left,
+                              color: GerenaColors.primaryColor,
+                              size: 40,
+                            ),
+                            onPressed: controller.previousPeriod,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            availabilityController.currentView.value == 'availability'
-                                ? 'Citas'
-                                : 'Disponibilidad',
-                            style: GoogleFonts.rubik(
-                              color: GerenaColors.textLightColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                controller.getFormattedDate(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 27,
+                                  color: GerenaColors.textPrimaryColor,
+                                ),
+                              ),
                             ),
                           ),
+                          SizedBox(width: 8),
+                          IconButton(
+                            icon: Icon(
+                              Icons.chevron_right,
+                              color: GerenaColors.primaryColor,
+                              size: 40,
+                            ),
+                            onPressed: controller.nextPeriod,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
                         ],
-                      ),
-                    ),
-                  ),
-                ),
-              )),
-        ],
-      ),
-    );
-  }
+                      )),
+
+                  // Botón de toggle (abajo)
+                  Obx(() => Container(
+                        decoration: BoxDecoration(
+                          color: availabilityController.currentView.value ==
+                                  'availability'
+                              ? GerenaColors.secondaryColor
+                              : GerenaColors.primaryColor,
+                          borderRadius: GerenaColors.smallBorderRadius,
+                          boxShadow: [GerenaColors.lightShadow],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              availabilityController.toggleView();
+                            },
+                            borderRadius: GerenaColors.smallBorderRadius,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    availabilityController
+                                                .currentView.value ==
+                                            'availability'
+                                        ? Icons.calendar_month
+                                        : Icons.schedule,
+                                    color: GerenaColors.textLightColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    availabilityController
+                                                .currentView.value ==
+                                            'availability'
+                                        ? 'Citas'
+                                        : 'Disponibilidad',
+                                    style: GoogleFonts.rubik(
+                                      color: GerenaColors.textLightColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Navegación del calendario - TAMBIÉN CORREGIDO PARA DESKTOP
+                  Obx(() => Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.chevron_left,
+                              color: GerenaColors.primaryColor,
+                              size: 40,
+                            ),
+                            onPressed: controller.previousPeriod,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          SizedBox(width: 18),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              controller.getFormattedDate(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 27,
+                                color: GerenaColors.textPrimaryColor,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 18),
+                          IconButton(
+                            icon: Icon(
+                              Icons.chevron_right,
+                              color: GerenaColors.primaryColor,
+                              size: 40,
+                            ),
+                            onPressed: controller.nextPeriod,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      )),
+
+                  // Botón de toggle
+                  Obx(() => Container(
+                        decoration: BoxDecoration(
+                          color: availabilityController.currentView.value ==
+                                  'availability'
+                              ? GerenaColors.secondaryColor
+                              : GerenaColors.primaryColor,
+                          borderRadius: GerenaColors.smallBorderRadius,
+                          boxShadow: [GerenaColors.lightShadow],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              availabilityController.toggleView();
+                            },
+                            borderRadius: GerenaColors.smallBorderRadius,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    availabilityController
+                                                .currentView.value ==
+                                            'availability'
+                                        ? Icons.calendar_month
+                                        : Icons.schedule,
+                                    color: GerenaColors.textLightColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    availabilityController
+                                                .currentView.value ==
+                                            'availability'
+                                        ? 'Citas'
+                                        : 'Disponibilidad',
+                                    style: GoogleFonts.rubik(
+                                      color: GerenaColors.textLightColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
+              ),
+      );
+    },
+  );
+}
 
   Widget _buildAvailabilityView() {
     return Container(
@@ -189,9 +333,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           children: [
             // Sección de agregar nueva disponibilidad
             _buildAddAvailabilitySection(),
-            
+
             const SizedBox(height: GerenaColors.paddingLarge),
-            
+
             // Lista de disponibilidades existentes
             _buildAvailabilityList(),
           ],
@@ -212,7 +356,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             style: GerenaColors.headingMedium,
           ),
           const SizedBox(height: GerenaColors.paddingMedium),
-          
+
           // Selector de día
           Text(
             'Día de la semana',
@@ -220,9 +364,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           ),
           const SizedBox(height: 8),
           _buildDaySelector(),
-          
+
           const SizedBox(height: GerenaColors.paddingMedium),
-          
+
           // Selectores de hora
           Row(
             children: [
@@ -254,45 +398,47 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     ),
                     const SizedBox(height: 8),
                     Obx(() => _buildTimeSelector(
-                      times: availabilityController.getAvailableEndTimes(),
-                      selectedTime: availabilityController.selectedEndTime,
-                      onSelected: availabilityController.selectEndTime,
-                    )),
+                          times: availabilityController.getAvailableEndTimes(),
+                          selectedTime: availabilityController.selectedEndTime,
+                          onSelected: availabilityController.selectEndTime,
+                        )),
                   ],
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: GerenaColors.paddingLarge),
-          
+
           // Botones de acción
           Obx(() => Row(
-            children: [
-              Expanded(
-                child: GerenaColors.widgetButton(
-                  text: 'AGREGAR',
-                  onPressed: availabilityController.addAvailability,
-                  isLoading: availabilityController.isLoading.value,
-                  backgroundColor: GerenaColors.secondaryColor,
-                  fontSize: 14,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-              ),
-              const SizedBox(width: GerenaColors.paddingMedium),
-              Expanded(
-                child: GerenaColors.widgetButton(
-                  text: 'LIMPIAR',
-                  onPressed: availabilityController.clearSelection,
-                  backgroundColor: GerenaColors.colorCancelar,
-                  textColor: GerenaColors.textPrimaryColor,
-                  fontSize: 14,
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  showShadow: false,
-                ),
-              ),
-            ],
-          )),
+                children: [
+                  Expanded(
+                    child: GerenaColors.widgetButton(
+                      text: 'AGREGAR',
+                      onPressed: availabilityController.addAvailability,
+                      isLoading: availabilityController.isLoading.value,
+                      backgroundColor: GerenaColors.secondaryColor,
+                      fontSize: 14,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(width: GerenaColors.paddingMedium),
+                  Expanded(
+                    child: GerenaColors.widgetButton(
+                      text: 'LIMPIAR',
+                      onPressed: availabilityController.clearSelection,
+                      backgroundColor: GerenaColors.colorCancelar,
+                      textColor: GerenaColors.textPrimaryColor,
+                      fontSize: 14,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      showShadow: false,
+                    ),
+                  ),
+                ],
+              )),
         ],
       ),
     );
@@ -308,8 +454,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           (index) {
             final day = availabilityController.daysOfWeek[index];
             final date = DateTime.now().add(Duration(days: index));
-            final isSelected = availabilityController.selectedDay.value?.weekday == date.weekday;
-            
+            final isSelected =
+                availabilityController.selectedDay.value?.weekday ==
+                    date.weekday;
+
             return InkWell(
               onTap: () => availabilityController.selectDay(date),
               borderRadius: GerenaColors.smallBorderRadius,
@@ -319,24 +467,25 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: isSelected 
-                    ? GerenaColors.secondaryColor 
-                    : GerenaColors.backgroundColor,
+                  color: isSelected
+                      ? GerenaColors.secondaryColor
+                      : GerenaColors.backgroundColor,
                   borderRadius: GerenaColors.smallBorderRadius,
                   border: Border.all(
-                    color: isSelected 
-                      ? GerenaColors.secondaryColor 
-                      : GerenaColors.dividerColor,
+                    color: isSelected
+                        ? GerenaColors.secondaryColor
+                        : GerenaColors.dividerColor,
                     width: 1.5,
                   ),
                 ),
                 child: Text(
                   day,
                   style: GoogleFonts.rubik(
-                    color: isSelected 
-                      ? GerenaColors.textLightColor 
-                      : GerenaColors.textPrimaryColor,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected
+                        ? GerenaColors.textLightColor
+                        : GerenaColors.textPrimaryColor,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                     fontSize: 14,
                   ),
                 ),
@@ -380,37 +529,39 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               color: GerenaColors.primaryColor,
             ),
             dropdownColor: GerenaColors.backgroundColor,
-            items: times.isEmpty 
-              ? [
-                  DropdownMenuItem<String>(
-                    value: null,
-                    enabled: false,
-                    child: Text(
-                      'No disponible',
-                      style: GoogleFonts.rubik(
-                        color: GerenaColors.textSecondaryColor,
-                        fontSize: 14,
+            items: times.isEmpty
+                ? [
+                    DropdownMenuItem<String>(
+                      value: null,
+                      enabled: false,
+                      child: Text(
+                        'No disponible',
+                        style: GoogleFonts.rubik(
+                          color: GerenaColors.textSecondaryColor,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  )
-                ]
-              : times.map((time) {
-                  return DropdownMenuItem<String>(
-                    value: time,
-                    child: Text(
-                      time,
-                      style: GoogleFonts.rubik(
-                        color: GerenaColors.textPrimaryColor,
-                        fontSize: 14,
+                    )
+                  ]
+                : times.map((time) {
+                    return DropdownMenuItem<String>(
+                      value: time,
+                      child: Text(
+                        time,
+                        style: GoogleFonts.rubik(
+                          color: GerenaColors.textPrimaryColor,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
-            onChanged: times.isEmpty ? null : (value) {
-              if (value != null) {
-                onSelected(value);
-              }
-            },
+                    );
+                  }).toList(),
+            onChanged: times.isEmpty
+                ? null
+                : (value) {
+                    if (value != null) {
+                      onSelected(value);
+                    }
+                  },
           ),
         ),
       );
@@ -429,7 +580,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             style: GerenaColors.headingMedium,
           ),
           const SizedBox(height: GerenaColors.paddingMedium),
-          
           Obx(() {
             if (availabilityController.isLoading.value) {
               return Center(
@@ -476,7 +626,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 height: 1,
               ),
               itemBuilder: (context, index) {
-                final availability = availabilityController.availabilities[index];
+                final availability =
+                    availabilityController.availabilities[index];
                 return _buildAvailabilityItem(availability);
               },
             );
@@ -487,7 +638,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   // Helper method para extraer propiedades de manera segura
-  String _getProperty(dynamic obj, List<String> possibleNames, String defaultValue) {
+  String _getProperty(
+      dynamic obj, List<String> possibleNames, String defaultValue) {
     for (var name in possibleNames) {
       try {
         final value = (obj as dynamic);
@@ -521,11 +673,13 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   }
 
   Widget _buildAvailabilityItem(dynamic availability) {
-    final dayOfWeek = _getProperty(availability, ['diaSemana', 'dayOfWeek'], 'Sin día');
-    final startTime = _getProperty(availability, ['horaInicio', 'startTime'], '--:--');
+    final dayOfWeek =
+        _getProperty(availability, ['diaSemana', 'dayOfWeek'], 'Sin día');
+    final startTime =
+        _getProperty(availability, ['horaInicio', 'startTime'], '--:--');
     final endTime = _getProperty(availability, ['horaFin', 'endTime'], '--:--');
     final id = _getId(availability);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: GerenaColors.paddingMedium,
@@ -547,9 +701,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               size: 24,
             ),
           ),
-          
+
           const SizedBox(width: GerenaColors.paddingMedium),
-          
+
           // Información del día y horario
           Expanded(
             child: Column(
@@ -584,7 +738,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               ],
             ),
           ),
-          
+
           // Botón de eliminar
           IconButton(
             icon: Icon(
@@ -605,7 +759,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
   void _showDeleteConfirmation(int? id) {
     if (id == null) return;
-    
+
     Get.dialog(
       AlertDialog(
         backgroundColor: GerenaColors.backgroundColor,
@@ -665,8 +819,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               child: SfCalendar(
                 view: CalendarView.month,
                 controller: calendarController.calendarController,
-                dataSource: _getCalendarDataSource(
-                    calendarController.appointments),
+                dataSource:
+                    _getCalendarDataSource(calendarController.appointments),
                 initialDisplayDate: calendarController.selectedDate.value,
                 initialSelectedDate: calendarController.selectedDate.value,
                 showNavigationArrow: false,
@@ -678,8 +832,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 ),
                 onViewChanged: (ViewChangedDetails details) {
                   if (details.visibleDates.isNotEmpty && mounted) {
-                    final newFocusDate = details
-                        .visibleDates[details.visibleDates.length ~/ 2];
+                    final newFocusDate =
+                        details.visibleDates[details.visibleDates.length ~/ 2];
                     print('Fecha enfocada cambiada a: $newFocusDate');
 
                     if (calendarController.focusedDate.value.month !=
@@ -688,8 +842,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                             newFocusDate.year) {
                       calendarController.focusedDate.value = newFocusDate;
 
-                      final firstDayOfMonth = DateTime(
-                          newFocusDate.year, newFocusDate.month, 1);
+                      final firstDayOfMonth =
+                          DateTime(newFocusDate.year, newFocusDate.month, 1);
                       calendarController
                           .loadAppointmentsForDate(firstDayOfMonth);
 
@@ -700,8 +854,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 },
                 monthViewSettings: MonthViewSettings(
                   showAgenda: false,
-                  appointmentDisplayMode:
-                      MonthAppointmentDisplayMode.none,
+                  appointmentDisplayMode: MonthAppointmentDisplayMode.none,
                   appointmentDisplayCount: 3,
                   monthCellStyle: MonthCellStyle(
                     textStyle: TextStyle(
@@ -736,8 +889,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 onTap: (CalendarTapDetails details) {
                   if (!mounted) return;
 
-                  if (details.targetElement ==
-                      CalendarElement.calendarCell) {
+                  if (details.targetElement == CalendarElement.calendarCell) {
                     if (details.date != null) {
                       _handleDateTap(details.date!, calendarController,
                           dashboardController);
@@ -754,8 +906,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     }
                   }
                 },
-                appointmentBuilder: (BuildContext context,
-                    CalendarAppointmentDetails details) {
+                appointmentBuilder:
+                    (BuildContext context, CalendarAppointmentDetails details) {
                   return Container();
                 },
               ),

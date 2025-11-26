@@ -134,8 +134,6 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
       'assets/images/celosome_4.png',
     ];
   }
-
-  // Método para abrir PDFs en WebView dentro de la app
   Future<void> _openPdfUrl(String url, String title) async {
     try {
       if (url.isEmpty) {

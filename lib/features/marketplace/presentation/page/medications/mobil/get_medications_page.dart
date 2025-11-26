@@ -29,6 +29,7 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                 letterSpacing: 1.5,
               ),
             ),
+            
             const Spacer(),
             Container(
               width: 200,
@@ -223,15 +224,7 @@ class GetMedicationsPage extends GetView<GetMedicationsController> {
                                     Expanded(
                                       child: ProductCardWidget(
                                         medication: controller.medications[startIdx + i],
-                                        onFavoritePressed: () {
-                                          final med = controller.medications[startIdx + i];
-                                          Get.snackbar(
-                                            'Favoritos',
-                                            '${med.name} agregado a favoritos',
-                                            snackPosition: SnackPosition.BOTTOM,
-                                            duration: const Duration(seconds: 2),
-                                          );
-                                        },
+                                       
                                         showFavoriteButton: true,
                                         showSaveIcon: true,
                                       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
+import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:get/get.dart';
@@ -30,13 +31,14 @@ class ProductCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wishlistController = Get.find<WishlistController>();
+    final cartController = Get.find<ShoppingCartController>(); // ⭐ Obtener controller
 
     return GestureDetector(
       onTap: onTap ??
           () {
             Get.toNamed(
               RoutesNames.productDetail,
-              arguments: medication.id, // ⭐ Solo envía el ID como int
+              arguments: medication.id,
             );
           },
       child: Container(
@@ -45,7 +47,7 @@ class ProductCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildImageSection(wishlistController),
+            _buildImageSection(wishlistController, cartController), // ⭐ Pasar controller
             const SizedBox(height: 8),
             _buildProductInfo(),
           ],
@@ -54,7 +56,10 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildImageSection(WishlistController wishlistController) {
+  Widget _buildImageSection(
+    WishlistController wishlistController,
+    ShoppingCartController cartController, // ⭐ Recibir controller
+  ) {
     return Container(
       height: imageHeight,
       child: Stack(
@@ -86,40 +91,98 @@ class ProductCardWidget extends StatelessWidget {
             ),
           ),
 
-          // Icono de guardar (top right)
+          // ⭐ Icono de agregar al carrito (top right)
           if (showSaveIcon)
             Positioned(
               top: 5,
               right: 5,
               child: Obx(() {
-                final isInWishlist = wishlistController.isInWishlist(medication.id);
+                final isInCart = cartController.isInCart(medication.id);
+                final quantity = cartController.getProductQuantity(medication.id);
                 
                 return InkWell(
-                  onTap: () {
-                    wishlistController.toggleWishlist(
+                  onTap: () async {
+                    if ((medication.stock ?? 0) <= 0) {
+                      Get.snackbar(
+                        'Producto agotado',
+                        'Este producto no está disponible',
+                        backgroundColor: Colors.red.withOpacity(0.8),
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.TOP,
+                        duration: Duration(seconds: 2),
+                      );
+                      return;
+                    }
+                    
+                    await cartController.addToCart(
                       medicamentoId: medication.id,
-                      precio: medication.price ?? 0.0, // ⭐ Usa price de la entity
+                      precio: medication.price ?? 0.0,
+                      cantidad: 1,
                     );
                   },
                   child: Container(
-                    width: 24,
-                    height: 24,
+                    padding: EdgeInsets.all(4),
                     decoration: BoxDecoration(
+                      color: isInCart 
+                          ? GerenaColors.primaryColor.withOpacity(0.9)
+                          : Colors.white.withOpacity(0.9),
                       shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: Image.asset(
-                      'assets/icons/guardar.png',
-                      width: 16,
-                      height: 16,
-                      fit: BoxFit.contain,
-                    //  color: isInWishlist ? GerenaColors.primaryColor : null,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          isInWishlist ? Icons.bookmark : Icons.bookmark_border,
-                          size: 16,
-                          color: isInWishlist ? GerenaColors.primaryColor : Colors.grey,
-                        );
-                      },
+                    child: Stack(
+                      children: [
+                        Image.asset(
+                          'assets/icons/guardar.png',
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                          color: isInCart ? Colors.white : null,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              isInCart ? Icons.shopping_cart : Icons.add_shopping_cart,
+                              size: 20,
+                              color: isInCart ? Colors.white : GerenaColors.primaryColor,
+                            );
+                          },
+                        ),
+                        // ⭐ Badge con cantidad si está en el carrito
+                        if (isInCart && quantity > 0)
+                          Positioned(
+                            top: -4,
+                            right: -4,
+                            child: Container(
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 1,
+                                ),
+                              ),
+                              constraints: BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Center(
+                                child: Text(
+                                  quantity.toString(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 );
@@ -142,7 +205,7 @@ class ProductCardWidget extends StatelessWidget {
                   onPressed: () {
                     wishlistController.toggleWishlist(
                       medicamentoId: medication.id,
-                      precio: medication.price ?? 0.0, // ⭐ Usa price de la entity
+                      precio: medication.price ?? 0.0,
                     );
                     
                     if (onFavoritePressed != null) {
@@ -205,7 +268,6 @@ class ProductCardWidget extends StatelessWidget {
   }
 
   Widget _buildProductImage() {
-    // ⭐ Usa el array de imágenes de la nueva entity
     final imageUrl = medication.images?.isNotEmpty == true 
         ? medication.images!.first 
         : null;
@@ -251,9 +313,8 @@ class ProductCardWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Nombre del producto
         Text(
-          medication.name ?? 'Sin nombre', // ⭐ Null safety
+          medication.name ?? 'Sin nombre',
           style: GoogleFonts.rubik(
             fontSize: 13,
             fontWeight: FontWeight.w400,
@@ -262,30 +323,24 @@ class ProductCardWidget extends StatelessWidget {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-
         const SizedBox(height: 4),
-
-        // Precios
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Precio actual
             Text(
-              '\$${(medication.price ?? 0.0).toStringAsFixed(2)} MXN', // ⭐ Usa price
+              '\$${(medication.price ?? 0.0).toStringAsFixed(2)} MXN',
               style: GoogleFonts.rubik(
                 fontSize: 14,
                 color: GerenaColors.textTertiaryColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
-
-            // Precio anterior
             if (hasDiscount) ...[
               const SizedBox(height: 2),
               Row(
                 children: [
                   Text(
-                    '\$${medication.previousPrice!.toStringAsFixed(2)} MXN', // ⭐ Usa previousPrice
+                    '\$${medication.previousPrice!.toStringAsFixed(2)} MXN',
                     style: GoogleFonts.rubik(
                       fontSize: 14,
                       color: GerenaColors.textpreviousprice,
@@ -306,7 +361,6 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  // ⭐ Helper para verificar si hay descuento
   bool _hasDiscount() {
     return medication.previousPrice != null &&
         medication.previousPrice! > (medication.price ?? 0);

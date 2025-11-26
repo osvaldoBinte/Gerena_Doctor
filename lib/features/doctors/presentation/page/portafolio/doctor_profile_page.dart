@@ -4,7 +4,9 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedure_card_widget.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
-import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/widget/procedure_widget.dart';
+import 'package:gerena/features/doctors/presentation/widget/share_and_procedures_widget.dart';
 import 'package:gerena/features/home/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
@@ -38,13 +40,8 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
         children: [
           _buildDoctorInfoCard(),
           const SizedBox(height: 16),
-          Text(
-            'Compartir tus procedimientos',
-            style: GerenaColors.headingSmall,
-          ),
-          ShareProcedureWidget(mediaController: mediaController),
-          const SizedBox(height: 16),
-          _buildBeforeAfterSection(),
+         
+          ShareAndProceduresWidget(),
           const SizedBox(height: 16),
           Text(
             'Reseñas de tus pacientes',

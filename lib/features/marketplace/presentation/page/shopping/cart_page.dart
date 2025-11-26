@@ -76,7 +76,7 @@ class CartPageContent extends StatelessWidget {
                 ),
                 SizedBox(height: 24),
                 ElevatedButton.icon(
-                  onPressed: navigationController.navigateToStore,
+                  onPressed: GetPlatform.isMobile ? () => Get.offAllNamed(RoutesNames.categoryById) : () => navigationController.navigateToStore(),
                   icon: Icon(Icons.shopping_bag),
                   label: Text('IR A LA TIENDA'),
                   style: ElevatedButton.styleFrom(

@@ -1,8 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
+import 'package:gerena/features/appointment/presentation/page/calendar/calendar_widget.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_page.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_page.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/historial_de_pedidos_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/get_medications_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_detail_page.dart';
@@ -44,6 +46,8 @@ class AppPages {
       page: () => PaymentCardsScreen(),
     ),
     GetPage(name: RoutesNames.productDetail, page: () =>ProductDetailPage()),
+    GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),
+    GetPage(name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
     GetPage(
       name: '/home',
       page: () => Scaffold(

@@ -10,7 +10,8 @@ import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
-import 'package:gerena/features/doctors/presentacion/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
+import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
@@ -25,7 +26,7 @@ import 'package:gerena/features/notification/presentation/page/notification_cont
 import 'package:gerena/features/review/presentation/page/review_controller.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
-import 'package:gerena/features/doctors/presentacion/page/editperfildoctor/movil/perfil_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
@@ -127,6 +128,7 @@ class App extends StatelessWidget {
         Get.put(ShopNavigationController());
         Get.put(PostController()); 
         Get.put(PerfilController());
+        Get.put(ControllerPerfilConfiguration());
 
 
       }),
