@@ -4,7 +4,7 @@ import 'package:gerena/features/notification/presentation/page/notificasiones/no
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
 import 'package:gerena/features/notification/presentation/page/notificasiones/notification_modal.dart';
-import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
+import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
 import 'package:get/get.dart';
 
 class StartController extends GetxController {

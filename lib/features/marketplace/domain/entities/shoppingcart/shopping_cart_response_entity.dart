@@ -1,10 +1,9 @@
 class ShoppingCartResponseEntity {
   final double totalActual;
+  final int gastoEnvio;
+  final int iva;
   final List<ItemEntity> itenms;
-  ShoppingCartResponseEntity({
-    required this.totalActual,
-    required this.itenms
-  });
+  ShoppingCartResponseEntity({required this.totalActual, required this.gastoEnvio,required this.iva,required this.itenms});
 }
 
 class ItemEntity {
@@ -17,16 +16,17 @@ class ItemEntity {
   String? alerta;
   String? imagen;
   String? categoria;
+  bool? oferta;
 
-  ItemEntity({
-    required this.medicamentoId,
-    required this.nombreMedicamento,
-    required this.cantidadSolicitada,
-    required this.precioActual,
-    required this.precioAnterior,
-    required this.sinStock,
-    this.alerta,
-    this.categoria,
-    this.imagen,
-  });
+  ItemEntity(
+      {required this.medicamentoId,
+      required this.nombreMedicamento,
+      required this.cantidadSolicitada,
+      required this.precioActual,
+      required this.precioAnterior,
+      required this.sinStock,
+      this.alerta,
+      this.categoria,
+      this.imagen,
+      this.oferta});
 }

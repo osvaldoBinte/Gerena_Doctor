@@ -4,16 +4,13 @@ import 'package:gerena/features/appointment/presentation/page/addappointment/add
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
 class ModalAgregarCita extends StatelessWidget {
   const ModalAgregarCita({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
- 
-    
-    // Obtener controller
     final controller = Get.find<AddAppointmentController>();
-
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -27,7 +24,6 @@ class ModalAgregarCita extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -59,8 +55,6 @@ class ModalAgregarCita extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Content
             Flexible(
               child: SingleChildScrollView(
                 child: Padding(
@@ -68,67 +62,64 @@ class ModalAgregarCita extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Sección: Información del Paciente
-                     
-                   // Sección: Información del Paciente
-_buildSectionTitle('INFORMACIÓN DEL PACIENTE'),
-const SizedBox(height: 12),
-Row(
-  children: [
-    Expanded(
-      child: Obx(() => GerenaColors.buildLabeledTextField(
-        'Nombres*',
-        '',
-        controller: controller.nombresController,
-        hintText: 'Juan Pedro',
-        errorText: 'El nombre es requerido',
-        showError: controller.nombresError.value.isNotEmpty,
-      )),
-    ),
-    const SizedBox(width: 12),
-    Expanded(
-      child: Obx(() => GerenaColors.buildLabeledTextField(
-        'Apellidos*',
-        '',
-        controller: controller.apellidosController,
-        hintText: 'González Pérez',
-        errorText: 'Los apellidos son requeridos',
-        showError: controller.apellidosError.value.isNotEmpty,
-      )),
-    ),
-  ],
-),
+                      _buildSectionTitle('INFORMACIÓN DEL PACIENTE'),
                       const SizedBox(height: 12),
-               Row(
-  children: [
-    Expanded(
-      child: _buildDatePickerField(
-        context,
-        'Fecha de Nacimiento',
-        controller.fechaNacimientoController,
-        () => controller.selectBirthDate(context),
-      ),
-    ),
-    const SizedBox(width: 12),
-    Expanded(
-      child: Obx(() => _buildDropdown(
-        'Tipo de Sangre',
-        controller.selectedTipoSangre.value,
-        controller.tiposSangre,
-        (value) {
-          controller.selectedTipoSangre.value = value;
-        },
-      )),
-    ),
-  ],
-),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Obx(() => GerenaColors.buildLabeledTextField(
+                                  'Nombres*',
+                                  '',
+                                  controller: controller.nombresController,
+                                  hintText: 'Juan Pedro',
+                                  errorText: 'El nombre es requerido',
+                                  showError:
+                                      controller.nombresError.value.isNotEmpty,
+                                )),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Obx(() => GerenaColors.buildLabeledTextField(
+                                  'Apellidos*',
+                                  '',
+                                  controller: controller.apellidosController,
+                                  hintText: 'González Pérez',
+                                  errorText: 'Los apellidos son requeridos',
+                                  showError: controller
+                                      .apellidosError.value.isNotEmpty,
+                                )),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildDatePickerField(
+                              context,
+                              'Fecha de Nacimiento',
+                              controller.fechaNacimientoController,
+                              () => controller.selectBirthDate(context),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Obx(() => _buildDropdown(
+                                  'Tipo de Sangre',
+                                  controller.selectedTipoSangre.value,
+                                  controller.tiposSangre,
+                                  (value) {
+                                    controller.selectedTipoSangre.value = value;
+                                  },
+                                )),
+                          ),
+                        ],
+                      ),
 
                       const SizedBox(height: 24),
 
-
                       const SizedBox(height: 24),
 
-                      // Sección: Dirección
                       _buildSectionTitle('DIRECCIÓN'),
                       const SizedBox(height: 12),
                       GerenaColors.buildLabeledTextField(
@@ -171,7 +162,6 @@ Row(
 
                       const SizedBox(height: 24),
 
-                      // Sección: Información Médica
                       _buildSectionTitle('INFORMACIÓN MÉDICA'),
                       const SizedBox(height: 12),
                       GerenaColors.buildLabeledTextField(
@@ -204,20 +194,21 @@ Row(
 
                       const SizedBox(height: 24),
 
-                      // Sección: Detalles de la Cita
                       _buildSectionTitle('DETALLES DE LA CITA'),
                       const SizedBox(height: 12),
-                Obx(() => _buildDropdown(
-  'Tipo de Cita*',
-  controller.selectedTipoCita.value,
-  controller.tiposCitaDisplay,
-  (value) {
-    controller.selectedTipoCita.value = value;
-    controller.tipoCitaError.value = ''; // ✅ Limpiar error al seleccionar
-  },
-  errorText: 'Selecciona un tipo de cita',
-  showError: controller.tipoCitaError.value.isNotEmpty,
-)),
+                      Obx(() => _buildDropdown(
+                            'Tipo de Cita*',
+                            controller.selectedTipoCita.value,
+                            controller.tiposCitaDisplay,
+                            (value) {
+                              controller.selectedTipoCita.value = value;
+                              controller.tipoCitaError.value =
+                                  ''; 
+                            },
+                            errorText: 'Selecciona un tipo de cita',
+                            showError:
+                                controller.tipoCitaError.value.isNotEmpty,
+                          )),
                       const SizedBox(height: 12),
                       GerenaColors.buildLabeledTextField(
                         'Motivo de la Consulta',
@@ -228,118 +219,119 @@ Row(
 
                       const SizedBox(height: 24),
 
-                      // Sección: Selección de Fecha y Hora
-                    // Sección: Selección de Fecha y Hora
-_buildSectionTitle('FECHA Y HORA DISPONIBLE'),
-const SizedBox(height: 12),
-Obx(() {
-  if (controller.isLoadingAvailability.value) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
+                      _buildSectionTitle('FECHA Y HORA DISPONIBLE'),
+                      const SizedBox(height: 12),
+                      Obx(() {
+                        if (controller.isLoadingAvailability.value) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
 
-  if (controller.availability.isEmpty) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline, color: Colors.grey[600]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'No hay horarios disponibles en los próximos días',
-              style: GoogleFonts.rubik(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                        if (controller.availability.isEmpty) {
+                          return Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.info_outline,
+                                    color: Colors.grey[600]),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'No hay horarios disponibles en los próximos días',
+                                    style: GoogleFonts.rubik(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Selección de fecha
-      Text(
-        'FECHA',
-        style: GerenaColors.headingSmall.copyWith(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 8),
-      SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: controller.availability.map((date) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Obx(() {
-                final isSelected = controller.selectedDate.value == date;
-                return _buildDateOption(
-                  date.diaNombre,
-                  date.fecha,
-                  isSelected,
-                  () => controller.selectDate(date),
-                );
-              }),
-            );
-          }).toList(),
-        ),
-      ),
-      const SizedBox(height: 16),
-      // Selección de hora
-      Obx(() {
-        if (controller.selectedDate.value == null) {
-          return const SizedBox.shrink();
-        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'FECHA',
+                              style: GerenaColors.headingSmall.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: controller.availability.map((date) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: Obx(() {
+                                      final isSelected =
+                                          controller.selectedDate.value == date;
+                                      return _buildDateOption(
+                                        date.diaNombre,
+                                        date.fecha,
+                                        isSelected,
+                                        () => controller.selectDate(date),
+                                      );
+                                    }),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Obx(() {
+                              if (controller.selectedDate.value == null) {
+                                return const SizedBox.shrink();
+                              }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'HORA',
-              style: GerenaColors.headingSmall.copyWith(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: controller.selectedDate.value!.timeSlots.map((time) {
-                return Obx(() {
-                  final isSelected = controller.selectedTime.value == time;
-                  return _buildTimeOption(
-                    time.hora,
-                    isSelected,
-                    () => controller.selectTime(time),
-                  );
-                });
-              }).toList(),
-            ),
-          ],
-        );
-      }),
-    ],
-  );
-}),
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'HORA',
+                                    style: GerenaColors.headingSmall.copyWith(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: controller
+                                        .selectedDate.value!.timeSlots
+                                        .map((time) {
+                                      return Obx(() {
+                                        final isSelected =
+                                            controller.selectedTime.value ==
+                                                time;
+                                        return _buildTimeOption(
+                                          time.hora,
+                                          isSelected,
+                                          () => controller.selectTime(time),
+                                        );
+                                      });
+                                    }).toList(),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ],
+                        );
+                      }),
 
                       const SizedBox(height: 24),
 
-                      // Comentarios adicionales
                       _buildSectionTitle('COMENTARIOS ADICIONALES'),
                       const SizedBox(height: 12),
                       GerenaColors.buildLabeledTextField(
@@ -351,7 +343,6 @@ Obx(() {
 
                       const SizedBox(height: 24),
 
-                      // Botón de acción
                       Align(
                         alignment: Alignment.centerRight,
                         child: Obx(() {
@@ -380,78 +371,76 @@ Obx(() {
       ),
     );
   }
-  
-  Widget _buildDatePickerField(
-  BuildContext context,
-  String label,
-  TextEditingController controller,
-  VoidCallback onTap,
-) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: GoogleFonts.rubik(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: GerenaColors.textPrimaryColor,
-        ),
-      ),
-      const SizedBox(height: 5),
-      TextField(
-        controller: controller,
-        readOnly: true, // ✅ Solo lectura, no editable manualmente
-        onTap: onTap,
-        style: GoogleFonts.rubik(
-          fontSize: 14,
-          color: Colors.black,
-        ),
-        decoration: InputDecoration(
-          hintText: 'Selecciona una fecha',
-          hintStyle: GoogleFonts.rubik(
-            color: Colors.grey[600],
-            fontSize: 14,
-          ),
-          suffixIcon: Icon(
-            Icons.calendar_today,
-            color: GerenaColors.primaryColor,
-            size: 18,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 10,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: BorderSide(color: GerenaColors.colorinput),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.zero,
-            borderSide: BorderSide(color: GerenaColors.colorinput),
-          ),
-          isDense: true,
-        ),
-      ),
-    ],
-  );
-}
 
-// Método helper para formatear la fecha para mostrar
-String _formatDisplayDate(String date) {
-  if (date.isEmpty) return '';
-  
-  try {
-    // Si viene en formato yyyy-MM-dd, convertir a dd/MM/yyyy
-    final parsedDate = DateTime.parse(date);
-    return DateFormat('dd/MM/yyyy').format(parsedDate);
-  } catch (e) {
-    // Si ya está en otro formato, devolverlo tal cual
-    return date;
+  Widget _buildDatePickerField(
+    BuildContext context,
+    String label,
+    TextEditingController controller,
+    VoidCallback onTap,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.rubik(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: GerenaColors.textPrimaryColor,
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          readOnly: true,
+          onTap: onTap,
+          style: GoogleFonts.rubik(
+            fontSize: 14,
+            color: Colors.black,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Selecciona una fecha',
+            hintStyle: GoogleFonts.rubik(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+            suffixIcon: Icon(
+              Icons.calendar_today,
+              color: GerenaColors.primaryColor,
+              size: 18,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: GerenaColors.colorinput),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: GerenaColors.colorinput),
+            ),
+            isDense: true,
+          ),
+        ),
+      ],
+    );
   }
-}
+
+  String _formatDisplayDate(String date) {
+    if (date.isEmpty) return '';
+
+    try {
+      final parsedDate = DateTime.parse(date);
+      return DateFormat('dd/MM/yyyy').format(parsedDate);
+    } catch (e) {
+      return date;
+    }
+  }
+
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -461,94 +450,95 @@ String _formatDisplayDate(String date) {
         color: GerenaColors.textPrimaryColor,
       ),
     );
-  }Widget _buildDropdown(
-  String label,
-  String? value,
-  List<String> items,
-  Function(String?) onChanged,
-  {String? errorText, bool showError = false}
-) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: GoogleFonts.rubik(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: GerenaColors.textPrimaryColor,
-        ),
-      ),
-      const SizedBox(height: 5),
-      Container(
-        height: showError ? null : 40, // ✅ Altura dinámica cuando hay error
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          value: value,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            // ✅ Mensaje de error
-            errorText: showError ? errorText : null,
-            errorStyle: GoogleFonts.rubik(
-              color: GerenaColors.errorColor,
-              fontSize: 12,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
-                width: showError ? 1.5 : 1,
-              ),
-              borderRadius: BorderRadius.zero,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
-                width: showError ? 1.5 : 1,
-              ),
-              borderRadius: BorderRadius.zero,
-            ),
-            errorBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: GerenaColors.errorColor,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.zero,
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                color: GerenaColors.errorColor,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.zero,
-            ),
-          ),
-          icon: Icon(
-            Icons.keyboard_arrow_down,
-            color: Colors.grey[600],
-            size: 18,
-          ),
+  }
+
+  Widget _buildDropdown(String label, String? value, List<String> items,
+      Function(String?) onChanged,
+      {String? errorText, bool showError = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
           style: GoogleFonts.rubik(
             fontSize: 14,
-            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            color: GerenaColors.textPrimaryColor,
           ),
-          items: items.map((item) {
-            return DropdownMenuItem(
-              value: item,
-              child: Text(
-                item,
-                overflow: TextOverflow.ellipsis,
-              ),
-            );
-          }).toList(),
-          onChanged: onChanged,
         ),
-      ),
-    ],
-  );
-}
+        const SizedBox(height: 5),
+        Container(
+          height: showError ? null : 40,
+          child: DropdownButtonFormField<String>(
+            isExpanded: true,
+            value: value,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              errorText: showError ? errorText : null,
+              errorStyle: GoogleFonts.rubik(
+                color: GerenaColors.errorColor,
+                fontSize: 12,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: showError
+                      ? GerenaColors.errorColor
+                      : GerenaColors.colorinput,
+                  width: showError ? 1.5 : 1,
+                ),
+                borderRadius: BorderRadius.zero,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: showError
+                      ? GerenaColors.errorColor
+                      : GerenaColors.colorinput,
+                  width: showError ? 1.5 : 1,
+                ),
+                borderRadius: BorderRadius.zero,
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: GerenaColors.errorColor,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.zero,
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: GerenaColors.errorColor,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.zero,
+              ),
+            ),
+            icon: Icon(
+              Icons.keyboard_arrow_down,
+              color: Colors.grey[600],
+              size: 18,
+            ),
+            style: GoogleFonts.rubik(
+              fontSize: 14,
+              color: Colors.black,
+            ),
+            items: items.map((item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(
+                  item,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ),
+      ],
+    );
+  }
 
   Widget _buildDateOption(
     String day,
@@ -563,9 +553,7 @@ String _formatDisplayDate(String date) {
         decoration: BoxDecoration(
           color: isSelected ? GerenaColors.secondaryColor : Colors.white,
           border: Border.all(
-            color: isSelected
-                ? GerenaColors.secondaryColor
-                : Colors.grey[300]!,
+            color: isSelected ? GerenaColors.secondaryColor : Colors.grey[300]!,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -576,9 +564,8 @@ String _formatDisplayDate(String date) {
               style: GoogleFonts.rubik(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? Colors.white
-                    : GerenaColors.textPrimaryColor,
+                color:
+                    isSelected ? Colors.white : GerenaColors.textPrimaryColor,
               ),
             ),
             const SizedBox(height: 4),
@@ -586,9 +573,8 @@ String _formatDisplayDate(String date) {
               date,
               style: GoogleFonts.rubik(
                 fontSize: 11,
-                color: isSelected
-                    ? Colors.white
-                    : GerenaColors.textSecondaryColor,
+                color:
+                    isSelected ? Colors.white : GerenaColors.textSecondaryColor,
               ),
             ),
           ],
@@ -609,9 +595,7 @@ String _formatDisplayDate(String date) {
         decoration: BoxDecoration(
           color: isSelected ? GerenaColors.secondaryColor : Colors.white,
           border: Border.all(
-            color: isSelected
-                ? GerenaColors.secondaryColor
-                : Colors.grey[300]!,
+            color: isSelected ? GerenaColors.secondaryColor : Colors.grey[300]!,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -620,15 +604,13 @@ String _formatDisplayDate(String date) {
           style: GoogleFonts.rubik(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color:
-                isSelected ? Colors.white : GerenaColors.textPrimaryColor,
+            color: isSelected ? Colors.white : GerenaColors.textPrimaryColor,
           ),
         ),
       ),
     );
   }
 
-  // Método estático para mostrar el modal con Get.dialog
   static void show({
     required int clienteId,
     required int doctorId,

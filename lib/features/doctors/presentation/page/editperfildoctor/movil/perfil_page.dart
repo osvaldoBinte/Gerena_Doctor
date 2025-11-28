@@ -47,12 +47,10 @@ Widget build(BuildContext context) {
       ),
     ),
     body: Obx(() {
-      // Verificar si mostrar configuración
       if (perfilConfiguration.showConfiguration.value) {
-        return ProfileConfiguration(); // O tu página de edición de perfil de doctor
+        return ProfileConfiguration(); 
       }
 
-      // Vista normal del perfil
       if (doctorController.isLoading.value) {
         return const Center(child: CircularProgressIndicator());
       }
@@ -164,7 +162,6 @@ Widget build(BuildContext context) {
   );
 }
 
-  // Widget para la sección de recompensas (dinámico)
   Widget _buildRewardsSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
@@ -198,7 +195,6 @@ Widget build(BuildContext context) {
     });
   }
 
-  // Widget para la sección de ejecutivo asignado (dinámico)
   Widget _buildExecutiveSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
@@ -356,7 +352,6 @@ Widget build(BuildContext context) {
                                       ),
                           ),
                         ),
-                        // Botón para editar foto
                         Positioned(
                           bottom: 0,
                           right: 0,
@@ -492,7 +487,6 @@ Widget build(BuildContext context) {
                     text: 'EDITAR PERFIL',
                     borderRadius: 30,
                     onPressed: () {
-          // Mostrar vista de configuración
           perfilConfiguration.showConfigurationView();
         },
                   ),

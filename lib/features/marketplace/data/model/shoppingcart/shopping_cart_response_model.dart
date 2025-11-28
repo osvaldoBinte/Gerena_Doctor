@@ -4,11 +4,14 @@ import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shoppin
 
 class ShoppingCartResponseModel extends ShoppingCartResponseEntity {
   ShoppingCartResponseModel(
-      {required super.totalActual, required super.itenms});
+      {required super.totalActual, required super.itenms, required super.gastoEnvio, required super.iva});
 
   factory ShoppingCartResponseModel.fromJson(Map<String, dynamic> json) {
     return ShoppingCartResponseModel(
       totalActual: (json['totalActual'] ?? 0).toDouble(),
+gastoEnvio: (json['gastosEnvio'] as num?)?.toInt() ?? 0,
+iva: (json['iva'] as num?)?.toInt() ?? 0,
+
       itenms: (json['items'] as List?)
               ?.map((order) => ItemModel.fromJson(order))
               .toList() ??
@@ -27,6 +30,7 @@ class ItemModel extends ItemEntity {
     super.alerta,
     super.categoria,
     super.imagen,
+    super.oferta
   });
 
   factory ItemModel.fromJson(Map<String, dynamic> json) {
@@ -61,6 +65,7 @@ class ItemModel extends ItemEntity {
       alerta: json['alerta'],
       categoria: json['categoria'],
       imagen: imageUrl, 
+      oferta: json['oferta']
     );
   }
 }

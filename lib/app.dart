@@ -5,10 +5,12 @@ import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/add_appointment_controller.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/appointment_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/availability_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
+import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
@@ -29,7 +31,7 @@ import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
-import 'package:gerena/page/store/blogGerena/blog_gerena.dart';
+import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:gerena/usecase_config.dart';
 import 'package:get/get.dart';
@@ -66,6 +68,8 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getMedicinesOnSaleUsecase!, permanent:  true);
         Get.put(usecaseConfig.shoppingCartUsecase!,permanent:  true);
         Get.put(usecaseConfig.postAppointmentUsecase!,permanent:  true);
+        Get.put(usecaseConfig.cancelAppointmentUsecase!,permanent:  true);
+        Get.put(usecaseConfig.appointmentCompletedUsecase!,permanent:  true);
         Get.put(usecaseConfig.getDoctorAvailabilityUsecase!,permanent:  true);
         Get.put(usecaseConfig.attachPaymentMethodToCustomerUsecase!,permanent:  true);
         Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
@@ -100,6 +104,13 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.addAvailabilityUsecase!, permanent: true);
         Get.put(usecaseConfig.deleteAvailabilityUsecase!, permanent: true);
         Get.put(usecaseConfig.getMyLastPaidOrderUsecase!, permanent: true);
+        Get.put(usecaseConfig.getBlogGerenaUsecase!, permanent:  true);
+        Get.put(usecaseConfig.getBlogGerenaByIdUsecase!,permanent: true);
+        Get.put(usecaseConfig.getBlogSocialUsecase!,permanent: true);
+        Get.put(usecaseConfig.getBlogSocialByIdUsecase!,permanent: true);
+        Get.put(usecaseConfig.createBlogSocialUsecase!,permanent: true);
+        Get.put(usecaseConfig.postAnswerBlogUsecase!,permanent: true);
+        Get.put(usecaseConfig.calculateDiscountPointsUsecase!, permanent: true);
 
 
 
@@ -113,9 +124,10 @@ class App extends StatelessWidget {
         Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find()), fenix:  true);
         Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => ProductDetailController(getMedicineByIdUsecase: Get.find(),), fenix:  true);
-        Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), payOrderUsecase:  Get.find(), ), fenix:  true,);
+        Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), payOrderUsecase:  Get.find(), calculateDiscountPointsUsecase:  Get.find(),  ), fenix:  true,);
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
+        Get.lazyPut(() => AppointmentController(appointmentCompletedUsecase: Get.find(), cancelAppointmentUsecase: Get.find()), fenix:  true);
         Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(), savecardUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => AddressesController(getAddressesUsecase:  Get.find(), postAddressesUsecase: Get.find(), putAddressesUsecase: Get.find(), deleteAddressesUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
@@ -124,6 +136,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => ProceduresController(getProceduresUsecase:  Get.find(), createProcedureUsecase:  Get.find(), updateProcedureUsecase: Get.find(), addImagenesUsecase: Get.find(), deleteProcedureUsecase: Get.find(), deleteImgUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => NotificationController(getNotificationUsecase: Get.find()), fenix:  true);
         Get.lazyPut(() => AvailabilityController(addAvailabilityUsecase:  Get.find(), deleteAvailabilityUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
+        Get.lazyPut(() => BlogController(getBlogGerenaUsecase: Get.find(), getBlogGerenaByIdUsecase: Get.find(), getBlogSocialUsecase: Get.find(), getBlogSocialByIdUsecase: Get.find(), createBlogSocialUsecase: Get.find(), postAnswerBlogUsecase: Get.find()), fenix: true,);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

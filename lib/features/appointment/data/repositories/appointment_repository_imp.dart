@@ -36,4 +36,17 @@ class AppointmentRepositoryImp implements AppointmentRepository {
     final session = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
     return await appointmentDataSources.deleteAvailability(id, session);
   }
+  
+  @override
+  Future<void> appointmentcompleted(int id, String notasDoctor, String diagnostico) async {
+    final token = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
+
+    return await appointmentDataSources.appointmentcompleted(id, notasDoctor, diagnostico, token);
+  }
+  
+  @override
+  Future<void> cancelappointment(int id, String motivoCancelacion) async {
+    final token = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await appointmentDataSources.cancelappointment(id, motivoCancelacion, token);
+  }
 }

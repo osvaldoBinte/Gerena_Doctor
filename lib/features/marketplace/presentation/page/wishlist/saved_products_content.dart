@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/widgets/simple_counter.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/modalGuardarProducto/modal_guardar_producto.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:get/get.dart';
@@ -395,111 +396,20 @@ class SavedProductsContent extends StatelessWidget {
   }
 
   // ✅ Método para construir la imagen del producto
-  Widget _buildProductImage(String? imagePath) {
-    if (imagePath == null || imagePath.isEmpty) {
-      return Container(
-        width: 100,
-        height: 100,
-        decoration: BoxDecoration(
-          color: Colors.grey[200],
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(4),
-            bottomLeft: Radius.circular(4),
-          ),
-        ),
-        child: Icon(
-          Icons.medical_services,
-          size: 40,
-          color: Colors.grey[400],
-        ),
-      );
-    }
-
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(4),
-          bottomLeft: Radius.circular(4),
-        ),
-        child: Image.network(
-          imagePath,
-          width: 100,
-          height: 100,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  bottomLeft: Radius.circular(4),
-                ),
-              ),
-              child: Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                  strokeWidth: 2,
-                ),
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(4),
-                  bottomLeft: Radius.circular(4),
-                ),
-              ),
-              child: Icon(
-                Icons.medical_services,
-                size: 40,
-                color: Colors.grey[400],
-              ),
-            );
-          },
-        ),
-      );
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(4),
-        bottomLeft: Radius.circular(4),
-      ),
-      child: Image.asset(
-        imagePath,
-        width: 100,
-        height: 100,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(4),
-                bottomLeft: Radius.circular(4),
-              ),
-            ),
-            child: Icon(
-              Icons.medical_services,
-              size: 40,
-              color: Colors.grey[400],
-            ),
-          );
-        },
-      ),
-    );
-  }
+// ✅ Método simplificado para construir la imagen del producto
+Widget _buildProductImage(String? imagePath) {
+  return ClipRRect(
+    borderRadius: BorderRadius.only(
+      topLeft: Radius.circular(4),
+      bottomLeft: Radius.circular(4),
+    ),
+    child: NetworkImageWidget(
+      imageUrl: imagePath,
+      width: 100,
+      height: 100,
+      fit: BoxFit.cover,
+      showPlaceholderDecoration: false, // Ya tenemos el ClipRRect
+    ),
+  );
+}
 }

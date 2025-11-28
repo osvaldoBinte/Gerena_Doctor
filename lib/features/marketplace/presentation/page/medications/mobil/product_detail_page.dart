@@ -151,7 +151,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
 
       final uri = Uri.parse(url);
 
-      // Intenta abrir en navegador in-app con barra de navegación
+    
       bool launched = await launchUrl(
         uri,
         mode: LaunchMode.inAppBrowserView,
@@ -164,7 +164,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
       if (!launched) {
         print('Intento 1 fallido (inAppBrowserView), probando con inAppWebView');
 
-        // Segundo intento: WebView embebido
+     
         launched = await launchUrl(
           uri,
           mode: LaunchMode.inAppWebView,
@@ -177,7 +177,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
         if (!launched) {
           print('Intento 2 fallido, probando con platformDefault');
 
-          // Tercer intento: comportamiento por defecto de la plataforma
+      
           launched = await launchUrl(
             uri,
             mode: LaunchMode.platformDefault,
@@ -186,7 +186,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
           if (!launched) {
             print('Intento 3 fallido, probando con externalApplication');
 
-            // Último intento: navegador externo
+        
             launched = await launchUrl(
               uri,
               mode: LaunchMode.externalApplication,
@@ -622,7 +622,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
       margin: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          if (widget.medication.termsUrl != null)
+          if (widget.medication.termsUrl != null && widget.medication.technicalSheetUrl!.isNotEmpty)
             _buildLinkItem(
               text: 'Consulta términos y condiciones de la venta',
               onTap: () => _openPdfUrl(
@@ -630,7 +630,7 @@ class _ProductDetailContentState extends State<_ProductDetailContent> {
                 'Términos y Condiciones',
               ),
             ),
-          if (widget.medication.technicalSheetUrl != null)
+          if (widget.medication.technicalSheetUrl != null && widget.medication.technicalSheetUrl!.isNotEmpty)
             _buildLinkItem(
               text: 'Descargar Ficha Técnica',
               onTap: () => _openPdfUrl(

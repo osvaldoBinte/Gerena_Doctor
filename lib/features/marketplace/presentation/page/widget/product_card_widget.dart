@@ -131,47 +131,13 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProductImage() {
-    if (product['image']?.isNotEmpty ?? false) {
-      return Image.network(
-        product['image']!,
-        height: 300,
-        fit: BoxFit.contain,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
+Widget _buildProductImage() {
+  return NetworkImageWidget(
+    imageUrl: product['image'],
+    height: 300,
+  );
+}
 
-          return Container(
-            height: 120,
-            child: Center(
-              child: SizedBox(
-                width: 30,
-                height: 30,
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                  color: GerenaColors.primaryColor,
-                  strokeWidth: 3,
-                ),
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return ImagePlaceholderWidget(
-            icon: Icons.broken_image_outlined,
-            text: 'Imagen no disponible',
-          );
-        },
-      );
-    }
-
-    return ImagePlaceholderWidget(
-      icon: Icons.image_outlined,
-      text: 'Sin imagen',
-    );
-  }
 
   Widget _buildProductInfo(
     bool hasDiscount,

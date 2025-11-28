@@ -3,6 +3,8 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gerena/features/appointment/data/datasources/appointment_data_sources_imp.dart';
 import 'package:gerena/features/appointment/data/repositories/appointment_repository_imp.dart';
 import 'package:gerena/features/appointment/domain/usecase/add_availability_usecase.dart';
+import 'package:gerena/features/appointment/domain/usecase/appointment_completed_usecase.dart';
+import 'package:gerena/features/appointment/domain/usecase/cancel_appointment_usecase.dart';
 import 'package:gerena/features/appointment/domain/usecase/delete_availability_usecase.dart';
 import 'package:gerena/features/appointment/domain/usecase/get_appointments_usecase.dart';
 import 'package:gerena/features/appointment/domain/usecase/post_appointment_usecase.dart';
@@ -12,6 +14,14 @@ import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
 import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
 import 'package:gerena/features/banners/domain/usecase/get_banners_usecase.dart';
+import 'package:gerena/features/blog/data/datasources/blog_data_sources_imp.dart';
+import 'package:gerena/features/blog/data/repositories/blog_repository_imp.dart';
+import 'package:gerena/features/blog/domain/usecase/create_blog_social_usecase.dart';
+import 'package:gerena/features/blog/domain/usecase/get_blog_gerena_by_id_usecase.dart';
+import 'package:gerena/features/blog/domain/usecase/get_blog_gerena_usecase.dart';
+import 'package:gerena/features/blog/domain/usecase/get_blog_social_by_id_usecase.dart';
+import 'package:gerena/features/blog/domain/usecase/get_blog_social_usecase.dart';
+import 'package:gerena/features/blog/domain/usecase/post_answer_blog_usecase.dart';
 import 'package:gerena/features/doctorprocedures/data/datasources/procedures_data_sources_imp.dart';
 import 'package:gerena/features/doctorprocedures/data/repositories/procedure_repository_imp.dart';
 import 'package:gerena/features/doctorprocedures/domain/usecase/add_imagenes_usecase.dart';
@@ -36,6 +46,7 @@ import 'package:gerena/features/marketplace/domain/usecase/addresses/delete_addr
 import 'package:gerena/features/marketplace/domain/usecase/addresses/get_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/post_addresses_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/addresses/put_addresses_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/calculate_discount_points_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/create_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_medicine_by_id_usecase.dart';
@@ -77,6 +88,7 @@ class UsecaseConfig {
    ProcedureRepositoryImp? procedureRepositoryImp;
    ReviewRepositoryImp? reviewRepositoryImp;
    NotificationRepositoryImp? notificationRepositoryImp;
+   BlogRepositoryImp? blogRepositoryImp;
 
 
 
@@ -89,6 +101,7 @@ class UsecaseConfig {
    ProceduresDataSourcesImp? proceduresDataSourcesImp;
    ReviewDataSourcesImp? reviewDataSourcesImp;
    NotificationDataSourcesImp? notificationDataSourcesImp;
+   BlogDataSourcesImp? blogDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -103,6 +116,8 @@ class UsecaseConfig {
    AppointmentRepositoryImp? appointmentRepositoryImp;
    AppointmentDataSourcesImp? appointmentDataSourcesImp;
    GetAppointmentsUsecase? getAppointmentsUsecase;
+   CancelAppointmentUsecase?cancelAppointmentUsecase;
+   AppointmentCompletedUsecase? appointmentCompletedUsecase;
    DeleteAvailabilityUsecase? deleteAvailabilityUsecase;
    AddAvailabilityUsecase? addAvailabilityUsecase;
 
@@ -118,6 +133,7 @@ class UsecaseConfig {
    PostAppointmentUsecase? postAppointmentUsecase;
    CreateOrderUsecase? createOrderUsecase;
    PayOrderUsecase? payOrderUsecase;
+   CalculateDiscountPointsUsecase? calculateDiscountPointsUsecase;
 
    GetAddressesUsecase ? getAddressesUsecase;
    PostAddressesUsecase? postAddressesUsecase;
@@ -155,6 +171,14 @@ class UsecaseConfig {
 
    GetNotificationUsecase? getnotificationUsecase;
 
+   GetBlogGerenaUsecase? getBlogGerenaUsecase;
+   GetBlogGerenaByIdUsecase? getBlogGerenaByIdUsecase;
+   GetBlogSocialUsecase?getBlogSocialUsecase;
+   GetBlogSocialByIdUsecase?getBlogSocialByIdUsecase;
+   CreateBlogSocialUsecase?createBlogSocialUsecase;
+   PostAnswerBlogUsecase?postAnswerBlogUsecase;
+   
+
 
 
 
@@ -170,6 +194,7 @@ class UsecaseConfig {
       proceduresDataSourcesImp = ProceduresDataSourcesImp();
       reviewDataSourcesImp = ReviewDataSourcesImp();
       notificationDataSourcesImp = NotificationDataSourcesImp();
+      blogDataSourcesImp = BlogDataSourcesImp();
       
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
@@ -183,6 +208,7 @@ class UsecaseConfig {
       procedureRepositoryImp = ProcedureRepositoryImp(proceduresDataSourcesImp: proceduresDataSourcesImp!);
       reviewRepositoryImp = ReviewRepositoryImp(reviewDataSourcesImp: reviewDataSourcesImp!);
       notificationRepositoryImp =NotificationRepositoryImp(notificationDataSourcesImp: notificationDataSourcesImp!);
+      blogRepositoryImp = BlogRepositoryImp(blogDataSourcesImp: blogDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -192,6 +218,8 @@ class UsecaseConfig {
      addAvailabilityUsecase = AddAvailabilityUsecase(appointmentRepository: appointmentRepositoryImp!);
      getDoctorAvailabilityUsecase = GetDoctorAvailabilityUsecase(doctorRepository: doctorRepositoryImp!);
      postAppointmentUsecase = PostAppointmentUsecase(appointmentRepository: appointmentRepositoryImp!);
+     appointmentCompletedUsecase = AppointmentCompletedUsecase(appointmentRepository: appointmentRepositoryImp!);
+     cancelAppointmentUsecase = CancelAppointmentUsecase(appointmentRepository: appointmentRepositoryImp!);
      updateDoctorProfileUsecase = UpdateDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
      updatefotoDoctorProfileUsecase = UpdatefotoDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
 
@@ -206,6 +234,7 @@ class UsecaseConfig {
      shoppingCartUsecase = ShoppingCartUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      createOrderUsecase = CreateOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      payOrderUsecase = PayOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+     calculateDiscountPointsUsecase =CalculateDiscountPointsUsecase(marketplaceRepository: marketplaceRepositoryImp!);
 
      getAddressesUsecase = GetAddressesUsecase(addressesRepository: addressesRepositoryImp!);
      postAddressesUsecase = PostAddressesUsecase(addressesRepository: addressesRepositoryImp!);
@@ -243,6 +272,17 @@ class UsecaseConfig {
       myReviewUsecase = MyReviewUsecase(reviewRepository: reviewRepositoryImp!);
 
       getnotificationUsecase = GetNotificationUsecase(notificationRepository: notificationRepositoryImp!);
+
+
+
+      
+      getBlogGerenaUsecase = GetBlogGerenaUsecase(blogRepository: blogRepositoryImp!);
+      getBlogGerenaByIdUsecase = GetBlogGerenaByIdUsecase(blogRepository: blogRepositoryImp!);
+      getBlogSocialUsecase = GetBlogSocialUsecase(blogRepository: blogRepositoryImp!);
+      getBlogSocialByIdUsecase = GetBlogSocialByIdUsecase(blogRepository: blogRepositoryImp!);
+      createBlogSocialUsecase = CreateBlogSocialUsecase(blogRepository: blogRepositoryImp!);
+      postAnswerBlogUsecase = PostAnswerBlogUsecase(blogRepository: blogRepositoryImp!);
+
 
     
   }

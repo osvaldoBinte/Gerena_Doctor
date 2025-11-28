@@ -1,8 +1,10 @@
 
+import 'dart:math';
+
 import 'package:gerena/features/marketplace/domain/entities/orders/create/create_new_order_entity.dart';
 
 class CreateNewOrderModel extends CreateNewOrderEntity {
-  CreateNewOrderModel({required super.items, });
+  CreateNewOrderModel({required super.items,required super.usepoints, super.pointstouse });
 
   
    CreateNewOrderModel.fromEntity(CreateNewOrderEntity entity) 
@@ -11,6 +13,9 @@ class CreateNewOrderModel extends CreateNewOrderEntity {
          medicamentoId: item.medicamentoId,
          quantity: item.quantity,
        )).toList(),
+
+       usepoints: entity.usepoints,
+       pointstouse: entity.pointstouse
     
     );
   
@@ -20,6 +25,8 @@ class CreateNewOrderModel extends CreateNewOrderEntity {
             'medicamentoId': item.medicamentoId,
             'cantidad': item.quantity,
           }).toList(),
+      'usarPuntos': usepoints,
+      'puntosAUsar': pointstouse
      
     };  
   }

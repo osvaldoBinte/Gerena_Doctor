@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
+import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/create/create_new_order_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_post_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart' hide ItemEntity;
+import 'package:gerena/features/marketplace/domain/usecase/calculate_discount_points_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/create_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/pay_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
@@ -18,12 +20,14 @@ class ShoppingCartController extends GetxController {
   final ShoppingCartUsecase shoppingCartUsecase;
   final CreateOrderUsecase createOrderUsecase;
   final PayOrderUsecase payOrderUsecase;
+  final CalculateDiscountPointsUsecase   calculateDiscountPointsUsecase;
   final PreferencesUser _prefs = PreferencesUser();
 
   ShoppingCartController({
     required this.shoppingCartUsecase,
     required this.createOrderUsecase,
     required this.payOrderUsecase,
+    required this.calculateDiscountPointsUsecase
   });
   
   final RxList<ShoppingCartPostEntity> cartItems = <ShoppingCartPostEntity>[].obs;
@@ -37,13 +41,138 @@ class ShoppingCartController extends GetxController {
   
   final RxBool isBuyNowModeActive = false.obs;
   
+  final RxBool usePoints = false.obs;
+  final RxInt pointsToUse = 0.obs;
+  final RxInt availablePoints = 0.obs;
+    final RxDouble pointsDiscount = 0.0.obs; // NUEVO: descuento real calculado
+  final RxBool isCalculatingDiscount = false.obs; // NUEVO: loading del cálculo
+  
   @override
   void onInit() {
     super.onInit();
     _checkAndLoadCart();
+    _loadAvailablePoints();
+        loadAvailablePoints();  
+
+  }
+
+  Future<void> loadAvailablePoints() async {
+    try {
+      final doctorController = Get.find<PrefilDortorController>();
+      
+      await doctorController.loadProfile();
+      
+      if (doctorController.doctorProfile.value != null) {
+        final newPoints = doctorController.doctorProfile.value!.puntosDisponibles ?? 0;
+        
+        if (availablePoints.value != newPoints) {
+          availablePoints.value = newPoints;
+          print('💰 Puntos actualizados: ${availablePoints.value}');
+          
+          if (usePoints.value && pointsToUse.value > availablePoints.value) {
+            print('⚠️ Los puntos seleccionados exceden los disponibles, ajustando...');
+            await updatePointsToUse(availablePoints.value);
+          }
+        }
+      }
+    } catch (e) {
+      print('⚠️ No se pudieron cargar los puntos disponibles: $e');
+      availablePoints.value = 0;
+    }
   }
   
-  Future<void> _checkAndLoadCart() async {
+  Future<void> _loadAvailablePoints() async {
+    try {
+      final doctorController = Get.find<PrefilDortorController>();
+      if (doctorController.doctorProfile.value != null) {
+        availablePoints.value = doctorController.doctorProfile.value!.puntosDisponibles ?? 0;
+        print('💰 Puntos disponibles cargados: ${availablePoints.value}');
+      }
+    } catch (e) {
+      print('⚠️ No se pudieron cargar los puntos disponibles: $e');
+      availablePoints.value = 0;
+    }
+  }
+ 
+void toggleUsePoints(bool value) async {
+  usePoints.value = value;
+  
+  if (!value) {
+    pointsToUse.value = 0;
+    pointsDiscount.value = 0.0;
+  } else {
+    // REMOVIDO: ya no limitamos por el total de la orden
+    // Solo usamos el máximo de puntos disponibles
+    final maxPointsAvailable = availablePoints.value;
+    
+    await updatePointsToUse(maxPointsAvailable);
+  }
+  
+  print('💳 Usar puntos: $value | Puntos a usar: ${pointsToUse.value} | Descuento: ${pointsDiscount.value}');
+}
+
+
+Future<void> updatePointsToUse(int points) async {
+  if (points < 0) {
+    pointsToUse.value = 0;
+    pointsDiscount.value = 0.0;
+    return;
+  }
+  
+  final totalOrder = cartResponse.value?.totalActual ?? 0.0;
+  final maxPointsAvailable = availablePoints.value;
+  
+  // ÚNICA validación: que no exceda los puntos disponibles
+  if (points > maxPointsAvailable) {
+    showErrorSnackbar('No tienes suficientes puntos. Máximo disponible: $maxPointsAvailable');
+    pointsToUse.value = maxPointsAvailable;
+    points = maxPointsAvailable;
+  }
+  
+  if (points == 0) {
+    pointsToUse.value = 0;
+    pointsDiscount.value = 0.0;
+    return;
+  }
+  
+  // CALCULAR EL DESCUENTO REAL
+  try {
+    isCalculatingDiscount.value = true;
+    
+    final montoInt = totalOrder.toInt();
+    final discountEntity = await calculateDiscountPointsUsecase.execute(
+      montoInt, 
+      points,
+    );
+    
+    final calculatedDiscount = discountEntity.totalDiscount;
+    
+    // REMOVIDO: la validación que no permitía descuentos mayores al total
+    // Ahora el backend decide cómo manejar esto
+    
+    pointsToUse.value = points;
+    pointsDiscount.value = calculatedDiscount;
+    
+    print('💰 Puntos: $points | Monto orden: \$${totalOrder.toStringAsFixed(2)} | Descuento calculado: \$${calculatedDiscount.toStringAsFixed(2)}');
+    
+  } catch (e) {
+    print('❌ Error al calcular descuento: $e');
+    showErrorSnackbar('No se pudo calcular el descuento con puntos');
+    pointsToUse.value = 0;
+    pointsDiscount.value = 0.0;
+  } finally {
+    isCalculatingDiscount.value = false;
+  }
+}
+  
+  double get finalTotal {
+    final subtotal = cartResponse.value?.totalActual ?? 0.0;
+    final discount = usePoints.value ? pointsDiscount.value : 0.0;
+  
+    return subtotal - discount ;
+  }
+  
+ Future<void> _checkAndLoadCart() async {
     final buyNowJson = await _prefs.loadPrefs(
       type: String, 
       key: AppConstants.buynowKey
@@ -57,7 +186,7 @@ class ShoppingCartController extends GetxController {
       await loadCartFromPreferences();
     }
   }
-  
+
   void selectPaymentMethod(String paymentMethodId) {
     selectedPaymentMethodId.value = paymentMethodId;
     print('💳 Método de pago seleccionado: $paymentMethodId');
@@ -74,93 +203,122 @@ class ShoppingCartController extends GetxController {
     print('📍 Dirección seleccionada en controller: $addressId');
   }
 
- Future<void> confirmPurchase() async {
-  if (selectedPaymentMethodId.value.isEmpty) {
-    showErrorSnackbar('Por favor selecciona un método de pago');
-    return;
-  }
   
-  if (selectedAddressId.value.isEmpty) {
-    showErrorSnackbar('Por favor selecciona una dirección de entrega');
-    return;
-  }
   
-  if (cartItems.isEmpty) {
-    showErrorSnackbar('El carrito está vacío');
-    return;
-  }
-  
-  final response = cartResponse.value;
-  if (response != null) {
-    final hasOutOfStock = response.itenms.any((item) => item.sinStock);
-    if (hasOutOfStock) {
-      showErrorSnackbar('Hay productos sin stock en tu carrito');
+  Future<void> confirmPurchase() async {
+    if (selectedPaymentMethodId.value.isEmpty) {
+      showErrorSnackbar('Por favor selecciona un método de pago');
       return;
     }
-  }
-  
-  try {
-    isProcessingPayment.value = true;
     
-    
-    final addressId = int.parse(selectedAddressId.value);
-    
-    final items = cartItems.map((item) => ItemEntity(
-      medicamentoId: item.medicamentoId,
-      quantity: item.cantidad,
-    )).toList();
-    
-    final orderEntity = CreateNewOrderEntity(
-      items: items,
-    );
-    
-    final orderResponse = await createOrderUsecase.createaneworder(
-      orderEntity,
-      addressId,
-    );
-    
-
-    await payOrderUsecase.execute(
-      orderResponse.orderId,
-      selectedPaymentMethodId.value, 
-    );
-    
-    print('✅ Pago procesado exitosamente con método: ${selectedPaymentMethodId.value}');
-    
-    showSuccessSnackbar('¡Compra confirmada exitosamente!');
-    
-    final wasBuyNowMode = isBuyNowModeActive.value;
-    
-    if (isBuyNowModeActive.value) {
-      await clearBuyNow();
-      isBuyNowModeActive.value = false;
-      await loadCartFromPreferences();
-    } else {
-      await clearCart();
+    if (selectedAddressId.value.isEmpty) {
+      showErrorSnackbar('Por favor selecciona una dirección de entrega');
+      return;
     }
     
-    if (wasBuyNowMode) {
-      print('🎉 Navegando a tienda después de Comprar Ahora');
+    if (cartItems.isEmpty) {
+      showErrorSnackbar('El carrito está vacío');
+      return;
+    }
+    
+    final response = cartResponse.value;
+    if (response != null) {
+      final hasOutOfStock = response.itenms.any((item) => item.sinStock);
+      if (hasOutOfStock) {
+        showErrorSnackbar('Hay productos sin stock en tu carrito');
+        return;
+      }
+    }
+    
+    if (usePoints.value) {
+      if (pointsToUse.value > availablePoints.value) {
+        showErrorSnackbar('No tienes suficientes puntos disponibles');
+        return;
+      }
       
-      Get.find<ShopNavigationController>().navigateToStore();
-      Get.to(
-        () => GlobalShopInterface(),
-        arguments: {
-          'categoryName': '',
-          'showOffers': true,
-        },
-      );
-    } else {
-      print('🎉 Compra desde carrito normal completada');
+      if (pointsToUse.value <= 0) {
+        showErrorSnackbar('Debes especificar cuántos puntos deseas usar');
+        return;
+      }
+      
+      if (pointsDiscount.value <= 0) {
+        showErrorSnackbar('El descuento con puntos debe ser mayor a 0');
+        return;
+      }
     }
     
-  } catch (e, stackTrace) {
-    print('❌ Error al confirmar compra: $e\n$stackTrace');
-    showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
-  } finally {
-    isProcessingPayment.value = false;
+    try {
+      isProcessingPayment.value = true;
+      
+      final addressId = int.parse(selectedAddressId.value);
+      
+      final items = cartItems.map((item) => ItemEntity(
+        medicamentoId: item.medicamentoId,
+        quantity: item.cantidad,
+      )).toList();
+      
+      final orderEntity = CreateNewOrderEntity(
+        items: items,
+        usepoints: usePoints.value,
+        pointstouse: usePoints.value ? pointsToUse.value : null,
+      );
+      
+      print('📦 Creando orden con usepoints: ${orderEntity.usepoints}, pointstouse: ${orderEntity.pointstouse}, descuento: \$${pointsDiscount.value}');
+      
+      final orderResponse = await createOrderUsecase.createaneworder(
+        orderEntity,
+        addressId,
+      );
+      
+      await payOrderUsecase.execute(
+        orderResponse.orderId,
+        selectedPaymentMethodId.value, 
+      );
+      
+      print('✅ Pago procesado exitosamente');
+      
+      if (usePoints.value) {
+        print('💰 Se usaron ${pointsToUse.value} puntos con descuento de \$${pointsDiscount.value.toStringAsFixed(2)} en la compra');
+      }
+      
+      showSuccessSnackbar('¡Compra confirmada exitosamente!');
+      
+      final wasBuyNowMode = isBuyNowModeActive.value;
+      
+      usePoints.value = false;
+      pointsToUse.value = 0;
+      pointsDiscount.value = 0.0;
+      await loadAvailablePoints();
+      
+      if (isBuyNowModeActive.value) {
+        await clearBuyNow();
+        isBuyNowModeActive.value = false;
+        await loadCartFromPreferences();
+      } else {
+        await clearCart();
+      }
+      
+      if (wasBuyNowMode) {
+        print('🎉 Navegando a tienda después de Comprar Ahora');
+        Get.find<ShopNavigationController>().navigateToStore();
+        Get.to(
+          () => GlobalShopInterface(),
+          arguments: {
+            'categoryName': '',
+            'showOffers': true,
+          },
+        );
+      } else {
+        print('🎉 Compra desde carrito normal completada');
+      }
+      
+    } catch (e, stackTrace) {
+      print('❌ Error al confirmar compra: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
+    } finally {
+      isProcessingPayment.value = false;
+    }
   }
-}
   
   Future<void> loadCartFromPreferences() async {
     try {
@@ -343,6 +501,9 @@ class ShoppingCartController extends GetxController {
     cartResponse.value = null;
     selectedPaymentMethodId.value = '';
     selectedAddressId.value = '';
+    usePoints.value = false;
+    pointsToUse.value = 0;
+    pointsDiscount.value = 0.0;
     await _prefs.clearOnePreference(key: AppConstants.cartKey);
     
     print('🧹 Carrito limpiado completamente');

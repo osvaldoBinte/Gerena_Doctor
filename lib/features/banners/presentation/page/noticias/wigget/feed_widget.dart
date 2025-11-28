@@ -57,46 +57,6 @@ import 'package:get/get.dart';
 
 
 
-  Widget buildQuestionCard() {
-    return GestureDetector(
-      onTap: () {
-        _navigateToForum();
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: GerenaColors.smallBorderRadius,
-          boxShadow: [GerenaColors.lightShadow],
-        ),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '¿Recomendación de marcas para aplicación de ácido hialurónico?',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: GerenaColors.textPrimaryColor,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Text(
-                  '82 comentarios',
-                  style: TextStyle(
-                    color: GerenaColors.textSecondaryColor,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
    void _navigateToForum() {
     Get.find<ShopNavigationController>().navigateToBlogGerena();
       Get.to(() => GlobalShopInterface());

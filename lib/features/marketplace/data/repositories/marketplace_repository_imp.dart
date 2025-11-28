@@ -1,6 +1,7 @@
 import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/descuentopuntos/descuento_puntos_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/create/create_new_order_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/create/ressponse_new_order_entity.dart';
@@ -77,6 +78,12 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
   Future<OrderEntity> getMylastpaidorder() async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await marketplaceDataSourcesImp.getMylastpaidorder(token);
+  }
+
+  @override
+  Future<DescuentoPuntosEntity> calculatediscountpoints(int  monto,int puntosAUsar) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await marketplaceDataSourcesImp.calculatediscountpoints(monto, puntosAUsar, token);
   }
  
 }

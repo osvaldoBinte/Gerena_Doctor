@@ -150,4 +150,74 @@ Future<void> addAvailability(
       throw Exception('$e');
     }
   }
+
+
+
+   Future<void> cancelappointment(int id, String motivoCancelacion, String token) async {
+    try {
+      Uri url =
+          Uri.parse('$defaultApiServer/doctor/citas/$id/cancelar');
+
+      final response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          "motivoCancelacion": motivoCancelacion,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+
+
+  Future<void> appointmentcompleted(int id,String notasDoctor,String diagnostico, String token) async {
+    try {
+      Uri url =
+          Uri.parse('$defaultApiServer/doctor/citas/$id/completar');
+
+      final response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          "notasDoctor": notasDoctor,
+          "diagnostico": diagnostico,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
 }

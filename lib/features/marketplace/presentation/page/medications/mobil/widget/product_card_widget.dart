@@ -267,45 +267,18 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProductImage() {
-    final imageUrl = medication.images?.isNotEmpty == true 
-        ? medication.images!.first 
-        : null;
+Widget _buildProductImage() {
+  final imageUrl = medication.images?.isNotEmpty == true 
+      ? medication.images!.first 
+      : null;
 
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      return Image.network(
-        imageUrl,
-        height: 100,
-        fit: BoxFit.contain,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            height: 100,
-            child: Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                    : null,
-                color: GerenaColors.primaryColor,
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return ImagePlaceholderWidget(
-            icon: Icons.broken_image_outlined,
-            text: 'Imagen no disponible',
-          );
-        },
-      );
-    }
+  return NetworkImageWidget(
+    imageUrl: imageUrl,
+    height: 100,
+      showPlaceholderDecoration: false,
 
-    return ImagePlaceholderWidget(
-      icon: Icons.image_outlined,
-      text: 'Sin imagen',
-    );
-  }
+  );
+}
 
   Widget _buildProductInfo() {
     final bool hasDiscount = _hasDiscount();

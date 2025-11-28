@@ -1,134 +1,101 @@
 import 'package:flutter/material.dart';
-import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:gerena/common/theme/App_Theme.dart';
 
-class ImagePlaceholderWidget extends StatelessWidget {
-  final IconData icon;
-  final String text;
+class NetworkImageWidget extends StatelessWidget {
+  final String? imageUrl;
   final double? height;
   final double? width;
-  final double? iconSize;
-  final double? fontSize;
-  final Color? backgroundColor;
-  final Color? iconColor;
-  final Color? textColor;
-  final BorderRadius? borderRadius;
-  final EdgeInsets? padding;
+  final BoxFit fit;
+  final bool showPlaceholderDecoration;
+  final Color? placeholderBackgroundColor;
+  final double? placeholderBorderRadius;
 
-  const ImagePlaceholderWidget({
-    Key? key,
-    required this.icon,
-    required this.text,
+  const NetworkImageWidget({
+    super.key,
+    required this.imageUrl,
     this.height,
     this.width,
-    this.iconSize = 50,
-    this.fontSize = 10,
-    this.backgroundColor,
-    this.iconColor,
-    this.textColor,
-    this.borderRadius,
-    this.padding,
-  }) : super(key: key);
+    this.fit = BoxFit.contain,
+    this.showPlaceholderDecoration = true,
+    this.placeholderBackgroundColor,
+    this.placeholderBorderRadius,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    // Si no hay URL o está vacía, mostrar placeholder
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return _buildPlaceholder(Icons.broken_image_outlined, 'Sin imagen');
+    }
+
+    return Image.network(
+      imageUrl!,
       height: height,
       width: width,
-      padding: padding,
-     
+      fit: fit,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        
+        return _buildLoading();
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return _buildPlaceholder(Icons.broken_image_outlined, 'Sin imagen');
+      },
+    );
+  }
+
+  Widget _buildLoading() {
+    return Container(
+      height: height ?? 120,
+      width: width,
+      decoration: showPlaceholderDecoration
+          ? BoxDecoration(
+              color: placeholderBackgroundColor ?? GerenaColors.backgroundColorfondo,
+              borderRadius: BorderRadius.circular(placeholderBorderRadius ?? 8),
+            )
+          : null,
+      child: Center(
+        child: SizedBox(
+          width: 30,
+          height: 30,
+          child: CircularProgressIndicator(
+            color: GerenaColors.primaryColor,
+            strokeWidth: 3,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder(IconData icon, String text) {
+    return Container(
+      height: height ?? 120,
+      width: width,
+      decoration: showPlaceholderDecoration
+          ? BoxDecoration(
+              color: placeholderBackgroundColor ?? GerenaColors.backgroundColorfondo,
+              borderRadius: BorderRadius.circular(placeholderBorderRadius ?? 8),
+            )
+          : null,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
-            size: iconSize,
-            color: iconColor ?? GerenaColors.textTertiaryColor.withOpacity(0.4),
+            size: 50,
+            color: GerenaColors.textTertiaryColor.withOpacity(0.4),
           ),
           const SizedBox(height: 8),
           Text(
             text,
-            style: GoogleFonts.rubik(
-              fontSize: fontSize,
-              color: textColor ?? GerenaColors.textTertiaryColor.withOpacity(0.6),
-            ),
             textAlign: TextAlign.center,
+            style: GoogleFonts.rubik(
+              color: GerenaColors.textTertiaryColor.withOpacity(0.6),
+              fontSize: 12,
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// Variante predefinida para "Sin imagen"
-class NoImagePlaceholder extends StatelessWidget {
-  final double? height;
-  final double? width;
-
-  const NoImagePlaceholder({
-    Key? key,
-    this.height,
-    this.width,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ImagePlaceholderWidget(
-      icon: Icons.image_outlined,
-      text: 'Sin imagen',
-      height: height ?? 120,
-      width: width,
-    );
-  }
-}
-
-// Variante predefinida para "Imagen no disponible"
-class BrokenImagePlaceholder extends StatelessWidget {
-  final double? height;
-  final double? width;
-
-  const BrokenImagePlaceholder({
-    Key? key,
-    this.height,
-    this.width,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ImagePlaceholderWidget(
-      icon: Icons.broken_image_outlined,
-      text: 'Imagen no disponible',
-      height: height ?? 120,
-      width: width,
-    );
-  }
-}
-
-// Variante predefinida para "Cargando..."
-class LoadingImagePlaceholder extends StatelessWidget {
-  final double? height;
-  final double? width;
-
-  const LoadingImagePlaceholder({
-    Key? key,
-    this.height,
-    this.width,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height ?? 120,
-      width: width,
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColorfondo,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: GerenaColors.primaryColor,
-          strokeWidth: 3,
-        ),
       ),
     );
   }

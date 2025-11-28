@@ -3,6 +3,7 @@ import 'package:gerena/features/banners/domain/entity/banners_entity.dart';
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/wigget/feed_widget.dart';
+import 'package:gerena/features/blog/presentation/widget/mixed_blog_feed.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart'; 
 import 'package:gerena/common/theme/App_Theme.dart';
@@ -66,31 +67,11 @@ class NewsFeedWidget extends StatelessWidget {
         children: [
             BannersListWidget(
                       height: 200,
-                      maxBanners: 2, // Mostrar máximo 2 banners
+                      maxBanners: 2, 
                       
                     ),
-          
-         /* GerenaColors.createArticleCard(
-            title: 'Revoluciona tus aplicaciones de tóxina botulínica siguiendo los consejos del Dr. Juan Pérez',
-            content: 'Aplicar toxina botulínica no es solo una técnica, es un arte que se perfecciona con conocimiento, práctica y paciencia. Sigue estos consejos del Dr. Juan Pérez y podrás dar un paso más en la excelencia de tus tratamientos y ofrecer...',
-            date: 'Blog Gerena | Lun 31 de Marzo',
-            imagePath: 'https://www.esheformacion.com/assets/base/img/uploads/64353608f4215Facotres.jpg',
-            onReadMorePressed: () {
-              _navigateToForum();
-            },
-          ),
-          const SizedBox(height: 16),
-          buildQuestionCard(),
-          const SizedBox(height: 16),
-          GerenaColors.createArticleCard(
-            title: 'Casos reales: cómo fidelicé a mis pacientes con educación y transparencia',
-            content: 'En un entorno donde muchos pacientes llegan con dudas, miedo o expectativas irreales, descubrí que la ética en consulta estética definitiva no está solo en los resultados estéticos, sino en cómo los acompañó desde el primer contacto.',
-            date: 'Blog Social | Lun 31 de Marzo',
-            imagePath: 'https://www.esheformacion.com/assets/base/img/uploads/643532b3621beMedicoMexico.jpg',
-            onReadMorePressed: () {
-              _navigateToForum();
-            },
-          ),*/
+                    SizedBox( height:  30,),
+        MixedBlogFeed()
         ],
       );
     });

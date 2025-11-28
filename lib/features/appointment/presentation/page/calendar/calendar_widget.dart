@@ -1419,98 +1419,101 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       procedimiento = appointment.notes!;
     }
 
-    return GestureDetector(
-      onTap: () {
-        final appointmentsForDay =
-            controller.getAppointmentsForDate(appointment.startTime);
-        dashboardController.showMedicalAppointments(
-            appointment.startTime, appointmentsForDay);
-      },
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [GerenaColors.lightShadow],
-          border: Border.all(
-            color: Colors.grey[200]!,
-            width: 1,
-          ),
+return MouseRegion(
+  cursor: SystemMouseCursors.click, // 👈 Cambia el cursor
+  child: GestureDetector(
+    onTap: () {
+      final appointmentsForDay =
+          controller.getAppointmentsForDate(appointment.startTime);
+      dashboardController.showMedicalAppointments(
+          appointment.startTime, appointmentsForDay);
+    },
+    child: Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [GerenaColors.lightShadow],
+        border: Border.all(
+          color: Colors.grey[200]!,
+          width: 1,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 70,
-                height: 70,
-                child: _buildDefaultAvatar(),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      appointment.subject,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: GerenaColors.primaryColor,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      tipoVisita,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: GerenaColors.textPrimaryColor,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      procedimiento,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: GerenaColors.textPrimaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 70,
+              height: 70,
+              child: _buildDefaultAvatar(),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    formattedDate,
+                    appointment.subject,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: GerenaColors.primaryColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    tipoVisita,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: GerenaColors.textPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    procedimiento,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: GerenaColors.textPrimaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  formattedDate,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: GerenaColors.textSecondaryColor,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  child: Text(
+                    formattedTime,
                     style: TextStyle(
                       fontSize: 11,
                       color: GerenaColors.textSecondaryColor,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    child: Text(
-                      formattedTime,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: GerenaColors.textSecondaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
-    );
+    ),
+  ),
+);
+
   }
 
   Widget _buildDefaultAvatar() {

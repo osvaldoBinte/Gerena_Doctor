@@ -7,5 +7,7 @@ abstract class AppointmentRepository {
   Future<List<GetApppointmentEntity>> getAppointments(String date, String day);
   Future<void> addAvailability(List<AddAvailabilityEntity> entities);
     Future<void> deleteAvailability(int id);
+  Future<void> cancelappointment(int id, String motivoCancelacion);
+  Future<void> appointmentcompleted(int id,String notasDoctor,String diagnostico);
 
 }

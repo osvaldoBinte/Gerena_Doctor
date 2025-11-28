@@ -3,8 +3,9 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/Category/widget/half_cut_circle.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
-import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart'; // ⭐ Agregar import
+import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -31,19 +32,24 @@ class CategoryPage extends GetView<CategoryController> {
               ),
             ),
             const Spacer(),
+          
             Container(
-              width: 140,
-              child: GerenaColors.createSearchContainer(
-                height: 26,
-                heightcontainer: 15,
-                iconSize: 18,
-                onTap: () {},
+              width: 200,
+              child: GerenaColors.createSearchTextField(
+                controller: controller.searchController,
+                hintText: 'Buscar categoría',
+                onChanged: (value) {
+                  controller.filterCategories(value);
+                },
+                onSearchPressed: () {
+                 
+                },
               ),
             ),
           ],
         ),
       ),
-      body: Stack( // ⭐ Cambiar de SafeArea a Stack
+      body: Stack(
         children: [
           SafeArea(
             child: Column(
@@ -87,6 +93,50 @@ class CategoryPage extends GetView<CategoryController> {
                     ],
                   ),
                 )),
+                
+                Obx(() {
+                  if (controller.searchQuery.value.isEmpty) {
+                    return SizedBox.shrink();
+                  }
+                  
+                  return Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    color: GerenaColors.primaryColor.withOpacity(0.1),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.search,
+                          size: 18,
+                          color: GerenaColors.primaryColor,
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Buscando: "${controller.searchQuery.value}" - ${controller.filteredCategories.length} resultado(s)',
+                            style: GoogleFonts.rubik(
+                              fontSize: 13,
+                              color: GerenaColors.textPrimaryColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.grey[600],
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: BoxConstraints(),
+                          onPressed: () {
+                            controller.clearSearch();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                
                 Expanded(
                   child: Obx(() => showWishlist.value
                       ? SavedProductsContent(
@@ -98,7 +148,6 @@ class CategoryPage extends GetView<CategoryController> {
             ),
           ),
           
-          // ⭐ Agregar el FloatingCartButton aquí
           FloatingCartButton(),
         ],
       ),
@@ -141,16 +190,58 @@ class CategoryPage extends GetView<CategoryController> {
         );
       }
 
-      if (controller.categories.isEmpty) {
+      if (controller.filteredCategories.isEmpty) {
         return Center(
-          child: Text(
-            'No hay categorías disponibles',
-            style: GoogleFonts.rubik(fontSize: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                controller.searchQuery.value.isEmpty 
+                    ? Icons.category_outlined 
+                    : Icons.search_off,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+              SizedBox(height: 16),
+              Text(
+                controller.searchQuery.value.isEmpty
+                    ? 'No hay categorías disponibles'
+                    : 'No se encontraron categorías',
+                style: GoogleFonts.rubik(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: GerenaColors.textTertiaryColor,
+                ),
+              ),
+              if (controller.searchQuery.value.isNotEmpty) ...[
+                SizedBox(height: 8),
+                Text(
+                  'Intenta con otra búsqueda',
+                  style: GoogleFonts.rubik(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    controller.clearSearch();
+                  },
+                  icon: Icon(Icons.clear),
+                  label: Text('Limpiar búsqueda'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GerenaColors.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  ),
+                ),
+              ],
+            ],
           ),
         );
       }
 
-      return _buildCategoryGridWithLines(controller.categories);
+      return _buildCategoryGridWithLines(controller.filteredCategories);
     });
   }
 
@@ -217,44 +308,59 @@ class CategoryPage extends GetView<CategoryController> {
     return GestureDetector(
       onTap: () => _navigateToCategory(category),
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            (category.image != null && category.image!.isNotEmpty)
-                ? Image.network(
-                    category.image!,
-                    width: 70,
-                    height: 70,
-                    fit: BoxFit.contain,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        width: 70,
-                        height: 70,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
+            PhysicalShape(
+              clipper: BottomFlatClipper(),
+              color: GerenaColors.backgroundColor,
+              elevation: 4,
+              shadowColor: Colors.black.withOpacity(0.3),
+              child: Container(
+                width: 120,
+                height: 120,
+                padding: const EdgeInsets.all(15),
+                child: (category.image != null && category.image!.isNotEmpty)
+                    ? Image.network(
+                        category.image!,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: GerenaColors.primaryColor,
+                              strokeWidth: 2,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            Icons.category,
                             color: GerenaColors.primaryColor,
-                            strokeWidth: 2,
-                          ),
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildPlaceholderIcon(70);
-                    },
-                  )
-                : _buildPlaceholderIcon(70),
-            SizedBox(height: 12),
+                            size: 40,
+                          );
+                        },
+                      )
+                    : Icon(
+                        Icons.category,
+                        color: GerenaColors.primaryColor,
+                        size: 40,
+                      ),
+              ),
+            ),
+            
+            SizedBox(height: 8),
+            
             Text(
               category.category ?? 'Sin nombre',
               textAlign: TextAlign.center,
               style: GoogleFonts.rubik(
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: GerenaColors.textPrimaryColor,
               ),
@@ -263,22 +369,6 @@ class CategoryPage extends GetView<CategoryController> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderIcon(double size) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: GerenaColors.primaryColor,
-        borderRadius: GerenaColors.smallBorderRadius,
-      ),
-      child: Icon(
-        Icons.category,
-        color: Colors.white,
-        size: size * 0.5,
       ),
     );
   }

@@ -1,110 +1,150 @@
-
-  import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/page/store/blogGerena/blog_controller.dart';
+import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
 
 Widget buildBackButton(BlogController controller) {
-    return Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: GerenaColors.secondaryColor,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+  return Container(
+    width: 40,
+    height: 40,
+    decoration: BoxDecoration(
+      color: GerenaColors.secondaryColor,
+      shape: BoxShape.circle,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: IconButton(
+      onPressed: () => controller.goBackFromArticleDetail(),
+      icon: Icon(
+        Icons.arrow_back,
+        color: GerenaColors.backgroundColor,
+      ),
+    ),
+  );
+}
+
+Widget buildArticleDetailContent(BlogController controller) {
+  final article = controller.selectedArticle.value;
+  if (article == null) return const SizedBox.shrink();
+  
+  return SingleChildScrollView(
+    padding: const EdgeInsets.symmetric(horizontal: 100), 
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 10),
+          child: Container(
+            height: 350,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                article.imageUrl ?? '',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Imagen no disponible',
+                            style: TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),
-                      child:IconButton(
-            onPressed: () => controller.goBackFromArticleDetail(),
-            icon: Icon(
-              Icons.arrow_back,
-              color: GerenaColors.backgroundColor,
-            ),
-          ),
-                    );
-  }
-
-
-  Widget buildArticleDetailContent(BlogController controller) {
-    if (controller.selectedSocialArticle == null) return const SizedBox.shrink();
-    
-    final article = controller.selectedSocialArticle!;
-    
-    return SingleChildScrollView(
-  padding: const EdgeInsets.symmetric(horizontal: 100), 
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 10),
-  child: Container(
-    height: 350,
-    width: double.infinity,
-    decoration: BoxDecoration(
-      image: DecorationImage(
-        image: AssetImage(article['image']!),
-        fit: BoxFit.contain,
-      ),
-    ),
-  ),
-),
-      const SizedBox(height: 24),
-      
-      Container(
-        padding: const EdgeInsets.all(GerenaColors.paddingLarge),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  article['date'] ?? 'Hoy',
-                  style: GerenaColors.bodySmall.copyWith(
-                    color: GerenaColors.textTertiaryColor,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Text(
-                  article['author'] ?? 'Blog Gerena',
-                  style: GerenaColors.bodySmall.copyWith(
-                    color: GerenaColors.textTertiaryColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-            Divider(
-              color: GerenaColors.textTertiaryColor.withOpacity(0.6),
-              thickness: 2,
-            ),
-            const SizedBox(height: 30),
-            
-            Text(
-              article['title']!,
-              style: GerenaColors.headingLarge.copyWith(
-                fontSize: 28,
-                height: 1.3,
-                color: GerenaColors.textTertiaryColor
+                    ),
+                  );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
-            
-            const SizedBox(height: 24),
-            
-            Text(
-              article['content']!,
-              style: GerenaColors.bodyLarge.copyWith(height: 1.6),
-            ),
-            
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
-      ),
-    ],
-  ),
-);
-  }
+        
+        const SizedBox(height: 24),
+        
+        Container(
+          padding: const EdgeInsets.all(GerenaColors.paddingLarge),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    article.date ?? 'Hoy',
+                    style: GerenaColors.bodySmall.copyWith(
+                      color: GerenaColors.textTertiaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Text(
+                    'Blog Gerena',
+                    style: GerenaColors.bodySmall.copyWith(
+                      color: GerenaColors.textTertiaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              
+              Divider(
+                color: GerenaColors.textTertiaryColor.withOpacity(0.6),
+                thickness: 2,
+              ),
+              
+              const SizedBox(height: 30),
+              
+              Text(
+                article.title ?? '',
+                style: GerenaColors.headingLarge.copyWith(
+                  fontSize: 28,
+                  height: 1.3,
+                  color: GerenaColors.textTertiaryColor,
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              Text(
+                article.content ?? '',
+                style: GerenaColors.bodyLarge.copyWith(height: 1.6),
+              ),
+              
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}

@@ -328,7 +328,6 @@ class HistorialDePedidosContent extends StatelessWidget {
   );
 }
 
-// ⭐ Agregar widget helper para placeholder
 Widget _buildPlaceholderImage() {
   return Image.asset(
     '',

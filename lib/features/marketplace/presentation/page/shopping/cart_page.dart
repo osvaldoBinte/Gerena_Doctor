@@ -10,6 +10,7 @@ import 'package:gerena/features/marketplace/presentation/page/addresses/getaddre
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
+import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,13 +22,16 @@ class CartPageContent extends StatelessWidget {
     final cartController = Get.find<ShoppingCartController>();
     final navigationController = Get.find<ShopNavigationController>();
     final paymentController = Get.find<PaymentCartController>();
-    final addressesController = Get.find<AddressesController>(); // ✅ AGREGAR
-  ever(addressesController.selectedAddress, (AddressesEntity? address) {
-    if (address != null) {
-      cartController.selectAddress(address.id.toString());
-      print('📍 Dirección sincronizada en cart controller: ${address.id}');
-    }
-  });
+    final addressesController = Get.find<AddressesController>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartController.loadAvailablePoints();
+    });
+    ever(addressesController.selectedAddress, (AddressesEntity? address) {
+      if (address != null) {
+        cartController.selectAddress(address.id.toString());
+        print('📍 Dirección sincronizada en cart controller: ${address.id}');
+      }
+    });
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorfondo,
       appBar: PreferredSize(
@@ -76,7 +80,9 @@ class CartPageContent extends StatelessWidget {
                 ),
                 SizedBox(height: 24),
                 ElevatedButton.icon(
-                  onPressed: GetPlatform.isMobile ? () => Get.offAllNamed(RoutesNames.categoryById) : () => navigationController.navigateToStore(),
+                  onPressed: GetPlatform.isMobile
+                      ? () => Get.offAllNamed(RoutesNames.categoryById)
+                      : () => navigationController.navigateToStore(),
                   icon: Icon(Icons.shopping_bag),
                   label: Text('IR A LA TIENDA'),
                   style: ElevatedButton.styleFrom(
@@ -107,10 +113,9 @@ class CartPageContent extends StatelessWidget {
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(25),
-                    onTap: GetPlatform.isMobile
-    ? () => Get.offAllNamed(RoutesNames.categoryById)
-    : () => navigationController.navigateToStore(),
-
+                      onTap: GetPlatform.isMobile
+                          ? () => Get.offAllNamed(RoutesNames.categoryById)
+                          : () => navigationController.navigateToStore(),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -167,51 +172,54 @@ class CartPageContent extends StatelessWidget {
                               Column(
                                 children: [
                                   if (response != null)
-  ...response.itenms
-      .map((item) => Column(
-            children: [
-              _buildCartItem(
-                item.nombreMedicamento,
-                item.alerta ?? '',
-                item.imagen ?? "", 
-                "${item.precioActual.toStringAsFixed(2)} MXN",
-                medicamentoId: item.medicamentoId,
-                cantidad: item.cantidadSolicitada,
-                hasDiscount: item.precioAnterior > item.precioActual,
-                originalPrice: item.precioAnterior > item.precioActual
-                    ? "${item.precioAnterior.toStringAsFixed(2)} MXN"
-                    : null,
-                sinStock: item.sinStock,
-                cartController: cartController,
-              ),
-              SizedBox(height: 10),
-            ],
-          ))
-      .toList(),
+                                    ...response.itenms
+                                        .map((item) => Column(
+                                              children: [
+                                                _buildCartItem(
+                                                  item.nombreMedicamento,
+                                                  item.alerta ?? '',
+                                                  item.imagen ?? "",
+                                                  "${item.precioActual.toStringAsFixed(2)} MXN",
+                                                  medicamentoId:
+                                                      item.medicamentoId,
+                                                  cantidad:
+                                                      item.cantidadSolicitada,
+                                                  hasDiscount:
+                                                      item.precioAnterior >
+                                                          item.precioActual,
+                                                  originalPrice: item
+                                                              .precioAnterior >
+                                                          item.precioActual
+                                                      ? "${item.precioAnterior.toStringAsFixed(2)} MXN"
+                                                      : null,
+                                                  sinStock: item.sinStock,
+                                                  oferta: item.oferta ??
+                                                      false, // NUEVO
+                                                  cartController:
+                                                      cartController,
+                                                ),
+                                                SizedBox(height: 10),
+                                              ],
+                                            ))
+                                        .toList(),
                                   const Divider(),
                                 ],
                               ),
-
                               const SizedBox(height: 30),
-
-                             
-     _buildSection("DIRECCIÓN DE ENTREGA"),
-
-const SizedBox(height: 15),
-
-AddressSelectorWidget(
-  addressesController: addressesController,
-  onAddressSelected: (address) {
-    cartController.selectAddress(address.id.toString());
-    print('📍 Dirección sincronizada: ${address.id}');
-  },
-),
-                              const SizedBox(height: 30),
-
-                              _buildSection("MÉTODO DE PAGO"),
-
+                              _buildSection("DIRECCIÓN DE ENTREGA"),
                               const SizedBox(height: 15),
-
+                              AddressSelectorWidget(
+                                addressesController: addressesController,
+                                onAddressSelected: (address) {
+                                  cartController
+                                      .selectAddress(address.id.toString());
+                                  print(
+                                      '📍 Dirección sincronizada: ${address.id}');
+                                },
+                              ),
+                              const SizedBox(height: 30),
+                              _buildSection("MÉTODO DE PAGO"),
+                              const SizedBox(height: 15),
                               Obx(() {
                                 if (paymentController.isLoading.value) {
                                   return Center(
@@ -237,12 +245,13 @@ AddressSelectorWidget(
                                       const SizedBox(height: 10),
                                       TextButton.icon(
                                         onPressed: () {
-                                         if (GetPlatform.isMobile) {
-                                                    Get.offAllNamed(RoutesNames.paymentCardsPage,);
-
+                                          if (GetPlatform.isMobile) {
+                                            Get.offAllNamed(
+                                              RoutesNames.paymentCardsPage,
+                                            );
                                           } else {
                                             navigationController
-                                              .navigateToPaymentCards();
+                                                .navigateToPaymentCards();
                                           }
                                         },
                                         icon: Icon(Icons.add_card),
@@ -256,9 +265,8 @@ AddressSelectorWidget(
                                   );
                                 }
 
-                                // Obtener tarjeta seleccionada o usar la primera por defecto
-                                final selectedId =
-                                    cartController.selectedPaymentMethodId.value;
+                                final selectedId = cartController
+                                    .selectedPaymentMethodId.value;
                                 final selectedCard = selectedId.isNotEmpty
                                     ? paymentController.paymentMethods
                                         .firstWhereOrNull(
@@ -268,14 +276,13 @@ AddressSelectorWidget(
                                 final displayCard = selectedCard ??
                                     paymentController.paymentMethods.first;
 
-                                // Auto-seleccionar la primera tarjeta si no hay ninguna seleccionada
                                 if (selectedId.isEmpty &&
                                     paymentController
                                         .paymentMethods.isNotEmpty) {
                                   WidgetsBinding.instance
                                       .addPostFrameCallback((_) {
-                                    cartController
-                                        .selectPaymentMethod(displayCard.paymentMethodId??'');
+                                    cartController.selectPaymentMethod(
+                                        displayCard.paymentMethodId ?? '');
                                   });
                                 }
 
@@ -313,7 +320,247 @@ AddressSelectorWidget(
                                   ],
                                 );
                               }),
+                              const SizedBox(height: 30),
+                              Obx(() {
+                                final points =
+                                    cartController.availablePoints.value;
 
+                                if (points <= 0) {
+                                  return SizedBox.shrink();
+                                }
+
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildSection("USAR PUNTOS"),
+                                    const SizedBox(height: 15),
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.grey[300]!),
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: GerenaColors
+                                            .colorSubsCardBackground,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.monetization_on,
+                                                color:
+                                                    GerenaColors.primaryColor,
+                                                size: 24,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Puntos disponibles',
+                                                      style: GoogleFonts.rubik(
+                                                        fontSize: 14,
+                                                        color: Colors.grey[600],
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '$points puntos',
+                                                      style: GoogleFonts.rubik(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: GerenaColors
+                                                            .primaryColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Obx(() => Switch(
+                                                    value: cartController
+                                                        .usePoints.value,
+                                                    onChanged: (value) {
+                                                      cartController
+                                                          .toggleUsePoints(
+                                                              value);
+                                                    },
+                                                    activeColor: GerenaColors
+                                                        .primaryColor,
+                                                  )),
+                                            ],
+                                          ),
+                                          Obx(() {
+                                            if (!cartController
+                                                .usePoints.value) {
+                                              return SizedBox.shrink();
+                                            }
+
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const SizedBox(height: 16),
+                                                const Divider(),
+                                                const SizedBox(height: 16),
+
+                                                Text(
+                                                  '¿Cuántos puntos deseas usar?',
+                                                  style: GoogleFonts.rubik(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: GerenaColors
+                                                        .textPrimaryColor,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 12),
+
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          hintText:
+                                                              'Puntos a usar',
+                                                          border:
+                                                              OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                          ),
+                                                          contentPadding:
+                                                              EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 12,
+                                                            vertical: 12,
+                                                          ),
+                                                          suffixText: 'pts',
+                                                        ),
+                                                        onChanged: (value) {
+                                                          final points =
+                                                              int.tryParse(
+                                                                      value) ??
+                                                                  0;
+                                                          cartController
+                                                              .updatePointsToUse(
+                                                                  points);
+                                                        },
+                                                        controller:
+                                                            TextEditingController(
+                                                          text: cartController
+                                                              .pointsToUse.value
+                                                              .toString(),
+                                                        )..selection = TextSelection
+                                                                  .fromPosition(
+                                                                TextPosition(
+                                                                  offset: cartController
+                                                                      .pointsToUse
+                                                                      .value
+                                                                      .toString()
+                                                                      .length,
+                                                                ),
+                                                              ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 12),
+                                                    ElevatedButton(
+                                                      onPressed: () {
+                                                        // CAMBIADO: ahora usa todos los puntos disponibles sin restricción
+                                                        final maxPoints =
+                                                            cartController
+                                                                .availablePoints
+                                                                .value;
+                                                        cartController
+                                                            .updatePointsToUse(
+                                                                maxPoints);
+                                                      },
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            GerenaColors
+                                                                .primaryColor,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                        ),
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                          horizontal: 16,
+                                                          vertical: 12,
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Máximo',
+                                                        style:
+                                                            GoogleFonts.rubik(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+
+                                                const SizedBox(height: 12),
+
+                                                // Donde muestras los puntos a usar, cambia esto:
+                                                Container(
+                                                  padding: EdgeInsets.all(12),
+                                                  decoration: BoxDecoration(
+                                                    color: GerenaColors
+                                                        .primaryColor
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.info_outline,
+                                                        size: 18,
+                                                        color: GerenaColors
+                                                            .primaryColor,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Expanded(
+                                                        child: Obx(() => Text(
+                                                              cartController
+                                                                      .isCalculatingDiscount
+                                                                      .value
+                                                                  ? 'Calculando descuento...'
+                                                                  : 'Usarás ${cartController.pointsToUse.value} puntos = -\$${cartController.pointsDiscount.value.toStringAsFixed(2)} MXN',
+                                                              style: GoogleFonts
+                                                                  .rubik(
+                                                                fontSize: 12,
+                                                                color: GerenaColors
+                                                                    .textPrimaryColor,
+                                                              ),
+                                                            )),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 30),
+                                  ],
+                                );
+                              }),
                               const SizedBox(height: 30),
                               Divider(color: GerenaColors.textTertiaryColor),
                               const SizedBox(height: 30),
@@ -322,34 +569,58 @@ AddressSelectorWidget(
 
                               const SizedBox(height: 15),
 
+// Subtotal
                               _buildSummaryItem(
                                   "Subtotal",
                                   response != null
-                                      ? response.totalActual.toString()
+                                      ? "${response.totalActual.toStringAsFixed(2)} MXN"
                                       : "0.00 MXN"),
                               Divider(color: GerenaColors.textTertiaryColor),
+
+// Descuento por puntos (si aplica)
+                              Obx(() {
+                                if (!cartController.usePoints.value ||
+                                    cartController.pointsDiscount.value <= 0) {
+                                  return SizedBox.shrink();
+                                }
+
+                                return Column(
+                                  children: [
+                                    _buildSummaryItem(
+                                      "Descuento por puntos (${cartController.pointsToUse.value} pts)",
+                                      "-${cartController.pointsDiscount.value.toStringAsFixed(2)} MXN",
+                                      valueColor: GerenaColors.descuento,
+                                    ),
+                                    Divider(
+                                        color: GerenaColors.textTertiaryColor),
+                                  ],
+                                );
+                              }),
+
+// Gastos de envío (dinámico desde response)
                               _buildSummaryItem(
-                                  "Descuentos y promociones", "-0.00 MXN"),
+                                  "Gastos de envío",
+                                  response != null
+                                      ? "${response.gastoEnvio.toStringAsFixed(2)} MXN"
+                                      : "0.00 MXN"),
                               Divider(color: GerenaColors.textTertiaryColor),
-                              _buildSummaryItem("*IVA", "0.00 MXN"),
-                              Divider(color: GerenaColors.textTertiaryColor),
+
+// IVA (dinámico desde response)
                               _buildSummaryItem(
-                                  "Gastos de envío", "250.00 MXN"),
-                              Divider(color: GerenaColors.textTertiaryColor),
-                              _buildSummaryItem(
-                                  "Puntos acumulados", "+0.00 MXN"),
+                                  "IVA",
+                                  response != null
+                                      ? "${response.iva.toStringAsFixed(2)} MXN"
+                                      : "0.00 MXN"),
 
                               const Divider(height: 30),
 
-                              _buildTotalRow(
-                                  "TOTAL:",
-                                  response != null
-                                      ? response.totalActual.toString()
-                                      : "0.00 MXN"),
+// Total final
+                              Obx(() => _buildTotalRow(
+                                    "TOTAL:",
+                                    "${cartController.finalTotal.toStringAsFixed(2)} MXN",
+                                  )),
 
                               const SizedBox(height: 100),
-
-                              // BOTÓN CONFIRMAR COMPRA
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Container(
@@ -359,7 +630,8 @@ AddressSelectorWidget(
                                                 !cartController
                                                     .isLoading.value &&
                                                 !cartController
-                                                    .isProcessingPayment.value &&
+                                                    .isProcessingPayment
+                                                    .value &&
                                                 cartController
                                                     .selectedPaymentMethodId
                                                     .value
@@ -392,7 +664,8 @@ AddressSelectorWidget(
                                                     CircularProgressIndicator(
                                                   strokeWidth: 2,
                                                   valueColor:
-                                                      AlwaysStoppedAnimation<Color?>(Colors.white),
+                                                      AlwaysStoppedAnimation<
+                                                          Color?>(Colors.white),
                                                 ),
                                               )
                                             : Text(
@@ -405,7 +678,6 @@ AddressSelectorWidget(
                                       )),
                                 ),
                               ),
-
                               const SizedBox(height: 20),
                             ],
                           ),
@@ -467,7 +739,6 @@ AddressSelectorWidget(
                 ],
               ),
               SizedBox(height: 16),
-
               Flexible(
                 child: Obx(() {
                   return SingleChildScrollView(
@@ -475,7 +746,8 @@ AddressSelectorWidget(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: addressesController.addresses.length,
-                      separatorBuilder: (context, index) => SizedBox(height: 12),
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final address = addressesController.addresses[index];
                         final isSelected =
@@ -495,16 +767,14 @@ AddressSelectorWidget(
                   );
                 }),
               ),
-
               SizedBox(height: 16),
-
               OutlinedButton.icon(
                 onPressed: () {
                   Get.back();
                   Get.dialog(
-      AddAddressModal(),
-      barrierDismissible: false,
-    );
+                    AddAddressModal(),
+                    barrierDismissible: false,
+                  );
                 },
                 icon: Icon(Icons.add_location),
                 label: Text('Agregar nueva dirección'),
@@ -525,7 +795,6 @@ AddressSelectorWidget(
     );
   }
 
-  // ✅ NUEVO: Widget para cada opción de dirección
   Widget _buildAddressOption({
     required AddressesEntity address,
     required bool isSelected,
@@ -558,7 +827,6 @@ AddressSelectorWidget(
               size: 40,
             ),
             SizedBox(width: 16),
-
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -591,7 +859,6 @@ AddressSelectorWidget(
                 ],
               ),
             ),
-
             if (isSelected)
               Icon(
                 Icons.check_circle,
@@ -609,6 +876,7 @@ AddressSelectorWidget(
       ),
     );
   }
+
   Widget _buildSelectedAddressFromEntity(
     AddressesEntity address, {
     VoidCallback? onEdit,
@@ -683,250 +951,336 @@ AddressSelectorWidget(
       ),
     );
   }
-Widget _buildCartItem(
-  String title,
-  String description, // Ahora será la alerta
-  String imagePath,
-  String price, {
-  required int medicamentoId,
-  required int cantidad,
-  bool hasDiscount = false,
-  String? originalPrice,
-  bool sinStock = false,
-  required ShoppingCartController cartController,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(right: 16.0),
-    child: Opacity(
-      opacity: sinStock ? 0.5 : 1.0,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: _buildProductImage(imagePath),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+  Widget _buildCartItem(
+    String title,
+    String description,
+    String imagePath,
+    String price, {
+    required int medicamentoId,
+    required int cantidad,
+    bool hasDiscount = false,
+    String? originalPrice,
+    bool sinStock = false,
+    bool oferta = false, // NUEVO parámetro
+    required ShoppingCartController cartController,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0),
+      child: Opacity(
+        opacity: sinStock ? 0.5 : 1.0,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Imagen del producto con badge de oferta
+            Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: GoogleFonts.rubik(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: GerenaColors.primaryColor,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: () =>
-                          cartController.removeFromCart(medicamentoId),
-                      tooltip: 'Eliminar producto',
-                    ),
-                  ],
+                Center(
+                  child: _buildProductImage(imagePath),
                 ),
-                const SizedBox(height: 5),
-
-                // ✅ MOSTRAR ALERTA SI EXISTE
-                if (description.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: sinStock 
-                          ? Colors.red.withOpacity(0.1) 
-                          : Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: sinStock 
-                            ? Colors.red.withOpacity(0.3) 
-                            : Colors.orange.withOpacity(0.3),
+                // BADGE DE OFERTA
+                if (oferta && !sinStock)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          sinStock ? Icons.error_outline : Icons.warning_amber,
-                          size: 16,
-                          color: sinStock ? Colors.red : Colors.orange[700],
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            description,
-                            style: GoogleFonts.rubik(
-                              fontSize: 12,
-                              color: sinStock ? Colors.red : Colors.orange[900],
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                const SizedBox(height: 8),
-
-                // Indicador adicional de sin stock
-                if (sinStock)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.local_offer,
+                            color: Colors.white,
+                            size: 12,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            'SIN STOCK',
+                          const SizedBox(width: 4),
+                          Text(
+                            'OFERTA',
                             style: GoogleFonts.rubik(
                               fontSize: 10,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (hasDiscount && originalPrice != null)
-                          Row(
-                            children: [
-                              Text(
-                                originalPrice,
-                                style: GoogleFonts.rubik(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: Colors.grey[500],
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                price,
-                                style: GoogleFonts.rubik(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          )
-                        else
-                          Text(
-                            price,
-                            style: GoogleFonts.rubik(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: GerenaColors.primaryColor,
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    simpleCounter(
-                      initialValue: cantidad,
-                      onChanged: (newValue) {
-                        cartController.updateQuantity(
-                            medicamentoId, newValue);
-                      },
-                      enabled: !sinStock,
-                    ),
-                  ],
-                ),
               ],
             ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // BADGE DE OFERTA alternativo (como chip junto al título)
+                            if (oferta && !sinStock)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.red[700]!,
+                                        Colors.red[500]!,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.local_offer,
+                                        color: Colors.white,
+                                        size: 12,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '¡EN OFERTA!',
+                                        style: GoogleFonts.rubik(
+                                          fontSize: 10,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            Text(
+                              title,
+                              style: GoogleFonts.rubik(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: GerenaColors.primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete_outline, color: Colors.red),
+                        onPressed: () =>
+                            cartController.removeFromCart(medicamentoId),
+                        tooltip: 'Eliminar producto',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
 
-// ✅ NUEVO: Método helper para manejar imágenes de red o assets
-Widget _buildProductImage(String imagePath) {
-  // Si la imagen está vacía o es null, mostrar placeholder
-  if (imagePath.isEmpty) {
-    return Container(
-      width: 80,
-      height: 120,
-      color: Colors.grey[200],
-      child: Icon(Icons.image_not_supported, color: Colors.grey),
+                  // Alerta (si existe)
+                  if (description.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: sinStock
+                            ? Colors.red.withOpacity(0.1)
+                            : Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: sinStock
+                              ? Colors.red.withOpacity(0.3)
+                              : Colors.orange.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            sinStock
+                                ? Icons.error_outline
+                                : Icons.warning_amber,
+                            size: 16,
+                            color: sinStock ? Colors.red : Colors.orange[700],
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              description,
+                              style: GoogleFonts.rubik(
+                                fontSize: 12,
+                                color:
+                                    sinStock ? Colors.red : Colors.orange[900],
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 8),
+
+                  // Badge SIN STOCK
+                  if (sinStock)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'SIN STOCK',
+                              style: GoogleFonts.rubik(
+                                fontSize: 10,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  // Precios y contador
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (hasDiscount && originalPrice != null)
+                            Row(
+                              children: [
+                                Text(
+                                  originalPrice,
+                                  style: GoogleFonts.rubik(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.grey[500],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  price,
+                                  style: GoogleFonts.rubik(
+                                    color:
+                                        oferta ? Colors.red[700] : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                // Porcentaje de descuento opcional
+                                if (oferta && originalPrice != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        _calculateDiscount(
+                                            originalPrice, price),
+                                        style: GoogleFonts.rubik(
+                                          fontSize: 9,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            )
+                          else
+                            Text(
+                              price,
+                              style: GoogleFonts.rubik(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: GerenaColors.primaryColor,
+                              ),
+                            ),
+                        ],
+                      ),
+                      simpleCounter(
+                        initialValue: cantidad,
+                        onChanged: (newValue) {
+                          cartController.updateQuantity(
+                              medicamentoId, newValue);
+                        },
+                        enabled: !sinStock,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  // Si es una URL (comienza con http:// o https://), usar Image.network
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return Image.network(
-      imagePath,
+// Método auxiliar para calcular el porcentaje de descuento
+  String _calculateDiscount(String originalPrice, String currentPrice) {
+    try {
+      final original =
+          double.parse(originalPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
+      final current =
+          double.parse(currentPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
+
+      if (original <= 0) return '';
+
+      final discount = ((original - current) / original * 100).round();
+      return '-$discount%';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  Widget _buildProductImage(String imagePath) {
+    return NetworkImageWidget(
+      imageUrl: imagePath,
       width: 80,
       height: 120,
       fit: BoxFit.contain,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          width: 80,
-          height: 120,
-          color: Colors.grey[200],
-          child: Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-            ),
-          ),
-        );
-      },
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: 80,
-          height: 120,
-          color: Colors.grey[200],
-          child: Icon(Icons.image_not_supported, color: Colors.grey),
-        );
-      },
     );
   }
 
-  // Si no es una URL, asumir que es un asset
-  return Image.asset(
-    imagePath,
-    width: 80,
-    height: 120,
-    fit: BoxFit.contain,
-    errorBuilder: (context, error, stackTrace) {
-      return Container(
-        width: 80,
-        height: 120,
-        color: Colors.grey[200],
-        child: Icon(Icons.image_not_supported, color: Colors.grey),
-      );
-    },
-  );
-}
   Widget _buildSection(String title) {
     return Text(
       title,
@@ -991,8 +1345,8 @@ Widget _buildProductImage(String imagePath) {
     );
   }
 
-  Widget _buildSummaryItem(String label, String value) {
-    final Color valueColor = GerenaColors.textTertiaryColor;
+  Widget _buildSummaryItem(String label, String value, {Color? valueColor}) {
+    final Color finalValueColor = valueColor ?? GerenaColors.textTertiaryColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
@@ -1001,15 +1355,13 @@ Widget _buildProductImage(String imagePath) {
         children: [
           Text(
             label,
-            style: GoogleFonts.rubik(
-              color: GerenaColors.textTertiaryColor,
-            ),
+            style: GoogleFonts.rubik(color: finalValueColor),
           ),
           Text(
             value,
             style: GoogleFonts.rubik(
               fontWeight: FontWeight.w500,
-              color: valueColor,
+              color: finalValueColor,
             ),
           ),
         ],
@@ -1047,116 +1399,113 @@ Widget _buildProductImage(String imagePath) {
     );
   }
 
-  /// Mostrar diálogo para seleccionar método de pago
- void _showPaymentMethodSelector(
-  BuildContext context,
-  PaymentCartController paymentController,
-  ShoppingCartController cartController,
-) {
-  Get.dialog(
-    Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: 500, // Ancho máximo para desktop
-          maxHeight: MediaQuery.of(context).size.height * 0.8, // Altura máxima
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
+  void _showPaymentMethodSelector(
+    BuildContext context,
+    PaymentCartController paymentController,
+    ShoppingCartController cartController,
+  ) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    'Selecciona un método de pago',
-                    style: GoogleFonts.rubik(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: GerenaColors.textPrimaryColor,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: 500,
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Selecciona un método de pago',
+                      style: GoogleFonts.rubik(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: GerenaColors.textPrimaryColor,
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () => Get.back(),
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-
-            // Lista de tarjetas con scroll
-            Flexible(
-              child: Obx(() {
-                return SingleChildScrollView(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: paymentController.paymentMethods.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final card = paymentController.paymentMethods[index];
-                      final isSelected =
-                          cartController.selectedPaymentMethodId.value == card.id;
-
-                      return _buildPaymentCardOption(
-                        card: card,
-                        isSelected: isSelected,
-                        paymentController: paymentController,
-                        onTap: () {
-                          cartController.selectPaymentMethod(card.id);
-                          Get.back();
-                        },
-                      );
-                    },
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () => Get.back(),
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(),
                   ),
-                );
-              }),
-            ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Flexible(
+                child: Obx(() {
+                  return SingleChildScrollView(
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: paymentController.paymentMethods.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final card = paymentController.paymentMethods[index];
+                        final isSelected =
+                            cartController.selectedPaymentMethodId.value ==
+                                card.id;
 
-            SizedBox(height: 16),
-
-            // Botón para agregar nueva tarjeta
-            OutlinedButton.icon(
-              onPressed: () {
-                Get.back();
-                if (GetPlatform.isMobile) {
-                                                    Get.offAllNamed(RoutesNames.paymentCardsPage,);
-
-                                          } else {
-                                                          Get.find<ShopNavigationController>().navigateToPaymentCards();
-
-                                          }
-              },
-              icon: Icon(Icons.add_card),
-              label: Text('Agregar nueva tarjeta'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: GerenaColors.primaryColor,
-                side: BorderSide(color: GerenaColors.primaryColor),
-                minimumSize: Size(double.infinity, 45),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                        return _buildPaymentCardOption(
+                          card: card,
+                          isSelected: isSelected,
+                          paymentController: paymentController,
+                          onTap: () {
+                            cartController.selectPaymentMethod(card.id);
+                            Get.back();
+                          },
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ),
+              SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Get.back();
+                  if (GetPlatform.isMobile) {
+                    Get.offAllNamed(
+                      RoutesNames.paymentCardsPage,
+                    );
+                  } else {
+                    Get.find<ShopNavigationController>()
+                        .navigateToPaymentCards();
+                  }
+                },
+                icon: Icon(Icons.add_card),
+                label: Text('Agregar nueva tarjeta'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: GerenaColors.primaryColor,
+                  side: BorderSide(color: GerenaColors.primaryColor),
+                  minimumSize: Size(double.infinity, 45),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-    barrierDismissible: true, // Permite cerrar tocando fuera del diálogo
-  );
-}
-  /// Widget para cada opción de tarjeta en el selector
+      barrierDismissible: true,
+    );
+  }
+
   Widget _buildPaymentCardOption({
     required PaymentMethodEntity card,
     required bool isSelected,
@@ -1192,7 +1541,6 @@ Widget _buildProductImage(String imagePath) {
         ),
         child: Row(
           children: [
-            // Icono de la tarjeta
             Image.asset(
               getCardIcon(card.brand),
               width: 40,
@@ -1202,8 +1550,6 @@ Widget _buildProductImage(String imagePath) {
               },
             ),
             SizedBox(width: 16),
-
-            // Información de la tarjeta
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1234,8 +1580,6 @@ Widget _buildProductImage(String imagePath) {
                 ],
               ),
             ),
-
-            // Indicador de selección
             if (isSelected)
               Icon(
                 Icons.check_circle,

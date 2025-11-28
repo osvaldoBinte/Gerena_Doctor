@@ -1,4 +1,5 @@
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
+import 'package:gerena/features/marketplace/domain/entities/descuentopuntos/descuento_puntos_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/create/create_new_order_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/orders/create/ressponse_new_order_entity.dart';
@@ -22,4 +23,6 @@ abstract class MarketplaceRepository {
 
 
   Future<OrderEntity> getMylastpaidorder() ;
+
+  Future<DescuentoPuntosEntity> calculatediscountpoints(int  monto,int puntosAUsar) ;
 }

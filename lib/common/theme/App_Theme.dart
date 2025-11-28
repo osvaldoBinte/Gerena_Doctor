@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class GerenaColors {
@@ -37,7 +38,7 @@ class GerenaColors {
   // Colores de estado
   static const Color successColor = Color(0xFF4CAF50);      // Verde para éxito
   static const Color warningColor = Color(0xFFF7770E); 
-  static const Color descuento = Color(0xFFFF3B3B);        // Rojo para errores
+  static const Color descuento = Color(0xFFF7770E);       // Rojo para errores
   static const Color errorColor = Color(0xFFFF3B3B);        // Rojo para errores
   static const Color infoColor = Color(0xFF2196F3);         // Azul para información
   
@@ -525,110 +526,130 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
       ),
     );
   }
-  // Tarjeta para noticias o artículos - VERSIÓN CON CONTENIDO FIJO ABAJO
+
 static Widget createArticleCard({
   required String title, 
   required String content, 
   required String date,
   required String imagePath,
   required VoidCallback onReadMorePressed,
-  double? height, // Altura opcional para controlar el tamaño de la card
+  double? height,
+  bool isLoading = false,
 }) {
-  return Container(
-    height: height ?? 400, // Altura fija o por defecto
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(smallRadius),
-      boxShadow: [lightShadow],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Imagen con altura fija
-        ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(smallRadius),
-            topRight: Radius.circular(smallRadius),
-          ),
-          child: Image.network(
-            imagePath,
-            width: double.infinity,
-            height: 160,
-            fit: BoxFit.cover,
-          ),
+  return MouseRegion(
+    cursor: isLoading 
+        ? SystemMouseCursors.basic        
+        : SystemMouseCursors.click,      
+    child: GestureDetector(
+      onTap: isLoading ? null : onReadMorePressed,
+      child: Container(
+        height: height ?? 400,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(smallRadius),
+          boxShadow: [lightShadow],
         ),
-        
-        // Contenido expandible que empuja el footer hacia abajo
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Título
-                Text(
-                  title,
-                  style: GoogleFonts.rubik(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: GerenaColors.textPrimaryColor,
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                
-                // Contenido expandible que toma el espacio disponible
-                Expanded(
-                  child: Text(
-                    content,
-                    style: GoogleFonts.rubik(
-                      fontSize: 12,
-                      color: GerenaColors.textPrimaryColor,
-                    ),
-                    maxLines: null, // Permitir múltiples líneas
-                    overflow: TextOverflow.fade, // Fade en lugar de ellipsis
-                  ),
-                ),
-                
-                // Footer fijo en la parte inferior
-                Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(smallRadius),
+                topRight: Radius.circular(smallRadius),
+              ),
+              child: NetworkImageWidget(
+                imageUrl: imagePath,
+                width: double.infinity,
+                height: 160,
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Fecha
+
+                    Text(
+                      title,
+                      style: GoogleFonts.rubik(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: GerenaColors.textPrimaryColor,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 8),
+
                     Expanded(
-                      flex: 2,
                       child: Text(
-                        date,
+                        content,
                         style: GoogleFonts.rubik(
-                          color: Colors.grey,
                           fontSize: 12,
+                          color: GerenaColors.textPrimaryColor,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: null,
+                        overflow: TextOverflow.fade,
                       ),
                     ),
-                    // Botón "Continuar leyendo"
-                    TextButton(
-                      onPressed: onReadMorePressed,
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        minimumSize: Size.zero,
-                      ),
-                      child: Text(
-                        'Continuar leyendo...',
-                        style: GoogleFonts.rubik(
-                          color: GerenaColors.accentColor,
-                          fontSize: 11,
+
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            date,
+                            style: GoogleFonts.rubik(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
+
+                        if (isLoading)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  GerenaColors.accentColor,
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          TextButton(
+                            onPressed: onReadMorePressed,
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              minimumSize: Size.zero,
+                            ),
+                            child: Text(
+                              'Continuar leyendo...',
+                              style: GoogleFonts.rubik(
+                                color: GerenaColors.accentColor,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     ),
   );
 }
@@ -973,7 +994,7 @@ static Widget createArticleCardFlexible({
     required TextEditingController controller,
     String hintText = '',
     VoidCallback? onSearchPressed,
-    Function(String)? onChanged, // Nuevo parámetro
+    Function(String)? onChanged,
   }) {
     return Container(
       height: 35,
@@ -1259,9 +1280,10 @@ static Widget buildLabeledTextField(
     String? errorText, 
     bool showError = false,
     bool readOnly = false,
+    int maxLines = 1, // ✅ Nuevo parámetro
+    ValueChanged<String>? onChanged, // ✅ Nuevo parámetro para detectar cambios
   }
 ) {
-  // ✅ Si no hay controller, no mostrar el TextField
   if (controller == null) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1313,9 +1335,11 @@ static Widget buildLabeledTextField(
       ),
       const SizedBox(height: 5),
       TextField(
-        key: ObjectKey(controller), // ✅ Usar ObjectKey con el controller
+        key: ObjectKey(controller),
         controller: controller,
         readOnly: readOnly,
+        maxLines: maxLines, // ✅ Usar maxLines
+        onChanged: onChanged, // ✅ Callback para detectar cambios
         style: GoogleFonts.rubik(
           fontSize: 16,
           color: readOnly ? Colors.grey.shade700 : Colors.black,
@@ -1338,35 +1362,35 @@ static Widget buildLabeledTextField(
             vertical: 9,
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0),
+            borderRadius: BorderRadius.circular(8), // ✅ Cambiado a 8 para los modales
             borderSide: BorderSide(
               color: GerenaColors.colorinput.withOpacity(0.5),
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0),
+            borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
               width: showError ? 1.5 : 1,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0),
+            borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
-              color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
-              width: showError ? 1.5 : 1,
+              color: showError ? GerenaColors.errorColor : GerenaColors.primaryColor,
+              width: 1.5,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0),
+            borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: GerenaColors.errorColor,
               width: 1.5,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(0),
+            borderRadius: BorderRadius.circular(8),
             borderSide: BorderSide(
               color: GerenaColors.errorColor,
               width: 1.5,
@@ -1378,7 +1402,6 @@ static Widget buildLabeledTextField(
     ],
   );
 }
-
 
 static Widget widgetButton({
   VoidCallback? onPressed,
