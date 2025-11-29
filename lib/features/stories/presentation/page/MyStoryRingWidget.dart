@@ -30,7 +30,7 @@ class MyStoryRingWidget extends StatelessWidget {
         }
 
         // Si tengo historia, mostrarla
-        if (storyController.hasMyStory.value && storyController.myStory.value != null) {
+        if (storyController.hasMyStory.value && storyController.myStories.isNotEmpty) {
           return _buildMyStoryRing(context, storyController, doctorController);
         }
 
@@ -47,6 +47,9 @@ class MyStoryRingWidget extends StatelessWidget {
   ) {
     final doctor = doctorController.doctorProfile.value;
     
+    // Verificar si todas las historias fueron vistas
+    final bool allViewed = storyController.myStories.every((story) => story.yaVista);
+    
     return GestureDetector(
       onTap: () {
         // Abrir modal de historia con la opción isMyStory = true
@@ -57,25 +60,93 @@ class MyStoryRingWidget extends StatelessWidget {
           GerenaColors.createStoryRing(
             child: _buildProfileImage(doctor),
             hasStory: true,
-            isViewed: storyController.myStory.value!.yaVista,
+            isViewed: allViewed,
             size: size,
           ),
-          // Indicador de que es mi historia
+          // ✅ CAMBIO: Mostrar botón de agregar en lugar del contador
           Positioned(
             right: 0,
-            top: 0,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: GerenaColors.primaryColor,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
+            bottom: 0,
+            child: GestureDetector(
+              onTap: () {
+                // Navegar a la pantalla de crear historia
+                Get.to(() => const CreateStoryScreen());
+              },
+              child: Container(
+                width: 29,
+                height: 29,
+               
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.asset(
+                    'assets/icons/aadHistory.png',
+                    fit: BoxFit.contain,
+                  
+                  ),
+                ),
               ),
-              child: const Icon(
-                Icons.check,
-                size: 12,
-                color: Colors.white,
+            ),
+          ),
+          // ✅ NUEVO: Contador de historias en la esquina superior derecha
+          if (storyController.myStories.length > 1)
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: GerenaColors.primaryColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 20,
+                  minHeight: 20,
+                ),
+                child: Center(
+                  child: Text(
+                    '${storyController.myStories.length}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddStoryButton(BuildContext context, PrefilDortorController doctorController) {
+    final doctor = doctorController.doctorProfile.value;
+
+    return GestureDetector(
+      onTap: () {
+        // Navegar a la pantalla de crear historia
+        Get.to(() => const CreateStoryScreen());
+      },
+      child: Stack(
+        children: [
+          GerenaColors.createStoryRing(
+            child: _buildProfileImage(doctor),
+            hasStory: false,
+            size: size,
+          ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: SizedBox(
+              width: 29,
+              height: 29,
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Image.asset(
+                  'assets/icons/aadHistory.png',
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -84,71 +155,42 @@ class MyStoryRingWidget extends StatelessWidget {
     );
   }
 
-Widget _buildAddStoryButton(BuildContext context, PrefilDortorController doctorController) {
-  final doctor = doctorController.doctorProfile.value;
-
-  return GestureDetector(
-    onTap: () {
-      // Navegar a la pantalla de crear historia
-      Get.to(() =>  CreateStoryScreen());
-    },
-    child: Stack(
-      children: [
-        GerenaColors.createStoryRing(
-          child: _buildProfileImage(doctor),
-          hasStory: false,
-          size: size,
-        ),
-        Positioned(
-          right: 0,
-          bottom: 0,
-          child: SizedBox(
-            width: 29,
-            height: 29,
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Image.asset(
-                'assets/icons/aadHistory.png',
-                fit: BoxFit.contain,
-              ),
-            ),
+Widget _buildProfileImage(dynamic doctor) {
+  if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+    return Image.network(
+      doctor.foto!,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return _buildFallbackIcon();
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: GerenaColors.backgroundColorfondo,
+          child: const Center(
+            child: CircularProgressIndicator(strokeWidth: 2),
           ),
-        ),
-      ],
+        );
+      },
+    );
+  } else {
+    return _buildFallbackIcon();
+  }
+}
+
+Widget _buildFallbackIcon() {
+  return Container(
+    color: GerenaColors.backgroundColorfondo,
+    child: const Center(
+      child: Icon(
+        Icons.person,
+        size: 20,
+        color: Colors.grey,
+      ),
     ),
   );
 }
 
-  Widget _buildProfileImage(dynamic doctor) {
-    if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-      return Image.network(
-        doctor.foto!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.asset(
-            'assets/perfil.png',
-            fit: BoxFit.cover,
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: GerenaColors.backgroundColorfondo,
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ),
-            ),
-          );
-        },
-      );
-    } else {
-      return Image.asset(
-        'assets/perfil.png',
-        fit: BoxFit.cover,
-      );
-    }
-  }
 
   Widget _buildLoadingRing() {
     return Container(

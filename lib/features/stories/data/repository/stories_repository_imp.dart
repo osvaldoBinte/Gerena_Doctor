@@ -29,7 +29,7 @@ class StoriesRepositoryImp implements StoriesRepository {
   }
 
   @override
-  Future<StoryEntity> fetchStoriesbyid(int iduser) async {
+  Future<List<StoryEntity>>  fetchStoriesbyid(int iduser) async {
     final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await storiesDataSourcesImp.fetchStoriesbyid(iduser,token);
   }

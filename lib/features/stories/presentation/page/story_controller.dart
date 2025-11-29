@@ -37,10 +37,13 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   final RxString error = ''.obs;
   final RxBool isViewingMyStory = false.obs;
 
-  // Para las historias del usuario actual
-  final Rx<StoryEntity?> myStory = Rx<StoryEntity?>(null);
+  // ✅ CAMBIO: Ahora es una lista de historias
+  final RxList<StoryEntity> myStories = <StoryEntity>[].obs;
   final RxBool isLoadingMyStory = false.obs;
   final RxBool hasMyStory = false.obs;
+
+  // ✅ NUEVO: Índice para navegar entre mis historias
+  final RxInt currentMyStoryIndex = 0.obs;
 
   final RxInt currentUserIndex = 0.obs;
   final RxInt currentStoryIndex = 0.obs;
@@ -60,6 +63,12 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   List<StoryEntity> get currentUserStories =>
       currentUser?.historias ?? [];
       
+  // ✅ NUEVO: Getter para obtener la historia actual del usuario
+  StoryEntity? get currentMyStory => 
+      myStories.isNotEmpty && currentMyStoryIndex.value < myStories.length
+          ? myStories[currentMyStoryIndex.value]
+          : null;
+      
   List<GetStoriesEntity> getStoriesForDisplay() {
     return allStories;
   }
@@ -68,7 +77,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   
   StoryEntity? get activeStory {
     if (isViewingMyStory.value) {
-      return myStory.value;
+      return currentMyStory; // ✅ CAMBIO: Usar currentMyStory
     }
     return currentStory;
   }
@@ -90,6 +99,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     isViewingMyStory.value = true;
     currentUserIndex.value = -1;
     currentStoryIndex.value = 0;
+    currentMyStoryIndex.value = 0; // ✅ NUEVO: Inicializar índice
     _setupProgressController(vsync);
   }
 
@@ -169,6 +179,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
+  // ✅ CAMBIO: Ahora carga una lista de historias
   Future<void> fetchMyStory() async {
     try {
       isLoadingMyStory.value = true;
@@ -177,15 +188,16 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
       if (userId == null) {
         isLoadingMyStory.value = false;
         hasMyStory.value = false;
+        myStories.clear();
         return;
       }
 
-      final story = await fetchStoriesByIdUsecase.execute(userId);
-      myStory.value = story;
-      hasMyStory.value = true;
+      final stories = await fetchStoriesByIdUsecase.execute(userId);
+      myStories.value = stories;
+      hasMyStory.value = stories.isNotEmpty;
       isLoadingMyStory.value = false;
     } catch (e) {
-      myStory.value = null;
+      myStories.clear();
       hasMyStory.value = false;
       isLoadingMyStory.value = false;
     }
@@ -205,15 +217,31 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     return 'imagen';
   }
 
+  // ✅ CAMBIO: Eliminar historia específica de mi lista
   Future<void> deleteMyStory() async {
-    if (myStory.value == null) return;
+    if (currentMyStory == null) return;
 
     try {
-      await removeStoryUsecase.execute(myStory.value!.id);
-      myStory.value = null;
-      hasMyStory.value = false;
-      showSuccessSnackbar('Historia eliminada correctamente');
+      await removeStoryUsecase.execute(currentMyStory!.id);
       
+      // Eliminar de la lista local
+      myStories.removeAt(currentMyStoryIndex.value);
+      
+      // Si no quedan más historias
+      if (myStories.isEmpty) {
+        hasMyStory.value = false;
+        Get.back(); // Cerrar modal
+      } else {
+        // Si había más historias, ajustar el índice
+        if (currentMyStoryIndex.value >= myStories.length) {
+          currentMyStoryIndex.value = myStories.length - 1;
+        }
+        // Reiniciar el progreso
+        progressController?.reset();
+        progressController?.forward();
+      }
+      
+      showSuccessSnackbar('Historia eliminada correctamente');
       await fetchStories();
     } catch (e) {
       showErrorSnackbar('No se pudo eliminar la historia');
@@ -225,7 +253,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     currentStoryIndex.value = 0;
     _setupProgressController(vsync);
     
-    // Marcar la primera historia como vista
     _markCurrentStoryAsSeen();
   }
 
@@ -250,12 +277,34 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     progressController!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (isViewingMyStory.value) {
-          goToFirstUserStory();
+          // ✅ CAMBIO: Navegar entre mis historias
+          _nextMyStory();
         } else {
           nextStory();
         }
       }
     });
+  }
+
+  // ✅ NUEVO: Navegar a la siguiente historia mía
+  void _nextMyStory() {
+    if (currentMyStoryIndex.value + 1 < myStories.length) {
+      currentMyStoryIndex.value++;
+      progressController?.reset();
+      progressController?.forward();
+    } else {
+      // Ya terminé todas mis historias, ir a la primera de otros
+      goToFirstUserStory();
+    }
+  }
+
+  // ✅ NUEVO: Navegar a la historia anterior mía
+  void _previousMyStory() {
+    if (currentMyStoryIndex.value > 0) {
+      currentMyStoryIndex.value--;
+      progressController?.reset();
+      progressController?.forward();
+    }
   }
 
   void goToFirstUserStory() {
@@ -266,7 +315,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
       progressController?.reset();
       progressController?.forward();
       
-      // Marcar como vista la primera historia del primer usuario
       _markCurrentStoryAsSeen();
     } else {
       Get.back();
@@ -279,7 +327,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
       progressController?.reset();
       progressController?.forward();
       
-      // Marcar la nueva historia como vista
       _markCurrentStoryAsSeen();
     } else {
       if (currentUserIndex.value + 1 < allStories.length) {
@@ -288,7 +335,6 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
         progressController?.reset();
         progressController?.forward();
         
-        // Marcar la nueva historia como vista
         _markCurrentStoryAsSeen();
       } else {
         Get.back();
@@ -296,11 +342,21 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
+  // ✅ CAMBIO: Manejar navegación hacia atrás incluyendo mis historias
   void previousStory() {
-    if (currentUserIndex.value == 0 && currentStoryIndex.value == 0 && myStory.value != null) {
+    if (isViewingMyStory.value) {
+      // Si estoy en mi primera historia, no hacer nada
+      if (currentMyStoryIndex.value == 0) {
+        return;
+      }
+      // Si no, ir a mi historia anterior
+      _previousMyStory();
+    } else if (currentUserIndex.value == 0 && currentStoryIndex.value == 0 && hasMyStory.value) {
+      // Si estoy en la primera historia del primer usuario y tengo historias propias
       isViewingMyStory.value = true;
       currentUserIndex.value = -1;
       currentStoryIndex.value = 0;
+      currentMyStoryIndex.value = myStories.length - 1; // ✅ Ir a mi última historia
       progressController?.reset();
       progressController?.forward();
     } else if (currentStoryIndex.value > 0) {
@@ -316,16 +372,14 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
-  // Marcar la historia actual como vista
   Future<void> _markCurrentStoryAsSeen() async {
-    if (isViewingMyStory.value) return; // No marcar mi propia historia
+    if (isViewingMyStory.value) return;
     if (currentStory == null) return;
-    if (currentStory!.yaVista) return; // Ya está vista
+    if (currentStory!.yaVista) return;
 
     try {
       await setStoryAsSeenUsecase.execute(currentStory!.id);
       
-      // Actualizar el estado local
       final userIndex = currentUserIndex.value;
       final storyIndex = currentStoryIndex.value;
       
@@ -337,7 +391,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
         fechaExpiracion: currentStory!.fechaExpiracion,
         vistas: currentStory!.vistas + 1,
         likes: currentStory!.likes,
-        yaVista: true, // Marcar como vista
+        yaVista: true,
         yaLikeada: currentStory!.yaLikeada,
       );
 
@@ -367,11 +421,25 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     progressController?.forward();
   }
 
+  // ✅ CAMBIO: Progreso para mis historias
   double getMyStoryProgress() {
     if (isViewingMyStory.value) {
       return progressAnimation?.value ?? 0.0;
     }
     return 0.0;
+  }
+
+  // ✅ NUEVO: Progreso individual para cada una de mis historias
+  double getMyStoryProgressAt(int index) {
+    if (!isViewingMyStory.value) return 0.0;
+    
+    if (index < currentMyStoryIndex.value) {
+      return 1.0; // Ya vista
+    } else if (index == currentMyStoryIndex.value) {
+      return progressAnimation?.value ?? 0.0; // Actual
+    } else {
+      return 0.0; // No vista aún
+    }
   }
 
   Future<void> likeStory() async {

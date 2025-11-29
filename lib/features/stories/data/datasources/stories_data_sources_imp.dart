@@ -41,65 +41,40 @@ class StoriesDataSourcesImp {
       }
       throw Exception('$e');
     }
-  }Future<void> createStrory(PostStoriesEntity entity, String token) async {
-  try {
-    Uri url = Uri.parse('$defaultApiServer/Historias');
-
-    print('📌 URL: $url');
-
-    var request = http.MultipartRequest('POST', url);
-
-    request.headers.addAll({
-      'Authorization': 'Bearer $token',
-    });
-
-    print('📌 Headers: ${request.headers}');
-
-    final model = PostStoriesModel.fromEntity(entity);
-
-    // 👉 Antes de agregar los fields
-    print('📌 Fields antes de agregar: ${request.fields}');
-
-    model.addFieldsToRequest(request);
-
-    // 👉 Después de agregar los fields
-    print('📌 Fields finales: ${request.fields}');
-
-    // 👉 Archivos antes
-    print('📌 Files antes: ${request.files}');
-
-    await model.addFileToRequest(request);
-
-    // 👉 Archivos después
-    print('📌 Files finales: ${request.files.map((f) => f.filename).toList()}');
-
-    // Puedes imprimir tamaño o bytes si quieres
-    // print(await request.files.first.finalize().bytesToString());
-
-    print('🚀 Enviando request...');
-
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
-    print('📥 STATUS: ${response.statusCode}');
-    print('📥 RESPONSE: ${response.body}');
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Error HTTP ${response.statusCode}: ${response.body}');
-    }
-  } catch (e) {
-    print('❌ Error en createStory: $e');
-
-    if (e is SocketException ||
-        e is http.ClientException ||
-        e is TimeoutException) {
-      throw Exception(convertMessageException(error: e));
-    }
-
-    throw Exception('Error procesando procedimiento: $e');
   }
-}
 
+  Future<void> createStrory(PostStoriesEntity entity, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Historias');
+
+      var request = http.MultipartRequest('POST', url);
+
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+
+      final model = PostStoriesModel.fromEntity(entity);
+
+      model.addFieldsToRequest(request);
+
+      await model.addFileToRequest(request);
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Error HTTP ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+
+      throw Exception('Error procesando procedimiento: $e');
+    }
+  }
 
   Future<List<GetStoriesEntity>> fetchStories(String token) async {
     try {
@@ -128,22 +103,21 @@ class StoriesDataSourcesImp {
     }
   }
 
-  Future<StoryEntity> fetchStoriesbyid(int id, String token) async {
+  Future<List<StoryEntity>> fetchStoriesbyid(int id, String token) async {
     try {
       Uri url = Uri.parse('$defaultApiServer/Historias/doctor/$id');
       final response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       });
-
-      if (response.statusCode == 200) {
+if (response.statusCode == 200) {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
-        final Map<String, dynamic> storyMap =
-            responseDecode is List ? responseDecode.first : responseDecode;
-        StoryModel data = StoryModel.fromJson(storyMap);
-        return data;
+
+        final List data = responseDecode;
+        return data.map((json) => StoryModel.fromJson(json)).toList();
       }
+     
 
       throw ApiExceptionCustom(response: response);
     } catch (e) {

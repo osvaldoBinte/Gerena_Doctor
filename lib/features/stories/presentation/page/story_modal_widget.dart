@@ -72,8 +72,9 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
   }
 
   Future<void> _initializeVideoIfNeeded() async {
+    // ✅ CAMBIO: Usar currentMyStory en lugar de myStory.value
     final story = widget.isMyStory 
-        ? controller.myStory.value 
+        ? controller.currentMyStory
         : controller.currentStory;
 
     if (story == null) return;
@@ -119,8 +120,9 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
       body: Obx(() {
         final isViewingMyStory = controller.isViewingMyStory.value;
         
+        // ✅ CAMBIO: Usar currentMyStory
         final currentStory = isViewingMyStory 
-            ? controller.myStory.value 
+            ? controller.currentMyStory
             : controller.currentStory;
 
         if (currentStory == null) {
@@ -167,30 +169,38 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Barra de progreso
+                        // ✅ CAMBIO: Mostrar múltiples barras para mis historias también
                         if (isViewingMyStory) ...[
-                          Container(
-                            height: 3,
-                            margin: const EdgeInsets.symmetric(horizontal: 1),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(2),
-                              color: Colors.white.withOpacity(0.3),
-                            ),
-                            child: AnimatedBuilder(
-                              animation: controller.progressAnimation!,
-                              builder: (context, child) {
-                                return Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: FractionallySizedBox(
-                                    widthFactor: controller.getMyStoryProgress(),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(2),
-                                        color: Colors.white,
-                                      ),
-                                    ),
+                          Row(
+                            children: List.generate(
+                              controller.myStories.length,
+                              (index) => Expanded(
+                                child: Container(
+                                  height: 3,
+                                  margin: const EdgeInsets.symmetric(horizontal: 1),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(2),
+                                    color: Colors.white.withOpacity(0.3),
                                   ),
-                                );
-                              },
+                                  child: AnimatedBuilder(
+                                    animation: controller.progressAnimation!,
+                                    builder: (context, child) {
+                                      return Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: FractionallySizedBox(
+                                          widthFactor: controller.getMyStoryProgressAt(index),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(2),
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ] else ...[
@@ -246,16 +256,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                               child: ClipOval(
                                 child: isViewingMyStory
                                     ? _buildMyProfileImage()
-                                    : Image.network(
-                                        controller.currentUser!.fotoPerfilUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Image.asset(
-                                            'assets/perfil.png',
-                                            fit: BoxFit.cover,
-                                          );
-                                        },
-                                      ),
+                                    : _fallbackIcon()
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -353,13 +354,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                   right: 0,
                   width: screenWidth * 0.3,
                   child: GestureDetector(
-                    onTap: () {
-                      if (isViewingMyStory) {
-                        controller.goToFirstUserStory();
-                      } else {
-                        controller.nextStory();
-                      }
-                    },
+                    onTap: () => controller.nextStory(), // ✅ CAMBIO: Siempre usar nextStory (maneja todo internamente)
                     onLongPress: () => controller.pauseStory(),
                     onLongPressEnd: (details) => controller.resumeStory(),
                     child: Container(color: Colors.transparent),
@@ -384,43 +379,48 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
       }),
     );
   }
+Widget _buildMyProfileImage() {
+  return Obx(() {
+    final doctor = doctorController.doctorProfile.value;
 
-  // Nuevo método para construir la imagen de perfil del doctor
-  Widget _buildMyProfileImage() {
-    return Obx(() {
-      final doctor = doctorController.doctorProfile.value;
-      
-      if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-        return Image.network(
-          doctor.foto!,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/perfil.png',
-              fit: BoxFit.cover,
-            );
-          },
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              color: GerenaColors.backgroundColorfondo,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
+    if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+      return Image.network(
+        doctor.foto!,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _fallbackIcon();
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: GerenaColors.backgroundColorfondo,
+            child: const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
               ),
-            );
-          },
-        );
-      } else {
-        return Image.asset(
-          'assets/perfil.png',
-          fit: BoxFit.cover,
-        );
-      }
-    });
-  }
+            ),
+          );
+        },
+      );
+    } else {
+      return _fallbackIcon();
+    }
+  });
+}
+Widget _fallbackIcon() {
+  return Container(
+    color: GerenaColors.backgroundColorfondo,
+    child: const Center(
+      child: Icon(
+        Icons.person,
+        size: 20,
+        color: Colors.grey,
+      ),
+    ),
+  );
+}
+
 
   Widget _buildStoryContent(StoryEntity story) {
     final isVideo = story.tipoContenido.toLowerCase() == 'video';
@@ -662,8 +662,8 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
           ),
           TextButton(
             onPressed: () async {
-              Get.back();
-              Get.back();
+              Get.back(); // Cerrar diálogo
+              // ✅ CAMBIO: No cerrar el modal aquí, el controller lo maneja
               await controller.deleteMyStory();
             },
             style: TextButton.styleFrom(

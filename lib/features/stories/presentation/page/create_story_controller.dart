@@ -2,16 +2,17 @@ import 'dart:async';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
 
 class CreateStoryController extends GetxController {
   // Camera
-  CameraController? cameraController;
+  Rx<CameraController?> cameraController = Rx<CameraController?>(null);
   final RxList<CameraDescription> cameras = <CameraDescription>[].obs;
   final RxBool isCameraInitialized = false.obs;
-  final RxBool isFrontCamera = true.obs;
+  final RxBool isFrontCamera = false.obs;
 
   // Recording
   final RxBool isRecording = false.obs;
@@ -23,6 +24,9 @@ class CreateStoryController extends GetxController {
   final Rx<File?> capturedFile = Rx<File?>(null);
   final Rx<String?> contentType = Rx<String?>(null);
   VideoPlayerController? videoController;
+  
+  // ✅ NUEVO: Flag para saber si el video está listo
+  final RxBool isVideoReady = false.obs;
 
   // Gallery
   final RxList<AssetEntity> galleryAssets = <AssetEntity>[].obs;
@@ -37,31 +41,52 @@ class CreateStoryController extends GetxController {
 
   @override
   void onClose() {
-    cameraController?.dispose();
+    cameraController.value?.dispose();
     videoController?.dispose();
     recordingTimer?.cancel();
     super.onClose();
   }
 
-  // Inicializar cámara
+  // Inicializar cámara con orientación correcta
   Future<void> initializeCamera() async {
     try {
-      final availableCameras = await availableCameras();
-      if (availableCameras.isEmpty) return;
+      isCameraInitialized.value = false;
+      
+      final availableCamerasList = await availableCameras();
+      if (availableCamerasList.isEmpty) {
+        debugPrint('No cameras available');
+        return;
+      }
 
-      cameras.value = availableCameras;
+      cameras.value = availableCamerasList;
       final camera = isFrontCamera.value ? cameras.last : cameras.first;
 
-      cameraController = CameraController(
+      final newController = CameraController(
         camera,
         ResolutionPreset.high,
         enableAudio: true,
+        imageFormatGroup: ImageFormatGroup.jpeg,
       );
 
-      await cameraController!.initialize();
-      isCameraInitialized.value = true;
+      await newController.initialize();
+      
+      // Bloquear orientación a portrait
+      await newController.lockCaptureOrientation(DeviceOrientation.portraitUp);
+      
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      if (newController.value.isInitialized) {
+        cameraController.value = newController;
+        
+        await Future.delayed(const Duration(milliseconds: 50));
+        isCameraInitialized.value = true;
+        
+        debugPrint('Camera initialized successfully');
+        debugPrint('Preview size: ${newController.value.previewSize}');
+      }
     } catch (e) {
       debugPrint('Error initializing camera: $e');
+      isCameraInitialized.value = false;
     }
   }
 
@@ -94,19 +119,20 @@ class CreateStoryController extends GetxController {
     if (cameras.length < 2) return;
 
     isFrontCamera.value = !isFrontCamera.value;
-    isCameraInitialized.value = false;
-
-    await cameraController?.dispose();
+    
+    await cameraController.value?.dispose();
+    cameraController.value = null;
+    
     await initializeCamera();
   }
 
   // Iniciar grabación
   Future<void> startRecording() async {
-    if (cameraController == null || !cameraController!.value.isInitialized) return;
+    if (cameraController.value == null || !cameraController.value!.value.isInitialized) return;
     if (isRecording.value) return;
 
     try {
-      await cameraController!.startVideoRecording();
+      await cameraController.value!.startVideoRecording();
 
       isRecording.value = true;
       recordingSeconds.value = 0;
@@ -129,7 +155,7 @@ class CreateStoryController extends GetxController {
 
     try {
       recordingTimer?.cancel();
-      final XFile video = await cameraController!.stopVideoRecording();
+      final XFile video = await cameraController.value!.stopVideoRecording();
 
       // Convertir .temp a .mp4
       final String originalPath = video.path;
@@ -144,18 +170,20 @@ class CreateStoryController extends GetxController {
       capturedFile.value = mp4File;
       contentType.value = 'video';
 
+      // Inicializar video antes de cambiar a preview
       await initializeVideoController();
     } catch (e) {
       debugPrint('Error stopping recording: $e');
+      isRecording.value = false;
     }
   }
 
   // Tomar foto
   Future<void> takePicture() async {
-    if (cameraController == null || !cameraController!.value.isInitialized) return;
+    if (cameraController.value == null || !cameraController.value!.value.isInitialized) return;
 
     try {
-      final XFile photo = await cameraController!.takePicture();
+      final XFile photo = await cameraController.value!.takePicture();
 
       capturedFile.value = File(photo.path);
       contentType.value = 'imagen';
@@ -168,15 +196,36 @@ class CreateStoryController extends GetxController {
   Future<void> initializeVideoController() async {
     if (capturedFile.value == null || contentType.value != 'video') return;
 
-    videoController?.dispose();
-    videoController = VideoPlayerController.file(capturedFile.value!);
-
     try {
+      isVideoReady.value = false; // ✅ Marcar como no listo
+      
+      videoController?.dispose();
+      videoController = VideoPlayerController.file(capturedFile.value!);
+
+      debugPrint('Initializing video: ${capturedFile.value!.path}');
+      
       await videoController!.initialize();
-      videoController!.setLooping(true);
-      videoController!.play();
+      
+      // Verificar que se inicializó correctamente
+      if (videoController!.value.isInitialized) {
+        videoController!.setLooping(true);
+        videoController!.play();
+        
+        isVideoReady.value = true; // ✅ Marcar como listo
+        
+        debugPrint('Video initialized successfully');
+        debugPrint('Duration: ${videoController!.value.duration}');
+        debugPrint('Size: ${videoController!.value.size}');
+      } else {
+        debugPrint('Video failed to initialize');
+        isVideoReady.value = false;
+      }
     } catch (e) {
       debugPrint('Error initializing video: $e');
+      // Limpiar si hay error
+      videoController?.dispose();
+      videoController = null;
+      isVideoReady.value = false;
     }
   }
 
@@ -190,6 +239,7 @@ class CreateStoryController extends GetxController {
       contentType.value = asset.type == AssetType.image ? 'imagen' : 'video';
 
       if (contentType.value == 'video') {
+        // Inicializar video antes de mostrar preview
         await initializeVideoController();
       }
     } catch (e) {
@@ -203,16 +253,17 @@ class CreateStoryController extends GetxController {
     contentType.value = null;
     videoController?.dispose();
     videoController = null;
+    isVideoReady.value = false; // ✅ Resetear flag
   }
 
   // Manejar ciclo de vida
   void handleAppLifecycleState(AppLifecycleState state) {
-    if (cameraController == null || !cameraController!.value.isInitialized) {
+    if (cameraController.value == null || !cameraController.value!.value.isInitialized) {
       return;
     }
 
     if (state == AppLifecycleState.inactive) {
-      cameraController?.dispose();
+      cameraController.value?.dispose();
     } else if (state == AppLifecycleState.resumed) {
       initializeCamera();
     }

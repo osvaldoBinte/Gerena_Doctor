@@ -167,33 +167,29 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
             child: Obx(() {
               final doctor = doctorController.doctorProfile.value;
               
-              Widget imageWidget;
-              if (doctorController.isLoading.value) {
-                imageWidget = Container(
-                  color: GerenaColors.backgroundColorfondo,
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
-                  ),
-                );
-              } else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-                imageWidget = Image.network(
-                  doctor.foto!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/perfil.png',
-                      fit: BoxFit.cover,
-                    );
-                  },
-                );
-              } else {
-                imageWidget = Image.asset(
-                  'assets/perfil.png',
-                  fit: BoxFit.cover,
-                );
-              }
+           Widget imageWidget;
+
+if (doctorController.isLoading.value) {
+  imageWidget = Container(
+    color: GerenaColors.backgroundColorfondo,
+    child: const Center(
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+      ),
+    ),
+  );
+} else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+  imageWidget = Image.network(
+    doctor.foto!,
+    fit: BoxFit.cover,
+    errorBuilder: (context, error, stackTrace) {
+      return _fallbackIcon();
+    },
+  );
+} else {
+  imageWidget = _fallbackIcon();
+}
+
               
               return Stack(
                 children: [
@@ -225,6 +221,19 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
       ),
     );
   }
+  Widget _fallbackIcon() {
+  return Container(
+    color: GerenaColors.backgroundColorfondo,
+    child: const Center(
+      child: Icon(
+        Icons.person,
+        size: 50,
+        color: Colors.grey,
+      ),
+    ),
+  );
+}
+
   Widget _buildCitasSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),

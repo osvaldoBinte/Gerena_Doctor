@@ -4,7 +4,7 @@ import 'package:gerena/features/stories/domain/entities/post/post_stories_entity
 
 abstract class StoriesRepository {
   Future<List <GetStoriesEntity>> fetchStories();
-  Future<StoryEntity> fetchStoriesbyid(int iduser);
+  Future<List<StoryEntity>> fetchStoriesbyid(int iduser);
   Future<void> createStrory(PostStoriesEntity entity);
   Future<void> addLikeToStory(int id);
   Future<void> setStoryAsSeen(int id);
