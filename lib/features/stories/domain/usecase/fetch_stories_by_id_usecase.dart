@@ -1,0 +1,10 @@
+import 'package:gerena/features/stories/domain/entities/getstories/story_entity.dart';
+import 'package:gerena/features/stories/domain/repository/stories_repository.dart';
+
+class FetchStoriesByIdUsecase {
+  final StoriesRepository storiesRepository;
+  FetchStoriesByIdUsecase({required this.storiesRepository});
+  Future<StoryEntity> execute(int iduser) async {
+    return await storiesRepository.fetchStoriesbyid(iduser);
+  }
+}

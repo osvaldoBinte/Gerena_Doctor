@@ -54,6 +54,10 @@ dependencies:
   google_fonts: ^6.1.0
   url_launcher: ^6.3.2
   flutter_stripe: ^12.1.0
+  video_player: ^2.10.1
+  image_picker: ^1.2.1
+  camera: ^0.11.2+1
+  photo_manager: ^3.8.2
 
 
 
@@ -158,6 +162,8 @@ flutter:
       - assets/icons/reacciones/lonecesito.png
       - assets/icons/reacciones/Star.png
       - assets/icons/favorite_border.png
+      - assets/icons/favorite.png
+      
       - assets/icons/WISHLIST.png
 
       - assets/icons/truck.png

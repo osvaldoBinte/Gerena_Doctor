@@ -6,6 +6,10 @@ import 'package:gerena/features/appointment/presentation/page/perfil/PatientProf
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/stories/presentation/page/MyStoryRingWidget.dart';
+import 'package:gerena/features/stories/presentation/page/story_controller.dart';
+import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
+import 'package:gerena/features/stories/presentation/page/story_ring_widget.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,12 +22,14 @@ class HomePageMovil extends StatefulWidget {
 }
 
 class _GerenaFeedScreenState extends State<HomePageMovil> {
-
   final CalendarControllerGetx calendarController =
       Get.find<CalendarControllerGetx>();
   
   final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
   final ControllerPerfilConfiguration profileController = Get.put(ControllerPerfilConfiguration());
+  
+  // Agrega esta línea
+  final StoryController storyController = Get.find<StoryController>();
 
   @override
   void initState() {
@@ -38,128 +44,52 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         AppBar().preferredSize.height -
         kBottomNavigationBarHeight;
 
-    String _getStoryUserImage(int index) {
-      final List<String> userImages = [
-        'https://img.freepik.com/foto-gratis/medica-hospital-estetoscopio_23-2148827774.jpg?semt=ais_hybrid&w=740&q=80',
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVloHdKoEaDEdR8yLKxemlzDDBu7lQ-MzqCw&s',
-        'https://img.freepik.com/foto-gratis/retrato-terapeuta-profesional-experimentado-estetoscopio-mirando-camara_1098-19305.jpg?semt=ais_hybrid&w=740&q=80',
-        'https://www.doctoranytime.mx/blog/wp-content/uploads/2022/12/2df54e3a5439308aacd85d8c275e888f.png',
-        'https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg',
-        'https://snibbs.co/cdn/shop/articles/What_are_the_Challenges_of_Being_a_Doctor.jpg?v=1684314843'
-      ];
-      return userImages[index];
-    }
-
     List<Widget> allItems = [
       Container(
         height: availableHeight,
         child: Column(
           children: [
+            // Sección de historias
             Container(
-              height: 100,
-              color: GerenaColors.backgroundColorFondo,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 6,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Container(
-                      margin:
-                          const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-                      child: Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              print("Agregar mi historia");
-                            },
-                            child: Obx(() {
-                              final doctor = doctorController.doctorProfile.value;
-                              
-                           
-                              Widget imageWidget;
-                              if (doctorController.isLoading.value) {
-                              
-                                imageWidget = Container(
-                                  color: GerenaColors.backgroundColorfondo,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                );
-                              } else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-                              
-                                imageWidget = Image.network(
-                                  doctor.foto!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      'assets/perfil.png',
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                );
-                              } else {
-                                imageWidget = Image.asset(
-                                  'assets/perfil.png',
-                                  fit: BoxFit.cover,
-                                );
-                              }
-                              
-                              return Stack(
-                                children: [
-                                  GerenaColors.createStoryRing(
-                                    child: imageWidget,
-                                    hasStory: false,
-                                    size: 80,
-                                  ),
-                                  Positioned(
-                                    right: 0,
-                                    bottom: 0,
-                                    child: SizedBox(
-                                      width: 29,
-                                      height: 29,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Image.asset(
-                                          'assets/icons/aadHistory.png',
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+  height: 100,
+  color: GerenaColors.backgroundColorFondo,
+  child: Obx(() {
+    if (storyController.isLoading.value && storyController.allStories.isEmpty) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
 
-                  return Container(
-                    margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {},
-                          child: GerenaColors.createStoryRing(
-                            child: Image.network(
-                              _getStoryUserImage(index),
-                              fit: BoxFit.cover,
-                            ),
-                            hasStory: true,
-                            isViewed: false,
-                            size: 80,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
+    final totalStories = storyController.allStories.length;
+    
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: totalStories + 1, 
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return MyStoryRingWidget(
+            size: 80,
+            onAddStory: () {
+              print("Navegar a crear historia");
+              // Get.to(() => CreateStoryScreen());
+            },
+          );
+        }
+
+        return Container(
+          margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+          child: StoryRingWidget(
+            index: index - 1,
+            size: 80,
+          ),
+        );
+      },
+    );
+  }),
+),
+            
+            // Resto del contenido
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -168,11 +98,9 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                     SizedBox(height: GerenaColors.paddingMedium),
                     _buildCitasSection(),
                     SizedBox(height: GerenaColors.paddingMedium),
-
                     BannersListWidget(
                       height: 200,
-                      maxBanners: 2, 
-                   
+                      maxBanners: 2,
                     ),
                   ],
                 ),
@@ -200,22 +128,10 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 letterSpacing: 1.5,
               ),
             ),
-            /*
-            const Spacer(),
-            Container(
-              width: 140,
-              child: GerenaColors.createSearchContainer(
-                height: 26,
-                heightcontainer: 15,
-                iconSize: 18,
-                onTap: () {},
-              ),
-            ),*/
           ],
         ),
       ),
-   body: Obx(() {
-        // Si showPatientProfile es true, muestra el PatientProfileScreen
+      body: Obx(() {
         if (profileController.showPatientProfile.value) {
           return PatientProfileScreen(
             appointment: profileController.selectedAppointment.value,
@@ -225,7 +141,6 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
           );
         }
         
-        // Si no, muestra el contenido normal
         return PageView.builder(
           scrollDirection: Axis.vertical,
           itemCount: allItems.length,
@@ -235,6 +150,79 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
           physics: const BouncingScrollPhysics(),
         );
       }),
+    );
+  }
+
+  // Widget para el botón de "Agregar mi historia"
+  Widget _buildAddStoryButton() {
+    return Container(
+      margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              print("Agregar mi historia");
+              // Aquí puedes agregar la funcionalidad para crear una historia
+            },
+            child: Obx(() {
+              final doctor = doctorController.doctorProfile.value;
+              
+              Widget imageWidget;
+              if (doctorController.isLoading.value) {
+                imageWidget = Container(
+                  color: GerenaColors.backgroundColorfondo,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  ),
+                );
+              } else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+                imageWidget = Image.network(
+                  doctor.foto!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/perfil.png',
+                      fit: BoxFit.cover,
+                    );
+                  },
+                );
+              } else {
+                imageWidget = Image.asset(
+                  'assets/perfil.png',
+                  fit: BoxFit.cover,
+                );
+              }
+              
+              return Stack(
+                children: [
+                  GerenaColors.createStoryRing(
+                    child: imageWidget,
+                    hasStory: false,
+                    size: 80,
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: SizedBox(
+                      width: 29,
+                      height: 29,
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Image.asset(
+                          'assets/icons/aadHistory.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
   Widget _buildCitasSection() {

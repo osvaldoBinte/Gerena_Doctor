@@ -25,14 +25,12 @@ class SubscriptionController extends GetxController {
     required this.postCancelSubcriptionUsecase,
   });
 
-  // Estado
   var isLoading = true.obs;
   var plans = <ViewAllPlansEntity>[].obs;
   var errorMessage = ''.obs;
   var selectedPaymentMethodId = ''.obs;
-  var isCancelling = false.obs; // 👈 NUEVO: Estado para cancelación
+  var isCancelling = false.obs; 
   
-  // Suscripción actual
   Rx<MySubscriptionEntity?> currentSubscription = Rx<MySubscriptionEntity?>(null);
   var hasActiveSubscription = false.obs;
 
@@ -42,7 +40,6 @@ class SubscriptionController extends GetxController {
     loadSubscriptionData();
   }
 
-  // Cargar datos de suscripción
   Future<void> loadSubscriptionData() async {
     await Future.wait([
       fetchPlans(),
@@ -50,7 +47,6 @@ class SubscriptionController extends GetxController {
     ]);
   }
 
-  // Obtener todos los planes
   Future<void> fetchPlans() async {
     try {
       isLoading.value = true;
@@ -65,7 +61,6 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  // Obtener mi suscripción actual
   Future<void> fetchMySubscription() async {
     try {
       final subscription = await getMySubscriptionUsecase.execute();
@@ -79,13 +74,11 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  // Verificar si el plan es el actual
   bool isCurrentPlan(int planId) {
     if (currentSubscription.value == null) return false;
     return currentSubscription.value!.subscriptionplanId == planId.toString();
   }
 
-  // Suscribirse a un plan (solo si NO tiene suscripción activa)
   Future<void> subscribeToPlan(int planId) async {
     try {
       if (hasActiveSubscription.value) {
@@ -118,7 +111,6 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  // Cambiar plan de suscripción
   Future<void> changeSubscriptionPlan(int newPlanId, bool immediateChange) async {
     try {
       if (!hasActiveSubscription.value) {
@@ -151,7 +143,6 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  // 👇 ACTUALIZADO: Cancelar suscripción con mejor manejo
   Future<void> cancelSubscription(bool cancelImmediately, String reason) async {
     try {
       if (!hasActiveSubscription.value) {
@@ -200,17 +191,13 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  // Verificar si tiene gradiente en el borde
   bool hasGradientBorder(String planName) {
     return planName.toUpperCase() == 'ELITE';
   }
 
-  // Verificar si tiene gradiente en el botón
   bool hasGradientButton(String planName) {
     return planName.toUpperCase() == 'ELITE';
   }
-
-  // Obtener texto del botón
   String getButtonText(int planId, String planName) {
     if (isCurrentPlan(planId)) {
       return 'MI PLAN ACTUAL';
@@ -227,7 +214,6 @@ class SubscriptionController extends GetxController {
     return 'ELEGIR PLAN';
   }
 
-  // Obtener acción del botón según el estado
   String getButtonAction(int planId) {
     if (isCurrentPlan(planId)) {
       return 'current';

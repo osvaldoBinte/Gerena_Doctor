@@ -69,6 +69,14 @@ import 'package:gerena/features/notification/domain/usecase/get_notification_use
 import 'package:gerena/features/review/data/datasources/review_data_sources_imp.dart';
 import 'package:gerena/features/review/data/repositories/review_repository_imp.dart';
 import 'package:gerena/features/review/domain/usecase/my_review_usecase.dart';
+import 'package:gerena/features/stories/data/datasources/stories_data_sources_imp.dart';
+import 'package:gerena/features/stories/data/repository/stories_repository_imp.dart';
+import 'package:gerena/features/stories/domain/usecase/add_like_to_story_usecase.dart';
+import 'package:gerena/features/stories/domain/usecase/create_strory_usecase.dart';
+import 'package:gerena/features/stories/domain/usecase/fetch_stories_by_id_usecase.dart';
+import 'package:gerena/features/stories/domain/usecase/fetch_stories_usecase.dart';
+import 'package:gerena/features/stories/domain/usecase/remove_story_usecase.dart';
+import 'package:gerena/features/stories/domain/usecase/set_story_as_seen_usecase.dart';
 import 'package:gerena/features/subscription/data/datasources/subscription_data_sources_imp.dart';
 import 'package:gerena/features/subscription/data/repositories/subscription_repository_imp.dart';
 import 'package:gerena/features/subscription/domain/usecase/change_subscription_plan_usecase.dart';
@@ -89,6 +97,7 @@ class UsecaseConfig {
    ReviewRepositoryImp? reviewRepositoryImp;
    NotificationRepositoryImp? notificationRepositoryImp;
    BlogRepositoryImp? blogRepositoryImp;
+   StoriesRepositoryImp? storiesRepositoryImp;
 
 
 
@@ -102,6 +111,7 @@ class UsecaseConfig {
    ReviewDataSourcesImp? reviewDataSourcesImp;
    NotificationDataSourcesImp? notificationDataSourcesImp;
    BlogDataSourcesImp? blogDataSourcesImp;
+   StoriesDataSourcesImp? storiesDataSourcesImp;
 
 
    LoginUsecase? loginUsecase;
@@ -177,7 +187,13 @@ class UsecaseConfig {
    GetBlogSocialByIdUsecase?getBlogSocialByIdUsecase;
    CreateBlogSocialUsecase?createBlogSocialUsecase;
    PostAnswerBlogUsecase?postAnswerBlogUsecase;
-   
+
+   AddLikeToStoryUsecase? addLikeToStoryUsecase;
+   CreateStroryUsecase? createStroryUsecase;
+   FetchStoriesByIdUsecase? fetchStoriesByIdUsecase;
+   FetchStoriesUsecase? fetchStoriesUsecase;
+   RemoveStoryUsecase? removeStoryUsecase;
+   SetStoryAsSeenUsecase? setStoryAsSeenUsecase;
 
 
 
@@ -195,6 +211,7 @@ class UsecaseConfig {
       reviewDataSourcesImp = ReviewDataSourcesImp();
       notificationDataSourcesImp = NotificationDataSourcesImp();
       blogDataSourcesImp = BlogDataSourcesImp();
+      storiesDataSourcesImp = StoriesDataSourcesImp();
       
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
@@ -209,6 +226,7 @@ class UsecaseConfig {
       reviewRepositoryImp = ReviewRepositoryImp(reviewDataSourcesImp: reviewDataSourcesImp!);
       notificationRepositoryImp =NotificationRepositoryImp(notificationDataSourcesImp: notificationDataSourcesImp!);
       blogRepositoryImp = BlogRepositoryImp(blogDataSourcesImp: blogDataSourcesImp!);
+      storiesRepositoryImp = StoriesRepositoryImp(storiesDataSourcesImp: storiesDataSourcesImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -282,6 +300,14 @@ class UsecaseConfig {
       getBlogSocialByIdUsecase = GetBlogSocialByIdUsecase(blogRepository: blogRepositoryImp!);
       createBlogSocialUsecase = CreateBlogSocialUsecase(blogRepository: blogRepositoryImp!);
       postAnswerBlogUsecase = PostAnswerBlogUsecase(blogRepository: blogRepositoryImp!);
+
+
+      addLikeToStoryUsecase = AddLikeToStoryUsecase(storiesRepository: storiesRepositoryImp!);
+      createStroryUsecase = CreateStroryUsecase(storiesRepository: storiesRepositoryImp!);
+      fetchStoriesByIdUsecase = FetchStoriesByIdUsecase(storiesRepository: storiesRepositoryImp!);
+      fetchStoriesUsecase = FetchStoriesUsecase(storiesRepository: storiesRepositoryImp!);
+      removeStoryUsecase = RemoveStoryUsecase(storiesRepository: storiesRepositoryImp!);
+      setStoryAsSeenUsecase = SetStoryAsSeenUsecase(storiesRepository: storiesRepositoryImp!);
 
 
     
