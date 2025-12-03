@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/loading/global_shop_loading.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
@@ -14,7 +15,7 @@ import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder
 import 'package:gerena/features/home/dashboard/widget/facturacion/facturacion.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/historial_de_pedidos_content.dart';
-import 'package:gerena/page/store/store_controller.dart';
+
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -80,7 +81,6 @@ class ShopNavigationController extends GetxController {
 class GlobalShopInterface extends StatelessWidget {
   GlobalShopInterface({Key? key}) : super(key: key);
 
-  final StoreController storeController = Get.put(StoreController());
   final navigationController = Get.find<ShopNavigationController>();
   final CarouselSliderController _carouselController =
       CarouselSliderController();
@@ -716,7 +716,7 @@ Widget _buildOffersSection() {
         const SizedBox(height: 16),
 
         if (medicationsController.isLoadingOffers.value)
-          Center(
+           Center(
             child: Padding(
               padding: const EdgeInsets.all(40.0),
               child: CircularProgressIndicator(
@@ -724,6 +724,7 @@ Widget _buildOffersSection() {
               ),
             ),
           )
+
         else if (medicationsController.errorMessageOffers.isNotEmpty)
           Center(
             child: Column(
@@ -890,14 +891,8 @@ Widget _buildCatalogSection() {
             
             Obx(() {
               if (medicationsController.isLoading.value) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(40.0),
-                    child: CircularProgressIndicator(
-                      color: GerenaColors.primaryColor,
-                    ),
-                  ),
-                );
+                    return GlobalShopLoading(loadingType: LoadingType.catalog);
+
               }
 
               if (medicationsController.errorMessage.isNotEmpty) {
@@ -1005,15 +1000,8 @@ Widget _buildCategoriesSidebar() {
         
         Obx(() {
           if (categoryController.isLoading.value) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(
-                  color: GerenaColors.primaryColor,
-                  strokeWidth: 2,
-                ),
-              ),
-            );
+               return GlobalShopLoading(loadingType: LoadingType.categories);
+
           }
           
           if (categoryController.errorMessage.isNotEmpty) {

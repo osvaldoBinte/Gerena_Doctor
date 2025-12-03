@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/review/domain/entities/my_review_entity.dart';
 import 'package:gerena/features/review/presentation/page/review_controller.dart';
+import 'package:gerena/features/review/presentation/widget/reviews_loading.dart';
 import 'package:get/get.dart';
 
 class ReviewsWidget extends StatelessWidget {
@@ -12,11 +13,7 @@ class ReviewsWidget extends StatelessWidget {
     return GetX<ReviewController>(
       builder: (controller) {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(
-              color: GerenaColors.primaryColor,
-            ),
-          );
+          return const ReviewsLoading();
         }
 
         if (controller.errorMessage.value.isNotEmpty) {
@@ -154,7 +151,7 @@ class ReviewsWidget extends StatelessWidget {
           child: Row(
             children: [
               _buildStarRating(review.rating.toDouble()),
-            /*  const Spacer(),
+              /*  const Spacer(),
               Text(
                 'Cita verificada',
                 style: GerenaColors.bodyMedium.copyWith(
@@ -256,11 +253,14 @@ class ReviewsWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         if (index < rating.floor()) {
-          return const Icon(Icons.star, color: GerenaColors.accentColor, size: 16);
+          return const Icon(Icons.star,
+              color: GerenaColors.accentColor, size: 16);
         } else if (index < rating) {
-          return const Icon(Icons.star_half, color: GerenaColors.accentColor, size: 16);
+          return const Icon(Icons.star_half,
+              color: GerenaColors.accentColor, size: 16);
         } else {
-          return const Icon(Icons.star_border, color: GerenaColors.accentColor, size: 16);
+          return const Icon(Icons.star_border,
+              color: GerenaColors.accentColor, size: 16);
         }
       }),
     );
@@ -286,13 +286,11 @@ class ReviewData {
     this.clientName = 'Usuario',
   });
 
-  // Obtener la inicial del cliente
   String get clientInitial {
     if (clientName.isEmpty) return 'U';
     return clientName[0].toUpperCase();
   }
 
-  // Converter desde Entity
   factory ReviewData.fromEntity(MyReviewEntity entity) {
     return ReviewData(
       title: entity.doctorName ?? 'Sin título',
@@ -305,7 +303,6 @@ class ReviewData {
     );
   }
 
-  // Formatear fecha
   static String _formatDate(String? date) {
     if (date == null || date.isEmpty) return 'Sin fecha';
     try {

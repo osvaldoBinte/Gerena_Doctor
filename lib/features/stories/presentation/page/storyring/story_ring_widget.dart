@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
+import 'package:gerena/features/stories/presentation/widgets/story_ring_loading.dart';
 import 'package:get/get.dart';
 
 class StoryRingWidget extends StatelessWidget {
@@ -19,18 +20,15 @@ class StoryRingWidget extends StatelessWidget {
     final StoryController controller = Get.find<StoryController>();
 
     return Obx(() {
-      // Si está cargando, mostrar loading
       if (controller.isLoading.value) {
-        return _buildLoadingRing();
+        return StoryRingLoading(size: size, multiple: true);
       }
 
-      // Si no hay historias, no mostrar nada
       if (!controller.hasStories(index)) {
         return const SizedBox.shrink();
       }
 
       final String? profileImage = controller.getUserProfileImage(index);
-      final bool hasUnviewed = controller.hasUnviewedStories(index);
       final bool allViewed = controller.hasViewedAllStories(index);
 
       return GestureDetector(
@@ -73,22 +71,5 @@ class StoryRingWidget extends StatelessWidget {
         ),
       );
     });
-  }
-
-  Widget _buildLoadingRing() {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.grey[200],
-      ),
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: GerenaColors.primaryColor,
-        ),
-      ),
-    );
   }
 }

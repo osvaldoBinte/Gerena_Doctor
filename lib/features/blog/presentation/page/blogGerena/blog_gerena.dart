@@ -5,6 +5,7 @@ import 'package:gerena/features/banners/presentation/widgets/image_viewer_dialog
 import 'package:gerena/features/blog/domain/entities/blog_gerena_entity.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
 import 'package:gerena/features/blog/presentation/page/blogSocial/blog_social.dart';
+import 'package:gerena/features/blog/presentation/widget/loading/blog_loading_widgets.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:get/get.dart';
 
@@ -13,7 +14,6 @@ class BlogGerena extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtener el controller desde GetX (debe estar registrado en bindings)
     final controller = Get.find<BlogController>();
     
     return Scaffold(
@@ -39,15 +39,13 @@ class BlogGerena extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             
-            // Usamos Obx para reactividad
-           // Usamos Obx para reactividad
 Obx(() {
   if (controller.showArticleDetail.value && !controller.showBlogSocial.value) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start, // ✅ Alinea a la izquierda
+      crossAxisAlignment: CrossAxisAlignment.start, 
       children: [
         Align(
-          alignment: Alignment.centerLeft, // ✅ Asegura que esté a la izquierda
+          alignment: Alignment.centerLeft, 
           child: buildBackButton(controller),
         ),
         if (controller.isLoadingDetail.value)
@@ -96,7 +94,6 @@ Obx(() {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Imagen con lupa y proporción correcta
         if (article.imageUrl != null && article.imageUrl!.isNotEmpty)
           Padding(
             padding: EdgeInsets.symmetric(horizontal: isTablet ? 50 : 0),
@@ -112,7 +109,7 @@ Obx(() {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: AspectRatio(
-                      aspectRatio: 16 / 9, // Mantiene proporción 16:9
+                      aspectRatio: 16 / 9, 
                       child: NetworkImageWidget(
                         imageUrl: article.imageUrl,
                         width: double.infinity,
@@ -120,7 +117,6 @@ Obx(() {
                       ),
                     ),
                   ),
-                  // Lupa en la esquina superior derecha
                   Positioned(
                     top: 12,
                     right: 12,
@@ -246,12 +242,7 @@ Obx(() {
   Widget _buildBlogGerenaContent(BlogController controller) {
     return Obx(() {
       if (controller.isLoadingGerena.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(40.0),
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return const BlogGerenaLoading();
       }
 
       return Column(

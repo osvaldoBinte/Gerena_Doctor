@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/notification/domain/entities/notification_entity.dart';
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
+import 'package:gerena/features/notification/presentation/widget/notification_modal_loading.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -42,7 +43,7 @@ class NotificationPage extends StatelessWidget {
               child: Obx(() {
                 if (controller.isLoading.value) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: NotificatioLoading(),
                   );
                 }
 

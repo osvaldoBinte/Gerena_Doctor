@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/estatusdepedido/estatus_de_pedido.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widget/status_card_loading.dart';
 import 'package:get/get.dart';
 
 class StatusCardWidget extends StatelessWidget {
@@ -13,7 +14,7 @@ class StatusCardWidget extends StatelessWidget {
 
     return Obx(() {
       if (controller.isLoading.value) {
-        return _buildLoadingCard();
+        return StatusCardLoading();
       }
 
       if (controller.errorMessage.isNotEmpty) {
@@ -28,20 +29,6 @@ class StatusCardWidget extends StatelessWidget {
     });
   }
 
-  Widget _buildLoadingCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: GerenaColors.smallBorderRadius,
-        boxShadow: [GerenaColors.lightShadow],
-      ),
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
 
   Widget _buildErrorCard(String message) {
     return Container(

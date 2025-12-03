@@ -6,6 +6,7 @@ import 'package:gerena/features/marketplace/presentation/page/Category/category_
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/widget/half_cut_circle.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/news_feed_widget.dart';
+import 'package:gerena/features/marketplace/presentation/page/Category/widget/loading/sidebar_loading.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widgets_status_pedido.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
@@ -26,193 +27,199 @@ class SidebarWidget extends StatelessWidget {
     final GetMyLastPaidOrderController orderController = 
         Get.find<GetMyLastPaidOrderController>(); 
 
-    return Container(
-      width: 350,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/menu/MENUGERENA.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 15),
-                            Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image.asset(
-                                    'assets/gerena-logo-home.png',
-                                    height: 45,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            _buildSearchField(),
-                            
-                            Obx(() {
-                              if (orderController.isLoading.value) {
-                                return const SizedBox.shrink();
-                              }
-                              
-                              if (orderController.errorMessage.isNotEmpty) {
-                                return const SizedBox.shrink();
-                              }
-                              
-                              if (!orderController.hasOrder) {
-                                return const SizedBox.shrink();
-                              }
-                              
-                              return const StatusCardWidget();
-                            }),
-                            
-                            SizedBox(height: 10),
-                            buildWishlistButton(
-                              onTap: () {
-                                final navigationController =
-                                    Get.find<ShopNavigationController>();
+    return Obx(() {
+      if (categoryController.isLoading.value) {
+        return const SidebarLoading();
+      }
 
-                                navigationController.navigateToWishlist();
-                                Get.to(() => GlobalShopInterface());
-                              },
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16.0, vertical: 8.0),
-                              child: Row(
-                                children: [
-                                  MouseRegion(
-                                    cursor: SystemMouseCursors.click,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Get.find<ShopNavigationController>()
-                                            .navigateToStore();
-                                        Get.to(
-                                          () => GlobalShopInterface(),
-                                          arguments: {
-                                            'categoryName': '',
-                                            'showOffers': true,
-                                          },
-                                        );
-                                      },
-                                      child: Text(
-                                        'CATÁLOGO',
-                                        style: TextStyle(
-                                          color: GerenaColors.textLightColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+      return Container(
+        width: 350,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/menu/MENUGERENA.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 15),
+                              Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/gerena-logo-home.png',
+                                      height: 45,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              _buildSearchField(),
+                              
+                              Obx(() {
+                                if (orderController.isLoading.value) {
+                                  return const SizedBox.shrink();
+                                }
+                                
+                                if (orderController.errorMessage.isNotEmpty) {
+                                  return const SizedBox.shrink();
+                                }
+                                
+                                if (!orderController.hasOrder) {
+                                  return const SizedBox.shrink();
+                                }
+                                
+                                return const StatusCardWidget();
+                              }),
+                              
+                              SizedBox(height: 10),
+                              buildWishlistButton(
+                                onTap: () {
+                                  final navigationController =
+                                      Get.find<ShopNavigationController>();
+
+                                  navigationController.navigateToWishlist();
+                                  Get.to(() => GlobalShopInterface());
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                child: Row(
+                                  children: [
+                                    MouseRegion(
+                                      cursor: SystemMouseCursors.click,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Get.find<ShopNavigationController>()
+                                              .navigateToStore();
+                                          Get.to(
+                                            () => GlobalShopInterface(),
+                                            arguments: {
+                                              'categoryName': '',
+                                              'showOffers': true,
+                                            },
+                                          );
+                                        },
+                                        child: Text(
+                                          'CATÁLOGO',
+                                          style: TextStyle(
+                                            color: GerenaColors.textLightColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              ),
+
+                              _buildCatalogGrid(categoryController),
+                              SizedBox(height: 50),
+
+                              Obx(() => (dashboardController
+                                          .isCalendarFullScreen.value ||
+                                      dashboardController.currentView.value ==
+                                          'appointments' ||
+                                      dashboardController.currentView.value ==
+                                          'doctor_profile' ||
+                                      dashboardController.currentView.value ==
+                                          'user_profile' ||
+                                      dashboardController.currentView.value ==
+                                          'membresia' ||
+                                      dashboardController.currentView.value ==
+                                          'PreguntasFrecuentes')
+                                  ? const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 16.0),
+                                      child: NewsFeedWidget(),
+                                    )
+                                  : const SizedBox.shrink()),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: controller.openWhatsApp,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: GerenaColors.surfaceColor,
+                      borderRadius: GerenaColors.smallBorderRadius,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: GerenaColors.surfaceColor,
+                          ),
+                          child: Image.asset(
+                            'assets/icons/headset_mic.png',
+                            width: 24,
+                            height: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: GerenaColors.primaryColor,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Text(
+                              'Gerena',
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                color: GerenaColors.surfaceColor,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-
-                            _buildCatalogGrid(categoryController),
-                            SizedBox(height: 50),
-
-                            Obx(() => (dashboardController
-                                        .isCalendarFullScreen.value ||
-                                    dashboardController.currentView.value ==
-                                        'appointments' ||
-                                    dashboardController.currentView.value ==
-                                        'doctor_profile' ||
-                                    dashboardController.currentView.value ==
-                                        'user_profile' ||
-                                    dashboardController.currentView.value ==
-                                        'membresia' ||
-                                    dashboardController.currentView.value ==
-                                        'PreguntasFrecuentes')
-                                ? const Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 16.0),
-                                    child: NewsFeedWidget(),
-                                  )
-                                : const SizedBox.shrink()),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: controller.openWhatsApp,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: GerenaColors.surfaceColor,
-                    borderRadius: GerenaColors.smallBorderRadius,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: GerenaColors.surfaceColor,
-                        ),
-                        child: Image.asset(
-                          'assets/icons/headset_mic.png',
-                          width: 24,
-                          height: 24,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: GerenaColors.primaryColor,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Text(
-                            'Gerena',
-                            textAlign: TextAlign.right,
-                            style: TextStyle(
-                              color: GerenaColors.surfaceColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+              Container(
+                width: 60,
+                height: 4,
+                margin: const EdgeInsets.only(top: 8, bottom: 12),
+                decoration: BoxDecoration(
+                  color: GerenaColors.surfaceColor,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-            Container(
-              width: 60,
-              height: 4,
-              margin: const EdgeInsets.only(top: 8, bottom: 12),
-              decoration: BoxDecoration(
-                color: GerenaColors.surfaceColor,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildSearchField() {
@@ -279,17 +286,6 @@ class SidebarWidget extends StatelessWidget {
 
   Widget _buildCatalogGrid(CategoryController controller) {
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Container(
-          height: 200,
-          child: Center(
-            child: CircularProgressIndicator(
-              color: GerenaColors.primaryColor,
-            ),
-          ),
-        );
-      }
-
       if (controller.errorMessage.isNotEmpty) {
         return Container(
           padding: EdgeInsets.all(16),

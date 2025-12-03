@@ -3,6 +3,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/add_address_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/addresses/getaddress_/loading/address_selector_loading.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -20,7 +21,7 @@ class AddressSelectorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       if (addressesController.isLoading.value) {
-        return _buildLoadingState();
+        return AddressSelectorLoading();
       }
 
       if (addressesController.errorMessage.value.isNotEmpty) {
@@ -34,20 +35,6 @@ class AddressSelectorWidget extends StatelessWidget {
       return _buildAddressContent();
     });
   }
-
-  // ✅ Estado de carga
-  Widget _buildLoadingState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: CircularProgressIndicator(
-          color: GerenaColors.primaryColor,
-        ),
-      ),
-    );
-  }
-
-  // ✅ Estado de error
   Widget _buildErrorState() {
     return Column(
       children: [
@@ -69,7 +56,6 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Estado vacío (sin direcciones)
   Widget _buildEmptyState() {
     return Column(
       children: [
@@ -98,18 +84,15 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Contenido principal con dirección seleccionada
   Widget _buildAddressContent() {
     return Obx(() {
       final selectedAddress = addressesController.selectedAddress.value;
 
-      // Auto-seleccionar la primera dirección si no hay ninguna seleccionada
       if (selectedAddress == null && addressesController.addresses.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final firstAddress = addressesController.addresses.first;
           addressesController.selectAddress(firstAddress);
           
-          // Llamar callback si existe
           if (onAddressSelected != null) {
             onAddressSelected!(firstAddress);
           }
@@ -130,7 +113,6 @@ class AddressSelectorWidget extends StatelessWidget {
     });
   }
 
-  // ✅ Widget de dirección seleccionada
   Widget _buildSelectedAddress(AddressesEntity address) {
     final fullAddress = '${address.street} ${address.exteriorNumber}'
         '${address.interiorNumber.isNotEmpty ? ', Int. ${address.interiorNumber}' : ''}, '
@@ -201,7 +183,6 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Botón para cambiar dirección
   Widget _buildChangeAddressButton() {
     return InkWell(
       onTap: () => _showAddressSelector(Get.context!),
@@ -230,8 +211,6 @@ class AddressSelectorWidget extends StatelessWidget {
       ),
     );
   }
-
-  // ✅ Mostrar diálogo de selección de direcciones
   void _showAddressSelector(BuildContext context) {
     Get.dialog(
       Dialog(
@@ -265,7 +244,6 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Header del diálogo
   Widget _buildDialogHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -290,7 +268,6 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Lista de direcciones
   Widget _buildAddressList() {
     return Flexible(
       child: Obx(() {
@@ -311,7 +288,6 @@ class AddressSelectorWidget extends StatelessWidget {
                 onTap: () {
                   addressesController.selectAddress(address);
                   
-                  // Llamar callback si existe
                   if (onAddressSelected != null) {
                     onAddressSelected!(address);
                   }
@@ -326,7 +302,6 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Botón para agregar nueva dirección
   Widget _buildAddNewAddressButton() {
     return OutlinedButton.icon(
       onPressed: () {
@@ -349,7 +324,6 @@ class AddressSelectorWidget extends StatelessWidget {
     );
   }
 
-  // ✅ Widget para cada opción de dirección
   Widget _buildAddressOption({
     required AddressesEntity address,
     required bool isSelected,
@@ -434,7 +408,6 @@ class AddressSelectorWidget extends StatelessWidget {
             ),
           ),
           
-          // ✅ Botones de acción
           Container(
             decoration: BoxDecoration(
               border: Border(
@@ -446,7 +419,7 @@ class AddressSelectorWidget extends StatelessWidget {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      Get.back(); // Cerrar el selector
+                      Get.back();
                       addressesController.prepareForEdit(address);
                       Get.dialog(
                         AddAddressModal(),
@@ -493,7 +466,6 @@ class AddressSelectorWidget extends StatelessWidget {
                   child: InkWell(
                     onTap: () {
                       if (address.id != null) {
-                        // ✅ Pasar closeSelector: true para cerrar el diálogo después de eliminar
                         addressesController.deleteAddress(address.id!, closeSelector: true);
                       }
                     },

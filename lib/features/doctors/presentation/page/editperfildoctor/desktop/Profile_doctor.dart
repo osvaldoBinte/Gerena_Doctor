@@ -6,6 +6,7 @@ import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/widget/loading/doctor_profile_loading.dart';
 import 'package:gerena/features/doctors/presentation/widget/social_networks_widget.dart';
 import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:gerena/features/home/dashboard/dashboard_page.dart';
@@ -29,7 +30,7 @@ class _UserProfileContentState extends State<UserProfileContent> {
     return Obx(() {
       if (controller.isLoading.value) {
         return Center(
-          child: CircularProgressIndicator(),
+          child: DoctorProfileLoading(),
         );
       }
 

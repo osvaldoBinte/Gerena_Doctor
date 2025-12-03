@@ -31,7 +31,6 @@ class BlogController extends GetxController {
     required this.postAnswerBlogUsecase,
   });
 
-  // Variables reactivas
   final RxBool showBlogSocial = false.obs;
   final RxBool showArticleDetail = false.obs;
   final Rx<BlogGerenaEntity?> selectedArticle = Rx<BlogGerenaEntity?>(null);
@@ -45,13 +44,11 @@ class BlogController extends GetxController {
 
   final CarouselSliderController carouselController = CarouselSliderController();
 
-  // Estados de carga
   final RxBool isLoadingGerena = false.obs;
   final RxBool isLoadingSocial = false.obs;
   final RxBool isLoadingDetail = false.obs;
   final RxBool isCreatingBlog = false.obs;
 
-  // Listas de datos
   final RxList<BlogGerenaEntity> blogGerenaList = <BlogGerenaEntity>[].obs;
   final RxList<BlogSocialEntity> blogSocialList = <BlogSocialEntity>[].obs;
   
@@ -67,7 +64,6 @@ class BlogController extends GetxController {
     loadBlogGerenaArticles();
   }
 
-  // ============ MÉTODOS PARA CARGAR DATOS ============
   List<BlogSocialEntity> getQuestions() {
     return blogSocialList.where((article) {
       return article.tipoPregunta != null && article.tipoPregunta!.isNotEmpty;
@@ -205,7 +201,6 @@ Future<void> sendAnswer({
     isLoadingDetail.value = false;
   }
 }
-  // ============ CREAR BLOG SOCIAL ============
   
   Future<void> createBlogSocial({
     required String title,
@@ -227,10 +222,8 @@ Future<void> sendAnswer({
       
       showSuccessSnackbar('Blog social creado correctamente');
       
-      // Recargar la lista de blogs sociales
       await loadBlogSocialArticles();
       
-      // Volver a la vista principal
       goBackToBlogSocial();
       
     } catch (e) {
@@ -240,8 +233,6 @@ Future<void> sendAnswer({
       isCreatingBlog.value = false;
     }
   }
-
-  // ============ MÉTODOS DE NAVEGACIÓN ============
 
   void showBlogSocialSection() {
     showBlogSocial.value = true;

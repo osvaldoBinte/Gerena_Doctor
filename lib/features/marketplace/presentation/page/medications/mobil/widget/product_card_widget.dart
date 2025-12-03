@@ -36,10 +36,16 @@ class ProductCardWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ??
           () {
-            Get.toNamed(
-              RoutesNames.productDetail,
-              arguments: medication.id,
-            );
+           // ✅ CORRECTO - Pasando un Map con los datos necesarios
+Get.toNamed(
+  RoutesNames.productDetail,
+  arguments: {
+    'id': medication.id,
+    'categoryName': medication.category ?? '', // O el nombre de categoría apropiado
+    // Puedes pasar el objeto completo si lo necesitas:
+    // 'medication': medication,
+  },
+);
           },
       child: Container(
         padding: EdgeInsets.all(cardPadding!),

@@ -5,6 +5,7 @@ import 'package:gerena/features/banners/presentation/widgets/image_viewer_dialog
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
 import 'package:gerena/features/blog/presentation/page/blogSocial/preguntas.dart';
 import 'package:gerena/features/blog/presentation/page/blogSocial/create_blog_social_form.dart';
+import 'package:gerena/features/blog/presentation/widget/loading/blog_loading_widgets.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:get/get.dart';
 
@@ -91,12 +92,7 @@ class BlogSocial extends StatelessWidget {
   Widget _buildBlogSocialContent(BlogController controller) {
     return Obx(() {
       if (controller.isLoadingSocial.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(40.0),
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return BlogGerenaLoading();
       }
 
       return Column(

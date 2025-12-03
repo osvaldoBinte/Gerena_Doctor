@@ -34,6 +34,9 @@ class GerenaColors {
   static const Color textchat = Color(0xFF656565); // Texto de pregunta en gris claro
   static const Color textTertiary = Color(0xFF000000);     
   static const Color textQuaternary = Color(0xFF00A6AD);
+static final Color loaddingwithOpacity1 = const Color.fromARGB(255, 200, 200, 200).withOpacity(0.15);
+static final Color loaddingwithOpacity3 = const Color.fromARGB(255, 180, 180, 180).withOpacity(0.35);
+static final Color loadding = const Color.fromARGB(255, 160, 160, 160);
 
   // Colores de estado
   static const Color successColor = Color(0xFF4CAF50);      // Verde para éxito

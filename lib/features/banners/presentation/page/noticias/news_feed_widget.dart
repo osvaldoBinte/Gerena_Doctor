@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gerena/features/banners/domain/entity/banners_entity.dart';
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/features/banners/presentation/page/noticias/wigget/feed_widget.dart';
+import 'package:gerena/features/banners/presentation/widgets/loading/news_feed_loading.dart';
 import 'package:gerena/features/blog/presentation/widget/mixed_blog_feed.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:get/get.dart'; 
@@ -30,12 +30,7 @@ class NewsFeedWidget extends StatelessWidget {
     
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: CircularProgressIndicator(),
-          ),
-        );
+        return NewsFeedLoading(isCompact: false);
       }
 
       if (controller.errorMessage.value.isNotEmpty) {
@@ -65,13 +60,12 @@ class NewsFeedWidget extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-            BannersListWidget(
-                      height: 200,
-                      maxBanners: 2, 
-                      
-                    ),
-                    SizedBox( height:  30,),
-        MixedBlogFeed()
+          BannersListWidget(
+            height: 200,
+            maxBanners: 2, 
+          ),
+          const SizedBox(height: 30),
+          MixedBlogFeed()
         ],
       );
     });
@@ -81,6 +75,10 @@ class NewsFeedWidget extends StatelessWidget {
     final BannerController controller = Get.find<BannerController>();
     
     return Obx(() {
+      if (controller.isLoading.value) {
+        return NewsFeedLoading(isCompact: true);
+      }
+      
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -102,14 +100,7 @@ class NewsFeedWidget extends StatelessWidget {
               ),
             ),
             
-            if (controller.isLoading.value)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            else if (controller.banners.isEmpty)
+            if (controller.banners.isEmpty)
               buildCompactNewsCard(
                 'BLOG',
                 'Aplicaciones de tóxina botulínica',
@@ -170,5 +161,4 @@ class NewsFeedWidget extends StatelessWidget {
     Get.find<ShopNavigationController>().navigateToBlogGerena();
     Get.to(() => GlobalShopInterface());
   }
-
 }

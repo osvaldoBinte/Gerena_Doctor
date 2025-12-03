@@ -4,10 +4,16 @@ import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widge
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedure_card_widget.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
+import 'package:gerena/features/doctors/presentation/widget/loading/share_and_procedures_loading.dart';
 import 'package:get/get.dart';
 
 class ShareAndProceduresWidget extends StatelessWidget {
-  const ShareAndProceduresWidget({Key? key}) : super(key: key);
+  final bool showShareSection;
+
+  const ShareAndProceduresWidget({
+    Key? key,
+    this.showShareSection = true, 
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +23,15 @@ class ShareAndProceduresWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Compartir tus procedimientos',
-          style: GerenaColors.headingSmall,
-        ),
-        ShareProcedureWidget(mediaController: mediaController),
-        const SizedBox(height: 16),
+        if (showShareSection) ...[
+          Text(
+            'Compartir tus procedimientos',
+            style: GerenaColors.headingSmall,
+          ),
+          ShareProcedureWidget(mediaController: mediaController),
+          const SizedBox(height: 16),
+        ],
+        
         _buildProceduresGrid(proceduresController),
       ],
     );
@@ -31,7 +40,8 @@ class ShareAndProceduresWidget extends StatelessWidget {
   Widget _buildProceduresGrid(ProceduresController proceduresController) {
     return Obx(() {
       if (proceduresController.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return ShareAndProceduresLoading(
+        );
       }
 
       if (proceduresController.errorMessage.isNotEmpty) {

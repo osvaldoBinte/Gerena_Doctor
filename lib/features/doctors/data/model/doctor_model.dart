@@ -28,7 +28,8 @@ class DoctorModel extends DoctorEntity {
       super.nombreVendedor,
       super.whatsAppVendedor,
       super.correoVendedor,
-      super.puntosDisponibles
+      super.puntosDisponibles,
+      super.calificaion
 
      
 
@@ -60,7 +61,10 @@ class DoctorModel extends DoctorEntity {
       nombreVendedor:json['nombreVendedor']??'',
       whatsAppVendedor:json['whatsAppVendedor']??'',
       correoVendedor:json['correoVendedor']??'',
-      puntosDisponibles:json['puntosDisponibles']??0
+      puntosDisponibles:json['puntosDisponibles']??0,
+      calificaion: json['calificaion'] != null 
+        ? (json['calificaion'] as num).toDouble() 
+        : null,
     );
   }
 factory DoctorModel.fromEntity(DoctorEntity entity) {
@@ -83,6 +87,7 @@ factory DoctorModel.fromEntity(DoctorEntity entity) {
     facebook:entity.facebook,
     x: entity.x,
     instagram:entity.instagram,
+    
 
   
   );

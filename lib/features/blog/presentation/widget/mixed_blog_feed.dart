@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
+import 'package:gerena/features/blog/presentation/widget/loading/mixed_blog_feed_loading.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
 import 'package:get/get.dart';
@@ -44,12 +45,8 @@ class _MixedBlogFeedState extends State<MixedBlogFeed> {
 
     return Obx(() {
       if (controller.isLoadingGerena.value || controller.isLoadingSocial.value) {
-        return const Center(
-          child: Padding(
-            padding: EdgeInsets.all(40.0),
-            child: CircularProgressIndicator(),
-          ),
-        );
+               return const MixedBlogFeedLoading();
+
       }
 
       final mixedList = _buildMixedList(controller);

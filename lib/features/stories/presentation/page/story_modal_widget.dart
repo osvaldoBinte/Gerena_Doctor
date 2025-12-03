@@ -50,8 +50,9 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
   final StoryController controller = Get.find<StoryController>();
   final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
   
-  VideoPlayerController? _videoController;
-  bool _isVideoInitialized = false;
+  // ✅ ELIMINAR estas variables locales - usar las del controller
+  // VideoPlayerController? _videoController;
+  // bool _isVideoInitialized = false;
 
   @override
   void initState() {
@@ -61,46 +62,11 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
     } else {
       controller.initializeStoryModal(widget.userIndex, this);
     }
-    
-    _initializeVideoIfNeeded();
   }
 
   @override
   void dispose() {
-    _videoController?.dispose();
     super.dispose();
-  }
-
-  Future<void> _initializeVideoIfNeeded() async {
-    // ✅ CAMBIO: Usar currentMyStory en lugar de myStory.value
-    final story = widget.isMyStory 
-        ? controller.currentMyStory
-        : controller.currentStory;
-
-    if (story == null) return;
-
-    if (story.tipoContenido.toLowerCase() == 'video') {
-      await _initializeVideo(story.urlContenido);
-    }
-  }
-
-  Future<void> _initializeVideo(String videoUrl) async {
-    try {
-      _videoController?.dispose();
-      _videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl));
-      
-      await _videoController!.initialize();
-      _videoController!.setLooping(true);
-      _videoController!.play();
-      
-      if (mounted) {
-        setState(() {
-          _isVideoInitialized = true;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error initializing video: $e');
-    }
   }
 
   @override
@@ -118,9 +84,10 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
         ),
       ),
       body: Obx(() {
+              if (!controller.isModalActive.value) {
+        return const SizedBox.shrink();
+      }
         final isViewingMyStory = controller.isViewingMyStory.value;
-        
-        // ✅ CAMBIO: Usar currentMyStory
         final currentStory = isViewingMyStory 
             ? controller.currentMyStory
             : controller.currentStory;
@@ -128,8 +95,6 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
         if (currentStory == null) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        _checkAndUpdateVideo(currentStory);
 
         return Material(
           color: Colors.black,
@@ -169,7 +134,6 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Barra de progreso
-                        // ✅ CAMBIO: Mostrar múltiples barras para mis historias también
                         if (isViewingMyStory) ...[
                           Row(
                             children: List.generate(
@@ -281,13 +245,14 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                             ),
                             
                             GestureDetector(
-                              onTap: () => Get.back(),
+                             onTap: () {
+    // ✅ CRÍTICO: Limpiar ANTES de cerrar
+    controller.disposeStoryModal();
+    Get.back();
+  },
                               child: Container(
                                 padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.3),
-                                  shape: BoxShape.circle,
-                                ),
+                               
                                 child: Image.asset(
                                   'assets/icons/close.png',
                                   width: 15,
@@ -302,38 +267,27 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                     ),
                   ),
                 ),
-
-                // Footer
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.6),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom + 16,
-                      left: 16,
-                      right: 16,
-                      top: 16,
-                    ),
-                    child: SizedBox(
+Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.black,
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom,
+                left: 16,
+                right: 16,
+                top: 16,
+              ),
+              child: SizedBox(
                       height: 50,
                       child: isViewingMyStory 
                           ? _buildMyStoryFooter(currentStory)
                           : _buildOtherStoryFooter(currentStory),
                     ),
-                  ),
-                ),
-
+            ),
+          ),
+               
                 // Áreas de navegación
                 Positioned(
                   top: 110,
@@ -354,7 +308,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                   right: 0,
                   width: screenWidth * 0.3,
                   child: GestureDetector(
-                    onTap: () => controller.nextStory(), // ✅ CAMBIO: Siempre usar nextStory (maneja todo internamente)
+                    onTap: () => controller.nextStory(),
                     onLongPress: () => controller.pauseStory(),
                     onLongPressEnd: (details) => controller.resumeStory(),
                     child: Container(color: Colors.transparent),
@@ -379,68 +333,86 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
       }),
     );
   }
-Widget _buildMyProfileImage() {
-  return Obx(() {
-    final doctor = doctorController.doctorProfile.value;
 
-    if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-      return Image.network(
-        doctor.foto!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _fallbackIcon();
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: GerenaColors.backgroundColorfondo,
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
+  Widget _buildMyProfileImage() {
+    return Obx(() {
+      final doctor = doctorController.doctorProfile.value;
+
+      if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+        return Image.network(
+          doctor.foto!,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _fallbackIcon();
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              color: GerenaColors.backgroundColorfondo,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          );
-        },
-      );
-    } else {
-      return _fallbackIcon();
-    }
-  });
-}
-Widget _fallbackIcon() {
-  return Container(
-    color: GerenaColors.backgroundColorfondo,
-    child: const Center(
-      child: Icon(
-        Icons.person,
-        size: 20,
-        color: Colors.grey,
+            );
+          },
+        );
+      } else {
+        return _fallbackIcon();
+      }
+    });
+  }
+
+  Widget _fallbackIcon() {
+    return Container(
+      color: GerenaColors.backgroundColorfondo,
+      child: const Center(
+        child: Icon(
+          Icons.person,
+          size: 20,
+          color: Colors.grey,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-
+  // ✅ CAMBIO: Usar videoController del controller con Obx
   Widget _buildStoryContent(StoryEntity story) {
     final isVideo = story.tipoContenido.toLowerCase() == 'video';
 
     if (isVideo) {
-      if (_videoController != null && _isVideoInitialized) {
-        return Center(
-          child: AspectRatio(
-            aspectRatio: _videoController!.value.aspectRatio,
-            child: VideoPlayer(_videoController!),
-          ),
-        );
-      } else {
-        return Container(
-          color: Colors.grey[900],
-          child: const Center(
-            child: CircularProgressIndicator(color: Colors.white),
-          ),
-        );
-      }
+      return Obx(() {
+        // ✅ Usar las variables del controller
+        if (controller.videoController != null && controller.isVideoInitialized.value) {
+          return Center(
+            child: AspectRatio(
+              aspectRatio: controller.videoController!.value.aspectRatio,
+              child: VideoPlayer(controller.videoController!),
+            ),
+          );
+        } else {
+          return Container(
+            color: Colors.grey[900],
+            child: const Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(color: Colors.white),
+                  SizedBox(height: 16),
+                  Text(
+                    'Cargando video...',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      });
     } else {
       return Image.network(
         story.urlContenido,
@@ -467,23 +439,6 @@ Widget _fallbackIcon() {
           );
         },
       );
-    }
-  }
-
-  void _checkAndUpdateVideo(StoryEntity newStory) {
-    final isVideo = newStory.tipoContenido.toLowerCase() == 'video';
-    
-    if (isVideo) {
-      if (_videoController == null || 
-          _videoController!.dataSource != newStory.urlContenido) {
-        _initializeVideo(newStory.urlContenido);
-      }
-    } else {
-      if (_videoController != null) {
-        _videoController!.dispose();
-        _videoController = null;
-        _isVideoInitialized = false;
-      }
     }
   }
 
@@ -564,31 +519,41 @@ Widget _fallbackIcon() {
         ),
       ],
     );
-  }
-
-  Widget _buildOtherStoryFooter(StoryEntity story) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: GestureDetector(
-        onTap: () => controller.likeStory(),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.4),
-            shape: BoxShape.circle,
-          ),
+  }Widget _buildOtherStoryFooter(StoryEntity story) {
+  return Align(
+    alignment: Alignment.centerRight,
+    child: GestureDetector(
+      onTap: () => controller.likeStory(),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.4),
+          shape: BoxShape.circle,
+        ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: child,
+            );
+          },
           child: Image.asset(
-            'assets/icons/favorite_border.png',
+            story.yaLikeada 
+                ? 'assets/icons/favorite.png'
+                : 'assets/icons/favorite_border.png',
+            key: ValueKey(story.yaLikeada), // ✅ Key necesaria para la animación
             color: story.yaLikeada 
-                ? Colors.red 
+                ? Colors.red
                 : Colors.white,
             width: 26,
             height: 26,
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _showDeleteOptions(BuildContext context) {
     showModalBottomSheet(
@@ -662,8 +627,7 @@ Widget _fallbackIcon() {
           ),
           TextButton(
             onPressed: () async {
-              Get.back(); // Cerrar diálogo
-              // ✅ CAMBIO: No cerrar el modal aquí, el controller lo maneja
+              Get.back();
               await controller.deleteMyStory();
             },
             style: TextButton.styleFrom(

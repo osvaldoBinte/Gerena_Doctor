@@ -128,7 +128,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => SplashController(doctorProfileUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => PrefilDortorController(doctorProfileUsecase:  Get.find(), updateDoctorProfileUsecase:  Get.find(), updatefotoDoctorProfileUsecase:  Get.find(), ), fenix: true);
         Get.lazyPut(() => CalendarControllerGetx(getAppointmentsUsecase: Get.find()), fenix: true);
-        Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find()), fenix:  true);
+        Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find(), searchingForMedicationsUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => ProductDetailController(getMedicineByIdUsecase: Get.find(),), fenix:  true);
         Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), payOrderUsecase:  Get.find(), calculateDiscountPointsUsecase:  Get.find(),  ), fenix:  true,);

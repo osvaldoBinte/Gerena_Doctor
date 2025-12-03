@@ -6,10 +6,11 @@ import 'package:gerena/features/appointment/presentation/page/perfil/PatientProf
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
-import 'package:gerena/features/stories/presentation/page/MyStoryRingWidget.dart';
+import 'package:gerena/features/stories/presentation/page/storyring/my_story_ring_widget.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
-import 'package:gerena/features/stories/presentation/page/story_ring_widget.dart';
+import 'package:gerena/features/stories/presentation/page/storyring/story_ring_widget.dart';
+import 'package:gerena/features/stories/presentation/widgets/story_ring_loading.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -49,15 +50,12 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         height: availableHeight,
         child: Column(
           children: [
-            // Sección de historias
             Container(
   height: 100,
   color: GerenaColors.backgroundColorFondo,
   child: Obx(() {
     if (storyController.isLoading.value && storyController.allStories.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const StoryRingLoading(multiple: true);
     }
 
     final totalStories = storyController.allStories.length;
@@ -70,10 +68,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         if (index == 0) {
           return MyStoryRingWidget(
             size: 80,
-            onAddStory: () {
-              print("Navegar a crear historia");
-              // Get.to(() => CreateStoryScreen());
-            },
+          
           );
         }
 
@@ -319,20 +314,7 @@ if (doctorController.isLoading.value) {
                         ),
                       ),
                       SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () {
-                         
-                          print('Ir a crear cita');
-                        },
-                        child: Text(
-                          'Agendar cita',
-                          style: GoogleFonts.rubik(
-                            fontSize: 13,
-                            color: GerenaColors.primaryColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                     
                     ],
                   ),
                 ),

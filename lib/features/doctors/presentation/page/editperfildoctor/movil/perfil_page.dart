@@ -10,6 +10,7 @@ import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widge
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_edit_page.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/doctors/presentation/widget/loading/doctor_profile_loading.dart';
 import 'package:gerena/features/doctors/presentation/widget/share_and_procedures_widget.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
 import 'package:gerena/movil/home/start_controller.dart';
@@ -29,143 +30,146 @@ class DoctorProfilePage extends StatefulWidget {
 class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final StartController controller = Get.find<StartController>();
   final MediaController mediaController = Get.put(MediaController());
-  final PromotionController promotionController = Get.put(PromotionController());
-  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
-  final ControllerPerfilConfiguration perfilConfiguration = 
+  final PromotionController promotionController =
+      Get.put(PromotionController());
+  final PrefilDortorController doctorController =
+      Get.find<PrefilDortorController>();
+  final ControllerPerfilConfiguration perfilConfiguration =
       Get.put(ControllerPerfilConfiguration(), tag: 'doctor');
 
- @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: GerenaColors.backgroundColorFondo,
-    appBar: PreferredSize(
-      preferredSize: const Size.fromHeight(0),
-      child: AppBar(
-        backgroundColor: GerenaColors.backgroundColorFondo,
-        elevation: 4,
-        shadowColor: GerenaColors.shadowColor,
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: GerenaColors.backgroundColorFondo,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          backgroundColor: GerenaColors.backgroundColorFondo,
+          elevation: 4,
+          shadowColor: GerenaColors.shadowColor,
+        ),
       ),
-    ),
-    body: Obx(() {
-      if (perfilConfiguration.showConfiguration.value) {
-        return ProfileConfiguration(); 
-      }
+      body: Obx(() {
+        if (perfilConfiguration.showConfiguration.value) {
+          return ProfileConfiguration();
+        }
 
-      if (doctorController.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
+        if (doctorController.isLoading.value) {
+          return DoctorProfileLoading();
+        }
 
-      if (doctorController.doctorProfile.value == null) {
-        return const Center(
-          child: Text('No se pudo cargar el perfil'),
-        );
-      }
+        if (doctorController.doctorProfile.value == null) {
+          return const Center(
+            child: Text('No se pudo cargar el perfil'),
+          );
+        }
 
-      return SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: _buildDoctorHeader(),
-            ),
-            const SizedBox(height: 16),
-            Divider(height: 2, color: GerenaColors.dividerColor),
-            const SizedBox(height: 16),
-            _buildWishlistButton(),
-            const SizedBox(height: 16),
-            Divider(height: 2, color: GerenaColors.dividerColor),
-            const SizedBox(height: 16),
-            SizedBox(height: GerenaColors.paddingMedium),
-            StatusCardWidget(),
-            const SizedBox(height: 16),
-            Divider(height: 2, color: GerenaColors.dividerColor),
-            _buildRewardsSection(),
-            const SizedBox(height: 16),
-            Divider(height: 2, color: GerenaColors.dividerColor),
-            const SizedBox(height: 16),
-            _buildExecutiveSection(),
-            const SizedBox(height: 16),
-            Divider(height: 2, color: GerenaColors.dividerColor),
-            const SizedBox(height: 16),
-            Text(
-              'PORTAFOLIO',
-              style: GerenaColors.headingSmall,
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: ShareAndProceduresWidget(),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'RESEÑAS DE SUS PACIENTES',
-                    style: GerenaColors.headingSmall,
-                  ),
-                  ReviewsWidget(),
-                  const SizedBox(height: 16),
-                /*  Text(
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: _buildDoctorHeader(),
+              ),
+              const SizedBox(height: 16),
+              Divider(height: 2, color: GerenaColors.dividerColor),
+              const SizedBox(height: 16),
+              _buildWishlistButton(),
+              const SizedBox(height: 16),
+              Divider(height: 2, color: GerenaColors.dividerColor),
+              const SizedBox(height: 16),
+              SizedBox(height: GerenaColors.paddingMedium),
+              StatusCardWidget(),
+              const SizedBox(height: 16),
+              Divider(height: 2, color: GerenaColors.dividerColor),
+              _buildRewardsSection(),
+              const SizedBox(height: 16),
+              Divider(height: 2, color: GerenaColors.dividerColor),
+              const SizedBox(height: 16),
+              _buildExecutiveSection(),
+              const SizedBox(height: 16),
+              Divider(height: 2, color: GerenaColors.dividerColor),
+              const SizedBox(height: 16),
+              Text(
+                'PORTAFOLIO',
+                style: GerenaColors.headingSmall,
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: ShareAndProceduresWidget(),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'RESEÑAS DE SUS PACIENTES',
+                      style: GerenaColors.headingSmall,
+                    ),
+                    ReviewsWidget(),
+                    const SizedBox(height: 16),
+                    /*  Text(
                     'PROMOCIONES Y DESCUENTOS ',
                     style: GerenaColors.headingSmall,
                   ),
                   const SizedBox(height: 16),
                   _buildPromocionSection(),*/
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Divider(height: 2, color: GerenaColors.dividerColor),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MouseRegion(
-                    child: Column(
-                      children: [
-                        buildProfileMenuItem('Historial de pedidos'),
-                        buildProfileMenuItem('Membresía'),
-                        buildProfileMenuItem('Preguntas frecuentes'),
-                        GestureDetector(
-                          onTap: () {
-                            Get.toNamed(RoutesNames.loginPage);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Cerrar sesión',
-                                  style: GoogleFonts.rubik(
-                                    fontSize: 14,
-                                    color: GerenaColors.textTertiaryColor,
+              const SizedBox(height: 16),
+              Divider(height: 2, color: GerenaColors.dividerColor),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    MouseRegion(
+                      child: Column(
+                        children: [
+                          buildProfileMenuItem('Historial de pedidos'),
+                          buildProfileMenuItem('Membresía'),
+                          buildProfileMenuItem('Preguntas frecuentes'),
+                          GestureDetector(
+                            onTap: () {
+                              Get.toNamed(RoutesNames.loginPage);
+                            },
+                            child: Container(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Cerrar sesión',
+                                    style: GoogleFonts.rubik(
+                                      fontSize: 14,
+                                      color: GerenaColors.textTertiaryColor,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    }),
-  );
-}
+            ],
+          ),
+        );
+      }),
+    );
+  }
 
   Widget _buildRewardsSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         child: Row(
@@ -198,7 +202,7 @@ Widget build(BuildContext context) {
   Widget _buildExecutiveSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
-      
+
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
@@ -229,7 +233,8 @@ Widget build(BuildContext context) {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (doctor?.correoVendedor != null && doctor!.correoVendedor!.isNotEmpty)
+                  if (doctor?.correoVendedor != null &&
+                      doctor!.correoVendedor!.isNotEmpty)
                     Text(
                       doctor.correoVendedor!,
                       style: GoogleFonts.rubik(
@@ -279,7 +284,7 @@ Widget build(BuildContext context) {
   Widget _buildDoctorHeader() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
-      
+
       if (doctorController.isLoading.value) {
         return Container(
           padding: const EdgeInsets.all(16),
@@ -289,7 +294,7 @@ Widget build(BuildContext context) {
           ),
         );
       }
-      
+
       if (doctor == null) {
         return Container(
           padding: const EdgeInsets.all(16),
@@ -299,7 +304,7 @@ Widget build(BuildContext context) {
           ),
         );
       }
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: GerenaColors.cardDecoration,
@@ -322,7 +327,8 @@ Widget build(BuildContext context) {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: doctorController.selectedImageFile.value != null
+                            child: doctorController.selectedImageFile.value !=
+                                    null
                                 ? Image.file(
                                     doctorController.selectedImageFile.value!,
                                     fit: BoxFit.cover,
@@ -331,9 +337,11 @@ Widget build(BuildContext context) {
                                     ? Image.network(
                                         doctor.foto!,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
                                           return Container(
-                                            color: GerenaColors.backgroundColorfondo,
+                                            color: GerenaColors
+                                                .backgroundColorfondo,
                                             child: const Icon(
                                               Icons.person,
                                               size: 50,
@@ -343,7 +351,8 @@ Widget build(BuildContext context) {
                                         },
                                       )
                                     : Container(
-                                        color: GerenaColors.backgroundColorfondo,
+                                        color:
+                                            GerenaColors.backgroundColorfondo,
                                         child: const Icon(
                                           Icons.person,
                                           size: 50,
@@ -376,7 +385,8 @@ Widget build(BuildContext context) {
                               : Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () => doctorController.pickAndUploadProfilePhoto(),
+                                    onTap: () => doctorController
+                                        .pickAndUploadProfilePhoto(),
                                     borderRadius: BorderRadius.circular(20),
                                     child: Container(
                                       padding: EdgeInsets.all(8),
@@ -404,15 +414,21 @@ Widget build(BuildContext context) {
                       ],
                     ),
                     SizedBox(height: GerenaColors.paddingExtraLarge),
-                    GerenaColors.createStarRating(rating: 5),
+                    GerenaColors.createStarRating(
+                        rating: doctor.calificaion ?? 0),
                     const SizedBox(width: 4),
-                    Text(
-                      '404 reseñas',
-                      style: GoogleFonts.rubik(
-                        fontSize: 12,
-                        color: GerenaColors.primaryColor,
-                      ),
-                    ),
+                    Row(
+                      children: [
+                      
+                        Text(
+                          doctor.calificaion?.toStringAsFixed(1) ?? "0.0",
+                          style: GoogleFonts.rubik(
+                            fontSize: 12,
+                            color: GerenaColors.primaryColor,
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
                 const SizedBox(height: GerenaColors.paddingSmall),
@@ -481,14 +497,17 @@ Widget build(BuildContext context) {
                     showShadow: false,
                     text: 'VER COMO PACIENTE',
                     borderRadius: 30,
+                     onPressed: () {
+                      Get.offNamed(RoutesNames.patientView);
+                    },
                   ),
                   GerenaColors.widgetButton(
                     showShadow: false,
                     text: 'EDITAR PERFIL',
                     borderRadius: 30,
                     onPressed: () {
-          perfilConfiguration.showConfigurationView();
-        },
+                      perfilConfiguration.showConfigurationView();
+                    },
                   ),
                 ],
               ),

@@ -1,3 +1,4 @@
+
 class DoctorEntity {
   int? userId;
   String? nombreCompleto;
@@ -27,6 +28,7 @@ class DoctorEntity {
   String? whatsAppVendedor;
   String? correoVendedor;
   int? puntosDisponibles;
+  double? calificaion;
 
   DoctorEntity(
       {this.userId,
@@ -54,5 +56,6 @@ class DoctorEntity {
       this.nombreVendedor,
       this.whatsAppVendedor,
       this.correoVendedor,
-      this.puntosDisponibles});
+      this.puntosDisponibles,
+      this.calificaion});
 }

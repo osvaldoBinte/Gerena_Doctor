@@ -5,6 +5,7 @@ import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/widget/half_cut_circle.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/mobil/widget/product_card_widget.dart'; // ✅ NUEVO
 import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,12 +38,12 @@ class CategoryPage extends GetView<CategoryController> {
               width: 200,
               child: GerenaColors.createSearchTextField(
                 controller: controller.searchController,
-                hintText: 'Buscar categoría',
+                hintText: 'Buscar...', // ✅ Cambiado
                 onChanged: (value) {
-                  controller.filterCategories(value);
+                  // El listener ya maneja esto
                 },
                 onSearchPressed: () {
-                 
+                  // Opcional: búsqueda manual
                 },
               ),
             ),
@@ -94,44 +95,73 @@ class CategoryPage extends GetView<CategoryController> {
                   ),
                 )),
                 
+                // ✅ NUEVO: Banner de resultados mejorado
                 Obx(() {
                   if (controller.searchQuery.value.isEmpty) {
                     return SizedBox.shrink();
                   }
                   
                   return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     color: GerenaColors.primaryColor.withOpacity(0.1),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.search,
-                          size: 18,
-                          color: GerenaColors.primaryColor,
-                        ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Buscando: "${controller.searchQuery.value}" - ${controller.filteredCategories.length} resultado(s)',
-                            style: GoogleFonts.rubik(
-                              fontSize: 13,
-                              color: GerenaColors.textPrimaryColor,
-                              fontWeight: FontWeight.w500,
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.search,
+                              size: 18,
+                              color: GerenaColors.primaryColor,
                             ),
-                          ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Buscando: "${controller.searchQuery.value}"',
+                                style: GoogleFonts.rubik(
+                                  fontSize: 13,
+                                  color: GerenaColors.textPrimaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Colors.grey[600],
+                              ),
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              onPressed: () {
+                                controller.clearSearch();
+                              },
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.close,
-                            size: 18,
-                            color: Colors.grey[600],
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(),
-                          onPressed: () {
-                            controller.clearSearch();
-                          },
-                        ),
+                        SizedBox(height: 8),
+                       // ✅ SOLUCIÓN 1: Hacer que el Row sea flexible
+Row(
+  children: [
+    Flexible(
+      child: _buildResultChip(
+        icon: Icons.category,
+        label: '${controller.filteredCategories.length} categorías',
+        color: Colors.blue,
+      ),
+    ),
+    SizedBox(width: 8),
+    Flexible(
+      child: Obx(() => _buildResultChip(
+        icon: Icons.inventory_2,
+        label: controller.isLoadingProducts.value 
+            ? 'Buscando...' 
+            : '${controller.medications.length} productos',
+        color: Colors.green,
+      )),
+    ),
+  ],
+),
                       ],
                     ),
                   );
@@ -142,7 +172,7 @@ class CategoryPage extends GetView<CategoryController> {
                       ? SavedProductsContent(
                           onBackPressed: () => showWishlist.value = false,
                         )
-                      : _buildCategoriesView()),
+                      : _buildMainContent()),
                 ),
               ],
             ),
@@ -154,6 +184,316 @@ class CategoryPage extends GetView<CategoryController> {
     );
   }
 
+  // ✅ NUEVO: Chip para mostrar resultados
+ // ✅ Y actualizar el widget del chip para que maneje el texto largo
+Widget _buildResultChip({
+  required IconData icon,
+  required String label,
+  required Color color,
+}) {
+  return Container(
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      color: color.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: color.withOpacity(0.3)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: color),
+        SizedBox(width: 4),
+        Flexible( // ✅ AGREGADO
+          child: Text(
+            label,
+            style: GoogleFonts.rubik(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+            overflow: TextOverflow.ellipsis, // ✅ AGREGADO
+            maxLines: 1, // ✅ AGREGADO
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+  // ✅ NUEVO: Contenido principal que decide qué mostrar
+  Widget _buildMainContent() {
+    return Obx(() {
+      if (controller.showingSearchResults.value && 
+          controller.searchQuery.value.isNotEmpty) {
+        return _buildSearchResults();
+      }
+      return _buildCategoriesView();
+    });
+  }
+
+  // ✅ NUEVO: Vista de resultados de búsqueda
+  Widget _buildSearchResults() {
+    return Obx(() {
+      final hasCategories = controller.filteredCategories.isNotEmpty;
+      final hasProducts = controller.medications.isNotEmpty;
+      final isLoading = controller.isLoadingProducts.value;
+
+      if (!hasCategories && !hasProducts && !isLoading) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search_off,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+              SizedBox(height: 16),
+              Text(
+                'No se encontraron resultados',
+                style: GoogleFonts.rubik(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: GerenaColors.textTertiaryColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Intenta con otra búsqueda',
+                style: GoogleFonts.rubik(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  controller.clearSearch();
+                },
+                icon: Icon(Icons.clear),
+                label: Text('Limpiar búsqueda'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: GerenaColors.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return ListView(
+        padding: EdgeInsets.all(16),
+        children: [
+          // Sección de Categorías
+          if (hasCategories) ...[
+            _buildSectionHeader(
+              icon: Icons.category,
+              title: 'Categorías (${controller.filteredCategories.length})',
+              color: Colors.blue,
+            ),
+            SizedBox(height: 12),
+            _buildCategoryGrid(controller.filteredCategories),
+            SizedBox(height: 24),
+          ],
+
+          // Sección de Productos
+          if (isLoading)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: CircularProgressIndicator(
+                  color: GerenaColors.primaryColor,
+                ),
+              ),
+            )
+          else if (hasProducts) ...[
+            _buildSectionHeader(
+              icon: Icons.inventory_2,
+              title: 'Productos (${controller.medications.length})',
+              color: Colors.green,
+            ),
+            SizedBox(height: 12),
+            _buildProductsGrid(controller.medications),
+          ],
+        ],
+      );
+    });
+  }
+
+  // ✅ NUEVO: Header de sección
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        SizedBox(width: 12),
+        Text(
+          title,
+          style: GoogleFonts.rubik(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: GerenaColors.textPrimaryColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ✅ NUEVO: Grid de categorías para búsqueda
+  Widget _buildCategoryGrid(List categories) {
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: categories.map((category) {
+        return InkWell(
+          onTap: () => _navigateToCategory(category),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 160,
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: GerenaColors.dividerColor,
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: GerenaColors.primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: (category.image != null && category.image!.isNotEmpty)
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            category.image!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Icons.category,
+                                color: GerenaColors.primaryColor,
+                                size: 30,
+                              );
+                            },
+                          ),
+                        )
+                      : Icon(
+                          Icons.category,
+                          color: GerenaColors.primaryColor,
+                          size: 30,
+                        ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  category.category ?? 'Sin nombre',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.rubik(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: GerenaColors.textPrimaryColor,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  // ✅ NUEVO: Grid de productos para búsqueda
+// ✅ SOLUCIÓN: Usar el mismo patrón de GetMedicationsPage
+Widget _buildProductsGrid(List medications) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final width = MediaQuery.of(context).size.width;
+
+      int crossAxisCount = 2;
+      if (width >= 1200) {
+        crossAxisCount = 5;
+      } else if (width >= 900) {
+        crossAxisCount = 4;
+      } else if (width >= 600) {
+        crossAxisCount = 3;
+      }
+
+      return ListView.separated(
+        shrinkWrap: true, // ✅ Importante para que funcione dentro de otro scroll
+        physics: NeverScrollableScrollPhysics(), // ✅ Importante
+        padding: const EdgeInsets.all(16.0),
+        itemCount: (medications.length / crossAxisCount).ceil(),
+        separatorBuilder: (context, index) => Divider(
+          height: 1,
+          thickness: 1,
+          color: GerenaColors.dividerColor,
+        ),
+        itemBuilder: (context, rowIndex) {
+          final startIdx = rowIndex * crossAxisCount;
+          final endIdx = (startIdx + crossAxisCount).clamp(
+            0,
+            medications.length,
+          );
+          final itemsInRow = endIdx - startIdx;
+
+          return IntrinsicHeight( // ✅ Esto permite altura automática
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (int i = 0; i < itemsInRow; i++) ...[
+                  Expanded(
+                    child: ProductCardWidget(
+                      medication: medications[startIdx + i],
+                      showFavoriteButton: true,
+                      showSaveIcon: true,
+                    ),
+                  ),
+                  if (i < itemsInRow - 1)
+                    VerticalDivider(
+                      width: 1,
+                      thickness: 1,
+                      color: GerenaColors.dividerColor,
+                    ),
+                ],
+                if (itemsInRow < crossAxisCount)
+                  ...List.generate(
+                    crossAxisCount - itemsInRow,
+                    (index) => Expanded(child: SizedBox()),
+                  ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
   Widget _buildCategoriesView() {
     return Obx(() {
       if (controller.isLoading.value) {
@@ -196,46 +536,19 @@ class CategoryPage extends GetView<CategoryController> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                controller.searchQuery.value.isEmpty 
-                    ? Icons.category_outlined 
-                    : Icons.search_off,
+                Icons.category_outlined,
                 size: 80,
                 color: Colors.grey[400],
               ),
               SizedBox(height: 16),
               Text(
-                controller.searchQuery.value.isEmpty
-                    ? 'No hay categorías disponibles'
-                    : 'No se encontraron categorías',
+                'No hay categorías disponibles',
                 style: GoogleFonts.rubik(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color: GerenaColors.textTertiaryColor,
                 ),
               ),
-              if (controller.searchQuery.value.isNotEmpty) ...[
-                SizedBox(height: 8),
-                Text(
-                  'Intenta con otra búsqueda',
-                  style: GoogleFonts.rubik(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    controller.clearSearch();
-                  },
-                  icon: Icon(Icons.clear),
-                  label: Text('Limpiar búsqueda'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: GerenaColors.primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
-                ),
-              ],
             ],
           ),
         );

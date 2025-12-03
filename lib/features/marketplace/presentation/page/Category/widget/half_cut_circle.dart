@@ -1,25 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 
-class HalfCutCircle extends StatelessWidget {
-  final IconData icon;
-
-  const HalfCutCircle({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipPath(
-      clipper: BottomFlatClipper(),
-      child: Container(
-        width: 60,
-        height: 60,
-        color: GerenaColors.secondaryColor,
-        child: Icon(icon, color: GerenaColors.textLightColor, size: 28),
-      ),
-    );
-  }
-}
-
 class BottomFlatClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

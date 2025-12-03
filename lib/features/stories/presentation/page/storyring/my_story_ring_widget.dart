@@ -4,16 +4,15 @@ import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controll
 import 'package:gerena/features/stories/presentation/page/create_story_screen.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
+import 'package:gerena/features/stories/presentation/widgets/story_ring_loading.dart'; 
 import 'package:get/get.dart';
 
 class MyStoryRingWidget extends StatelessWidget {
   final double size;
-  final VoidCallback? onAddStory;
-
+ 
   const MyStoryRingWidget({
     Key? key,
     this.size = 80,
-    this.onAddStory,
   }) : super(key: key);
 
   @override
@@ -24,17 +23,14 @@ class MyStoryRingWidget extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
       child: Obx(() {
-        // Mostrar loading si está cargando
         if (storyController.isLoadingMyStory.value) {
-          return _buildLoadingRing();
+          return StoryRingLoading(size: size);
         }
 
-        // Si tengo historia, mostrarla
         if (storyController.hasMyStory.value && storyController.myStories.isNotEmpty) {
           return _buildMyStoryRing(context, storyController, doctorController);
         }
 
-        // Si no tengo historia, mostrar botón de agregar
         return _buildAddStoryButton(context, doctorController);
       }),
     );
@@ -47,12 +43,10 @@ class MyStoryRingWidget extends StatelessWidget {
   ) {
     final doctor = doctorController.doctorProfile.value;
     
-    // Verificar si todas las historias fueron vistas
     final bool allViewed = storyController.myStories.every((story) => story.yaVista);
     
     return GestureDetector(
       onTap: () {
-        // Abrir modal de historia con la opción isMyStory = true
         showStoryModal(context, userIndex: -1, isMyStory: true);
       },
       child: Stack(
@@ -63,31 +57,26 @@ class MyStoryRingWidget extends StatelessWidget {
             isViewed: allViewed,
             size: size,
           ),
-          // ✅ CAMBIO: Mostrar botón de agregar en lugar del contador
           Positioned(
             right: 0,
             bottom: 0,
             child: GestureDetector(
               onTap: () {
-                // Navegar a la pantalla de crear historia
                 Get.to(() => const CreateStoryScreen());
               },
               child: Container(
                 width: 29,
                 height: 29,
-               
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Image.asset(
                     'assets/icons/aadHistory.png',
                     fit: BoxFit.contain,
-                  
                   ),
                 ),
               ),
             ),
           ),
-          // ✅ NUEVO: Contador de historias en la esquina superior derecha
           if (storyController.myStories.length > 1)
             Positioned(
               right: 0,
@@ -125,7 +114,6 @@ class MyStoryRingWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Navegar a la pantalla de crear historia
         Get.to(() => const CreateStoryScreen());
       },
       child: Stack(
@@ -155,55 +143,37 @@ class MyStoryRingWidget extends StatelessWidget {
     );
   }
 
-Widget _buildProfileImage(dynamic doctor) {
-  if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-    return Image.network(
-      doctor.foto!,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return _buildFallbackIcon();
-      },
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          color: GerenaColors.backgroundColorfondo,
-          child: const Center(
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        );
-      },
-    );
-  } else {
-    return _buildFallbackIcon();
+  Widget _buildProfileImage(dynamic doctor) {
+    if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
+      return Image.network(
+        doctor.foto!,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildFallbackIcon();
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: GerenaColors.backgroundColorfondo,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        },
+      );
+    } else {
+      return _buildFallbackIcon();
+    }
   }
-}
 
-Widget _buildFallbackIcon() {
-  return Container(
-    color: GerenaColors.backgroundColorfondo,
-    child: const Center(
-      child: Icon(
-        Icons.person,
-        size: 20,
-        color: Colors.grey,
-      ),
-    ),
-  );
-}
-
-
-  Widget _buildLoadingRing() {
+  Widget _buildFallbackIcon() {
     return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.grey[200],
-      ),
-      child: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: GerenaColors.primaryColor,
+      color: GerenaColors.backgroundColorfondo,
+      child: const Center(
+        child: Icon(
+          Icons.person,
+          size: 20,
+          color: Colors.grey,
         ),
       ),
     );

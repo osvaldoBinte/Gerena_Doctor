@@ -36,7 +36,7 @@ class ProductDetailPage extends GetView<ProductDetailController> {
                 letterSpacing: 1.5,
               ),
             ),
-            const Spacer(),
+            /*const Spacer(),
             Container(
               width: 140,
               child: GerenaColors.createSearchContainer(
@@ -45,7 +45,7 @@ class ProductDetailPage extends GetView<ProductDetailController> {
                 iconSize: 18,
                 onTap: () {},
               ),
-            ),
+            ),*/
           ],
         ),
       ),
