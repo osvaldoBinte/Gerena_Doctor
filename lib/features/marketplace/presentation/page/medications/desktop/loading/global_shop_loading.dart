@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 
 enum LoadingType {
-  offers,    
   catalog,    
   categories,  
 }
@@ -46,8 +45,6 @@ class _GlobalShopLoadingState extends State<GlobalShopLoading>
   @override
   Widget build(BuildContext context) {
     switch (widget.loadingType) {
-      case LoadingType.offers:
-        return _buildOffersLoading();
       case LoadingType.catalog:
         return _buildCatalogLoading();
       case LoadingType.categories:
@@ -83,58 +80,6 @@ class _GlobalShopLoadingState extends State<GlobalShopLoading>
     );
   }
 
-  Widget _buildOffersLoading() {
-    return AnimatedBuilder(
-      animation: _shimmerAnimation,
-      builder: (context, child) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(40.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: GerenaColors.loaddingwithOpacity1,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                
-                Expanded(
-                  child: Row(
-                    children: List.generate(
-                      3,
-                      (index) => Expanded(
-                        child: Container(
-                          height: 280,
-                          margin: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: _buildProductCardSkeleton(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(width: 12),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: GerenaColors.loaddingwithOpacity1,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildCatalogLoading() {
     return AnimatedBuilder(
       animation: _shimmerAnimation,
@@ -146,7 +91,7 @@ class _GlobalShopLoadingState extends State<GlobalShopLoading>
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 4,
-              childAspectRatio: 0.75,
+              childAspectRatio: 0.65,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
             ),
@@ -218,80 +163,87 @@ class _GlobalShopLoadingState extends State<GlobalShopLoading>
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 150,
-            decoration: BoxDecoration(
-              color: GerenaColors.loaddingwithOpacity1,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: SingleChildScrollView( 
+          physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 130, 
+                decoration: BoxDecoration(
+                  color: GerenaColors.loaddingwithOpacity1,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.image_outlined,
+                    size: 40,
+                    color: GerenaColors.loaddingwithOpacity3,
+                  ),
+                ),
               ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.image_outlined,
-                size: 50,
-                color: GerenaColors.loaddingwithOpacity3,
+              
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildShimmerBox(
+                      child: Container(
+                        height: 12, 
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: GerenaColors.loadding,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4), 
+                    _buildShimmerBox(
+                      child: Container(
+                        height: 12, 
+                        width: 80, 
+                        decoration: BoxDecoration(
+                          color: GerenaColors.loadding,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    _buildShimmerBox(
+                      child: Container(
+                        height: 16,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          color: GerenaColors.loadding,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    Container(
+                      width: double.infinity,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: GerenaColors.loaddingwithOpacity1,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
           ),
-          
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildShimmerBox(
-                  child: Container(
-                    height: 14,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                _buildShimmerBox(
-                  child: Container(
-                    height: 14,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                
-                
-                _buildShimmerBox(
-                  child: Container(
-                    height: 18,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                
-                Container(
-                  width: double.infinity,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: GerenaColors.loaddingwithOpacity1,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

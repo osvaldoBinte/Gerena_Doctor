@@ -289,43 +289,60 @@ Positioned(
           ),
                
                 // Áreas de navegación
-                Positioned(
-                  top: 110,
-                  bottom: 76 + MediaQuery.of(context).padding.bottom,
-                  left: 0,
-                  width: screenWidth * 0.3,
-                  child: GestureDetector(
-                    onTap: () => controller.previousStory(),
-                    onLongPress: () => controller.pauseStory(),
-                    onLongPressEnd: (details) => controller.resumeStory(),
-                    child: Container(color: Colors.transparent),
-                  ),
-                ),
+               // Área IZQUIERDA - Retroceder
+Positioned(
+  top: 110,
+  bottom: 76 + MediaQuery.of(context).padding.bottom,
+  left: 0,
+  width: screenWidth * 0.3,
+  child: GestureDetector(
+    onTap: () {
+      // ✅ NUEVO: Manejar tap diferente según el contexto
+      if (controller.isViewingMyStory.value) {
+        controller.previousMyStory();
+      } else {
+        controller.previousStory();
+      }
+    },
+    onLongPress: () => controller.pauseStory(),
+    onLongPressEnd: (details) => controller.resumeStory(),
+    child: Container(color: Colors.transparent),
+  ),
+),
 
-                Positioned(
-                  top: 110,
-                  bottom: 76 + MediaQuery.of(context).padding.bottom,
-                  right: 0,
-                  width: screenWidth * 0.3,
-                  child: GestureDetector(
-                    onTap: () => controller.nextStory(),
-                    onLongPress: () => controller.pauseStory(),
-                    onLongPressEnd: (details) => controller.resumeStory(),
-                    child: Container(color: Colors.transparent),
-                  ),
-                ),
+// Área DERECHA - Avanzar
+Positioned(
+  top: 110,
+  bottom: 76 + MediaQuery.of(context).padding.bottom,
+  right: 0,
+  width: screenWidth * 0.3,
+  child: GestureDetector(
+    onTap: () {
+      // ✅ NUEVO: Manejar tap diferente según el contexto
+      if (controller.isViewingMyStory.value) {
+        controller.nextMyStory();
+      } else {
+        controller.nextStory();
+      }
+    },
+    onLongPress: () => controller.pauseStory(),
+    onLongPressEnd: (details) => controller.resumeStory(),
+    child: Container(color: Colors.transparent),
+  ),
+),
 
-                Positioned(
-                  top: 110,
-                  bottom: 76 + MediaQuery.of(context).padding.bottom,
-                  left: screenWidth * 0.3,
-                  right: screenWidth * 0.3,
-                  child: GestureDetector(
-                    onLongPress: () => controller.pauseStory(),
-                    onLongPressEnd: (details) => controller.resumeStory(),
-                    child: Container(color: Colors.transparent),
-                  ),
-                ),
+// Área CENTRAL - Solo pausar/reanudar
+Positioned(
+  top: 110,
+  bottom: 76 + MediaQuery.of(context).padding.bottom,
+  left: screenWidth * 0.3,
+  right: screenWidth * 0.3,
+  child: GestureDetector(
+    onLongPress: () => controller.pauseStory(),
+    onLongPressEnd: (details) => controller.resumeStory(),
+    child: Container(color: Colors.transparent),
+  ),
+),
               ],
             ),
           ),

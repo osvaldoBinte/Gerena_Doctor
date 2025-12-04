@@ -399,7 +399,7 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
     progressController!.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (isViewingMyStory.value) {
-          _nextMyStory();
+          nextMyStory();
         } else {
           nextStory();
         }
@@ -407,7 +407,7 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
     });
   }
 
-  void _nextMyStory() async {
+  void nextMyStory() async {
     if (currentMyStoryIndex.value + 1 < myStories.length) {
       currentMyStoryIndex.value++;
       // ✅ NUEVO: Verificar y actualizar video
@@ -417,7 +417,7 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
     }
   }
 
-  void _previousMyStory() async {
+  void previousMyStory() async {
     if (currentMyStoryIndex.value > 0) {
       currentMyStoryIndex.value--;
       // ✅ NUEVO: Verificar y actualizar video
@@ -464,7 +464,7 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
       if (currentMyStoryIndex.value == 0) {
         return;
       }
-      _previousMyStory();
+      previousMyStory();
     } else if (currentUserIndex.value == 0 && currentStoryIndex.value == 0 && hasMyStory.value) {
       isViewingMyStory.value = true;
       currentUserIndex.value = -1;

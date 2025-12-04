@@ -4,6 +4,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/loading/global_shop_loading.dart';
+import 'package:gerena/features/marketplace/presentation/page/medications/desktop/loading/offers_loading.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/get_medications_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
@@ -716,14 +717,7 @@ Widget _buildOffersSection() {
         const SizedBox(height: 16),
 
         if (medicationsController.isLoadingOffers.value)
-           Center(
-            child: Padding(
-              padding: const EdgeInsets.all(40.0),
-              child: CircularProgressIndicator(
-                color: GerenaColors.primaryColor,
-              ),
-            ),
-          )
+          OffersLoading()
 
         else if (medicationsController.errorMessageOffers.isNotEmpty)
           Center(

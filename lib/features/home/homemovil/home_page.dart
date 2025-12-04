@@ -3,6 +3,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/perfil/PatientProfileScreen.dart';
+import 'package:gerena/features/appointment/presentation/widget/citas_loading.dart';
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
@@ -274,14 +275,7 @@ if (doctorController.isLoading.value) {
          
             if (calendarController.isLoading.value &&
                 calendarController.appointments.isEmpty) {
-              return Container(
-                height: 200,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: GerenaColors.primaryColor,
-                  ),
-                ),
-              );
+              return CitasLoading();
             }
 
            
