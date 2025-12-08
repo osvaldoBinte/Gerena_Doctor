@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/features/stories/presentation/page/create_story_controller.dart';
+import 'package:gerena/features/stories/presentation/page/create/create_story_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_manager/photo_manager.dart';

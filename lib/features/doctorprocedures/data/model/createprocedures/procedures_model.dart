@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart'; // ⬅️ AGREGAR ESTE IMPORT
+import 'package:http_parser/http_parser.dart'; 
 import 'package:gerena/features/doctorprocedures/domain/entities/createprocedures/create_procedures_entity.dart';
 
 class ProceduresModel extends ProceduresEntity {
@@ -56,7 +56,6 @@ class ProceduresModel extends ProceduresEntity {
         String fileName = file.path.split('/').last;
         String extension = fileName.split('.').last.toLowerCase();
 
-        // ⬅️ NUEVO: Determinar el Content-Type según la extensión
         MediaType? contentType = _getMediaType(extension);
 
         print('✅ Agregando imagen ${i + 1}/${imagenesLista.length}:');
@@ -65,13 +64,12 @@ class ProceduresModel extends ProceduresEntity {
         print('   - Extension: $extension');
         print('   - Content-Type: ${contentType?.mimeType ?? "no especificado"}');
 
-        // ⬅️ CAMBIO: Agregar contentType al MultipartFile
         request.files.add(
           await http.MultipartFile.fromPath(
             fieldName,
             filePath,
             filename: fileName,
-            contentType: contentType, // ⬅️ AGREGAR CONTENT-TYPE
+            contentType: contentType,
           ),
         );
       } else {
@@ -82,7 +80,6 @@ class ProceduresModel extends ProceduresEntity {
     print('✅ Total de imágenes agregadas: ${request.files.length}');
   }
 
-  // ⬅️ NUEVO: Método para determinar el MediaType según la extensión
   MediaType? _getMediaType(String extension) {
     switch (extension) {
       case 'jpg':
@@ -99,7 +96,7 @@ class ProceduresModel extends ProceduresEntity {
       case 'heic':
         return MediaType('image', 'heic');
       default:
-        return MediaType('image', 'jpeg'); // Default
+        return MediaType('image', 'jpeg');
     }
   }
 }

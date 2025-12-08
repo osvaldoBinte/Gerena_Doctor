@@ -36,6 +36,12 @@ import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.da
 import 'package:gerena/features/doctors/domain/usecase/get_doctor_availability_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/update_doctor_profile_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/updatefoto_doctor_profile_usecase.dart';
+import 'package:gerena/features/followers/data/datasources/follower_data_sources_imp.dart';
+import 'package:gerena/features/followers/data/repositories/follower_repository_imp.dart';
+import 'package:gerena/features/followers/domain/usecase/follow_user_usecase.dart';
+import 'package:gerena/features/followers/domain/usecase/get_follow_status_usecase.dart';
+import 'package:gerena/features/followers/domain/usecase/get_follows_usecase.dart';
+import 'package:gerena/features/followers/domain/usecase/unfollow_user_usecase.dart';
 import 'package:gerena/features/marketplace/data/datasources/Payment_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/addresses_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
@@ -66,6 +72,14 @@ import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase
 import 'package:gerena/features/notification/data/datasources/notification_data_sources_imp.dart';
 import 'package:gerena/features/notification/data/repositories/notification_repository_imp.dart';
 import 'package:gerena/features/notification/domain/usecase/get_notification_usecase.dart';
+import 'package:gerena/features/publications/data/datasources/publication_date_sources_imp.dart';
+import 'package:gerena/features/publications/data/repositories/publication_repository_imp.dart';
+import 'package:gerena/features/publications/domain/usecase/create_publication_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/delete_publication_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_feed_posts_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_my_posts_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/like_publication_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/update_publication_usecase.dart';
 import 'package:gerena/features/review/data/datasources/review_data_sources_imp.dart';
 import 'package:gerena/features/review/data/repositories/review_repository_imp.dart';
 import 'package:gerena/features/review/domain/usecase/my_review_usecase.dart';
@@ -98,6 +112,8 @@ class UsecaseConfig {
    NotificationRepositoryImp? notificationRepositoryImp;
    BlogRepositoryImp? blogRepositoryImp;
    StoriesRepositoryImp? storiesRepositoryImp;
+  PublicationRepositoryImp? publicationRepositoryImp;
+  FollowerRepositoryImp? followerRepositoryImp;
 
 
 
@@ -112,6 +128,9 @@ class UsecaseConfig {
    NotificationDataSourcesImp? notificationDataSourcesImp;
    BlogDataSourcesImp? blogDataSourcesImp;
    StoriesDataSourcesImp? storiesDataSourcesImp;
+     PublicationDateSourcesImp? publicationDateSourcesImp;
+  FollowerDataSourcesImp? followerDataSourcesImp;
+
 
 
    LoginUsecase? loginUsecase;
@@ -188,6 +207,14 @@ class UsecaseConfig {
    CreateBlogSocialUsecase?createBlogSocialUsecase;
    PostAnswerBlogUsecase?postAnswerBlogUsecase;
 
+
+  CreatePublicationUsecase? createPublicationUsecase;
+  DeletePublicationUsecase? deletePublicationUsecase;
+  GetFeedPostsUsecase? getFeedPostsUsecase;
+  GetMyPostsUsecase? getMyPostsUsecase;
+  LikePublicationUsecase? likePublicationUsecase;
+  UpdatePublicationUsecase? updatePublicationUsecase;
+
    AddLikeToStoryUsecase? addLikeToStoryUsecase;
    CreateStroryUsecase? createStroryUsecase;
    FetchStoriesByIdUsecase? fetchStoriesByIdUsecase;
@@ -196,7 +223,10 @@ class UsecaseConfig {
    SetStoryAsSeenUsecase? setStoryAsSeenUsecase;
 
 
-
+   FollowUserUsecase? followUserUsecase;
+   UnfollowUserUsecase? unfollowUserUsecase;
+   GetFollowStatusUsecase? getFollowStatusUsecase;
+   GetFollowsUsecase? getFollowsUsecase;
 
   UsecaseConfig(){
      authDataSources = AuthDataSourcesImp();
@@ -212,6 +242,9 @@ class UsecaseConfig {
       notificationDataSourcesImp = NotificationDataSourcesImp();
       blogDataSourcesImp = BlogDataSourcesImp();
       storiesDataSourcesImp = StoriesDataSourcesImp();
+      publicationDateSourcesImp = PublicationDateSourcesImp();
+      followerDataSourcesImp = FollowerDataSourcesImp();
+
       
 
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
@@ -227,6 +260,9 @@ class UsecaseConfig {
       notificationRepositoryImp =NotificationRepositoryImp(notificationDataSourcesImp: notificationDataSourcesImp!);
       blogRepositoryImp = BlogRepositoryImp(blogDataSourcesImp: blogDataSourcesImp!);
       storiesRepositoryImp = StoriesRepositoryImp(storiesDataSourcesImp: storiesDataSourcesImp!);
+      publicationRepositoryImp = PublicationRepositoryImp(publicationDateSourcesImp: publicationDateSourcesImp!);
+      followerRepositoryImp = FollowerRepositoryImp(followerDataSourcesImp: followerDataSourcesImp!);
+
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -302,6 +338,14 @@ class UsecaseConfig {
       postAnswerBlogUsecase = PostAnswerBlogUsecase(blogRepository: blogRepositoryImp!);
 
 
+      createPublicationUsecase = CreatePublicationUsecase(publicationRepository: publicationRepositoryImp!);
+      deletePublicationUsecase = DeletePublicationUsecase(publicationRepository: publicationRepositoryImp!);
+      getFeedPostsUsecase = GetFeedPostsUsecase(publicationRepository: publicationRepositoryImp!);
+      getMyPostsUsecase = GetMyPostsUsecase(publicationRepository: publicationRepositoryImp!);
+      likePublicationUsecase = LikePublicationUsecase(publicationRepository: publicationRepositoryImp!);
+      updatePublicationUsecase = UpdatePublicationUsecase(publicationRepository: publicationRepositoryImp!);
+
+
       addLikeToStoryUsecase = AddLikeToStoryUsecase(storiesRepository: storiesRepositoryImp!);
       createStroryUsecase = CreateStroryUsecase(storiesRepository: storiesRepositoryImp!);
       fetchStoriesByIdUsecase = FetchStoriesByIdUsecase(storiesRepository: storiesRepositoryImp!);
@@ -309,7 +353,11 @@ class UsecaseConfig {
       removeStoryUsecase = RemoveStoryUsecase(storiesRepository: storiesRepositoryImp!);
       setStoryAsSeenUsecase = SetStoryAsSeenUsecase(storiesRepository: storiesRepositoryImp!);
 
-
+ 
+      followUserUsecase = FollowUserUsecase(followerRepository: followerRepositoryImp!);
+      unfollowUserUsecase = UnfollowUserUsecase(followerRepository: followerRepositoryImp!);
+      getFollowStatusUsecase = GetFollowStatusUsecase(followerRepository: followerRepositoryImp!);
+      getFollowsUsecase = GetFollowsUsecase(followerRepository: followerRepositoryImp!);
     
   }
 }

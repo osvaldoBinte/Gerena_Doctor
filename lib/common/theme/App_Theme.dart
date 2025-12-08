@@ -85,7 +85,11 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
     accentColor, 
     secondaryColor,
   ];
-  
+    static LinearGradient get storyOverlayGradient => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Colors.black.withOpacity(0.5), Colors.black.withOpacity(0.5)],
+  );
   // Gradientes
   static LinearGradient get primaryGradient => LinearGradient(
     colors: [primaryColor, accentColor],
@@ -386,6 +390,23 @@ static final Color shadowColor = Colors.grey.withOpacity(0.5);
   
   // Helper methods para widgets comunes específicos de Gerena
   
+  static Widget createPostCard({
+    required Widget child,
+    EdgeInsets? padding,
+    Color? backgroundColor,
+    double? height, // Agregar parámetro de altura
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: padding,
+      height: height, // Aplicar la altura aquí
+      decoration: BoxDecoration(
+        color: backgroundColor ?? Colors.white,
+        boxShadow: [lightShadow],
+      ),
+      child: child,
+    );
+  }
   // Botón primario con estilo Gerena
   static Widget createPrimaryButton({
     required String text,
@@ -806,7 +827,16 @@ static Widget createBottomNavigationBar({
       ),
     ),
   );
-}
+}  static Widget createStoryOverlay({
+    required Widget child,
+    EdgeInsets? padding,
+  }) {
+    return Container(
+      decoration: BoxDecoration(gradient: storyOverlayGradient),
+      padding: padding ?? const EdgeInsets.all(16),
+      child: child,
+    );
+  }
 
    static Widget createLoginTextButton({
     required String text,

@@ -48,11 +48,6 @@ class StoryModalWidget extends StatefulWidget {
 class _StoryModalWidgetState extends State<StoryModalWidget>
     with TickerProviderStateMixin {
   final StoryController controller = Get.find<StoryController>();
-  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
-  
-  // ✅ ELIMINAR estas variables locales - usar las del controller
-  // VideoPlayerController? _videoController;
-  // bool _isVideoInitialized = false;
 
   @override
   void initState() {
@@ -84,9 +79,9 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
         ),
       ),
       body: Obx(() {
-              if (!controller.isModalActive.value) {
-        return const SizedBox.shrink();
-      }
+        if (!controller.isModalActive.value) {
+          return const SizedBox.shrink();
+        }
         final isViewingMyStory = controller.isViewingMyStory.value;
         final currentStory = isViewingMyStory 
             ? controller.currentMyStory
@@ -103,7 +98,6 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
             height: screenHeight,
             child: Stack(
               children: [
-                // Contenido de fondo (imagen o video)
                 Positioned.fill(
                   child: _buildStoryContent(currentStory),
                 ),
@@ -203,7 +197,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                         ],
                         const SizedBox(height: 16),
 
-                        // Info del usuario
+                        // Info del usuario con tiempo transcurrido
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -218,41 +212,58 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                                 ),
                               ),
                               child: ClipOval(
-                                child: isViewingMyStory
-                                    ? _buildMyProfileImage()
-                                    : _fallbackIcon()
+                                child: _fallbackIcon(),
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: Text(
-                                isViewingMyStory 
-                                    ? "Mi historia" 
-                                    : controller.currentUser!.nombreDoctor,
-                                style: GoogleFonts.rubik(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  shadows: [
-                                    Shadow(
-                                      offset: const Offset(0, 1),
-                                      blurRadius: 3,
-                                      color: Colors.black.withOpacity(0.5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isViewingMyStory 
+                                        ? "Mi historia" 
+                                        : controller.currentUser!.nombreDoctor,
+                                    style: GoogleFonts.rubik(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(0, 1),
+                                          blurRadius: 3,
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  // ✅ NUEVO: Mostrar tiempo transcurrido
+                                  Text(
+                                    controller.getTimeAgo(currentStory.fechaCreacion),
+                                    style: GoogleFonts.rubik(
+                                      color: Colors.white.withOpacity(0.8),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      shadows: [
+                                        Shadow(
+                                          offset: const Offset(0, 1),
+                                          blurRadius: 3,
+                                          color: Colors.black.withOpacity(0.5),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             
                             GestureDetector(
-                             onTap: () {
-    // ✅ CRÍTICO: Limpiar ANTES de cerrar
-    controller.disposeStoryModal();
-    Get.back();
-  },
+                              onTap: () {
+                                controller.disposeStoryModal();
+                                Get.back();
+                              },
                               child: Container(
                                 padding: const EdgeInsets.all(8),
-                               
                                 child: Image.asset(
                                   'assets/icons/close.png',
                                   width: 15,
@@ -267,82 +278,78 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                     ),
                   ),
                 ),
-Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: Colors.black,
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom,
-                left: 16,
-                right: 16,
-                top: 16,
-              ),
-              child: SizedBox(
+
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    color: Colors.black,
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom,
+                      left: 16,
+                      right: 16,
+                      top: 16,
+                    ),
+                    child: SizedBox(
                       height: 50,
                       child: isViewingMyStory 
                           ? _buildMyStoryFooter(currentStory)
                           : _buildOtherStoryFooter(currentStory),
                     ),
-            ),
-          ),
+                  ),
+                ),
                
                 // Áreas de navegación
-               // Área IZQUIERDA - Retroceder
-Positioned(
-  top: 110,
-  bottom: 76 + MediaQuery.of(context).padding.bottom,
-  left: 0,
-  width: screenWidth * 0.3,
-  child: GestureDetector(
-    onTap: () {
-      // ✅ NUEVO: Manejar tap diferente según el contexto
-      if (controller.isViewingMyStory.value) {
-        controller.previousMyStory();
-      } else {
-        controller.previousStory();
-      }
-    },
-    onLongPress: () => controller.pauseStory(),
-    onLongPressEnd: (details) => controller.resumeStory(),
-    child: Container(color: Colors.transparent),
-  ),
-),
+                Positioned(
+                  top: 110,
+                  bottom: 76 + MediaQuery.of(context).padding.bottom,
+                  left: 0,
+                  width: screenWidth * 0.3,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (controller.isViewingMyStory.value) {
+                        controller.previousMyStory();
+                      } else {
+                        controller.previousStory();
+                      }
+                    },
+                    onLongPress: () => controller.pauseStory(),
+                    onLongPressEnd: (details) => controller.resumeStory(),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
 
-// Área DERECHA - Avanzar
-Positioned(
-  top: 110,
-  bottom: 76 + MediaQuery.of(context).padding.bottom,
-  right: 0,
-  width: screenWidth * 0.3,
-  child: GestureDetector(
-    onTap: () {
-      // ✅ NUEVO: Manejar tap diferente según el contexto
-      if (controller.isViewingMyStory.value) {
-        controller.nextMyStory();
-      } else {
-        controller.nextStory();
-      }
-    },
-    onLongPress: () => controller.pauseStory(),
-    onLongPressEnd: (details) => controller.resumeStory(),
-    child: Container(color: Colors.transparent),
-  ),
-),
+                Positioned(
+                  top: 110,
+                  bottom: 76 + MediaQuery.of(context).padding.bottom,
+                  right: 0,
+                  width: screenWidth * 0.3,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (controller.isViewingMyStory.value) {
+                        controller.nextMyStory();
+                      } else {
+                        controller.nextStory();
+                      }
+                    },
+                    onLongPress: () => controller.pauseStory(),
+                    onLongPressEnd: (details) => controller.resumeStory(),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
 
-// Área CENTRAL - Solo pausar/reanudar
-Positioned(
-  top: 110,
-  bottom: 76 + MediaQuery.of(context).padding.bottom,
-  left: screenWidth * 0.3,
-  right: screenWidth * 0.3,
-  child: GestureDetector(
-    onLongPress: () => controller.pauseStory(),
-    onLongPressEnd: (details) => controller.resumeStory(),
-    child: Container(color: Colors.transparent),
-  ),
-),
+                Positioned(
+                  top: 110,
+                  bottom: 76 + MediaQuery.of(context).padding.bottom,
+                  left: screenWidth * 0.3,
+                  right: screenWidth * 0.3,
+                  child: GestureDetector(
+                    onLongPress: () => controller.pauseStory(),
+                    onLongPressEnd: (details) => controller.resumeStory(),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
               ],
             ),
           ),
@@ -351,39 +358,9 @@ Positioned(
     );
   }
 
-  Widget _buildMyProfileImage() {
-    return Obx(() {
-      final doctor = doctorController.doctorProfile.value;
-
-      if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-        return Image.network(
-          doctor.foto!,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _fallbackIcon();
-          },
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              color: GerenaColors.backgroundColorfondo,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              ),
-            );
-          },
-        );
-      } else {
-        return _fallbackIcon();
-      }
-    });
-  }
-
   Widget _fallbackIcon() {
     return Container(
-      color: GerenaColors.backgroundColorfondo,
+      color: GerenaColors.backgroundColor,
       child: const Center(
         child: Icon(
           Icons.person,
@@ -394,13 +371,11 @@ Positioned(
     );
   }
 
-  // ✅ CAMBIO: Usar videoController del controller con Obx
   Widget _buildStoryContent(StoryEntity story) {
     final isVideo = story.tipoContenido.toLowerCase() == 'video';
 
     if (isVideo) {
       return Obx(() {
-        // ✅ Usar las variables del controller
         if (controller.videoController != null && controller.isVideoInitialized.value) {
           return Center(
             child: AspectRatio(
@@ -536,41 +511,43 @@ Positioned(
         ),
       ],
     );
-  }Widget _buildOtherStoryFooter(StoryEntity story) {
-  return Align(
-    alignment: Alignment.centerRight,
-    child: GestureDetector(
-      onTap: () => controller.likeStory(),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.4),
-          shape: BoxShape.circle,
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          transitionBuilder: (child, animation) {
-            return ScaleTransition(
-              scale: animation,
-              child: child,
-            );
-          },
-          child: Image.asset(
-            story.yaLikeada 
-                ? 'assets/icons/favorite.png'
-                : 'assets/icons/favorite_border.png',
-            key: ValueKey(story.yaLikeada), // ✅ Key necesaria para la animación
-            color: story.yaLikeada 
-                ? Colors.red
-                : Colors.white,
-            width: 26,
-            height: 26,
+  }
+
+  Widget _buildOtherStoryFooter(StoryEntity story) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: GestureDetector(
+        onTap: () => controller.likeStory(),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.4),
+            shape: BoxShape.circle,
+          ),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            transitionBuilder: (child, animation) {
+              return ScaleTransition(
+                scale: animation,
+                child: child,
+              );
+            },
+            child: Image.asset(
+              story.yaLikeada 
+                  ? 'assets/icons/favorite.png'
+                  : 'assets/icons/favorite_border.png',
+              key: ValueKey(story.yaLikeada),
+              color: story.yaLikeada 
+                  ? Colors.red
+                  : Colors.white,
+              width: 26,
+              height: 26,
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _showDeleteOptions(BuildContext context) {
     showModalBottomSheet(

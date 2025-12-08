@@ -12,6 +12,7 @@ import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/doctors/presentation/widget/loading/doctor_profile_loading.dart';
 import 'package:gerena/features/doctors/presentation/widget/share_and_procedures_widget.dart';
+import 'package:gerena/features/followers/presentation/page/follower_controller.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/procedure_Widget.dart';
@@ -30,12 +31,11 @@ class DoctorProfilePage extends StatefulWidget {
 class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final StartController controller = Get.find<StartController>();
   final MediaController mediaController = Get.put(MediaController());
-  final PromotionController promotionController =
-      Get.put(PromotionController());
-  final PrefilDortorController doctorController =
-      Get.find<PrefilDortorController>();
+  final PromotionController promotionController = Get.put(PromotionController());
+  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
   final ControllerPerfilConfiguration perfilConfiguration =
       Get.put(ControllerPerfilConfiguration(), tag: 'doctor');
+  final FollowerController followerController = Get.find<FollowerController>();
 
   @override
   Widget build(BuildContext context) {
@@ -64,105 +64,222 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           );
         }
 
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: _buildDoctorHeader(),
-              ),
-              const SizedBox(height: 16),
-              Divider(height: 2, color: GerenaColors.dividerColor),
-              const SizedBox(height: 16),
-              _buildWishlistButton(),
-              const SizedBox(height: 16),
-              Divider(height: 2, color: GerenaColors.dividerColor),
-              const SizedBox(height: 16),
-              SizedBox(height: GerenaColors.paddingMedium),
-              StatusCardWidget(),
-              const SizedBox(height: 16),
-              Divider(height: 2, color: GerenaColors.dividerColor),
-              _buildRewardsSection(),
-              const SizedBox(height: 16),
-              Divider(height: 2, color: GerenaColors.dividerColor),
-              const SizedBox(height: 16),
-              _buildExecutiveSection(),
-              const SizedBox(height: 16),
-              Divider(height: 2, color: GerenaColors.dividerColor),
-              const SizedBox(height: 16),
-              Text(
-                'PORTAFOLIO',
-                style: GerenaColors.headingSmall,
-              ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: ShareAndProceduresWidget(),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'RESEÑAS DE SUS PACIENTES',
-                      style: GerenaColors.headingSmall,
-                    ),
-                    ReviewsWidget(),
-                    const SizedBox(height: 16),
-                    /*  Text(
-                    'PROMOCIONES Y DESCUENTOS ',
+        return RefreshIndicator(
+          onRefresh: () async {
+            await Future.wait([
+             // doctorController.loadDoctorProfile(),
+              followerController.refreshFollowStatus(),
+            ]);
+          },
+          child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: _buildDoctorHeader(),
+                ),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                const SizedBox(height: 16),
+                // NUEVA SECCIÓN DE ESTADÍSTICAS
+                _buildStatsSection(),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                const SizedBox(height: 16),
+                _buildWishlistButton(),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                const SizedBox(height: 16),
+                SizedBox(height: GerenaColors.paddingMedium),
+                StatusCardWidget(),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                _buildRewardsSection(),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                const SizedBox(height: 16),
+                _buildExecutiveSection(),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    'PORTAFOLIO',
                     style: GerenaColors.headingSmall,
                   ),
-                  const SizedBox(height: 16),
-                  _buildPromocionSection(),*/
-                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              Divider(height: 2, color: GerenaColors.dividerColor),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MouseRegion(
-                      child: Column(
-                        children: [
-                          buildProfileMenuItem('Historial de pedidos'),
-                          buildProfileMenuItem('Membresía'),
-                          buildProfileMenuItem('Preguntas frecuentes'),
-                          GestureDetector(
-                            onTap: () {
-                              Get.toNamed(RoutesNames.loginPage);
-                            },
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10.0),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Cerrar sesión',
-                                    style: GoogleFonts.rubik(
-                                      fontSize: 14,
-                                      color: GerenaColors.textTertiaryColor,
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ShareAndProceduresWidget(),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'RESEÑAS DE SUS PACIENTES',
+                        style: GerenaColors.headingSmall,
+                      ),
+                      ReviewsWidget(),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Divider(height: 2, color: GerenaColors.dividerColor),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MouseRegion(
+                        child: Column(
+                          children: [
+                            buildProfileMenuItem('Historial de pedidos'),
+                            buildProfileMenuItem('Membresía'),
+                            buildProfileMenuItem('Preguntas frecuentes'),
+                            GestureDetector(
+                              onTap: () {
+                                Get.toNamed(RoutesNames.loginPage);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Cerrar sesión',
+                                      style: GoogleFonts.rubik(
+                                        fontSize: 14,
+                                        color: GerenaColors.textTertiaryColor,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       }),
+    );
+  }
+
+  // 🔥 NUEVA SECCIÓN DE ESTADÍSTICAS
+  Widget _buildStatsSection() {
+    return Obx(() {
+      final doctor = doctorController.doctorProfile.value;
+      final isLoadingStats = followerController.isLoading.value && 
+                             followerController.followStatus.value == null;
+
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: GerenaColors.backgroundColor,
+          borderRadius: GerenaColors.mediumBorderRadius,
+          boxShadow: [GerenaColors.lightShadow],
+        ),
+        child: isLoadingStats
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: CircularProgressIndicator(
+                    color: GerenaColors.primaryColor,
+                    strokeWidth: 2,
+                  ),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildStatItem(
+                    icon: Icons.star_rounded,
+                    label: 'Calificación',
+                    value: doctor?.calificaion?.toStringAsFixed(1) ?? '0.0',
+                    color: GerenaColors.primaryColor,
+                  ),
+                  _buildVerticalDivider(),
+                  _buildStatItem(
+                    icon: Icons.people_rounded,
+                    label: 'Seguidores',
+                    value: '${followerController.totalFollowers}',
+                    color: GerenaColors.secondaryColor,
+                  ),
+                  _buildVerticalDivider(),
+                  _buildStatItem(
+                    icon: Icons.person_add_rounded,
+                    label: 'Siguiendo',
+                    value: '${followerController.totalFollowing}',
+                    color: GerenaColors.accentColor,
+                  ),
+                ],
+              ),
+      );
+    });
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.rubik(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: GerenaColors.textPrimaryColor,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.rubik(
+              fontSize: 12,
+              color: GerenaColors.textSecondaryColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(
+      height: 60,
+      width: 1,
+      color: GerenaColors.dividerColor,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
     );
   }
 
@@ -327,8 +444,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: doctorController.selectedImageFile.value !=
-                                    null
+                            child: doctorController.selectedImageFile.value != null
                                 ? Image.file(
                                     doctorController.selectedImageFile.value!,
                                     fit: BoxFit.cover,
@@ -337,11 +453,9 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                                     ? Image.network(
                                         doctor.foto!,
                                         fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
+                                        errorBuilder: (context, error, stackTrace) {
                                           return Container(
-                                            color: GerenaColors
-                                                .backgroundColorfondo,
+                                            color: GerenaColors.backgroundColorfondo,
                                             child: const Icon(
                                               Icons.person,
                                               size: 50,
@@ -351,8 +465,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                                         },
                                       )
                                     : Container(
-                                        color:
-                                            GerenaColors.backgroundColorfondo,
+                                        color: GerenaColors.backgroundColorfondo,
                                         child: const Icon(
                                           Icons.person,
                                           size: 50,
@@ -385,8 +498,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                               : Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () => doctorController
-                                        .pickAndUploadProfilePhoto(),
+                                    onTap: () => doctorController.pickAndUploadProfilePhoto(),
                                     borderRadius: BorderRadius.circular(20),
                                     child: Container(
                                       padding: EdgeInsets.all(8),
@@ -414,12 +526,10 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       ],
                     ),
                     SizedBox(height: GerenaColors.paddingExtraLarge),
-                    GerenaColors.createStarRating(
-                        rating: doctor.calificaion ?? 0),
+                    GerenaColors.createStarRating(rating: doctor.calificaion ?? 0),
                     const SizedBox(width: 4),
                     Row(
                       children: [
-                      
                         Text(
                           doctor.calificaion?.toStringAsFixed(1) ?? "0.0",
                           style: GoogleFonts.rubik(
@@ -493,21 +603,26 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GerenaColors.widgetButton(
-                    showShadow: false,
-                    text: 'VER COMO PACIENTE',
-                    borderRadius: 30,
-                     onPressed: () {
-                      Get.offNamed(RoutesNames.patientView);
-                    },
+                  Expanded(
+                    child: GerenaColors.widgetButton(
+                      showShadow: false,
+                      text: 'VER COMO PACIENTE',
+                      borderRadius: 30,
+                      onPressed: () {
+                        Get.offNamed(RoutesNames.patientView);
+                      },
+                    ),
                   ),
-                  GerenaColors.widgetButton(
-                    showShadow: false,
-                    text: 'EDITAR PERFIL',
-                    borderRadius: 30,
-                    onPressed: () {
-                      perfilConfiguration.showConfigurationView();
-                    },
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: GerenaColors.widgetButton(
+                      showShadow: false,
+                      text: 'EDITAR PERFIL',
+                      borderRadius: 30,
+                      onPressed: () {
+                        perfilConfiguration.showConfigurationView();
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -554,52 +669,6 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSpecialtiesSection() {
-    final specialties = [
-      'Mamoplastia',
-      'Otoplastia',
-      'Aplicación de hialurónico',
-      'Resección bolsas de Bichat',
-      'Mastopexia',
-      'Lifting facial'
-    ];
-
-    List<List<String>> specialtyRows = [];
-    for (int i = 0; i < specialties.length; i += 3) {
-      specialtyRows.add(specialties.sublist(
-          i, i + 3 > specialties.length ? specialties.length : i + 3));
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: specialtyRows
-          .map(
-            (row) => Container(
-              margin: const EdgeInsets.only(bottom: 17),
-              height: 20,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: row.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  return GerenaColors.widgetButton(
-                    text: row[index],
-                    textColor: GerenaColors.textSecondary,
-                    backgroundColor: GerenaColors.cardColor,
-                    borderColor: Color.fromARGB(255, 223, 220, 220),
-                    showShadow: true,
-                    customShadow: GerenaColors.lightShadow,
-                    borderRadius: 20,
-                    fontWeight: FontWeight.w300,
-                  );
-                },
-              ),
-            ),
-          )
-          .toList(),
     );
   }
 }

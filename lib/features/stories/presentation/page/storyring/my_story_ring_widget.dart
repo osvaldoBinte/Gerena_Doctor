@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
-import 'package:gerena/features/stories/presentation/page/create_story_screen.dart';
+import 'package:gerena/features/stories/presentation/page/create/create_story_screen.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
 import 'package:gerena/features/stories/presentation/widgets/story_ring_loading.dart'; 

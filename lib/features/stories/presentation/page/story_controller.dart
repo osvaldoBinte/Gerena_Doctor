@@ -260,13 +260,25 @@ void initializeMyStoryModal(TickerProvider vsync) {
   Get.back();
 }
 
+
   Future<void> fetchStories() async {
     try {
       isLoading.value = true;
       error.value = '';
       
       final stories = await fetchStoriesUsecase.execute();
-      allStories.value = stories;
+      
+      // ✅ ORDENAR las historias de cada usuario
+      final sortedStories = stories.map((userStory) {
+        return GetStoriesEntity(
+          doctorId: userStory.doctorId,
+          nombreDoctor: userStory.nombreDoctor,
+          fotoPerfilUrl: userStory.fotoPerfilUrl,
+          historias: _sortStoriesByDate(userStory.historias),
+        );
+      }).toList();
+      
+      allStories.value = sortedStories;
       
       isLoading.value = false;
     } catch (e) {
@@ -300,6 +312,7 @@ void initializeMyStoryModal(TickerProvider vsync) {
     }
   }
 
+  
   Future<void> fetchMyStory() async {
     try {
       isLoadingMyStory.value = true;
@@ -313,7 +326,9 @@ void initializeMyStoryModal(TickerProvider vsync) {
       }
 
       final stories = await fetchStoriesByIdUsecase.execute(userId);
-      myStories.value = stories;
+      
+      // ✅ ORDENAR mis historias por fecha de creación
+      myStories.value = _sortStoriesByDate(stories);
       hasMyStory.value = stories.isNotEmpty;
       isLoadingMyStory.value = false;
     } catch (e) {
@@ -321,7 +336,20 @@ void initializeMyStoryModal(TickerProvider vsync) {
       hasMyStory.value = false;
       isLoadingMyStory.value = false;
     }
-  }
+  }List<StoryEntity> _sortStoriesByDate(List<StoryEntity> stories) {
+  final sortedStories = List<StoryEntity>.from(stories);
+
+  sortedStories.sort((a, b) {
+    try {
+      return a.fechaCreacion.compareTo(b.fechaCreacion);
+    } catch (e) {
+      debugPrint('Error comparing dates: $e');
+      return 0;
+    }
+  });
+
+  return sortedStories;
+}
 
   String getContentType(String filePath) {
     final extension = filePath.toLowerCase().split('.').last;
@@ -604,7 +632,26 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
       return 0.0;
     }
   }
+String getTimeAgo(DateTime fechaCreacion) {
+  try {
+    final createdDate = fechaCreacion; 
+    final now = DateTime.now();
+    final difference = now.difference(createdDate);
 
+    if (difference.inDays > 0) {
+      return '${difference.inDays}d';
+    } else if (difference.inHours > 0) {
+      return '${difference.inHours}h';
+    } else if (difference.inMinutes > 0) {
+      return '${difference.inMinutes}m';
+    } else {
+      return 'Ahora';
+    }
+  } catch (e) {
+    debugPrint('Error parsing date: $e');
+    return '';
+  }
+}
   bool hasStories(int index) {
     return index < allStories.length && allStories[index].historias.isNotEmpty;
   }

@@ -7,6 +7,10 @@ import 'package:gerena/features/appointment/presentation/widget/citas_loading.da
 import 'package:gerena/features/banners/presentation/page/banners/banners_list_widget.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
+import 'package:gerena/features/publications/presentation/page/post_controller.dart';
+import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
+import 'package:gerena/features/publications/presentation/widget/post_card_widget.dart';
 import 'package:gerena/features/stories/presentation/page/storyring/my_story_ring_widget.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
@@ -26,18 +30,44 @@ class HomePageMovil extends StatefulWidget {
 class _GerenaFeedScreenState extends State<HomePageMovil> {
   final CalendarControllerGetx calendarController =
       Get.find<CalendarControllerGetx>();
-  
-  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
-  final ControllerPerfilConfiguration profileController = Get.put(ControllerPerfilConfiguration());
-  
-  // Agrega esta línea
+
+  final PrefilDortorController doctorController =
+      Get.find<PrefilDortorController>();
+  final ControllerPerfilConfiguration profileController =
+      Get.put(ControllerPerfilConfiguration());
+
   final StoryController storyController = Get.find<StoryController>();
+
+  final PublicationController publicationController =
+      Get.find<PublicationController>();
+
+  final ScrollController _internalScrollController = ScrollController();
+  
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
     final fechaInicial = DateTime(2025, 9, 1);
     calendarController.loadAppointmentsForDate(fechaInicial);
+    
+    _pageController = PageController();
+    
+    _internalScrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    _internalScrollController.removeListener(_scrollListener);
+    _internalScrollController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_internalScrollController.position.pixels >=
+        _internalScrollController.position.maxScrollExtent - 50) {
+    }
   }
 
   @override
@@ -45,67 +75,6 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     final double availableHeight = MediaQuery.of(context).size.height -
         AppBar().preferredSize.height -
         kBottomNavigationBarHeight;
-
-    List<Widget> allItems = [
-      Container(
-        height: availableHeight,
-        child: Column(
-          children: [
-            Container(
-  height: 100,
-  color: GerenaColors.backgroundColorFondo,
-  child: Obx(() {
-    if (storyController.isLoading.value && storyController.allStories.isEmpty) {
-      return const StoryRingLoading(multiple: true);
-    }
-
-    final totalStories = storyController.allStories.length;
-    
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: totalStories + 1, 
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return MyStoryRingWidget(
-            size: 80,
-          
-          );
-        }
-
-        return Container(
-          margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-          child: StoryRingWidget(
-            index: index - 1,
-            size: 80,
-          ),
-        );
-      },
-    );
-  }),
-),
-            
-            // Resto del contenido
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: GerenaColors.paddingMedium),
-                    _buildCitasSection(),
-                    SizedBox(height: GerenaColors.paddingMedium),
-                    BannersListWidget(
-                      height: 200,
-                      maxBanners: 2,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ];
 
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorFondo,
@@ -136,99 +105,280 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
             },
           );
         }
-        
-        return PageView.builder(
-          scrollDirection: Axis.vertical,
-          itemCount: allItems.length,
-          itemBuilder: (context, index) {
-            return allItems[index];
+
+        if (publicationController.isLoading.value &&
+            publicationController.posts.isEmpty) {
+          return _buildLoadingState(availableHeight);
+        }
+
+        if (publicationController.hasError.value &&
+            publicationController.posts.isEmpty) {
+          return _buildErrorState();
+        }
+
+        List<Widget> allItems = [
+          _buildFirstPageWithScroll(availableHeight),
+        ];
+
+        if (publicationController.posts.isNotEmpty) {
+          allItems.addAll(
+            publicationController.posts.map((post) => Container(
+                  height: availableHeight,
+                  child: _buildPostFromEntity(post),
+                )),
+          );
+        } else {
+          allItems.add(
+            Container(
+              height: availableHeight,
+              child: _buildEmptyPostsMessage(),
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            await publicationController.refreshPosts();
+            await calendarController.loadAppointmentsForDate(
+              calendarController.focusedDate.value,
+            );
           },
-          physics: const BouncingScrollPhysics(),
+          child: PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            itemCount: allItems.length,
+            itemBuilder: (context, index) {
+              return allItems[index];
+            },
+            physics: const BouncingScrollPhysics(),
+          ),
         );
       }),
     );
   }
 
-  // Widget para el botón de "Agregar mi historia"
-  Widget _buildAddStoryButton() {
-    return Container(
-      margin: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {
-              print("Agregar mi historia");
-              // Aquí puedes agregar la funcionalidad para crear una historia
-            },
-            child: Obx(() {
-              final doctor = doctorController.doctorProfile.value;
-              
-           Widget imageWidget;
+  Widget _buildFirstPageWithScroll(double availableHeight) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollEndNotification) {
+          if (_internalScrollController.position.pixels >=
+              _internalScrollController.position.maxScrollExtent - 10) {
+            Future.delayed(Duration(milliseconds: 100), () {
+              if (_pageController.hasClients && mounted) {
+                _pageController.nextPage(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            });
+          }
+        }
+        return false;
+      },
+      child: Container(
+        height: availableHeight,
+        child: Column(
+          children: [
+            Container(
+              height: 100,
+              color: GerenaColors.backgroundColorFondo,
+              child: Obx(() {
+                if (storyController.isLoading.value &&
+                    storyController.allStories.isEmpty) {
+                  return const StoryRingLoading(multiple: true);
+                }
 
-if (doctorController.isLoading.value) {
-  imageWidget = Container(
-    color: GerenaColors.backgroundColorfondo,
-    child: const Center(
-      child: CircularProgressIndicator(
-        strokeWidth: 2,
-      ),
-    ),
-  );
-} else if (doctor?.foto != null && doctor!.foto!.isNotEmpty) {
-  imageWidget = Image.network(
-    doctor.foto!,
-    fit: BoxFit.cover,
-    errorBuilder: (context, error, stackTrace) {
-      return _fallbackIcon();
-    },
-  );
-} else {
-  imageWidget = _fallbackIcon();
-}
+                final totalStories = storyController.allStories.length;
 
-              
-              return Stack(
-                children: [
-                  GerenaColors.createStoryRing(
-                    child: imageWidget,
-                    hasStory: false,
-                    size: 80,
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: SizedBox(
-                      width: 29,
-                      height: 29,
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: totalStories + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return MyStoryRingWidget(
+                        size: 80,
+                      );
+                    }
+
+                    return Container(
+                      margin: const EdgeInsets.only(
+                          right: 12, top: 8, bottom: 8),
+                      child: StoryRingWidget(
+                        index: index - 1,
+                        size: 80,
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
+
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _internalScrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    SizedBox(height: GerenaColors.paddingMedium),
+                    _buildCitasSection(),
+                    SizedBox(height: GerenaColors.paddingMedium),
+                    BannersListWidget(
+                      height: 200,
+                      maxBanners: 2,
+                    ),
+                    SizedBox(height: 20),
+                    GestureDetector(
+                      onVerticalDragEnd: (details) {
+                        if (details.primaryVelocity! < -500) {
+                          if (_pageController.hasClients) {
+                            _pageController.nextPage(
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        }
+                      },
                       child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Image.asset(
-                          'assets/icons/aadHistory.png',
-                          fit: BoxFit.contain,
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: GerenaColors.textSecondaryColor,
+                              size: 32,
+                            ),
+                            Text(
+                              'Desliza para ver publicaciones',
+                              style: GoogleFonts.rubik(
+                                fontSize: 12,
+                                color: GerenaColors.textSecondaryColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            }),
+                    SizedBox(height: 100),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(double availableHeight) {
+    return Container(
+      height: availableHeight,
+      child: Column(
+        children: [
+          Container(
+            height: 100,
+            color: GerenaColors.backgroundColorFondo,
+            child: const StoryRingLoading(multiple: true),
+          ),
+          Expanded(
+            child: Center(
+              child: CircularProgressIndicator(
+                color: GerenaColors.primaryColor,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-  Widget _fallbackIcon() {
-  return Container(
-    color: GerenaColors.backgroundColorfondo,
-    child: const Center(
-      child: Icon(
-        Icons.person,
-        size: 50,
-        color: Colors.grey,
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 60, color: Colors.red),
+          SizedBox(height: 16),
+          Text(
+            'Error al cargar publicaciones',
+            style: GoogleFonts.rubik(fontSize: 16),
+          ),
+          SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: () => publicationController.loadFeedPosts(),
+            child: Text('Reintentar'),
+          ),
+        ],
       ),
-    ),
-  );
-}
+    );
+  }
+
+  Widget _buildEmptyPostsMessage() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.post_add,
+            size: 60,
+            color: GerenaColors.textSecondaryColor,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No hay publicaciones disponibles',
+            style: GoogleFonts.rubik(
+              fontSize: 16,
+              color: GerenaColors.textSecondaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostFromEntity(PublicationEntity post) {
+    final PostController postController = Get.find<PostController>();
+
+    postController.initializeUserReaction(post.id, post.userreaction);
+
+    String userRole;
+    if (post.isReview && post.taggedDoctor != null) {
+      userRole = post.taggedDoctor!.nombreCompleto ?? 'Doctor';
+    } else if (post.isReview) {
+      userRole = 'Reseña verificada';
+    } else {
+      userRole = 'Publicación';
+    }
+
+    return PostCardWidget(
+      postId: post.id,
+      userName: post.author?.name ?? 'Usuario',
+      userRole: userRole,
+      postImages: publicationController.getOrderedImages(post),
+      description: post.description,
+      likes: post.reactions.total.toString(),
+      userImageAsset: post.author?.profilePhoto ?? '',
+      rating: post.rating?.toDouble(),
+      createdAt: publicationController.formatDate(post.createdAt),
+      userHasLiked: post.userHasLiked,
+      taggedDoctor: post.taggedDoctor,
+      userReaction: post.userreaction,
+      onReactionPressed: () {
+        final reactionType = postController.getCurrentReactionType(post.id);
+        publicationController.toggleLike(post.id, reactionType);
+      },
+      doctorData: {
+        'doctorName': post.taggedDoctor?.nombreCompleto ?? 'Doctor',
+        'specialty':
+            post.taggedDoctor?.especialidad ?? 'Especialidad no especificada',
+        'rating': post.rating?.toDouble() ?? 0.0,
+        'reviews': post.reactions.total.toString(),
+        'profileImage': post.taggedDoctor?.fotoPerfil ?? "assets/logo/logo.png",
+        'userId': post.taggedDoctor?.id ?? 0,
+      },
+    );
+  }
+
 
   Widget _buildCitasSection() {
     return Container(
@@ -269,19 +419,14 @@ if (doctorController.isLoading.value) {
             ],
           ),
           SizedBox(height: GerenaColors.paddingSmall),
-
-        
           Obx(() {
-         
             if (calendarController.isLoading.value &&
                 calendarController.appointments.isEmpty) {
               return CitasLoading();
             }
 
-           
             final upcomingAppointments = _getUpcomingAppointments();
 
-     
             if (upcomingAppointments.isEmpty) {
               return Container(
                 height: 200,
@@ -308,18 +453,17 @@ if (doctorController.isLoading.value) {
                         ),
                       ),
                       SizedBox(height: 8),
-                     
                     ],
                   ),
                 ),
               );
             }
+final citaCardHeight = MediaQuery.of(context).size.height * 0.25;
 
-          
             return Column(
               children: [
                 Container(
-                  height: 200,
+                  height: citaCardHeight,
                   child: PageView.builder(
                     controller: PageController(viewportFraction: 0.85),
                     itemCount: upcomingAppointments.length,
@@ -359,7 +503,6 @@ if (doctorController.isLoading.value) {
   Widget _buildCitaCard(dynamic appointment) {
     final String formattedTime = _formatTime(appointment.startTime);
     final String formattedDate = _formatDate(appointment.startTime);
-
 
     final String doctorName = appointment.subject ?? 'Sin nombre';
     final String appointmentType = appointment.location ?? 'Cita general';
@@ -462,8 +605,7 @@ if (doctorController.isLoading.value) {
               child: IntrinsicWidth(
                 child: GerenaColors.widgetButton(
                   onPressed: () {
-                       profileController.showPatientProfileView(appointment);
-
+                    profileController.showPatientProfileView(appointment);
                   },
                   text: 'Ver Ficha',
                   showShadow: false,
@@ -540,191 +682,5 @@ if (doctorController.isLoading.value) {
     final month = dateTime.month.toString().padLeft(2, '0');
     final year = dateTime.year;
     return '$day/$month/$year';
-  }
-
-  void _navigateToAppointmentDetails(dynamic appointment) {
-    print('Ver detalles de cita ID: ${appointment.id}');
-
-    // Get.to(() => AppointmentDetailsPage(appointmentId: appointment.id));
-  }
-
-  Widget _buildWebinarSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      height: 120,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            GerenaColors.primaryColor,
-            GerenaColors.accentColor,
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: GerenaColors.mediumBorderRadius,
-        boxShadow: [GerenaColors.lightShadow],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: -20,
-            top: -10,
-            bottom: -10,
-            child: Container(
-              width: 120,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/webinar_doctor.png'),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'WEBINAR',
-                  style: GoogleFonts.rubik(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: GerenaColors.textLightColor,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'APLICACIONES AVANZADAS DE\nLA TOXINA BOTULÍNICA EN\nMEDICINA ESTÉTICA',
-                  style: GoogleFonts.rubik(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: GerenaColors.textLightColor,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  '25 DE ABRIL',
-                  style: GoogleFonts.rubik(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: GerenaColors.textLightColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPromotionSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      height: 120,
-      decoration: BoxDecoration(
-        color: GerenaColors.secondaryColor,
-        borderRadius: GerenaColors.mediumBorderRadius,
-        boxShadow: [GerenaColors.lightShadow],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'LINETOX',
-                    style: GoogleFonts.rubik(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: GerenaColors.textLightColor,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
-                        '\$',
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: GerenaColors.textLightColor,
-                        ),
-                      ),
-                      Text(
-                        '1,500',
-                        style: GoogleFonts.rubik(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: GerenaColors.textLightColor,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    '3 ml',
-                    style: GoogleFonts.rubik(
-                      fontSize: 10,
-                      color: GerenaColors.textLightColor,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        '\$',
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: GerenaColors.textLightColor,
-                        ),
-                      ),
-                      Text(
-                        '4,100',
-                        style: GoogleFonts.rubik(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: GerenaColors.textLightColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              child: Image.asset(
-                'assets/linetox_product.png',
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: GerenaColors.textLightColor.withOpacity(0.2),
-                      borderRadius: GerenaColors.smallBorderRadius,
-                    ),
-                    child: Icon(
-                      Icons.medical_services,
-                      color: GerenaColors.textLightColor,
-                      size: 40,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

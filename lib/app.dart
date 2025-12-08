@@ -14,6 +14,7 @@ import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controlle
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
+import 'package:gerena/features/followers/presentation/page/follower_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
@@ -25,6 +26,10 @@ import 'package:gerena/features/marketplace/presentation/page/medications/mobil/
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
+import 'package:gerena/features/publications/presentation/page/create/create_publication_controller.dart';
+import 'package:gerena/features/publications/presentation/page/myposts/my_post_controller.dart';
+import 'package:gerena/features/publications/presentation/page/post_controller.dart';
+import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/features/review/presentation/page/review_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
@@ -118,8 +123,16 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.fetchStoriesUsecase! ,permanent:  true);
         Get.put(usecaseConfig.setStoryAsSeenUsecase!, permanent: true);
         Get.put(usecaseConfig.removeStoryUsecase!,permanent: true);
-
-
+       Get.put(usecaseConfig.createPublicationUsecase!, permanent: true);
+       Get.put(usecaseConfig.deletePublicationUsecase!, permanent: true);
+       Get.put(usecaseConfig.getFeedPostsUsecase!, permanent: true);
+       Get.put(usecaseConfig.getMyPostsUsecase!, permanent: true);
+       Get.put(usecaseConfig.likePublicationUsecase!, permanent: true);
+       Get.put(usecaseConfig.updatePublicationUsecase!, permanent: true);
+        Get.put(usecaseConfig.followUserUsecase!, permanent: true);
+        Get.put(usecaseConfig.unfollowUserUsecase!, permanent: true);
+        Get.put(usecaseConfig.getFollowStatusUsecase!, permanent: true);
+        Get.put(usecaseConfig.getFollowsUsecase!, permanent: true);
 
         Get.lazyPut(() => LoginController(loginUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => HistoryController(getMyOrderUsecase: Get.find()), fenix: true);
@@ -145,6 +158,11 @@ class App extends StatelessWidget {
         Get.lazyPut(() => AvailabilityController(addAvailabilityUsecase:  Get.find(), deleteAvailabilityUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => BlogController(getBlogGerenaUsecase: Get.find(), getBlogGerenaByIdUsecase: Get.find(), getBlogSocialUsecase: Get.find(), getBlogSocialByIdUsecase: Get.find(), createBlogSocialUsecase: Get.find(), postAnswerBlogUsecase: Get.find()), fenix: true,);
         Get.lazyPut(() => StoryController(fetchStoriesUsecase:  Get.find(), addLikeToStoryUsecase:  Get.find(), fetchStoriesByIdUsecase: Get.find(), removeStoryUsecase: Get.find(), createStroryUsecase: Get.find(), setStoryAsSeenUsecase:  Get.find()), fenix:  true);
+        Get.lazyPut(() =>CreatePublicationController(createPublicationUsecase: Get.find(),), fenix: true);
+        Get.lazyPut(() => PublicationController(getFeedPostsUsecase:Get.find(), likePublicationUsecase: Get.find()) , fenix:  true);
+        Get.lazyPut(() => MyPostController(getMyPostsUsecase: Get.find(), likePublicationUsecase:  Get.find(), deletePublicationUsecase: Get.find(),), fenix: true);
+              Get.lazyPut(() => FollowerController(getFollowStatusUsecase: Get.find()), fenix: true);
+
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

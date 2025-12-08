@@ -42,7 +42,7 @@ class _PostCarouselState extends State<PostCarousel> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10.0), 
-                    child: Image.asset(
+                    child: Image.network(
                       image,
                       fit: BoxFit.cover,
                       width: double.infinity,
