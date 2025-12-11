@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/tagged_doctor_entity.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
+import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/movil/homePage/posh_carousel.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,6 +48,8 @@ class _PostCardWidgetState extends State<PostCardWidget> {
   late PostController postController;
   bool _initialized = false;
 
+  final PublicationController publicationController =
+      Get.find<PublicationController>();
   @override
   void initState() {
     super.initState();
@@ -357,16 +360,18 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                               children: List.generate(
                                 postController.reactionIcons.length,
                                 (index) => GestureDetector(
-                                  onTap: () {
-                                    print(
-                                      "Reacción seleccionada: ${postController.reactionNames[index]}",
-                                    );
-                                    postController.selectReaction(
-                                        widget.postId, index);
-                                    if (widget.onReactionPressed != null) {
-                                      widget.onReactionPressed!();
-                                    }
-                                  },
+                                   onTap: () {
+                                  print(
+                                      "Reacción seleccionada: ${postController.reactionNames[index]}");
+                                  postController.selectReaction(
+                                      widget.postId, index);
+                                  final reactionType =
+                                      postController.getCurrentReactionType(
+                                    widget.postId,
+                                  );
+                                  publicationController.toggleLike(
+                                      widget.postId, reactionType);
+                                },
                                   child: Container(
                                     margin: const EdgeInsets.symmetric(
                                       horizontal: 4,

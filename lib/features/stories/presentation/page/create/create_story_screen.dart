@@ -350,93 +350,120 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
     controller.handleAppLifecycleState(state);
   }
 
-  Future<void> _publishStory() async {
-    if (controller.capturedFile.value == null || controller.contentType.value == null) {
-      return;
-    }
+ Future<void> _publishStory() async {
+  if (controller.capturedFile.value == null || controller.contentType.value == null) {
+    debugPrint('❌ No hay contenido para publicar');
+    return;
+  }
 
-    // ✅ Si hay textos, capturar/procesar la imagen o video con los textos
-    File? finalFile = controller.capturedFile.value;
+  debugPrint('📤 Iniciando publicación de historia...');
+  debugPrint('📋 Tipo: ${controller.contentType.value}');
+  debugPrint('📝 Cantidad de textos: ${controller.storyTexts.length}');
+
+  File? finalFile = controller.capturedFile.value;
+  
+  // Si hay textos, procesar el contenido
+  if (controller.storyTexts.isNotEmpty) {
+    debugPrint('🔄 Procesando contenido con textos...');
     
-    if (controller.storyTexts.isNotEmpty) {
-      // Mostrar indicador de procesamiento para videos
-      if (controller.contentType.value == 'video') {
-        Get.dialog(
-          WillPopScope(
-            onWillPop: () async => false,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(16),
+    // Mostrar diálogo de procesamiento
+    Get.dialog(
+      WillPopScope(
+        onWillPop: () async => false,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(color: Colors.white),
+                const SizedBox(height: 16),
+                Text(
+                  'Procesando historia con textos...',
+                  style: GoogleFonts.rubik(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(color: Colors.white),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Procesando video con textos...',
-                      style: GoogleFonts.rubik(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Esto puede tardar unos segundos',
-                      style: GoogleFonts.rubik(
-                        color: Colors.grey[400],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 8),
+                Text(
+                  'Esto puede tardar unos segundos',
+                  style: GoogleFonts.rubik(
+                    color: Colors.grey[400],
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
+              ],
             ),
           ),
-          barrierDismissible: false,
-        );
-      }
-
-      finalFile = await controller.captureStoryWithTexts();
-      
-      // Cerrar diálogo de procesamiento
-      if (controller.contentType.value == 'video') {
-        Get.back();
-      }
-    }
-
-    if (finalFile == null) {
-      Get.snackbar(
-        'Error',
-        'No se pudo procesar la historia',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    await storyController.createStory(
-      finalFile,
-      controller.contentType.value!,
-    );
-  }
-
-  // ✅ NUEVO: Mostrar editor de texto
-  void _showTextEditor() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StoryTextEditor(
-        onTextAdded: (text, color, position, scale) {
-          controller.addText(text, color, position, scale);
-        },
+        ),
       ),
+      barrierDismissible: false,
     );
+
+    // Capturar/procesar
+    finalFile = await controller.captureStoryWithTexts();
+    
+    // Cerrar diálogo
+    Get.back();
+    
+    debugPrint('📊 Resultado del procesamiento:');
+    debugPrint('   - Archivo: ${finalFile?.path}');
+    debugPrint('   - Tipo final: ${controller.contentType.value}');
   }
+
+  if (finalFile == null) {
+    debugPrint('❌ Error: archivo final es null');
+    Get.snackbar(
+      'Error',
+      'No se pudo procesar la historia',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+    return;
+  }
+
+  // Verificar que el archivo exista
+  if (!await finalFile.exists()) {
+    debugPrint('❌ Error: el archivo no existe en ${finalFile.path}');
+    Get.snackbar(
+      'Error',
+      'El archivo procesado no existe',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+    return;
+  }
+
+  debugPrint('✅ Publicando historia con archivo final: ${finalFile.path}');
+  
+  // Publicar
+  await storyController.createStory(
+    finalFile,
+    controller.contentType.value!,
+  );
+}
+// ✅ CORREGIDO: Mostrar editor de texto (PERMITIR EN VIDEOS)
+void _showTextEditor() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => StoryTextEditor(
+      onTextAdded: (text, color, position, scale) {
+        debugPrint('📝 Intentando agregar texto: "$text"');
+        controller.addText(text, color, position, scale);
+        debugPrint('📊 Total de textos ahora: ${controller.storyTexts.length}');
+      },
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -954,16 +981,21 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
     );
   }
 
-  // ✅ NUEVO: Botón para agregar texto
-  Widget _buildAddTextButton() {
-    return Positioned(
-      bottom: 30,
-      right: 20,
-      child: Column(
+  // ✅ CORREGIDO: Botón para agregar texto (FUNCIONA EN VIDEOS)
+Widget _buildAddTextButton() {
+  return Positioned(
+    bottom: 30,
+    right: 20,
+    child: Obx(() {
+      return Column(
         children: [
-          // Botón agregar texto
+          // Botón agregar texto (HABILITADO SIEMPRE)
           GestureDetector(
-            onTap: _showTextEditor,
+            onTap: () {
+              debugPrint('👆 Botón de texto presionado');
+              debugPrint('📹 Tipo: ${controller.contentType.value}');
+              _showTextEditor();
+            },
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -980,37 +1012,35 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
           ),
           
           // Botón eliminar texto seleccionado
-          Obx(() {
-            if (controller.selectedTextId.value != null) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 12),
-                child: GestureDetector(
-                  onTap: () {
-                    controller.removeText(controller.selectedTextId.value!);
-                    controller.selectText(null);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+          if (controller.selectedTextId.value != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: GestureDetector(
+                onTap: () {
+                  debugPrint('🗑️ Eliminando texto: ${controller.selectedTextId.value}');
+                  controller.removeText(controller.selectedTextId.value!);
+                  controller.selectText(null);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.8),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                    size: 28,
                   ),
                 ),
-              );
-            }
-            return const SizedBox.shrink();
-          }),
+              ),
+            ),
         ],
-      ),
-    );
-  }
+      );
+    }),
+  );
+}
 
   Widget _buildImagePreview() {
     if (controller.capturedFile.value == null) return const SizedBox.shrink();

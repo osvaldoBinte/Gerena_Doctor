@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgets_gobal.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
+import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/movil/widgets/widgets_gobal.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,14 +58,16 @@ class ReviewWidget extends StatefulWidget {
 class _ReviewWidgetState extends State<ReviewWidget> {
   late PostController postController;
   bool _initialized = false;
-
+  final PublicationController publicationController =
+      Get.find<PublicationController>();
   @override
   void initState() {
     super.initState();
     postController = Get.find<PostController>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_initialized) {
-        postController.initializeUserReaction(widget.postId, widget.userReaction);
+        postController.initializeUserReaction(
+            widget.postId, widget.userReaction);
         _initialized = true;
       }
     });
@@ -88,9 +91,10 @@ class _ReviewWidgetState extends State<ReviewWidget> {
               CircleAvatar(
                 radius: 20,
                 backgroundColor: GerenaColors.backgroundColorFondo,
-                backgroundImage: widget.avatarPath != null && widget.avatarPath!.isNotEmpty
-                    ? AssetImage(widget.avatarPath!)
-                    : null,
+                backgroundImage:
+                    widget.avatarPath != null && widget.avatarPath!.isNotEmpty
+                        ? NetworkImage(widget.avatarPath!)
+                        : null,
                 child: (widget.avatarPath == null || widget.avatarPath!.isEmpty)
                     ? Icon(Icons.person, color: GerenaColors.primaryColor)
                     : null,
@@ -172,16 +176,17 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                               children: [
                                 Obx(
                                   () => Opacity(
-                                    opacity: postController
-                                            .isShowingReactionOptions(widget.postId)
-                                        ? 0.0
-                                        : 1.0,
+                                    opacity:
+                                        postController.isShowingReactionOptions(
+                                                widget.postId)
+                                            ? 0.0
+                                            : 1.0,
                                     child: GestureDetector(
                                       onTap: () {
                                         print(
                                             "Toggling reactions for post: ${widget.postId}");
-                                        postController
-                                            .toggleReactionOptions(widget.postId);
+                                        postController.toggleReactionOptions(
+                                            widget.postId);
                                       },
                                       child: Column(
                                         crossAxisAlignment:
@@ -190,8 +195,8 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                                         children: [
                                           ColorFiltered(
                                             colorFilter: ColorFilter.mode(
-                                              postController
-                                                      .hasUserReacted(widget.postId)
+                                              postController.hasUserReacted(
+                                                      widget.postId)
                                                   ? postController
                                                       .getSelectedReactionColor(
                                                           widget.postId)
@@ -245,11 +250,7 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                                 color: GerenaColors.textTertiary,
                               ),
                             ),
-                          const SizedBox(height: 4),
-                          if (widget.showAgendarButton)
-                            GerenaColors.widgetButton(
-                             // doctorData: widget.doctorData,
-                            ),
+                          const SizedBox(height: 20),
                           if (widget.isReview) ...[
                             const SizedBox(height: 4),
                             Row(
@@ -299,14 +300,18 @@ class _ReviewWidgetState extends State<ReviewWidget> {
                                 onTap: () {
                                   print(
                                       "Reacción seleccionada: ${postController.reactionNames[index]}");
-                                  postController.selectReaction(widget.postId, index);
-                                  if (widget.onReactionPressed != null) {
-                                    widget.onReactionPressed!();
-                                  }
+                                  postController.selectReaction(
+                                      widget.postId, index);
+                                  final reactionType =
+                                      postController.getCurrentReactionType(
+                                    widget.postId,
+                                  );
+                                  publicationController.toggleLike(
+                                      widget.postId, reactionType);
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 4),
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 4),
                                   padding: const EdgeInsets.all(8),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,

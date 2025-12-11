@@ -21,7 +21,7 @@ Widget buildImageGallery(List<String> images) {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 image: DecorationImage(
-                  image: AssetImage(images[i]),
+                  image: NetworkImage(images[i]),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -35,7 +35,7 @@ Widget buildImageGallery(List<String> images) {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   image: DecorationImage(
-                    image: AssetImage(images[i + 1]),
+                    image: NetworkImage(images[i + 1]),
                     fit: BoxFit.cover,
                   ),
                 ),

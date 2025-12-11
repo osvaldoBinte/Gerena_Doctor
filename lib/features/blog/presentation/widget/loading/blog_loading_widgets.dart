@@ -116,9 +116,10 @@ class _BlogGerenaLoadingState extends State<BlogGerenaLoading>
                                  crossAxisCount == 2 ? 20 : 
                                  crossAxisCount == 3 ? 40 : 60;
         
-        double childAspectRatio = crossAxisCount == 1 ? 0.9 : 
-                                 crossAxisCount == 2 ? 1.0 : 
-                                 0.8;
+        // Ajustado el childAspectRatio para más altura
+        double childAspectRatio = crossAxisCount == 1 ? 0.75 : 
+                                 crossAxisCount == 2 ? 0.85 : 
+                                 0.7;
         
         return GridView.builder(
           shrinkWrap: true,
@@ -149,9 +150,10 @@ class _BlogGerenaLoadingState extends State<BlogGerenaLoading>
                                  crossAxisCount == 2 ? 20 : 
                                  crossAxisCount == 3 ? 40 : 60;
         
-        double childAspectRatio = crossAxisCount == 1 ? 0.9 : 
-                                 crossAxisCount == 2 ? 1.0 : 
-                                 0.8;
+        // Ajustado el childAspectRatio para más altura
+        double childAspectRatio = crossAxisCount == 1 ? 0.75 : 
+                                 crossAxisCount == 2 ? 0.85 : 
+                                 0.7;
         
         return GridView.builder(
           shrinkWrap: true,
@@ -179,139 +181,144 @@ class _BlogGerenaLoadingState extends State<BlogGerenaLoading>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen skeleton
-          Container(
-            height: 180,
-            decoration: BoxDecoration(
-              color: GerenaColors.loaddingwithOpacity1,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(
-                    GerenaColors.mediumBorderRadius.topLeft.x),
-                topRight: Radius.circular(
-                    GerenaColors.mediumBorderRadius.topRight.x),
+          // Imagen skeleton - Ahora usa Expanded con flex
+          Expanded(
+            flex: 4,
+            child: Container(
+              decoration: BoxDecoration(
+                color: GerenaColors.loaddingwithOpacity1,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(
+                      GerenaColors.mediumBorderRadius.topLeft.x),
+                  topRight: Radius.circular(
+                      GerenaColors.mediumBorderRadius.topRight.x),
+                ),
               ),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.article_outlined,
-                size: 60,
-                color: GerenaColors.loaddingwithOpacity3,
+              child: Center(
+                child: Icon(
+                  Icons.article_outlined,
+                  size: 60,
+                  color: GerenaColors.loaddingwithOpacity3,
+                ),
               ),
             ),
           ),
           
-          // Contenido
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Fecha y categoría
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildShimmerBox(
-                      child: Container(
-                        height: 12,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          color: GerenaColors.loadding,
-                          borderRadius: BorderRadius.circular(4),
+          // Contenido - Ahora usa Expanded con flex
+          Expanded(
+            flex: 6,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Fecha y categoría
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildShimmerBox(
+                        child: Container(
+                          height: 12,
+                          width: 80,
+                          decoration: BoxDecoration(
+                            color: GerenaColors.loadding,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
-                    ),
-                    _buildShimmerBox(
-                      child: Container(
-                        height: 12,
-                        width: 90,
-                        decoration: BoxDecoration(
-                          color: GerenaColors.loadding,
-                          borderRadius: BorderRadius.circular(4),
+                      _buildShimmerBox(
+                        child: Container(
+                          height: 12,
+                          width: 90,
+                          decoration: BoxDecoration(
+                            color: GerenaColors.loadding,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Título
+                  _buildShimmerBox(
+                    child: Container(
+                      height: 20,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: GerenaColors.loadding,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
-                  ],
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Título
-                _buildShimmerBox(
-                  child: Container(
-                    height: 20,
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  _buildShimmerBox(
+                    child: Container(
+                      height: 20,
+                      width: 180,
+                      decoration: BoxDecoration(
+                        color: GerenaColors.loadding,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  
+                  // Contenido (3 líneas)
+                  _buildShimmerBox(
+                    child: Container(
+                      height: 14,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: GerenaColors.loadding,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 6),
+                  
+                  _buildShimmerBox(
+                    child: Container(
+                      height: 14,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: GerenaColors.loadding,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 6),
+                  
+                  _buildShimmerBox(
+                    child: Container(
+                      height: 14,
+                      width: 150,
+                      decoration: BoxDecoration(
+                        color: GerenaColors.loadding,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                  
+                  const Spacer(),
+                  
+                  // Botón "Leer más"
+                  Container(
                     width: double.infinity,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
+                      color: GerenaColors.loaddingwithOpacity1,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
-                ),
-                
-                const SizedBox(height: 8),
-                
-                _buildShimmerBox(
-                  child: Container(
-                    height: 20,
-                    width: 180,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 12),
-                
-                // Contenido (3 líneas)
-                _buildShimmerBox(
-                  child: Container(
-                    height: 14,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 6),
-                
-                _buildShimmerBox(
-                  child: Container(
-                    height: 14,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 6),
-                
-                _buildShimmerBox(
-                  child: Container(
-                    height: 14,
-                    width: 150,
-                    decoration: BoxDecoration(
-                      color: GerenaColors.loadding,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 16),
-                
-                // Botón "Leer más"
-                Container(
-                  width: double.infinity,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: GerenaColors.loaddingwithOpacity1,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

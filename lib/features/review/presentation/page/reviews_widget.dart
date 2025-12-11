@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/features/review/domain/entities/my_review_entity.dart';
+import 'package:gerena/features/publications/domain/entities/myposts/image_entity.dart';
+import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
+import 'package:gerena/features/publications/presentation/widget/review_widget.dart';
 import 'package:gerena/features/review/presentation/page/review_controller.dart';
 import 'package:gerena/features/review/presentation/widget/reviews_loading.dart';
 import 'package:get/get.dart';
-
 class ReviewsWidget extends StatelessWidget {
   const ReviewsWidget({Key? key}) : super(key: key);
 
@@ -73,105 +74,236 @@ class ReviewsWidget extends StatelessWidget {
           );
         }
 
-        final reviewsList = controller.reviews
-            .map((entity) => ReviewData.fromEntity(entity))
-            .toList();
-
-        return _buildReviewsList(reviewsList);
+        return _buildReviewsList(controller.reviews, context);
       },
     );
   }
 
-  Widget _buildReviewsList(List<ReviewData> reviewsList) {
-    return Container(
+  Widget _buildReviewsList(List<PublicationEntity> reviews, BuildContext context) {
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: reviewsList
-            .map((review) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _buildReviewCard(review),
-                ))
-            .toList(),
+        children: reviews.map((review) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _buildReviewCard(review, context),
+          );
+        }).toList(),
       ),
     );
   }
 
-  Widget _buildReviewCard(ReviewData review) {
+  Widget _buildReviewCard(PublicationEntity review, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: GerenaColors.backgroundColor,
         borderRadius: GerenaColors.smallBorderRadius,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildReviewHeader(review),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+         
           Text(
-            review.title,
-            style: GerenaColors.headingSmall.copyWith(fontSize: 14),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            review.content,
-            style: GerenaColors.bodySmall,
+            review.description,
+            style: GerenaColors.bodyMedium,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
           if (review.images.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             _buildReviewImages(review.images),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildReviewFooter(review),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => _showReviewModal(context, review),
+              style: TextButton.styleFrom(
+                foregroundColor: GerenaColors.primaryColor,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Ver publicación',
+                    style: GerenaColors.bodyMedium.copyWith(
+                      color: GerenaColors.primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: GerenaColors.primaryColor,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildReviewHeader(ReviewData review) {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 16,
-          backgroundColor: GerenaColors.primaryColor,
-          child: Text(
-            review.clientInitial,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+void _showReviewModal(BuildContext context, PublicationEntity review) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
+          ),
+          decoration: BoxDecoration(
+            color: GerenaColors.backgroundColor,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header con botón cerrar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey[300]!,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Publicación',
+                      style: GerenaColors.headingSmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: GerenaColors.textSecondary,
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+              // Contenido scrollable
+              Flexible(
+                child: SingleChildScrollView(
+                  child: ReviewWidget(
+                    postId: review.id,
+                    userName: review.author?.name ?? 'Usuario',
+                    date: _formatDate(review.createdAt),
+                    title: review.taggedDoctor?.nombreCompleto ?? '',
+                    content: review.description,
+                    images: review.images.map((img) => img.imageUrl).toList(),
+                    userRole: review.taggedDoctor?.especialidad ?? '',
+                    rating: review.rating?.toDouble() ?? 0,
+                    reactions: review.reactions.total,
+                    avatarPath: review.author?.profilePhoto,
+                    margin: const EdgeInsets.all(0),
+                    padding: const EdgeInsets.all(16),
+                    showAgendarButton: true,
+                    isReview: true,
+                    userReaction: review.userreaction,
+                    showDeleteButton: false,
+                    doctorData: review.taggedDoctor != null
+                        ? {
+                            'id': review.taggedDoctor!.id,
+                            'nombreCompleto': review.taggedDoctor!.nombreCompleto,
+                            'especialidad': review.taggedDoctor!.especialidad,
+                            'fotoPerfil': review.taggedDoctor!.fotoPerfil,
+                          }
+                        : null,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 8),
+      );
+    },
+  );
+}
+  Widget _buildReviewHeader(PublicationEntity review) {
+    final author = review.author;
+    final authorName = author?.name ?? 'Usuario';
+    final authorPhoto = author?.profilePhoto;
+
+    return Row(
+      children: [
+        // Avatar del autor
+        CircleAvatar(
+          radius: 20,
+          backgroundColor: GerenaColors.primaryColor,
+          backgroundImage: authorPhoto != null && authorPhoto.isNotEmpty
+              ? NetworkImage(authorPhoto)
+              : null,
+          onBackgroundImageError: authorPhoto != null && authorPhoto.isNotEmpty
+              ? (exception, stackTrace) {
+                  // Error manejado con el child de fallback
+                }
+              : null,
+          child: authorPhoto == null || authorPhoto.isEmpty
+              ? Text(
+                  authorName.isNotEmpty ? authorName[0].toUpperCase() : 'U',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              : null,
+        ),
+        const SizedBox(width: 12),
         Expanded(
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStarRating(review.rating.toDouble()),
-              /*  const Spacer(),
               Text(
-                'Cita verificada',
+                authorName,
                 style: GerenaColors.bodyMedium.copyWith(
-                  color: GerenaColors.accentColor,
+                  fontWeight: FontWeight.w600,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Image.asset(
-                  'assets/icons/push-pin.png',
-                  width: 16,
-                  height: 16,
-                ),
-                onPressed: () {},
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  _buildStarRating(review.rating?.toDouble() ?? 0),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${review.rating ?? 0}/5',
+                    style: GerenaColors.bodySmall.copyWith(
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
-              */
             ],
           ),
         ),
@@ -179,14 +311,21 @@ class ReviewsWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewImages(List<String> images) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: images.map((imagePath) {
+
+  Widget _buildReviewImages(List<ImageEntity> images) {
+    // Ordenar imágenes por el campo order
+    final sortedImages = List<ImageEntity>.from(images)
+      ..sort((a, b) => a.order.compareTo(b.order));
+
+    return SizedBox(
+      height: 120,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: sortedImages.length,
+        itemBuilder: (context, index) {
+          final image = sortedImages[index];
           return Container(
-            width: 120,
-            height: 100,
+            width: 140,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
               borderRadius: GerenaColors.smallBorderRadius,
@@ -194,11 +333,24 @@ class ReviewsWidget extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: GerenaColors.smallBorderRadius,
-              child: Image.asset(
-                imagePath,
-                width: 120,
-                height: 100,
+              child: Image.network(
+                image.imageUrl,
                 fit: BoxFit.cover,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: GerenaColors.backgroundColorfondo,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
                     color: GerenaColors.backgroundColorfondo,
@@ -208,14 +360,14 @@ class ReviewsWidget extends StatelessWidget {
                         Icon(
                           Icons.broken_image,
                           color: Colors.grey[400],
-                          size: 24,
+                          size: 32,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Imagen no encontrada',
+                          'Error al cargar',
                           style: TextStyle(
                             color: Colors.grey[400],
-                            fontSize: 8,
+                            fontSize: 10,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -226,23 +378,40 @@ class ReviewsWidget extends StatelessWidget {
               ),
             ),
           );
-        }).toList(),
+        },
       ),
     );
   }
 
-  Widget _buildReviewFooter(ReviewData review) {
+  Widget _buildReviewFooter(PublicationEntity review) {
+    final reactions = review.reactions;
+
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          review.date,
-          style: GerenaColors.bodySmall,
+        // Reacciones totales
+        Row(
+          children: [
+            Icon(
+              Icons.favorite,
+              size: 16,
+              color: Colors.grey[600],
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '${reactions.total} reacciones',
+              style: GerenaColors.bodySmall.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 8),
+        // Fecha
         Text(
-          '${review.reactions} Reacciones',
-          style: GerenaColors.bodySmall,
+          _formatDate(review.createdAt),
+          style: GerenaColors.bodySmall.copyWith(
+            color: Colors.grey[600],
+          ),
         ),
       ],
     );
@@ -253,63 +422,50 @@ class ReviewsWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
         if (index < rating.floor()) {
-          return const Icon(Icons.star,
-              color: GerenaColors.accentColor, size: 16);
+          return const Icon(
+            Icons.star,
+            color: GerenaColors.accentColor,
+            size: 18,
+          );
         } else if (index < rating) {
-          return const Icon(Icons.star_half,
-              color: GerenaColors.accentColor, size: 16);
+          return const Icon(
+            Icons.star_half,
+            color: GerenaColors.accentColor,
+            size: 18,
+          );
         } else {
-          return const Icon(Icons.star_border,
-              color: GerenaColors.accentColor, size: 16);
+          return const Icon(
+            Icons.star_border,
+            color: GerenaColors.accentColor,
+            size: 18,
+          );
         }
       }),
     );
   }
-}
 
-class ReviewData {
-  final String title;
-  final String content;
-  final int rating;
-  final String date;
-  final List<String> images;
-  final int reactions;
-  final String clientName;
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
 
-  ReviewData({
-    required this.title,
-    required this.content,
-    required this.rating,
-    required this.date,
-    this.images = const [],
-    this.reactions = 0,
-    this.clientName = 'Usuario',
-  });
-
-  String get clientInitial {
-    if (clientName.isEmpty) return 'U';
-    return clientName[0].toUpperCase();
-  }
-
-  factory ReviewData.fromEntity(MyReviewEntity entity) {
-    return ReviewData(
-      title: entity.doctorName ?? 'Sin título',
-      content: entity.comment ?? 'Sin comentario',
-      rating: entity.rating ?? 0,
-      date: _formatDate(entity.creationDate),
-      clientName: entity.clientName ?? 'Usuario',
-      reactions: 0,
-      images: [],
-    );
-  }
-
-  static String _formatDate(String? date) {
-    if (date == null || date.isEmpty) return 'Sin fecha';
-    try {
-      final parsedDate = DateTime.parse(date);
-      return '${parsedDate.day.toString().padLeft(2, '0')}/${parsedDate.month.toString().padLeft(2, '0')}/${parsedDate.year}';
-    } catch (e) {
-      return date;
+    if (difference.inDays == 0) {
+      if (difference.inHours == 0) {
+        if (difference.inMinutes == 0) {
+          return 'Hace un momento';
+        }
+        return 'Hace ${difference.inMinutes}m';
+      }
+      return 'Hace ${difference.inHours}h';
+    } else if (difference.inDays < 7) {
+      return 'Hace ${difference.inDays}d';
+    } else if (difference.inDays < 30) {
+      final weeks = (difference.inDays / 7).floor();
+      return 'Hace ${weeks}sem';
+    } else if (difference.inDays < 365) {
+      final months = (difference.inDays / 30).floor();
+      return 'Hace ${months}m';
+    } else {
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     }
   }
 }

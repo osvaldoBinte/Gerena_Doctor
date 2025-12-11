@@ -1,6 +1,7 @@
-import 'package:gerena/features/review/domain/entities/my_review_entity.dart';
+import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
+
 
 abstract class ReviewRepository  {
-  Future<List< MyReviewEntity>> myreview();
+  Future<List< PublicationEntity>> myreview();
 
 }

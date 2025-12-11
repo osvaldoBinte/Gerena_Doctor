@@ -410,31 +410,32 @@ class CreateStoryController extends GetxController {
   }
 
   // Detener grabación
-  Future<void> stopRecording() async {
-    if (!isRecording.value) return;
+ // Detener grabación - CORREGIDO para iOS
+Future<void> stopRecording() async {
+  if (!isRecording.value) return;
 
-    try {
-      recordingTimer?.cancel();
-      final XFile video = await cameraController.value!.stopVideoRecording();
+  try {
+    recordingTimer?.cancel();
+    final XFile video = await cameraController.value!.stopVideoRecording();
 
-      final String originalPath = video.path;
-      final String mp4Path = originalPath.replaceAll('.temp', '.mp4');
+    // ✅ En iOS, mantener la extensión original (.mov)
+    // El video_player de iOS soporta .mov nativamente
+    final File videoFile = File(video.path);
+    
+    debugPrint('📹 Video grabado: ${video.path}');
+    debugPrint('📦 Tamaño: ${await videoFile.length()} bytes');
 
-      final File tempFile = File(originalPath);
-      final File mp4File = await tempFile.copy(mp4Path);
-      await tempFile.delete();
+    isRecording.value = false;
+    recordingSeconds.value = 0;
+    capturedFile.value = videoFile;
+    contentType.value = 'video';
 
-      isRecording.value = false;
-      recordingSeconds.value = 0;
-      capturedFile.value = mp4File;
-      contentType.value = 'video';
-
-      await initializeVideoController();
-    } catch (e) {
-      debugPrint('Error stopping recording: $e');
-      isRecording.value = false;
-    }
+    await initializeVideoController();
+  } catch (e) {
+    debugPrint('❌ Error deteniendo grabación: $e');
+    isRecording.value = false;
   }
+}
 
   // Tomar foto
   Future<void> takePicture() async {
@@ -451,34 +452,70 @@ class CreateStoryController extends GetxController {
   }
 
   // Inicializar video controller
-  Future<void> initializeVideoController() async {
-    if (capturedFile.value == null || contentType.value != 'video') return;
+ // Inicializar video controller - MEJORADO
+Future<void> initializeVideoController() async {
+  if (capturedFile.value == null || contentType.value != 'video') return;
 
-    try {
-      isVideoReady.value = false;
-      
-      videoController?.dispose();
-      videoController = VideoPlayerController.file(capturedFile.value!);
+  try {
+    isVideoReady.value = false;
+    
+    videoController?.dispose();
+    videoController = null;
 
-      await videoController!.initialize();
-      
-      if (videoController!.value.isInitialized) {
-        videoController!.setLooping(true);
-        videoController!.play();
-        
-        isVideoReady.value = true;
-        
-        debugPrint('Video initialized');
-        debugPrint('Duration: ${videoController!.value.duration}');
-        debugPrint('Size: ${videoController!.value.size}');
-      }
-    } catch (e) {
-      debugPrint('Error initializing video: $e');
-      videoController?.dispose();
-      videoController = null;
-      isVideoReady.value = false;
+    debugPrint('🎬 Inicializando video: ${capturedFile.value!.path}');
+    
+    // Verificar que el archivo existe
+    if (!await capturedFile.value!.exists()) {
+      debugPrint('❌ El archivo de video no existe');
+      return;
     }
+
+    final fileSize = await capturedFile.value!.length();
+    debugPrint('📦 Tamaño del archivo: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
+
+    // Crear controller
+    videoController = VideoPlayerController.file(capturedFile.value!);
+
+    // Inicializar con timeout
+    await videoController!.initialize().timeout(
+      const Duration(seconds: 10),
+      onTimeout: () {
+        debugPrint('⏱️ Timeout inicializando video');
+        throw TimeoutException('Video initialization timeout');
+      },
+    );
+    
+    if (videoController!.value.isInitialized) {
+      videoController!.setLooping(true);
+      await videoController!.play();
+      
+      isVideoReady.value = true;
+      
+      debugPrint('✅ Video inicializado correctamente');
+      debugPrint('   Duración: ${videoController!.value.duration}');
+      debugPrint('   Tamaño: ${videoController!.value.size}');
+      debugPrint('   Aspect Ratio: ${videoController!.value.aspectRatio}');
+    } else {
+      debugPrint('❌ Video no se pudo inicializar');
+    }
+  } catch (e, stackTrace) {
+    debugPrint('💥 Error inicializando video: $e');
+    debugPrint('📚 Stack trace: $stackTrace');
+    
+    videoController?.dispose();
+    videoController = null;
+    isVideoReady.value = false;
+    
+    // Mostrar error al usuario
+    Get.snackbar(
+      'Error',
+      'No se pudo cargar el video. Intenta de nuevo.',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 3),
+    );
   }
+}
 
   // Seleccionar de galería
   Future<void> selectFromGallery(AssetEntity asset) async {

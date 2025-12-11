@@ -1,6 +1,6 @@
 import 'package:gerena/common/constants/constants.dart';
-import 'package:gerena/features/review/data/model/my_review_model.dart';
-import 'package:gerena/features/review/domain/entities/my_review_entity.dart';
+import 'package:gerena/features/publications/data/model/myposts/publication_model.dart';
+import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -10,9 +10,9 @@ class ReviewDataSourcesImp {
     String defaultApiServer = AppConstants.serverBase;
 
 
-  Future<List<MyReviewEntity>> getMyReview( int id, String token) async {
+  Future<List<PublicationEntity>> getMyReview( int id, String token) async {
     try {
-      Uri uri = Uri.parse('$defaultApiServer/Reseñas/doctor/$id');
+      Uri uri = Uri.parse('$defaultApiServer/Publicaciones/doctor/$id/reseñas');
       final response = await http.get(uri, headers: <String, String >{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
@@ -22,9 +22,9 @@ class ReviewDataSourcesImp {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
 
-        final List data = responseDecode['reseñas'];
+        final List data = responseDecode['publicaciones'];
         return data
-            .map((json) => MyReviewModel.fromJson(json))
+            .map((json) => PublicationModel.fromJson(json))
             .toList();
       }
 

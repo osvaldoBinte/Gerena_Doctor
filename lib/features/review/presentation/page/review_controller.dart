@@ -1,4 +1,4 @@
-import 'package:gerena/features/review/domain/entities/my_review_entity.dart';
+import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/review/domain/usecase/my_review_usecase.dart';
 import 'package:get/get.dart';
 
@@ -8,7 +8,7 @@ class ReviewController extends GetxController {
   ReviewController({required this.myReviewUsecase});
   
   // Observable para las reviews
-  final RxList<MyReviewEntity> reviews = <MyReviewEntity>[].obs;
+  final RxList<PublicationEntity> reviews = <PublicationEntity>[].obs;
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 

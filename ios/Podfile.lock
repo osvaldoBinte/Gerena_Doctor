@@ -35,6 +35,8 @@ PODS:
   - ffmpeg_kit_flutter_new (1.0.0):
     - ffmpeg_kit_flutter_new/full-gpl (= 1.0.0)
     - Flutter
+  - ffmpeg_kit_flutter_new/full-gpl (1.0.0):
+    - Flutter
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
     - Flutter
@@ -51,9 +53,9 @@ PODS:
   - photo_manager (3.8.2):
     - Flutter
     - FlutterMacOS
-  - SDWebImage (5.21.0):
-    - SDWebImage/Core (= 5.21.0)
-  - SDWebImage/Core (5.21.0)
+  - SDWebImage (5.21.1):
+    - SDWebImage/Core (= 5.21.1)
+  - SDWebImage/Core (5.21.1)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -195,7 +197,7 @@ SPEC CHECKSUMS:
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   photo_manager: 8f40300912c856ef39d0d533a205afab5fbee62f
-  SDWebImage: f84b0feeb08d2d11e6a9b843cb06d75ebf5b8868
+  SDWebImage: f29024626962457f3470184232766516dee8dfea
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
   Stripe: a4b6584549bac3698733ed564e55b0b067cfda8a
@@ -211,6 +213,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
   video_player_avfoundation: 7c6c11d8470e1675df7397027218274b6d2360b3
 
-PODFILE CHECKSUM: ccec4784a4f77ad4fec8c10d0f236b9e20ae0a28
+PODFILE CHECKSUM: 6e9e48c67d8b2552a8a495f70992e00c4424df94
 
 COCOAPODS: 1.16.2

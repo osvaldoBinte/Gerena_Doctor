@@ -45,18 +45,24 @@
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
-		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Esta app necesita acceso a la galería para seleccionar fotos</string>
 		<key>UIStatusBarHidden</key>
 		<false/>
-
+		
+		<!-- Permisos de cámara y galería -->
 		<key>NSCameraUsageDescription</key>
-<string>Necesitamos acceso a tu cámara para crear historias</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>Necesitamos acceso a tu micrófono para grabar videos</string>
-<key>NSPhotoLibraryUsageDescription</key>
-<string>Necesitamos acceso a tus fotos para crear historias</string>
+		<string>Necesitamos acceso a tu cámara para crear historias</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Necesitamos acceso a tu micrófono para grabar videos</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Esta app necesita acceso a la galería para seleccionar fotos y videos</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Esta app necesita acceso para guardar fotos y videos</string>
+		
+		<!-- ✅ CLAVE: Permitir acceso HTTP local para video_player -->
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
 	</dict>
-
-
 </plist>
