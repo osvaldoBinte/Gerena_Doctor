@@ -13,6 +13,7 @@ import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controll
 import 'package:gerena/features/doctors/presentation/widget/loading/doctor_profile_loading.dart';
 import 'package:gerena/features/doctors/presentation/widget/share_and_procedures_widget.dart';
 import 'package:gerena/features/followers/presentation/page/follower_controller.dart';
+import 'package:gerena/features/publications/presentation/page/create/create_publication_modal.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/procedure_Widget.dart';
@@ -597,7 +598,6 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 ),
               ],
             ),
-            SizedBox(height: GerenaColors.paddingMedium),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 10),
               child: Row(
@@ -610,6 +610,34 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       borderRadius: 30,
                       onPressed: () {
                         Get.offNamed(RoutesNames.patientView);
+                      },
+                    ),
+                  ),
+                 
+                ],
+              ),
+            ),
+            SizedBox(height: GerenaColors.paddingMedium),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: GerenaColors.widgetButton(
+                      showShadow: false,
+                      text: 'PUBLICAR',
+                      borderRadius: 30,
+                      onPressed: () {
+                       Get.bottomSheet(
+                    Container(
+                      height: MediaQuery.of(Get.context!).size.height * 0.9,
+                      child: const CreatePublication(),
+                    ),
+                    isScrollControlled: true,
+                    isDismissible: true,
+                    enableDrag: true,
+                  );
                       },
                     ),
                   ),

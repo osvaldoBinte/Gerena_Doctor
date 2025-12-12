@@ -8,4 +8,7 @@ abstract class PublicationRepository {
   Future<void> likePublication(int publicationId,String tipoReaccion,);
   Future<void> updatePublication(String descripcion, int publicationId);
   Future<void> deletePublication(int publicationId);
+  Future<List<PublicationEntity>> getPostsUser(int userid) ;
+    Future<List<PublicationEntity>> getPostsDcotor(int userid) ;
+
 }

@@ -9,71 +9,25 @@ import 'package:gerena/features/publications/domain/usecase/create_publication_u
 
 class CreatePublicationController extends GetxController {
   final CreatePublicationUsecase createPublicationUsecase;
-  //final GetDoctorUsecase getDoctorUsecase;
 
   CreatePublicationController({
     required this.createPublicationUsecase,
-   // required this.getDoctorUsecase,
   });
 
-  final RxBool isReview = false.obs;
   final RxBool isLoading = false.obs;
-  final RxBool isSearchingDoctor = false.obs;
-
   final TextEditingController descriptionController = TextEditingController();
-  final TextEditingController doctorSearchController = TextEditingController();
-
-  final RxInt rating = 0.obs;
   final RxList<File> selectedImages = <File>[].obs;
-  //final RxList<FindDoctorsEntity> searchedDoctors = <FindDoctorsEntity>[].obs;
- // final Rxn<FindDoctorsEntity> selectedDoctor = Rxn<FindDoctorsEntity>();
-
   final ImagePicker _picker = ImagePicker();
 
   @override
   void onClose() {
     descriptionController.dispose();
-    doctorSearchController.dispose();
     super.onClose();
   }
-
-  void toggleReviewMode(bool value) {
-    isReview.value = value;
-    if (!value) {
-   //   selectedDoctor.value = null;
-      doctorSearchController.clear();
-    //  searchedDoctors.clear();
-      rating.value = 0;
-    }
-  }
-
-  Future<void> searchDoctors(String query) async {
-    if (query.isEmpty) {
-    //  searchedDoctors.clear();
-      return;
-    }
-
-    try {
-      isSearchingDoctor.value = true;
-   //   final result = await getDoctorUsecase.execute('', query);
-    //  searchedDoctors.value = result;
-    } catch (e) {
-      showErrorSnackbar('No se pudieron buscar doctores: $e');
-    } finally {
-      isSearchingDoctor.value = false;
-    }
-  }
-
- // void selectDoctor(FindDoctorsEntity doctor) {
-  //  selectedDoctor.value = doctor;
-  //  doctorSearchController.text = doctor.fullName;
- //   searchedDoctors.clear();
- // }
 
   Future<void> pickImageFromGallery() async {
     if (selectedImages.length >= 5) {
       showErrorSnackbar('Solo puedes seleccionar hasta 5 imágenes');
-
       return;
     }
 
@@ -96,7 +50,6 @@ class CreatePublicationController extends GetxController {
   Future<void> pickMultipleImages() async {
     if (selectedImages.length >= 5) {
       showErrorSnackbar('Solo puedes seleccionar hasta 5 imágenes');
-
       return;
     }
 
@@ -129,7 +82,6 @@ class CreatePublicationController extends GetxController {
   Future<void> takePhoto() async {
     if (selectedImages.length >= 5) {
       showErrorSnackbar('Solo puedes seleccionar hasta 5 imágenes');
-
       return;
     }
 
@@ -216,16 +168,6 @@ class CreatePublicationController extends GetxController {
       return;
     }
 
-  //  if (isReview.value && selectedDoctor.value == null) {
-  //    showErrorSnackbar('Por favor selecciona un doctor para la reseña');
-  ///    return;
-  //  }
-
-    if (isReview.value && rating.value == 0) {
-      showErrorSnackbar('Por favor califica al doctor');
-      return;
-    }
-
     try {
       isLoading.value = true;
 
@@ -233,21 +175,16 @@ class CreatePublicationController extends GetxController {
 
       final entity = CreatePublicationsEntity(
         description: descriptionController.text,
-        isReview: isReview.value.toString(),
-        taggedDoctorId: isReview.value ? null /*selectedDoctor.value!.id*/ : null,
-        ratings:
-            isReview.value ? rating.value : 0,
+        isReview: 'false',
+        taggedDoctorId: null,
+        ratings: 0,
         images: imagePaths,
       );
 
       await createPublicationUsecase.execute(entity);
 
       Get.back();
-      showSuccessSnackbar(
-        isReview.value
-            ? 'Reseña creada exitosamente'
-            : 'Publicación creada exitosamente',
-      );
+      showSuccessSnackbar('Publicación creada exitosamente');
 
       _resetForm();
     } catch (e) {
@@ -260,11 +197,6 @@ class CreatePublicationController extends GetxController {
 
   void _resetForm() {
     descriptionController.clear();
-    doctorSearchController.clear();
-    isReview.value = false;
-    rating.value = 0;
     selectedImages.clear();
-  //  selectedDoctor.value = null;
-   // searchedDoctors.clear();
   }
 }

@@ -8,4 +8,6 @@ abstract class ProceduresRepository {
   Future <void> addimagenes(ProceduresEntity entity,int procedimientoId);
   Future<void> deleteprocedure(int id);
  Future<void> deleteimg(int id);
+   Future<List< GetProceduresEntity>> getProceduresbyidDoctor(int id,);
+
 }

@@ -6,6 +6,9 @@ class GerenaColors {
   // Colores principales
   static const Color primaryColor = Color(0xFF00535C);       // Color principal verde azulado oscuro
   static const Color secondaryColor = Color(0xFF63C2A7);     // Color secundario turquesa claro
+  static const Color textUsername = Color(
+    0xFF009FE0,
+  ); // Verde azulado oscuro principal
 
   static const Color accentColor = Color(0xFF00A99D);        // Color de acento verde azulado medio
   static const Color backgroundlogin = Color(0xFF004346);

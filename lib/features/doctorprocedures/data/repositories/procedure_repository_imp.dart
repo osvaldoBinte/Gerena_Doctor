@@ -47,5 +47,11 @@ class ProcedureRepositoryImp implements ProceduresRepository {
 
     return await proceduresDataSourcesImp.deleteprocedure(id, token);
   }
+  
+  @override
+  Future<List<GetProceduresEntity>> getProceduresbyidDoctor(int id) async {
+       final token = await authService.getToken()?? ( throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+   return await proceduresDataSourcesImp.getProceduresbyidDoctor(id, token);
+  }
 
 }

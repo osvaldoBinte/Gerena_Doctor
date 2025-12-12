@@ -11,6 +11,37 @@ import 'package:gerena/common/errors/api_errors.dart';
 
 class ProceduresDataSourcesImp {
   String defaultApiServer = AppConstants.serverBase;
+    Future<List< GetProceduresEntity>> getProceduresbyidDoctor(int id,String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Procedimientos/doctor/$id');
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+   if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List doctores = responseDecode;
+        return doctores
+            .map((json) => GetProceduresModel.fromJson(json))
+            .toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
 Future<void> createprocedure(ProceduresEntity entity, String token) async {
   try {
     Uri url = Uri.parse('$defaultApiServer/Procedimientos');

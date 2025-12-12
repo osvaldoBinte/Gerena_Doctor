@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_controller.dart';
 import 'package:gerena/features/notification/presentation/page/notificasiones/notification_page.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
 import 'package:gerena/features/notification/presentation/page/notificasiones/notification_modal.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
 import 'package:gerena/features/publications/presentation/page/home_page.dart';
+import 'package:gerena/features/user/presentation/page/getusebyid/get_user_by_id_controller.dart';
+import 'package:gerena/features/user/presentation/page/getusebyid/user_profile_page.dart';
 import 'package:get/get.dart';
 
 class StartController extends GetxController {
@@ -32,85 +35,87 @@ class StartController extends GetxController {
     'assets/icons/home/select/notificacione.png', 
     'assets/icons/home/select/Perfil.png',
   ];
-
+  void setInitialIndex(int index) {
+    if (index >= 0 && index < pages.length) {
+      selectedIndex.value = index;
+      print('📍 Navegando a página inicial: $index');
+    }
+  }
   final RxInt selectedIndex = 0.obs;
-  final RxBool showAgendarCita = false.obs;
-  final RxBool showTendencias = false.obs;
-  final RxBool showDoctorSearch = false.obs;
+  void hideUserPage() {
+    showUserProfile.value = false;
+    selectedUserData.value = null;
+  }
   final RxBool showDoctorProfile = false.obs;
-  final RxBool showCalendar = false.obs;
+    final RxBool showUserProfile = false.obs;
+  final Rx<Map<String, dynamic>?> selectedDoctorData = Rx<Map<String, dynamic>?>(null);
+final Rx<Map<String, dynamic>?> selectedUserData = Rx<Map<String, dynamic>?>(null);
 
   void changePage(int index) {
     selectedIndex.value = index;
-    _hideAllOverlayPages();
-  }
 
-  void _hideAllOverlayPages() {
-    showAgendarCita.value = false;
-    showTendencias.value = false;
-    showDoctorSearch.value = false;
     showDoctorProfile.value = false;
-    showCalendar.value = false;
-  }
-
-  void showAgendarCitaPage() {
+    showUserProfile.value = false;
+    selectedDoctorData.value = null;
+    selectedUserData.value = null;
     _hideAllOverlayPages();
-    showAgendarCita.value = true;
   }
 
-  void hideAgendarCitaPage() {
-    showAgendarCita.value = false;
+void showUserProfilePage({Map<String, dynamic>? userData}) {
+  if (userData != null) {
+    selectedUserData.value = userData;
+    print('📋 Datos del usuario guardados en StartController:');
+    print('   - Nombre: ${userData['userName']}');
+    print('   - ID: ${userData['userId']}');
+    print('   - Username: ${userData['username']}');
   }
-
-  void showTendenciasPage() {
-    _hideAllOverlayPages();
-    showTendencias.value = true;
+  
+  showUserProfile.value = true;
+  showDoctorProfile.value = false;
+  
+  if (Get.isRegistered<GetUserByIdController>()) {
+    final controller = Get.find<GetUserByIdController>();
+    controller.loadUserData();
   }
+}
+void showDoctorProfilePage({Map<String, dynamic>? doctorData}) {
 
-  void hideTendenciasPage() {
-    showTendencias.value = false;
-  }
-
-  void showDoctorSearchPage() {
-    _hideAllOverlayPages();
-    showDoctorSearch.value = true;
-  }
-
-  void hideDoctorSearchPage() {
-    showDoctorSearch.value = false;
-  }
-
-  void showDoctorProfilePage() {
-    _hideAllOverlayPages();
+    if (doctorData != null) {
+      selectedDoctorData.value = doctorData;
+      print('📋 Datos del doctor guardados en StartController:');
+      print('   - Nombre: ${doctorData['doctorName']}');
+      print('   - ID: ${doctorData['userId']}');
+      print('   - Especialidad: ${doctorData['specialty']}');
+    }
     showDoctorProfile.value = true;
+    if (Get.isRegistered<DoctorProfileController>()) {
+      final controller = Get.find<DoctorProfileController>();
+      controller.loadDoctorData();
+    }
   }
-
+  void _hideAllOverlayPages() {
+    showDoctorProfile.value = false;
+  }
   void hideDoctorProfilePage() {
     showDoctorProfile.value = false;
   }
-
-  void showCalendarPage() {
-    _hideAllOverlayPages();
-    showCalendar.value = true;
-  }
-
-  void hideCalendarPage() {
-    showCalendar.value = false;
-  }
-
   Widget get currentPage {
-   
+  
+    if (showDoctorProfile.value) {
+      return DoctorProfilePage();
+    }
+    if (showUserProfile.value) {
+      return UserProfilePage();
+    }
     return pages[selectedIndex.value];
   }
 
-  bool get shouldShowBottomNav => !showAgendarCita.value && 
-                                  !showTendencias.value && 
-                                  !showDoctorSearch.value && 
+  bool get shouldShowBottomNav => 
                                   !showDoctorProfile.value &&
-                                  !showCalendar.value;
+                                  !showUserProfile.value;
 
   String getIconPath(int index) {
-    if (showAgendarCita.value || showTendencias.value || showDoctorSearch.value || showDoctorProfile.value || showCalendar.value) {
+    if (showUserProfile.value || showDoctorProfile.value) {
       return iconPaths[index];
     }
     
@@ -118,42 +123,20 @@ class StartController extends GetxController {
         ? selectedIconPaths[index] 
         : iconPaths[index];
   }
-
-  @override
+  
+  Map<String, dynamic>? get currentDoctorData => selectedDoctorData.value;
+Map<String, dynamic>? get currentUserData => selectedUserData.value;
+@override
   void onInit() {
     super.onInit();
+    final arguments = Get.arguments;
+    if (arguments is int) {
+      setInitialIndex(arguments);
+    }
   }
 
   @override
   void onClose() {
     super.onClose();
-  }
-}
-class NotificationsPage extends StatelessWidget {
-  const NotificationsPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Blog')),
-      body: Center(
-        child: Text('Página de Blog'),
-      ),
-    );
-  }
-}
-
-
-class CartPage extends StatelessWidget {
-  const CartPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Carrito')),
-      body: Center(
-        child: Text('Página de Carrito'),
-      ),
-    );
   }
 }

@@ -13,6 +13,68 @@ import 'package:http/http.dart' as http;
 class PublicationDateSourcesImp {
     String defaultApiServer = AppConstants.serverBase;
 
+ Future<List<PublicationEntity>> getPostsUser(int userid,String token) async {
+   try {
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones/cliente/$userid');
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+   if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List data = responseDecode;
+        return data
+            .map((json) => PublicationModel.fromJson(json))
+            .toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+   Future<List<PublicationEntity>> getPostsDcotor(int userid,String token) async {
+   try {
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones/doctor/$userid/reseñas');
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+   if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List data = responseDecode['publicaciones'];
+        return data
+            .map((json) => PublicationModel.fromJson(json))
+            .toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
 Future<void> createPublication(CreatePublicationsEntity entity, String token) async {
   try {
     Uri url = Uri.parse('$defaultApiServer/Publicaciones');

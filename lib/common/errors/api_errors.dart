@@ -30,31 +30,38 @@ class ApiExceptionCustom implements Exception {
     }
   }
 
-  void validateMesage() {
-    String errorMessage = '';
-    if (response != null && response?.statusCode != 500) {
-      if (response!.body.toString() != '') {
-        final dataUTF8 = utf8.decode(response!.bodyBytes);
-        try {
-          final body = jsonDecode(dataUTF8);
-          if (body is Map<String, dynamic> && body.containsKey('message')) {
+
+void validateMesage() {
+  String errorMessage = '';
+  if (response != null && response!.statusCode != 500) {
+    if (response!.body.isNotEmpty) {
+      final dataUTF8 = utf8.decode(response!.bodyBytes);
+      try {
+        final body = jsonDecode(dataUTF8);
+        if (body is Map<String, dynamic>) {
+          if (body.containsKey('mensaje')) {
+            errorMessage = body['mensaje'];
+          } else if (body.containsKey('message')) {
             errorMessage = body['message'];
           } else {
             errorMessage = getMessage(response!.statusCode);
           }
-        } catch (e) {
+        } else {
           errorMessage = getMessage(response!.statusCode);
         }
-      } else {
+      } catch (e) {
         errorMessage = getMessage(response!.statusCode);
       }
-    } else if (response == null && errorMessage != '') {
-      errorMessage = message;
     } else {
-      errorMessage = getMessage(response?.statusCode);
+      errorMessage = getMessage(response!.statusCode);
     }
-    message = errorMessage;
+  } else if (response == null && message.isNotEmpty) {
+    errorMessage = message;
+  } else {
+    errorMessage = getMessage(response?.statusCode);
   }
+  message = errorMessage;
+}
 
  @override
   String toString() {

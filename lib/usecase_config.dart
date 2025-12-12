@@ -28,11 +28,13 @@ import 'package:gerena/features/doctorprocedures/domain/usecase/add_imagenes_use
 import 'package:gerena/features/doctorprocedures/domain/usecase/create_procedure_usecase.dart';
 import 'package:gerena/features/doctorprocedures/domain/usecase/delete_img_usecase.dart';
 import 'package:gerena/features/doctorprocedures/domain/usecase/delete_procedure_usecase.dart';
+import 'package:gerena/features/doctorprocedures/domain/usecase/get_procedures_by_doctor_usecase.dart';
 import 'package:gerena/features/doctorprocedures/domain/usecase/get_procedures_usecase.dart';
 import 'package:gerena/features/doctorprocedures/domain/usecase/update_procedure_usecase.dart';
 import 'package:gerena/features/doctors/data/datasources/doctos_data_sources_imp.dart';
 import 'package:gerena/features/doctors/data/repositories/doctor_repository_imp.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
+import 'package:gerena/features/doctors/domain/usecase/fetch_doctor_by_id_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/get_doctor_availability_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/update_doctor_profile_usecase.dart';
 import 'package:gerena/features/doctors/domain/usecase/updatefoto_doctor_profile_usecase.dart';
@@ -78,6 +80,8 @@ import 'package:gerena/features/publications/domain/usecase/create_publication_u
 import 'package:gerena/features/publications/domain/usecase/delete_publication_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_feed_posts_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_my_posts_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_post_doctor_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/like_publication_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/update_publication_usecase.dart';
 import 'package:gerena/features/review/data/datasources/review_data_sources_imp.dart';
@@ -99,6 +103,9 @@ import 'package:gerena/features/subscription/domain/usecase/get_my_subscription_
 import 'package:gerena/features/subscription/domain/usecase/post_cancel_subcription_usecase.dart';
 import 'package:gerena/features/subscription/domain/usecase/post_reactivate_subscription_usecase.dart';
 import 'package:gerena/features/subscription/domain/usecase/post_subscribe_to_plan_usecase.dart';
+import 'package:gerena/features/user/data/datasources/user_datasource_imp.dart';
+import 'package:gerena/features/user/data/repositories/user_repository_imp.dart';
+import 'package:gerena/features/user/domain/usecase/get_user_details_by_id_usecase.dart';
 
 class UsecaseConfig {
    AuthRepositoryImp? authRepositoryImp;
@@ -114,9 +121,10 @@ class UsecaseConfig {
    StoriesRepositoryImp? storiesRepositoryImp;
   PublicationRepositoryImp? publicationRepositoryImp;
   FollowerRepositoryImp? followerRepositoryImp;
+  UserRepositoryImp?userRepositoryImp;
 
 
-
+  UserDatasourceImp?userDatasourceImp;
    AuthDataSourcesImp? authDataSources;
    MarketplaceDataSourcesImp?marketplaceDataSourcesImp;
    PaymentDataSourcesImp? paymentDataSourcesImp;
@@ -191,9 +199,13 @@ class UsecaseConfig {
    AddImagenesUsecase? addImagenesUsecase;
    CreateProcedureUsecase? createProcedureUsecase;
    GetProceduresUsecase? getProceduresUsecase;
+   GetProceduresByDoctorUsecase? getProceduresByDoctorUsecase;
    UpdateProcedureUsecase? updateProcedureUsecase;
    DeleteImgUsecase? deleteImgUsecase;
    DeleteProcedureUsecase? deleteProcedureUsecase;
+   GetPostDoctorUsecase? getPostDoctorUsecase;
+   GetPostsUserUsecase? getPostsUserUsecase;
+   FetchDoctorByIdUsecase? fetchDoctorByIdUsecase;
 
 
    MyReviewUsecase?myReviewUsecase;
@@ -228,6 +240,8 @@ class UsecaseConfig {
    GetFollowStatusUsecase? getFollowStatusUsecase;
    GetFollowsUsecase? getFollowsUsecase;
 
+   GetUserDetailsByIdUsecase? getUserDetailsByIdUsecase;
+
   UsecaseConfig(){
      authDataSources = AuthDataSourcesImp();
      doctosDataSources = DoctosDataSourcesImp();
@@ -244,9 +258,11 @@ class UsecaseConfig {
       storiesDataSourcesImp = StoriesDataSourcesImp();
       publicationDateSourcesImp = PublicationDateSourcesImp();
       followerDataSourcesImp = FollowerDataSourcesImp();
+           userDatasourceImp = UserDatasourceImp();
+
 
       
-
+     userRepositoryImp = UserRepositoryImp(userDataSource:  userDatasourceImp!);
      doctorRepositoryImp = DoctorRepositoryImp(doctosDataSources: doctosDataSources!);
      authRepositoryImp = AuthRepositoryImp(authDataSources: authDataSources!);
       appointmentRepositoryImp = AppointmentRepositoryImp(appointmentDataSources: appointmentDataSourcesImp!);
@@ -262,7 +278,7 @@ class UsecaseConfig {
       storiesRepositoryImp = StoriesRepositoryImp(storiesDataSourcesImp: storiesDataSourcesImp!);
       publicationRepositoryImp = PublicationRepositoryImp(publicationDateSourcesImp: publicationDateSourcesImp!);
       followerRepositoryImp = FollowerRepositoryImp(followerDataSourcesImp: followerDataSourcesImp!);
-
+      getPostsUserUsecase = GetPostsUserUsecase(publicationRepository: publicationRepositoryImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -276,6 +292,9 @@ class UsecaseConfig {
      cancelAppointmentUsecase = CancelAppointmentUsecase(appointmentRepository: appointmentRepositoryImp!);
      updateDoctorProfileUsecase = UpdateDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
      updatefotoDoctorProfileUsecase = UpdatefotoDoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
+     getPostDoctorUsecase= GetPostDoctorUsecase(publicationRepository: publicationRepositoryImp!);
+     fetchDoctorByIdUsecase = FetchDoctorByIdUsecase(doctorRepository: doctorRepositoryImp!);
+     
 
      getMedicineByIdUsecase = GetMedicineByIdUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      getMyOrderUsecase = GetMyOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
@@ -289,6 +308,7 @@ class UsecaseConfig {
      createOrderUsecase = CreateOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      payOrderUsecase = PayOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      calculateDiscountPointsUsecase =CalculateDiscountPointsUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+
 
      getAddressesUsecase = GetAddressesUsecase(addressesRepository: addressesRepositoryImp!);
      postAddressesUsecase = PostAddressesUsecase(addressesRepository: addressesRepositoryImp!);
@@ -318,6 +338,7 @@ class UsecaseConfig {
       addImagenesUsecase = AddImagenesUsecase(proceduresRepository: procedureRepositoryImp!);
       createProcedureUsecase = CreateProcedureUsecase(proceduresRepository: procedureRepositoryImp!);
       getProceduresUsecase = GetProceduresUsecase(proceduresRepository: procedureRepositoryImp!);
+      getProceduresByDoctorUsecase = GetProceduresByDoctorUsecase(proceduresRepository: procedureRepositoryImp!);
       updateProcedureUsecase = UpdateProcedureUsecase(proceduresRepository: procedureRepositoryImp!);
       deleteImgUsecase = DeleteImgUsecase(proceduresRepository: procedureRepositoryImp!);        
       deleteProcedureUsecase = DeleteProcedureUsecase(proceduresRepository: procedureRepositoryImp!) ;
@@ -358,6 +379,9 @@ class UsecaseConfig {
       unfollowUserUsecase = UnfollowUserUsecase(followerRepository: followerRepositoryImp!);
       getFollowStatusUsecase = GetFollowStatusUsecase(followerRepository: followerRepositoryImp!);
       getFollowsUsecase = GetFollowsUsecase(followerRepository: followerRepositoryImp!);
+
+
+      getUserDetailsByIdUsecase = GetUserDetailsByIdUsecase(userRepository: userRepositoryImp!);
     
   }
 }

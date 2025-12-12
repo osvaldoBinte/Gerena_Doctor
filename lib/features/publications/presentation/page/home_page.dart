@@ -352,12 +352,11 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
 
     return PostCardWidget(
       postId: post.id,
-      userName: post.author?.name ?? 'Usuario',
+      author: post.author,
       userRole: userRole,
       postImages: publicationController.getOrderedImages(post),
       description: post.description,
       likes: post.reactions.total.toString(),
-      userImageAsset: post.author?.profilePhoto ?? '',
       rating: post.rating?.toDouble(),
       createdAt: publicationController.formatDate(post.createdAt),
       userHasLiked: post.userHasLiked,
@@ -380,30 +379,38 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
   }
 
 
-  Widget _buildCitasSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
+Widget _buildCitasSection() {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
                 'CITAS',
                 style: GoogleFonts.rubik(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: GerenaColors.textPrimaryColor,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
-              Obx(() => calendarController.isLoading.value
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: GerenaColors.primaryColor,
+            ),
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: Obx(() => calendarController.isLoading.value
+                  ? Center(
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: GerenaColors.primaryColor,
+                        ),
                       ),
                     )
                   : IconButton(
@@ -415,78 +422,104 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                       },
                       padding: EdgeInsets.zero,
                       constraints: BoxConstraints(),
+                      iconSize: 20,
                     )),
-            ],
-          ),
-          SizedBox(height: GerenaColors.paddingSmall),
-          Obx(() {
-            if (calendarController.isLoading.value &&
-                calendarController.appointments.isEmpty) {
-              return CitasLoading();
-            }
+            ),
+          ],
+        ),
+        SizedBox(height: GerenaColors.paddingSmall),
+        
+        // USAMOS LAYOUTBUILDER AQUÍ
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Obx(() {
+              if (calendarController.isLoading.value &&
+                  calendarController.appointments.isEmpty) {
+                return CitasLoading();
+              }
 
-            final upcomingAppointments = _getUpcomingAppointments();
+              final upcomingAppointments = _getUpcomingAppointments();
 
-            if (upcomingAppointments.isEmpty) {
-              return Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  color: GerenaColors.backgroundColor,
-                  borderRadius: GerenaColors.mediumBorderRadius,
-                  boxShadow: [GerenaColors.lightShadow],
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 48,
-                        color: GerenaColors.textSecondaryColor,
-                      ),
-                      SizedBox(height: 12),
-                      Text(
-                        'No tienes citas próximas',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
+              if (upcomingAppointments.isEmpty) {
+                return Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: GerenaColors.backgroundColor,
+                    borderRadius: GerenaColors.mediumBorderRadius,
+                    boxShadow: [GerenaColors.lightShadow],
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          size: 48,
                           color: GerenaColors.textSecondaryColor,
                         ),
-                      ),
-                      SizedBox(height: 8),
-                    ],
+                        SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'No tienes citas próximas',
+                            style: GoogleFonts.rubik(
+                              fontSize: 14,
+                              color: GerenaColors.textSecondaryColor,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                );
+              }
+
+              // Calculamos altura disponible más conservadora
+              final hasIndicators = upcomingAppointments.length > 1;
+              final indicatorSpace = hasIndicators ? 30.0 : 0.0; // espacio para indicadores
+              final availableHeight = constraints.maxHeight;
+              
+              // Altura de la tarjeta dejando espacio para indicadores
+              final citaCardHeight = hasIndicators 
+                  ? (availableHeight - indicatorSpace).clamp(150.0, 200.0)
+                  : availableHeight.clamp(150.0, 220.0);
+
+              return SizedBox(
+                height: citaCardHeight + indicatorSpace, // altura total fija
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: PageView.builder(
+                        controller: PageController(viewportFraction: 0.85),
+                        itemCount: upcomingAppointments.length,
+                        itemBuilder: (context, index) {
+                          final appointment = upcomingAppointments[index];
+                          return Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            child: _buildCitaCard(appointment),
+                          );
+                        },
+                      ),
+                    ),
+                    if (hasIndicators) ...[
+                      SizedBox(height: 8),
+                      SizedBox(
+                        height: 20, // altura fija para indicadores
+                        child: _buildPageIndicators(upcomingAppointments.length),
+                      ),
+                    ],
+                  ],
                 ),
               );
-            }
-final citaCardHeight = MediaQuery.of(context).size.height * 0.25;
-
-            return Column(
-              children: [
-                Container(
-                  height: citaCardHeight,
-                  child: PageView.builder(
-                    controller: PageController(viewportFraction: 0.85),
-                    itemCount: upcomingAppointments.length,
-                    itemBuilder: (context, index) {
-                      final appointment = upcomingAppointments[index];
-                      return Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        child: _buildCitaCard(appointment),
-                      );
-                    },
-                  ),
-                ),
-                if (upcomingAppointments.length > 1) ...[
-                  SizedBox(height: 20),
-                  _buildPageIndicators(upcomingAppointments.length),
-                ],
-              ],
-            );
-          }),
-        ],
-      ),
-    );
-  }
+            });
+          },
+        ),
+      ],
+    ),
+  );
+}
 
   List<dynamic> _getUpcomingAppointments() {
     final allAppointments = calendarController.appointments.toList();
@@ -499,125 +532,136 @@ final citaCardHeight = MediaQuery.of(context).size.height * 0.25;
 
     return allAppointments.take(5).toList();
   }
+Widget _buildCitaCard(dynamic appointment) {
+  final String formattedTime = _formatTime(appointment.startTime);
+  final String formattedDate = _formatDate(appointment.startTime);
 
-  Widget _buildCitaCard(dynamic appointment) {
-    final String formattedTime = _formatTime(appointment.startTime);
-    final String formattedDate = _formatDate(appointment.startTime);
+  final String doctorName = appointment.subject ?? 'Sin nombre';
+  final String appointmentType = appointment.location ?? 'Cita general';
+  final String treatment = appointment.notes ?? 'Sin descripción';
 
-    final String doctorName = appointment.subject ?? 'Sin nombre';
-    final String appointmentType = appointment.location ?? 'Cita general';
-    final String treatment = appointment.notes ?? 'Sin descripción';
-
-    return Container(
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: GerenaColors.mediumBorderRadius,
-        boxShadow: [GerenaColors.lightShadow],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        doctorName,
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: GerenaColors.textPrimaryColor,
+  return Container(
+    decoration: BoxDecoration(
+      color: GerenaColors.backgroundColor,
+      borderRadius: GerenaColors.mediumBorderRadius,
+      boxShadow: [GerenaColors.lightShadow],
+    ),
+    child: ClipRRect(
+      borderRadius: GerenaColors.mediumBorderRadius,
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          doctorName,
+                          style: GoogleFonts.rubik(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: GerenaColors.textPrimaryColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        SizedBox(height: 8),
+                        Text(
+                          appointmentType,
+                          style: GoogleFonts.rubik(
+                            fontSize: 12,
+                            color: GerenaColors.textSecondaryColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          treatment,
+                          style: GoogleFonts.rubik(
+                            fontSize: 11,
+                            color: GerenaColors.textTertiaryColor,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [GerenaColors.lightShadow],
+                        ),
+                        child: ClipOval(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: GerenaColors.primaryColor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              color: GerenaColors.textLightColor,
+                              size: 25,
+                            ),
+                          ),
+                        ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 8),
                       Text(
-                        appointmentType,
+                        formattedTime,
                         style: GoogleFonts.rubik(
                           fontSize: 12,
-                          color: GerenaColors.textSecondaryColor,
+                          color: GerenaColors.textQuaternary,
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 4),
                       Text(
-                        treatment,
+                        formattedDate,
                         style: GoogleFonts.rubik(
-                          fontSize: 11,
+                          fontSize: 10,
                           color: GerenaColors.textTertiaryColor,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                ),
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [GerenaColors.lightShadow],
-                      ),
-                      child: ClipOval(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: GerenaColors.primaryColor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            color: GerenaColors.textLightColor,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      formattedTime,
-                      style: GoogleFonts.rubik(
-                        fontSize: 13,
-                        color: GerenaColors.textQuaternary,
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      formattedDate,
-                      style: GoogleFonts.rubik(
-                        fontSize: 10,
-                        color: GerenaColors.textTertiaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Center(
-              child: IntrinsicWidth(
-                child: GerenaColors.widgetButton(
-                  onPressed: () {
-                    profileController.showPatientProfileView(appointment);
-                  },
-                  text: 'Ver Ficha',
-                  showShadow: false,
-                  borderRadius: 20,
+                ],
+              ),
+              SizedBox(height: 12),
+              Center(
+                child: IntrinsicWidth(
+                  child: GerenaColors.widgetButton(
+                    onPressed: () {
+                      profileController.showPatientProfileView(appointment);
+                    },
+                    text: 'Ver Ficha',
+                    showShadow: false,
+                    borderRadius: 20,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPageIndicators(int count) {
     if (count <= 1) return SizedBox.shrink();
