@@ -16,6 +16,7 @@ import 'package:gerena/features/stories/presentation/page/story_controller.dart'
 import 'package:gerena/features/stories/presentation/page/story_modal_widget.dart';
 import 'package:gerena/features/stories/presentation/page/storyring/story_ring_widget.dart';
 import 'package:gerena/features/stories/presentation/widgets/story_ring_loading.dart';
+import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -91,6 +92,20 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
                 letterSpacing: 1.5,
+              ),
+            ),
+             const Spacer(),
+            Container(
+              width: 140,
+              child: GerenaColors.createSearchContainer(
+                height: 26,
+                heightcontainer: 15,
+                iconSize: 18,
+                onTap: () {
+                  final StartController controller =
+                      Get.find<StartController>();
+                  controller.showSearch();
+                },
               ),
             ),
           ],

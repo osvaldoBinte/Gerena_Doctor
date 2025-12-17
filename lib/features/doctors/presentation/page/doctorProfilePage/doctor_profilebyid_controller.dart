@@ -8,28 +8,43 @@ import 'package:gerena/features/doctors/domain/usecase/fetch_doctor_by_id_usecas
 import 'package:gerena/features/followers/presentation/page/follower_user_controller.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_doctor_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
-
-class DoctorProfileController extends GetxController {
+class DoctorProfilebyidController extends GetxController {
   final GetProceduresByDoctorUsecase getProceduresByDoctorUsecase;
   final GetPostDoctorUsecase getPostDoctorUsecase;
   final FetchDoctorByIdUsecase fetchDoctorByIdUsecase;
+  final GetPostsUserUsecase getPostsUserUsecase;
   
-  DoctorProfileController({
+  DoctorProfilebyidController({
     required this.getProceduresByDoctorUsecase,
     required this.getPostDoctorUsecase,
     required this.fetchDoctorByIdUsecase,
+    required this.getPostsUserUsecase
   });
   
-  // ÚNICA FUENTE DE VERDAD: la entidad completa del doctor
   final Rx<DocotorByIdEntity?> doctorEntity = Rx<DocotorByIdEntity?>(null);
-  
   final RxList<GetProceduresEntity> procedures = <GetProceduresEntity>[].obs;
   final RxBool isLoading = false.obs;
   final RxString errorMessage = ''.obs;
 
-  // Getters que SOLO usan doctorEntity
+  // Posts de usuario (publicaciones del doctor)
+  final RxList<PublicationEntity> userPosts = <PublicationEntity>[].obs;
+  final RxBool isLoadingUserPosts = false.obs;
+  final RxString errorMessageUserPosts = ''.obs;
+
+  // Reviews del doctor (reseñas que otros hacen del doctor)
+  final RxList<PublicationEntity> reviews = <PublicationEntity>[].obs;
+  final RxBool isLoadingReviews = false.obs;
+  final RxString errorMessageReviews = ''.obs;
+
+  // NUEVO: Lista combinada de ambos
+  final RxList<PublicationEntity> allPublications = <PublicationEntity>[].obs;
+  final RxBool isLoadingAllPublications = false.obs;
+  final RxString errorMessageAllPublications = ''.obs;
+
+  // Getters
   int? get doctorId => doctorEntity.value?.userId;
   String get doctorName => doctorEntity.value?.nombreCompleto ?? 'Doctor no seleccionado';
   String get doctorSpecialty => doctorEntity.value?.especialidad ?? '';
@@ -40,15 +55,10 @@ class DoctorProfileController extends GetxController {
   String get doctorPhone => doctorEntity.value?.telefono ?? '';
   String get doctorBio => doctorEntity.value?.biografia ?? '';
   
-  // Redes sociales
   String get linkedInUrl => doctorEntity.value?.linkedIn ?? '';
   String get facebookUrl => doctorEntity.value?.facebook ?? '';
   String get xUrl => doctorEntity.value?.x ?? '';
   String get instagramUrl => doctorEntity.value?.instagram ?? '';
-
-  final RxList<PublicationEntity> reviews = <PublicationEntity>[].obs;
-  final RxBool isLoadingReviews = false.obs;
-  final RxString errorMessageReviews = ''.obs;
 
   FollowerUserController get followerController => Get.find<FollowerUserController>();
 
@@ -57,19 +67,16 @@ class DoctorProfileController extends GetxController {
     super.onInit();
     loadDoctorData();
     
-    // Escuchar cambios en doctorEntity (no en currentDoctorId)
     ever(doctorEntity, (entity) {
       if (entity != null) {
         print('🔄 Doctor cargado: ${entity.nombreCompleto}');
-        // Cargar datos relacionados
         loadProcedures();
-        loadReviews();
+        loadAllPublications(); // CAMBIADO: Ahora carga todo junto
         loadFollowStatus();
       }
     });
   }
 
-  // Este método ahora extrae el ID y carga la entidad completa
   void loadDoctorData() async {
     try {
       final startController = Get.find<StartController>();
@@ -118,6 +125,80 @@ class DoctorProfileController extends GetxController {
     }
   }
 
+  // NUEVO: Método para cargar AMBOS tipos de publicaciones
+  Future<void> loadAllPublications() async {
+    try {
+      isLoadingAllPublications.value = true;
+      errorMessageAllPublications.value = '';
+      
+      final id = doctorId;
+      if (id == null) {
+        throw Exception('ID del doctor no disponible');
+      }
+      
+      print('🔍 Cargando todas las publicaciones del doctor ID: $id');
+      
+      // Cargar ambos en paralelo
+      final results = await Future.wait([
+        getPostsUserUsecase.execute(id),      // Publicaciones del doctor
+        getPostDoctorUsecase.execute(id),     // Reseñas del doctor
+      ]);
+      
+      userPosts.value = results[0];
+      reviews.value = results[1];
+      
+      // Combinar ambas listas
+      final combined = <PublicationEntity>[];
+      combined.addAll(results[0]); // Publicaciones del doctor
+      combined.addAll(results[1]); // Reseñas del doctor
+      
+      // Ordenar por fecha (más recientes primero)
+      combined.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      
+      allPublications.value = combined;
+      
+      print('✅ Publicaciones cargadas: ${userPosts.length} posts + ${reviews.length} reseñas = ${allPublications.length} total');
+      
+    } catch (e) {
+      errorMessageAllPublications.value = 'Error al cargar las publicaciones: $e';
+      print('❌ Error en loadAllPublications: $e');
+      showErrorSnackbar('No se pudieron cargar las publicaciones');
+    } finally {
+      isLoadingAllPublications.value = false;
+    }
+  }
+
+  Future<void> refreshAllPublications() async {
+    if (doctorId != null) {
+      await loadAllPublications();
+    }
+  }
+
+  // Mantener métodos individuales por si los necesitas
+  Future<void> loadUserPosts() async {
+    try {
+      isLoadingUserPosts.value = true;
+      errorMessageUserPosts.value = '';
+      
+      final id = doctorId;
+      if (id == null) {
+        throw Exception('ID del doctor no disponible');
+      }
+      
+      print('🔍 Cargando posts del usuario ID: $id');
+      final result = await getPostsUserUsecase.execute(id);
+      userPosts.value = result;
+      print('✅ Posts del usuario cargados: ${userPosts.length}');
+      
+    } catch (e) {
+      errorMessageUserPosts.value = 'Error al cargar las publicaciones: $e';
+      print('❌ Error en loadUserPosts: $e');
+      showErrorSnackbar('No se pudieron cargar las publicaciones');
+    } finally {
+      isLoadingUserPosts.value = false;
+    }
+  }
+
   Future<void> loadReviews() async {
     try {
       isLoadingReviews.value = true;
@@ -145,6 +226,12 @@ class DoctorProfileController extends GetxController {
   Future<void> refreshReviews() async {
     if (doctorId != null) {
       await loadReviews();
+    }
+  }
+
+  Future<void> refreshUserPosts() async {
+    if (doctorId != null) {
+      await loadUserPosts();
     }
   }
 
@@ -203,9 +290,7 @@ class DoctorProfileController extends GetxController {
     return id != null ? followerController.isLoadingFollowFor(id) : false;
   }
 
-  // ============ MÉTODO GENERAL DE RETRY ============
-
   Future<void> retryLoad() async {
-     loadDoctorData();
+    loadDoctorData();
   }
 }

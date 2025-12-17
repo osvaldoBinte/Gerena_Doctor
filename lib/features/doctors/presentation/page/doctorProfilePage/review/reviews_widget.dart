@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/image_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/publications/presentation/widget/review_widget.dart';
 import 'package:gerena/features/review/presentation/widget/reviews_loading.dart';
 import 'package:get/get.dart';
-class ReviewsWidget extends StatelessWidget {
-  const ReviewsWidget({Key? key}) : super(key: key);
+
+class ReviewsByDoctorWidget extends StatelessWidget {
+  const ReviewsByDoctorWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GetX<DoctorProfileController>(
+    return GetX<DoctorProfilebyidController>(
       builder: (controller) {
-        if (controller.isLoading.value) {
+        if (controller.isLoadingAllPublications.value) {
           return const ReviewsLoading();
         }
 
-        if (controller.errorMessage.value.isNotEmpty) {
+        if (controller.errorMessageAllPublications.value.isNotEmpty) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -31,13 +32,13 @@ class ReviewsWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    controller.errorMessage.value,
+                    controller.errorMessageAllPublications.value,
                     style: GerenaColors.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: controller.refreshReviews,
+                    onPressed: controller.refreshAllPublications,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: GerenaColors.primaryColor,
                     ),
@@ -49,7 +50,7 @@ class ReviewsWidget extends StatelessWidget {
           );
         }
 
-        if (controller.reviews.isEmpty) {
+        if (controller.allPublications.isEmpty) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -57,16 +58,17 @@ class ReviewsWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.rate_review_outlined,
+                    Icons.library_books_outlined,
                     color: Colors.grey[400],
                     size: 48,
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No hay reseñas disponibles',
+                    'No hay publicaciones ni reseñas disponibles',
                     style: GerenaColors.bodyMedium.copyWith(
                       color: Colors.grey[600],
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -74,26 +76,26 @@ class ReviewsWidget extends StatelessWidget {
           );
         }
 
-        return _buildReviewsList(controller.reviews, context);
+        return _buildPublicationsList(controller.allPublications, context);
       },
     );
   }
 
-  Widget _buildReviewsList(List<PublicationEntity> reviews, BuildContext context) {
+  Widget _buildPublicationsList(List<PublicationEntity> publications, BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
-        children: reviews.map((review) {
+        children: publications.map((publication) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: _buildReviewCard(review, context),
+            child: _buildPublicationCard(publication, context),
           );
         }).toList(),
       ),
     );
   }
 
-  Widget _buildReviewCard(PublicationEntity review, BuildContext context) {
+  Widget _buildPublicationCard(PublicationEntity publication, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -110,26 +112,28 @@ class ReviewsWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildReviewHeader(review),
+          // Badge para identificar el tipo
+          _buildPublicationTypeBadge(publication),
+          const SizedBox(height: 8),
+          _buildPublicationHeader(publication),
           const SizedBox(height: 12),
-         
           Text(
-            review.description,
+            publication.description,
             style: GerenaColors.bodyMedium,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
-          if (review.images.isNotEmpty) ...[
+          if (publication.images.isNotEmpty) ...[
             const SizedBox(height: 12),
-            _buildReviewImages(review.images),
+            _buildPublicationImages(publication.images),
           ],
           const SizedBox(height: 12),
-          _buildReviewFooter(review),
+          _buildPublicationFooter(publication),
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () => _showReviewModal(context, review),
+              onPressed: () => _showPublicationModal(context, publication),
               style: TextButton.styleFrom(
                 foregroundColor: GerenaColors.primaryColor,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -159,103 +163,134 @@ class ReviewsWidget extends StatelessWidget {
     );
   }
 
-void _showReviewModal(BuildContext context, PublicationEntity review) {
-  showDialog(
-    context: context,
-    barrierDismissible: true,
-    builder: (BuildContext context) {
-      return Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-        child: Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.85,
+  // NUEVO: Badge para identificar si es reseña o publicación
+  Widget _buildPublicationTypeBadge(PublicationEntity publication) {
+    final isReview = publication.isReview;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isReview 
+            ? GerenaColors.accentColor.withOpacity(0.1)
+            : GerenaColors.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isReview ? Icons.star : Icons.article,
+            size: 14,
+            color: isReview ? GerenaColors.accentColor : GerenaColors.primaryColor,
           ),
-          decoration: BoxDecoration(
-            color: GerenaColors.backgroundColor,
-            borderRadius: BorderRadius.circular(20),
+          const SizedBox(width: 4),
+          Text(
+            isReview ? 'Reseña' : 'Publicación',
+            style: GerenaColors.bodySmall.copyWith(
+              color: isReview ? GerenaColors.accentColor : GerenaColors.primaryColor,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header con botón cerrar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.grey[300]!,
-                      width: 1,
+        ],
+      ),
+    );
+  }
+
+  void _showPublicationModal(BuildContext context, PublicationEntity publication) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            decoration: BoxDecoration(
+              color: GerenaColors.backgroundColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey[300]!,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        publication.isReview ? 'Reseña' : 'Publicación',
+                        style: GerenaColors.headingSmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: GerenaColors.textSecondary,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: ReviewWidget(
+                      postId: publication.id,
+                      userName: publication.author?.name ?? 'Usuario',
+                      date: _formatDate(publication.createdAt),
+                      title: publication.taggedDoctor?.nombreCompleto ?? '',
+                      content: publication.description,
+                      images: publication.images.map((img) => img.imageUrl).toList(),
+                      userRole: publication.taggedDoctor?.especialidad ?? '',
+                      rating: publication.rating?.toDouble() ?? 0,
+                      reactions: publication.reactions.total,
+                      avatarPath: publication.author?.profilePhoto,
+                      margin: const EdgeInsets.all(0),
+                      padding: const EdgeInsets.all(16),
+                      showAgendarButton: true,
+                      isReview: publication.isReview,
+                      userReaction: publication.userreaction,
+                      showDeleteButton: false,
+                      doctorData: publication.taggedDoctor != null
+                          ? {
+                              'id': publication.taggedDoctor!.id,
+                              'nombreCompleto': publication.taggedDoctor!.nombreCompleto,
+                              'especialidad': publication.taggedDoctor!.especialidad,
+                              'fotoPerfil': publication.taggedDoctor!.fotoPerfil,
+                            }
+                          : null,
                     ),
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Publicación',
-                      style: GerenaColors.headingSmall.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: GerenaColors.textSecondary,
-                      ),
-                      onPressed: () => Navigator.of(context).pop(),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-              ),
-              // Contenido scrollable
-              Flexible(
-                child: SingleChildScrollView(
-                  child: ReviewWidget(
-                    postId: review.id,
-                    userName: review.author?.name ?? 'Usuario',
-                    date: _formatDate(review.createdAt),
-                    title: review.taggedDoctor?.nombreCompleto ?? '',
-                    content: review.description,
-                    images: review.images.map((img) => img.imageUrl).toList(),
-                    userRole: review.taggedDoctor?.especialidad ?? '',
-                    rating: review.rating?.toDouble() ?? 0,
-                    reactions: review.reactions.total,
-                    avatarPath: review.author?.profilePhoto,
-                    margin: const EdgeInsets.all(0),
-                    padding: const EdgeInsets.all(16),
-                    showAgendarButton: true,
-                    isReview: true,
-                    userReaction: review.userreaction,
-                    showDeleteButton: false,
-                    doctorData: review.taggedDoctor != null
-                        ? {
-                            'id': review.taggedDoctor!.id,
-                            'nombreCompleto': review.taggedDoctor!.nombreCompleto,
-                            'especialidad': review.taggedDoctor!.especialidad,
-                            'fotoPerfil': review.taggedDoctor!.fotoPerfil,
-                          }
-                        : null,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-  Widget _buildReviewHeader(PublicationEntity review) {
-    final author = review.author;
+        );
+      },
+    );
+  }
+
+  Widget _buildPublicationHeader(PublicationEntity publication) {
+    final author = publication.author;
     final authorName = author?.name ?? 'Usuario';
     final authorPhoto = author?.profilePhoto;
 
     return Row(
       children: [
-        // Avatar del autor
         CircleAvatar(
           radius: 20,
           backgroundColor: GerenaColors.primaryColor,
@@ -263,9 +298,7 @@ void _showReviewModal(BuildContext context, PublicationEntity review) {
               ? NetworkImage(authorPhoto)
               : null,
           onBackgroundImageError: authorPhoto != null && authorPhoto.isNotEmpty
-              ? (exception, stackTrace) {
-                  // Error manejado con el child de fallback
-                }
+              ? (exception, stackTrace) {}
               : null,
           child: authorPhoto == null || authorPhoto.isEmpty
               ? Text(
@@ -291,19 +324,21 @@ void _showReviewModal(BuildContext context, PublicationEntity review) {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  _buildStarRating(review.rating?.toDouble() ?? 0),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${review.rating ?? 0}/5',
-                    style: GerenaColors.bodySmall.copyWith(
-                      color: Colors.grey[600],
+              if (publication.isReview) ...[
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    _buildStarRating(publication.rating?.toDouble() ?? 0),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${publication.rating ?? 0}/5',
+                      style: GerenaColors.bodySmall.copyWith(
+                        color: Colors.grey[600],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -311,9 +346,7 @@ void _showReviewModal(BuildContext context, PublicationEntity review) {
     );
   }
 
-
-  Widget _buildReviewImages(List<ImageEntity> images) {
-    // Ordenar imágenes por el campo order
+  Widget _buildPublicationImages(List<ImageEntity> images) {
     final sortedImages = List<ImageEntity>.from(images)
       ..sort((a, b) => a.order.compareTo(b.order));
 
@@ -383,13 +416,12 @@ void _showReviewModal(BuildContext context, PublicationEntity review) {
     );
   }
 
-  Widget _buildReviewFooter(PublicationEntity review) {
-    final reactions = review.reactions;
+  Widget _buildPublicationFooter(PublicationEntity publication) {
+    final reactions = publication.reactions;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Reacciones totales
         Row(
           children: [
             Icon(
@@ -406,9 +438,8 @@ void _showReviewModal(BuildContext context, PublicationEntity review) {
             ),
           ],
         ),
-        // Fecha
         Text(
-          _formatDate(review.createdAt),
+          _formatDate(publication.createdAt),
           style: GerenaColors.bodySmall.copyWith(
             color: Colors.grey[600],
           ),

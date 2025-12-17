@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedure_card_widget.dart';
-import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
 import 'package:gerena/features/doctors/presentation/widget/loading/share_and_procedures_loading.dart';
 import 'package:get/get.dart';
 
-class ProceduresDoctorWidget extends StatelessWidget {
+class ProceduresDoctorbyidWidget extends StatelessWidget {
 
-  const ProceduresDoctorWidget({
+  const ProceduresDoctorbyidWidget({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final DoctorProfileController proceduresController = Get.find<DoctorProfileController>();
+    final DoctorProfilebyidController proceduresController = Get.find<DoctorProfilebyidController>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +25,7 @@ class ProceduresDoctorWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildProceduresGrid(DoctorProfileController proceduresController) {
+  Widget _buildProceduresGrid(DoctorProfilebyidController proceduresController) {
     return Obx(() {
       if (proceduresController.isLoading.value) {
         return ShareAndProceduresLoading(
@@ -72,8 +72,8 @@ class ProceduresDoctorWidget extends StatelessWidget {
                   Expanded(
                     child: ProcedureCardWidget(
                       procedure: proceduresController.procedures[i],
-                      showActions: true,
-                      showAddImageButton: true,
+                      showActions: false,
+                      showAddImageButton: false,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -81,8 +81,8 @@ class ProceduresDoctorWidget extends StatelessWidget {
                     Expanded(
                       child: ProcedureCardWidget(
                         procedure: proceduresController.procedures[i + 1],
-                        showActions: true,
-                        showAddImageButton: true,
+                        showActions: false,
+                        showAddImageButton: false,
                       ),
                     )
                   else

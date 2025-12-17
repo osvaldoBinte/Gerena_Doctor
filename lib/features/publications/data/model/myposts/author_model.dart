@@ -5,6 +5,7 @@ class AuthorModel extends AuthorEntity {
     required super.id,
      super.name,
      super.profilePhoto,
+     super.rol
   });
 
   factory AuthorModel.fromJson(Map<String, dynamic> json) {
@@ -12,6 +13,7 @@ class AuthorModel extends AuthorEntity {
       id: json["id"],
       name: json["nombre"],
       profilePhoto: json["fotoPerfil"],
+      rol: json['rol']
     );
   }
 
@@ -20,6 +22,7 @@ class AuthorModel extends AuthorEntity {
       "id": id,
       "nombre": name,
       "fotoPerfil": profilePhoto,
+      'rol':rol
     };
   }
 
@@ -28,6 +31,7 @@ class AuthorModel extends AuthorEntity {
       id: entity.id,
       name: entity.name,
       profilePhoto: entity.profilePhoto,
+      rol: entity.rol
     );
   }
 }

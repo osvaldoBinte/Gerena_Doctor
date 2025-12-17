@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
-import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_controller.dart';
-import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/prosedimiento/share_and_procedures_widget.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/prosedimiento/procedures_doctorbyid_widget.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/review/reviews_widget.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DoctorProfilePage extends StatefulWidget {
+class DoctorProfileByidPage extends StatefulWidget {
   @override
   _DoctorProfilePageState createState() => _DoctorProfilePageState();
 }
 
-class _DoctorProfilePageState extends State<DoctorProfilePage> {
+class _DoctorProfilePageState extends State<DoctorProfileByidPage> {
   final StartController controller = Get.find<StartController>();
-  final DoctorProfileController doctorController = Get.find<DoctorProfileController>();
+  final DoctorProfilebyidController doctorController = Get.find<DoctorProfilebyidController>();
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
               
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: ProceduresDoctorWidget(),
+                child: ProceduresDoctorbyidWidget(),
               ),
               
               const SizedBox(height: GerenaColors.paddingMedium),
@@ -108,7 +109,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                         color: GerenaColors.textSecondary,
                       ),
                     ),
-                    ReviewsWidget(),
+                    ReviewsByDoctorWidget(),
                     const SizedBox(height: GerenaColors.paddingMedium),
                     _buildSocialLinksSection(),
                   ],
@@ -532,14 +533,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                     );
                   }),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GerenaColors.widgetButton(
-                    showShadow: false,
-                    text: 'AGENDAR CITA',
-                   
-                  ),
-                ),
+                
               ],
             ),
           ),

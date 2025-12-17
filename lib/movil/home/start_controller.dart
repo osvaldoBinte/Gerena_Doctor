@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_page.dart';
 import 'package:gerena/features/notification/presentation/page/notificasiones/notification_page.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
-import 'package:gerena/features/notification/presentation/page/notificasiones/notification_modal.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
 import 'package:gerena/features/publications/presentation/page/home_page.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/get_user_by_id_controller.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/user_profile_page.dart';
+import 'package:gerena/features/user/presentation/page/search/search_profile_page.dart';
 import 'package:get/get.dart';
 
 class StartController extends GetxController {
@@ -48,8 +49,19 @@ class StartController extends GetxController {
   }
   final RxBool showDoctorProfile = false.obs;
     final RxBool showUserProfile = false.obs;
+    final RxBool showSearchPage = false.obs;
+
   final Rx<Map<String, dynamic>?> selectedDoctorData = Rx<Map<String, dynamic>?>(null);
 final Rx<Map<String, dynamic>?> selectedUserData = Rx<Map<String, dynamic>?>(null);
+void showSearch() {
+  showSearchPage.value = true;
+
+  showDoctorProfile.value = false;
+  showUserProfile.value = false;
+}
+void hideSearch() {
+  showSearchPage.value = false;
+}
 
   void changePage(int index) {
     selectedIndex.value = index;
@@ -72,7 +84,8 @@ void showUserProfilePage({Map<String, dynamic>? userData}) {
   
   showUserProfile.value = true;
   showDoctorProfile.value = false;
-  
+    showSearchPage.value = false;
+
   if (Get.isRegistered<GetUserByIdController>()) {
     final controller = Get.find<GetUserByIdController>();
     controller.loadUserData();
@@ -88,27 +101,38 @@ void showDoctorProfilePage({Map<String, dynamic>? doctorData}) {
       print('   - Especialidad: ${doctorData['specialty']}');
     }
     showDoctorProfile.value = true;
-    if (Get.isRegistered<DoctorProfileController>()) {
-      final controller = Get.find<DoctorProfileController>();
+      showSearchPage.value = false;
+
+    if (Get.isRegistered<DoctorProfilebyidController>()) {
+      final controller = Get.find<DoctorProfilebyidController>();
       controller.loadDoctorData();
     }
   }
-  void _hideAllOverlayPages() {
-    showDoctorProfile.value = false;
-  }
+ void _hideAllOverlayPages() {
+  showDoctorProfile.value = false;
+  showUserProfile.value = false;
+  showSearchPage.value = false;
+}
+
   void hideDoctorProfilePage() {
     showDoctorProfile.value = false;
   }
-  Widget get currentPage {
-  
-    if (showDoctorProfile.value) {
-      return DoctorProfilePage();
-    }
-    if (showUserProfile.value) {
-      return UserProfilePage();
-    }
-    return pages[selectedIndex.value];
+ Widget get currentPage {
+  if (showSearchPage.value) {
+    return SearchProfilePage();
   }
+
+  if (showDoctorProfile.value) {
+    return DoctorProfileByidPage();
+  }
+
+  if (showUserProfile.value) {
+    return UserProfilePage();
+  }
+
+  return pages[selectedIndex.value];
+}
+
 
   bool get shouldShowBottomNav => 
                                   !showDoctorProfile.value &&

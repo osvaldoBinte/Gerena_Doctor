@@ -106,6 +106,7 @@ import 'package:gerena/features/subscription/domain/usecase/post_subscribe_to_pl
 import 'package:gerena/features/user/data/datasources/user_datasource_imp.dart';
 import 'package:gerena/features/user/data/repositories/user_repository_imp.dart';
 import 'package:gerena/features/user/domain/usecase/get_user_details_by_id_usecase.dart';
+import 'package:gerena/features/user/domain/usecase/search_profile_usecase.dart';
 
 class UsecaseConfig {
    AuthRepositoryImp? authRepositoryImp;
@@ -220,6 +221,7 @@ class UsecaseConfig {
    PostAnswerBlogUsecase?postAnswerBlogUsecase;
 
 
+
   CreatePublicationUsecase? createPublicationUsecase;
   DeletePublicationUsecase? deletePublicationUsecase;
   GetFeedPostsUsecase? getFeedPostsUsecase;
@@ -241,6 +243,7 @@ class UsecaseConfig {
    GetFollowsUsecase? getFollowsUsecase;
 
    GetUserDetailsByIdUsecase? getUserDetailsByIdUsecase;
+   SearchProfileUsecase? searchProfileUsecase;
 
   UsecaseConfig(){
      authDataSources = AuthDataSourcesImp();
@@ -382,6 +385,7 @@ class UsecaseConfig {
 
 
       getUserDetailsByIdUsecase = GetUserDetailsByIdUsecase(userRepository: userRepositoryImp!);
+      searchProfileUsecase = SearchProfileUsecase(userRepository: userRepositoryImp!);
     
   }
 }

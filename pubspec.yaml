@@ -166,6 +166,7 @@ flutter:
       - assets/icons/favorite.png
       
       - assets/icons/WISHLIST.png
+      - assets/icons/doctor.png
 
       - assets/icons/truck.png
       - assets/icons/calendar.png
@@ -178,6 +179,7 @@ flutter:
       - assets/menu/MENUGERENA.png
       - assets/icons/headset_mic.png
       - assets/icons/close.png
+      - assets/icons/arrow_back.png
       - assets/icons/search.png
       - assets/icons/shopping_cart.png
       - assets/icons/FOTOGRAFIA.png

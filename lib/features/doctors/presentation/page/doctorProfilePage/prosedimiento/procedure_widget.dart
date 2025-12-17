@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedure_card_widget.dart';
-import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
 import 'package:get/get.dart';
 
 class ProcedureWidget extends StatelessWidget {
@@ -9,7 +9,7 @@ class ProcedureWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DoctorProfileController proceduresController = Get.find<DoctorProfileController>();
+    final DoctorProfilebyidController proceduresController = Get.find<DoctorProfilebyidController>();
 
     return Obx(() {
       if (proceduresController.isLoading.value) {

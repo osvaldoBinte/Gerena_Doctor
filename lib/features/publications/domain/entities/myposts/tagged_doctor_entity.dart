@@ -3,6 +3,7 @@ class TaggedDoctorEntity {
   final String? nombreCompleto;
   final String? especialidad;
   final String? fotoPerfil;
+  
 
   TaggedDoctorEntity({
     required this.id,

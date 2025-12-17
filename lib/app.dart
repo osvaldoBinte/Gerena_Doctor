@@ -12,6 +12,7 @@ import 'package:gerena/features/auth/presentacion/page/login/login_controller.da
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
+import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/followers/presentation/page/follower_controller.dart';
@@ -35,6 +36,7 @@ import 'package:gerena/features/review/presentation/page/review_controller.dart'
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/get_user_by_id_controller.dart';
+import 'package:gerena/features/user/presentation/page/search/search_profile_controller.dart';
 import 'package:gerena/movil/homePage/PostController/post_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
@@ -135,9 +137,12 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.unfollowUserUsecase!, permanent: true);
         Get.put(usecaseConfig.getFollowStatusUsecase!, permanent: true);
         Get.put(usecaseConfig.getFollowsUsecase!, permanent: true);
- Get.put(usecaseConfig.getUserDetailsByIdUsecase!, permanent: true);
- Get.put(usecaseConfig.getPostsUserUsecase!, permanent: true);
- Get.put(usecaseConfig.fetchDoctorByIdUsecase!, permanent: true);
+        Get.put(usecaseConfig.getUserDetailsByIdUsecase!, permanent: true);
+        Get.put(usecaseConfig.getPostsUserUsecase!, permanent: true);
+        Get.put(usecaseConfig.fetchDoctorByIdUsecase!, permanent: true);
+        Get.put(usecaseConfig.getPostDoctorUsecase!,permanent: true);
+        Get.put(usecaseConfig.getProceduresByDoctorUsecase!,permanent: true);
+        Get.put(usecaseConfig.searchProfileUsecase!,permanent: true);
 
         Get.lazyPut(() => LoginController(loginUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => HistoryController(getMyOrderUsecase: Get.find()), fenix: true);
@@ -169,6 +174,8 @@ class App extends StatelessWidget {
               Get.lazyPut(() => FollowerController(getFollowStatusUsecase: Get.find()), fenix: true);
               Get.lazyPut(() => FollowerUserController(followUserUsecase:  Get.find(), unfollowUserUsecase:  Get.find(), getFollowStatusUsecase:  Get.find()), fenix: true);
         Get.lazyPut(() =>GetUserByIdController(getUserDetailsByIdUsecase: Get.find(), getPostsUserUsecase: Get.find()),fenix: true);
+        Get.lazyPut(() =>SearchProfileController(searchProfileUsecase:  Get.find()),fenix: true);
+        Get.lazyPut(() => DoctorProfilebyidController(getProceduresByDoctorUsecase: Get.find(), getPostDoctorUsecase: Get.find(), fetchDoctorByIdUsecase: Get.find(), getPostsUserUsecase: Get.find()),fenix: true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

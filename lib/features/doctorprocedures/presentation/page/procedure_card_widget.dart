@@ -13,6 +13,7 @@ class ProcedureCardWidget extends StatelessWidget {
   final VoidCallback? onDelete;
   final bool showActions;
   final bool showAddImageButton;
+  
 
   const ProcedureCardWidget({
     Key? key,
@@ -21,6 +22,7 @@ class ProcedureCardWidget extends StatelessWidget {
     this.onDelete,
     this.showActions = true,
     this.showAddImageButton = true,
+    
   }) : super(key: key);
 
   @override

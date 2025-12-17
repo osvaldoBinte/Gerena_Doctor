@@ -10,5 +10,4 @@ abstract class PublicationRepository {
   Future<void> deletePublication(int publicationId);
   Future<List<PublicationEntity>> getPostsUser(int userid) ;
     Future<List<PublicationEntity>> getPostsDcotor(int userid) ;
-
 }

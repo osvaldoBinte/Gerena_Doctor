@@ -40,7 +40,7 @@ class PostCardWidget extends StatefulWidget {
     this.userReaction,
     this.onReactionPressed,
     this.doctorData,
-    this.author, // 👈 Agregar esto
+    this.author,
   }) : super(key: key);
   @override
   State<PostCardWidget> createState() => _PostCardWidgetState();
@@ -75,19 +75,17 @@ class _PostCardWidgetState extends State<PostCardWidget> {
         .replaceAll('. ', '.\n\n')
         .replaceAll('.', '.\n')
         .replaceAll('\n\n', '\n');
-    processedText =
-        processedText
-            .replaceAll('TEMP_DR_PLACEHOLDER ', 'Dr. ')
-            .replaceAll('TEMP_DRA_PLACEHOLDER ', 'Dra. ')
-            .trim();
+    processedText = processedText
+        .replaceAll('TEMP_DR_PLACEHOLDER ', 'Dr. ')
+        .replaceAll('TEMP_DRA_PLACEHOLDER ', 'Dra. ')
+        .trim();
     return processedText;
   }
 
   @override
   Widget build(BuildContext context) {
     return GerenaColors.createPostCard(
-      height:
-          MediaQuery.of(context).size.height -
+      height: MediaQuery.of(context).size.height -
           AppBar().preferredSize.height -
           kBottomNavigationBarHeight,
       child: Column(
@@ -98,49 +96,68 @@ class _PostCardWidgetState extends State<PostCardWidget> {
             child: Row(
               children: [
                 GestureDetector(
-                onTap: widget.author != null
-    ? () async {
-        AuthService authService = AuthService();
-        int? loggedUserId = await authService.getUsuarioId();
-        int authorId = widget.author!.id;
+                  onTap: widget.author != null
+                      ? () async {
+                          AuthService authService = AuthService();
+                          int? loggedUserId = await authService.getUsuarioId();
+                          int authorId = widget.author!.id;
 
-        if (loggedUserId == authorId) {
-          Get.offAllNamed(RoutesNames.homePage, arguments: 4);
-        } else {
-          final startController = Get.find<StartController>();
-          startController.showUserProfilePage(
-            userData: {
-              'userId': widget.author!.id,
-              'userName': widget.author!.name ?? 'Usuario',
-              'username': widget.author!.profilePhoto ??
-                  widget.author!.name?.toLowerCase().replaceAll(' ', '') ??
-                  'usuario',
-            },
-          );
-        }
-      }
-    : null,
+                          if (loggedUserId == authorId) {
+                            Get.offAllNamed(RoutesNames.homePage, arguments: 4);
+                            return;
+                          }
 
+                          if (widget.author != null) {
+                            final rol = widget.author!.rol;
+                            final startController = Get.find<StartController>();
 
+                            if (rol == 'cliente') {
+                              startController.showUserProfilePage(
+                                userData: {
+                                  'userId': widget.author!.id,
+                                  'userName': widget.author!.name ?? 'Usuario',
+                                  'username': widget.author!.profilePhoto ??
+                                      widget.author!.name
+                                          ?.toLowerCase()
+                                          .replaceAll(' ', '') ??
+                                      'usuario',
+                                },
+                              );
+                            } else if (rol == 'doctor') {
+                              print('roll es dcotor');
+                              startController.showDoctorProfilePage(
+                                doctorData: {
+                                   'userId': widget.author!.id,
+                                  'userName': widget.author!.name ?? 'Usuario',
+                                  'username': widget.author!.profilePhoto ??
+                                      widget.author!.name
+                                          ?.toLowerCase()
+                                          .replaceAll(' ', '') ??
+                                      'usuario',
+                                },
+                              );
+                            }
+
+                            return;
+                          }
+                        }
+                      : null,
                   child: CircleAvatar(
                     radius: 20,
-                    backgroundImage:
-                        widget.author?.profilePhoto != null &&
-                                widget.author!.profilePhoto!.isNotEmpty &&
-                                widget.author!.profilePhoto!.startsWith('http')
-                            ? NetworkImage(widget.author!.profilePhoto!)
-                            : (widget.author?.profilePhoto != null &&
-                                    widget.author!.profilePhoto!.isNotEmpty
-                                ? AssetImage(widget.author!.profilePhoto!)
-                                : null),
-                    child:
-                        widget.author?.profilePhoto == null ||
-                                widget.author!.profilePhoto!.isEmpty
-                            ? const Icon(Icons.person, size: 20)
-                            : null,
+                    backgroundImage: widget.author?.profilePhoto != null &&
+                            widget.author!.profilePhoto!.isNotEmpty &&
+                            widget.author!.profilePhoto!.startsWith('http')
+                        ? NetworkImage(widget.author!.profilePhoto!)
+                        : (widget.author?.profilePhoto != null &&
+                                widget.author!.profilePhoto!.isNotEmpty
+                            ? AssetImage(widget.author!.profilePhoto!)
+                            : null),
+                    child: widget.author?.profilePhoto == null ||
+                            widget.author!.profilePhoto!.isEmpty
+                        ? const Icon(Icons.person, size: 20)
+                        : null,
                   ),
                 ),
-
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -151,29 +168,52 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                           Row(
                             children: [
                               GestureDetector(
-                              onTap: widget.author != null
-    ? () async {
-        AuthService authService = AuthService();
-        int? loggedUserId = await authService.getUsuarioId();
-        int authorId = widget.author!.id;
+                                onTap: widget.author != null
+                                    ? () async {
+                                                                 AuthService authService = AuthService();
+                          int? loggedUserId = await authService.getUsuarioId();
+                          int authorId = widget.author!.id;
 
-        if (loggedUserId == authorId) {
-          Get.offAllNamed(RoutesNames.homePage, arguments: 3);
-        } else {
-          final startController = Get.find<StartController>();
-          startController.showUserProfilePage(
-            userData: {
-              'userId': widget.author!.id,
-              'userName': widget.author!.name ?? 'Usuario',
-              'username': widget.author!.profilePhoto ??
-                  widget.author!.name?.toLowerCase().replaceAll(' ', '') ??
-                  'usuario',
-            },
-          );
-        }
-      }
-    : null,
+                          if (loggedUserId == authorId) {
+                            Get.offAllNamed(RoutesNames.homePage, arguments: 4);
+                            return;
+                          }
 
+                          if (widget.author != null) {
+                            final rol = widget.author!.rol;
+                            final startController = Get.find<StartController>();
+
+                            if (rol == 'cliente') {
+                              startController.showUserProfilePage(
+                                userData: {
+                                  'userId': widget.author!.id,
+                                  'userName': widget.author!.name ?? 'Usuario',
+                                  'username': widget.author!.profilePhoto ??
+                                      widget.author!.name
+                                          ?.toLowerCase()
+                                          .replaceAll(' ', '') ??
+                                      'usuario',
+                                },
+                              );
+                            } else if (rol == 'doctor') {
+                             
+                              startController.showDoctorProfilePage(
+                                doctorData: {
+                                   'userId': widget.author!.id,
+                                  'userName': widget.author!.name ?? 'Usuario',
+                                  'username': widget.author!.profilePhoto ??
+                                      widget.author!.name
+                                          ?.toLowerCase()
+                                          .replaceAll(' ', '') ??
+                                      'usuario',
+                                },
+                              );
+                            }
+
+                            return;
+                          }
+                                      }
+                                    : null,
                                 child: Text(
                                   widget.author?.name ?? 'Usuario',
                                   style: GoogleFonts.rubik(
@@ -295,24 +335,17 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                         startController.showDoctorProfilePage(
                                           doctorData: {
                                             'userId': widget.taggedDoctor!.id,
-                                            'doctorName':
-                                                widget
-                                                    .taggedDoctor!
-                                                    .nombreCompleto,
-                                            'specialty':
-                                                widget
-                                                    .taggedDoctor!
+                                            'doctorName': widget
+                                                .taggedDoctor!.nombreCompleto,
+                                            'specialty': widget.taggedDoctor!
                                                     .especialidad ??
                                                 '',
-                                            'location':
-                                                '', 
-                                            'profileImage':
-                                                widget
-                                                    .taggedDoctor!
-                                                    .fotoPerfil ??
+                                            'location': '',
+                                            'profileImage': widget
+                                                    .taggedDoctor!.fotoPerfil ??
                                                 'assets/logo/logo.png',
-                                            'rating': 0.0, 
-                                            'reviews': '', 
+                                            'rating': 0.0,
+                                            'reviews': '',
                                             'info': '',
                                           },
                                         );
@@ -338,7 +371,8 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                         'valoración',
                                         style: GoogleFonts.rubik(
                                           fontSize: 10,
-                                          color: GerenaColors.textSecondaryColor,
+                                          color:
+                                              GerenaColors.textSecondaryColor,
                                         ),
                                       ),
                                       const SizedBox(width: 4),
@@ -389,13 +423,12 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                     children: [
                                       Obx(
                                         () => Opacity(
-                                          opacity:
-                                              postController
-                                                      .isShowingReactionOptions(
-                                                        widget.postId,
-                                                      )
-                                                  ? 0.0
-                                                  : 1.0,
+                                          opacity: postController
+                                                  .isShowingReactionOptions(
+                                            widget.postId,
+                                          )
+                                              ? 0.0
+                                              : 1.0,
                                           child: GestureDetector(
                                             onTap: () {
                                               print(
@@ -403,8 +436,8 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                               );
                                               postController
                                                   .toggleReactionOptions(
-                                                    widget.postId,
-                                                  );
+                                                widget.postId,
+                                              );
                                             },
                                             child: Column(
                                               crossAxisAlignment:
@@ -415,20 +448,20 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                                   colorFilter: ColorFilter.mode(
                                                     postController
                                                             .hasUserReacted(
-                                                              widget.postId,
-                                                            )
+                                                      widget.postId,
+                                                    )
                                                         ? postController
                                                             .getSelectedReactionColor(
-                                                              widget.postId,
-                                                            )
+                                                            widget.postId,
+                                                          )
                                                         : Color(0xFFF0F0F0),
                                                     BlendMode.srcATop,
                                                   ),
                                                   child: Image.asset(
                                                     postController
                                                         .getSelectedReactionIcon(
-                                                          widget.postId,
-                                                        )!,
+                                                      widget.postId,
+                                                    )!,
                                                     width: 24,
                                                     height: 24,
                                                   ),
@@ -437,8 +470,8 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                                 Text(
                                                   postController
                                                       .getSelectedReactionName(
-                                                        widget.postId,
-                                                      ),
+                                                    widget.postId,
+                                                  ),
                                                   style: GoogleFonts.rubik(
                                                     fontSize: 9,
                                                     color: Color(0xFFF0F0F0),
@@ -452,7 +485,6 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                     ],
                                   ),
                                   const Spacer(),
-                                  
                                 ],
                               ),
                             ),
@@ -470,65 +502,65 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                   );
                   return postController.isShowingReactionOptions(widget.postId)
                       ? Positioned(
-                        bottom: 16,
-                        left: 12,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: List.generate(
-                              postController.reactionIcons.length,
-                              (index) => GestureDetector(
-                                onTap: () {
-                                  print(
-                                    "Reacción seleccionada: ${postController.reactionNames[index]}",
-                                  );
-                                  postController.selectReaction(
-                                    widget.postId,
-                                    index,
-                                  );
-                                  final reactionType = postController
-                                      .getCurrentReactionType(widget.postId);
-                                  publicationController.toggleLike(
-                                    widget.postId,
-                                    reactionType,
-                                  );
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                  padding: const EdgeInsets.all(8),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
-                                        postController.reactionIcons[index],
-                                        width: 24,
-                                        height: 24,
-                                      ),
-                                      Text(
-                                        postController.reactionNames[index],
-                                        style: GoogleFonts.rubik(
-                                          fontSize: 9,
-                                          color: Color(0xFFF0F0F0),
+                          bottom: 16,
+                          left: 12,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: List.generate(
+                                postController.reactionIcons.length,
+                                (index) => GestureDetector(
+                                  onTap: () {
+                                    print(
+                                      "Reacción seleccionada: ${postController.reactionNames[index]}",
+                                    );
+                                    postController.selectReaction(
+                                      widget.postId,
+                                      index,
+                                    );
+                                    final reactionType = postController
+                                        .getCurrentReactionType(widget.postId);
+                                    publicationController.toggleLike(
+                                      widget.postId,
+                                      reactionType,
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    padding: const EdgeInsets.all(8),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Image.asset(
+                                          postController.reactionIcons[index],
+                                          width: 24,
+                                          height: 24,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          postController.reactionNames[index],
+                                          style: GoogleFonts.rubik(
+                                            fontSize: 9,
+                                            color: Color(0xFFF0F0F0),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      )
+                        )
                       : const SizedBox.shrink();
                 }),
               ],

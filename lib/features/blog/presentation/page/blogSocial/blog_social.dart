@@ -332,10 +332,7 @@ Widget _buildArticleDetailContent(BlogController controller, BuildContext contex
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
+                 Text(
                       respuesta.usuarioNombre??'',
                       style: GerenaColors.headingSmall.copyWith(
                         fontSize: 14,
@@ -349,8 +346,6 @@ Widget _buildArticleDetailContent(BlogController controller, BuildContext contex
                           color: GerenaColors.textSecondaryColor,
                         ),
                       ),
-                  ],
-                ),
                 const SizedBox(height: 8),
                 Text(
                   respuesta.contenido ?? '',
