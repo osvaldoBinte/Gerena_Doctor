@@ -4,6 +4,7 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/author_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/tagged_doctor_entity.dart';
+import 'package:gerena/features/publications/presentation/page/comment/comment_modal_widget.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
 import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
@@ -484,7 +485,46 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                       ),
                                     ],
                                   ),
-                                  const Spacer(),
+                                   SizedBox(width: 16), // Espacio entre botones
+                                  // BOTÓN DE COMENTARIOS
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          Get.bottomSheet(
+                                            CommentModalWidget(
+                                              postId: widget.postId,
+                                            ),
+                                            isScrollControlled: true,
+                                            backgroundColor: Colors.transparent,
+                                          );
+                                        },
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.comment_outlined,
+                                              color: Color(0xFFF0F0F0),
+                                              size: 24,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Comentar',
+                                              style: GoogleFonts.rubik(
+                                                fontSize: 9,
+                                                color: Color(0xFFF0F0F0),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ),

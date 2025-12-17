@@ -76,10 +76,13 @@ import 'package:gerena/features/notification/data/repositories/notification_repo
 import 'package:gerena/features/notification/domain/usecase/get_notification_usecase.dart';
 import 'package:gerena/features/publications/data/datasources/publication_date_sources_imp.dart';
 import 'package:gerena/features/publications/data/repositories/publication_repository_imp.dart';
+import 'package:gerena/features/publications/domain/usecase/add_comment_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/create_publication_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/delete_comment_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/delete_publication_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_feed_posts_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_my_posts_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_post_comments_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_doctor_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/like_publication_usecase.dart';
@@ -221,6 +224,9 @@ class UsecaseConfig {
    PostAnswerBlogUsecase?postAnswerBlogUsecase;
 
 
+  GetPostCommentsUsecase? getPostCommentsUsecase;
+  AddCommentUsecase ? addCommentUsecase;
+  DeleteCommentUsecase?deleteCommentUsecase;
 
   CreatePublicationUsecase? createPublicationUsecase;
   DeletePublicationUsecase? deletePublicationUsecase;
@@ -235,6 +241,7 @@ class UsecaseConfig {
    FetchStoriesUsecase? fetchStoriesUsecase;
    RemoveStoryUsecase? removeStoryUsecase;
    SetStoryAsSeenUsecase? setStoryAsSeenUsecase;
+   
 
 
    FollowUserUsecase? followUserUsecase;
@@ -369,6 +376,10 @@ class UsecaseConfig {
       likePublicationUsecase = LikePublicationUsecase(publicationRepository: publicationRepositoryImp!);
       updatePublicationUsecase = UpdatePublicationUsecase(publicationRepository: publicationRepositoryImp!);
 
+      addCommentUsecase =AddCommentUsecase(publicationRepository: publicationRepositoryImp!);
+      deleteCommentUsecase = DeleteCommentUsecase(publicationRepository: publicationRepositoryImp!);
+      getPostCommentsUsecase = GetPostCommentsUsecase(publicationRepository: publicationRepositoryImp!);
+      
 
       addLikeToStoryUsecase = AddLikeToStoryUsecase(storiesRepository: storiesRepositoryImp!);
       createStroryUsecase = CreateStroryUsecase(storiesRepository: storiesRepositoryImp!);

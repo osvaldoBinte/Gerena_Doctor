@@ -1,7 +1,9 @@
 import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/api_errors.dart';
+import 'package:gerena/features/publications/data/model/comments/get_comments_model.dart';
 import 'package:gerena/features/publications/data/model/create/create_publications_model.dart';
 import 'package:gerena/features/publications/data/model/myposts/publication_model.dart';
+import 'package:gerena/features/publications/domain/entities/comments/get_comments_entity.dart';
 import 'package:gerena/features/publications/domain/entities/create/create_publications_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 
@@ -238,5 +240,130 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
   Future<void> updatePublication(String descripcion, int publicationId,String token) {
     // TODO: implement updatePublication
     throw UnimplementedError();
+  }
+ Future<void> addComment(int publicacionId, String comment, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/publicaciones/$publicacionId/comentarios');
+
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'comentario': comment}),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+
+  Future<void> updateComment(
+    int publicacionId,
+    int idcomment,
+    String comment,
+    String token,
+  ) async {
+    try {
+      Uri url = Uri.parse(
+        '$defaultApiServer/publicaciones/$publicacionId/comentarios/$idcomment',
+      );
+
+      final response = await http.put(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'comentario': comment}),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+
+  Future<void> deleteComment(int publicacionId, int idcomment, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/publicaciones/$publicacionId/comentarios/$idcomment');
+
+      final response = await http.delete(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+  Future<List<GetCommentsEntity>> getPostComments(int publicacionId,int page,String token) async{
+    try {
+      Uri url = Uri.parse(
+        '$defaultApiServer/publicaciones/$publicacionId/comentarios?Pagina=$page&TamañoPagina=20&Orden=recientes',
+      );
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List data = responseDecode['comentarios'];
+        return data.map((json) => GetCommentsModel.fromJson(json)).toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
   }
   }

@@ -28,6 +28,7 @@ import 'package:gerena/features/marketplace/presentation/page/medications/mobil/
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_controller.dart';
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
+import 'package:gerena/features/publications/presentation/page/comment/comment_controller.dart';
 import 'package:gerena/features/publications/presentation/page/create/create_publication_controller.dart';
 import 'package:gerena/features/publications/presentation/page/myposts/my_post_controller.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
@@ -144,6 +145,10 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.getProceduresByDoctorUsecase!,permanent: true);
         Get.put(usecaseConfig.searchProfileUsecase!,permanent: true);
 
+        Get.put(usecaseConfig.addCommentUsecase!, permanent: true);
+        Get.put(usecaseConfig.deleteCommentUsecase!,permanent: true);
+        Get.put(usecaseConfig.getPostCommentsUsecase!,permanent: true);
+
         Get.lazyPut(() => LoginController(loginUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => HistoryController(getMyOrderUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => GetMyLastPaidOrderController(getMyLastPaidOrderUsecase: Get.find()), fenix: true);
@@ -176,6 +181,8 @@ class App extends StatelessWidget {
         Get.lazyPut(() =>GetUserByIdController(getUserDetailsByIdUsecase: Get.find(), getPostsUserUsecase: Get.find()),fenix: true);
         Get.lazyPut(() =>SearchProfileController(searchProfileUsecase:  Get.find()),fenix: true);
         Get.lazyPut(() => DoctorProfilebyidController(getProceduresByDoctorUsecase: Get.find(), getPostDoctorUsecase: Get.find(), fetchDoctorByIdUsecase: Get.find(), getPostsUserUsecase: Get.find()),fenix: true);
+             Get.lazyPut(() => CommentController( getPostCommentsUsecase: Get.find(),  addCommentUsecase: Get.find(), deleteCommentUsecase: Get.find(),),fenix: true);
+
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

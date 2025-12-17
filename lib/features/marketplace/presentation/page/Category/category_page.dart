@@ -5,7 +5,7 @@ import 'package:gerena/common/widgets/widgts.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/widget/half_cut_circle.dart';
 import 'package:gerena/features/marketplace/presentation/page/wishlist/saved_products_content.dart';
-import 'package:gerena/features/marketplace/presentation/page/medications/mobil/widget/product_card_widget.dart'; // ✅ NUEVO
+import 'package:gerena/features/marketplace/presentation/page/medications/mobil/widget/product_card_widget.dart'; 
 import 'package:gerena/features/marketplace/presentation/page/widget/floating_cart_button.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,12 +38,10 @@ class CategoryPage extends GetView<CategoryController> {
               width: 200,
               child: GerenaColors.createSearchTextField(
                 controller: controller.searchController,
-                hintText: 'Buscar...', // ✅ Cambiado
+                hintText: 'Buscar...',
                 onChanged: (value) {
-                  // El listener ya maneja esto
                 },
                 onSearchPressed: () {
-                  // Opcional: búsqueda manual
                 },
               ),
             ),
@@ -95,7 +93,6 @@ class CategoryPage extends GetView<CategoryController> {
                   ),
                 )),
                 
-                // ✅ NUEVO: Banner de resultados mejorado
                 Obx(() {
                   if (controller.searchQuery.value.isEmpty) {
                     return SizedBox.shrink();
@@ -140,7 +137,6 @@ class CategoryPage extends GetView<CategoryController> {
                           ],
                         ),
                         SizedBox(height: 8),
-                       // ✅ SOLUCIÓN 1: Hacer que el Row sea flexible
 Row(
   children: [
     Flexible(
@@ -184,8 +180,6 @@ Row(
     );
   }
 
-  // ✅ NUEVO: Chip para mostrar resultados
- // ✅ Y actualizar el widget del chip para que maneje el texto largo
 Widget _buildResultChip({
   required IconData icon,
   required String label,
@@ -203,7 +197,7 @@ Widget _buildResultChip({
       children: [
         Icon(icon, size: 14, color: color),
         SizedBox(width: 4),
-        Flexible( // ✅ AGREGADO
+        Flexible( 
           child: Text(
             label,
             style: GoogleFonts.rubik(
@@ -211,8 +205,8 @@ Widget _buildResultChip({
               fontWeight: FontWeight.w600,
               color: color,
             ),
-            overflow: TextOverflow.ellipsis, // ✅ AGREGADO
-            maxLines: 1, // ✅ AGREGADO
+            overflow: TextOverflow.ellipsis, 
+            maxLines: 1,
           ),
         ),
       ],
@@ -220,7 +214,6 @@ Widget _buildResultChip({
   );
 }
 
-  // ✅ NUEVO: Contenido principal que decide qué mostrar
   Widget _buildMainContent() {
     return Obx(() {
       if (controller.showingSearchResults.value && 
@@ -231,7 +224,6 @@ Widget _buildResultChip({
     });
   }
 
-  // ✅ NUEVO: Vista de resultados de búsqueda
   Widget _buildSearchResults() {
     return Obx(() {
       final hasCategories = controller.filteredCategories.isNotEmpty;
@@ -286,7 +278,6 @@ Widget _buildResultChip({
       return ListView(
         padding: EdgeInsets.all(16),
         children: [
-          // Sección de Categorías
           if (hasCategories) ...[
             _buildSectionHeader(
               icon: Icons.category,
@@ -298,7 +289,6 @@ Widget _buildResultChip({
             SizedBox(height: 24),
           ],
 
-          // Sección de Productos
           if (isLoading)
             Center(
               child: Padding(
@@ -322,7 +312,6 @@ Widget _buildResultChip({
     });
   }
 
-  // ✅ NUEVO: Header de sección
   Widget _buildSectionHeader({
     required IconData icon,
     required String title,
@@ -351,7 +340,6 @@ Widget _buildResultChip({
     );
   }
 
-  // ✅ NUEVO: Grid de categorías para búsqueda
   Widget _buildCategoryGrid(List categories) {
     return Wrap(
       spacing: 12,
@@ -428,8 +416,6 @@ Widget _buildResultChip({
     );
   }
 
-  // ✅ NUEVO: Grid de productos para búsqueda
-// ✅ SOLUCIÓN: Usar el mismo patrón de GetMedicationsPage
 Widget _buildProductsGrid(List medications) {
   return LayoutBuilder(
     builder: (context, constraints) {
@@ -445,8 +431,8 @@ Widget _buildProductsGrid(List medications) {
       }
 
       return ListView.separated(
-        shrinkWrap: true, // ✅ Importante para que funcione dentro de otro scroll
-        physics: NeverScrollableScrollPhysics(), // ✅ Importante
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16.0),
         itemCount: (medications.length / crossAxisCount).ceil(),
         separatorBuilder: (context, index) => Divider(
@@ -462,7 +448,7 @@ Widget _buildProductsGrid(List medications) {
           );
           final itemsInRow = endIdx - startIdx;
 
-          return IntrinsicHeight( // ✅ Esto permite altura automática
+          return IntrinsicHeight( 
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -617,23 +603,26 @@ Widget _buildProductsGrid(List medications) {
     );
   }
 
-  Widget _buildCategoryCard(dynamic category) {
-    return GestureDetector(
-      onTap: () => _navigateToCategory(category),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            PhysicalShape(
-              clipper: BottomFlatClipper(),
-              color: GerenaColors.backgroundColor,
-              elevation: 4,
-              shadowColor: Colors.black.withOpacity(0.3),
-              child: Container(
-                width: 120,
-                height: 120,
-                padding: const EdgeInsets.all(15),
+ Widget _buildCategoryCard(dynamic category) {
+  return GestureDetector(
+    onTap: () => _navigateToCategory(category),
+    child: Container(
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          PhysicalShape(
+            clipper: BottomFlatClipper(),
+            color: GerenaColors.backgroundColor,
+            elevation: 4,
+            shadowColor: Colors.black.withOpacity(0.3),
+            child: Container(
+              width: 120,
+              height: 120,
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 70, // 58% del contenedor - se ve bien
+                height: 70,
                 child: (category.image != null && category.image!.isNotEmpty)
                     ? Image.network(
                         category.image!,
@@ -655,37 +644,37 @@ Widget _buildProductsGrid(List medications) {
                           return Icon(
                             Icons.category,
                             color: GerenaColors.primaryColor,
-                            size: 40,
+                            size: 35,
                           );
                         },
                       )
                     : Icon(
                         Icons.category,
                         color: GerenaColors.primaryColor,
-                        size: 40,
+                        size: 35,
                       ),
               ),
             ),
-            
-            SizedBox(height: 8),
-            
-            Text(
-              category.category ?? 'Sin nombre',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.rubik(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: GerenaColors.textPrimaryColor,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          ),
+          
+          SizedBox(height: 8),
+          
+          Text(
+            category.category ?? 'Sin nombre',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.rubik(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: GerenaColors.textPrimaryColor,
             ),
-          ],
-        ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   void _navigateToCategory(dynamic category) {
     Get.toNamed(
       RoutesNames.categoryById,
