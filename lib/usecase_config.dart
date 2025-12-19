@@ -10,7 +10,9 @@ import 'package:gerena/features/appointment/domain/usecase/get_appointments_usec
 import 'package:gerena/features/appointment/domain/usecase/post_appointment_usecase.dart';
 import 'package:gerena/features/auth/data/datasources/auth_data_sources_imp.dart';
 import 'package:gerena/features/auth/data/repositories/auth_repository_imp.dart';
+import 'package:gerena/features/auth/domain/usecase/confirm_password_reset_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
+import 'package:gerena/features/auth/domain/usecase/request_password_code_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
 import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
 import 'package:gerena/features/banners/domain/usecase/get_banners_usecase.dart';
@@ -146,6 +148,8 @@ class UsecaseConfig {
 
 
    LoginUsecase? loginUsecase;
+   RequestPasswordCodeUsecase?requestPasswordCodeUsecase;
+   ConfirmPasswordResetUsecase?confirmPasswordResetUsecase;
 
    DoctorRepositoryImp? doctorRepositoryImp;
    DoctosDataSourcesImp? doctosDataSources;
@@ -291,6 +295,8 @@ class UsecaseConfig {
       getPostsUserUsecase = GetPostsUserUsecase(publicationRepository: publicationRepositoryImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
+     requestPasswordCodeUsecase =RequestPasswordCodeUsecase(authRepository: authRepositoryImp!);
+     confirmPasswordResetUsecase = ConfirmPasswordResetUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
 
      getAppointmentsUsecase = GetAppointmentsUsecase(appointmentRepository: appointmentRepositoryImp!);

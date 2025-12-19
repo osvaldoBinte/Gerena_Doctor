@@ -144,9 +144,9 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
   }
   }
 
-  Future<List<PublicationEntity>> getFeedPosts(String token) async {
+  Future<List<PublicationEntity>> getFeedPosts(int page,int pagesize,String token) async {
    try {
-      Uri url = Uri.parse('$defaultApiServer/Publicaciones/feed?pagina=1&tamañoPagina=10&soloSeguidos=false&soloReseñas=false&doctorId');
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones/feed?pagina=$page&tamañoPagina=$pagesize&soloSeguidos=false&soloReseñas=false&doctorId');
       final response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'

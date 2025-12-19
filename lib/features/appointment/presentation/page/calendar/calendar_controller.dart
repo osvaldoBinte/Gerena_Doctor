@@ -25,6 +25,7 @@ class CalendarControllerGetx extends GetxController {
 
   final RxInt currentAppointmentIndex = 0.obs;
   late PageController pageController;
+  final RxMap<int, Map<String, dynamic>> appointmentsExtraData = <int, Map<String, dynamic>>{}.obs;
 
   late CalendarController calendarController;
 
@@ -128,24 +129,41 @@ class CalendarControllerGetx extends GetxController {
     final lastDayCurrentMonth = firstDayNextMonth.subtract(const Duration(days: 1));
     return lastDayCurrentMonth.day;
   }
+String? getAppointmentPhoto(int appointmentId) {
+  return appointmentsExtraData[appointmentId]?['foto'];
+}
 
-  Appointment _convertEntityToAppointment(GetApppointmentEntity entity) {
-
-    final startDateTime = DateTime.parse(entity.startDateTime);
-    final endDateTime = DateTime.parse(entity.endDateTime);
-    
-    return Appointment(
-      subject: entity.clientName,
-      startTime: startDateTime,
-      endTime: endDateTime,
-      color: GerenaColors.accentColor,
-      notes: entity.consultationReason.isNotEmpty 
-          ? 'Procedimiento: ${entity.consultationReason}' 
-          : 'Sin motivo especificado',
-      location: entity.appointmentType,
-      id: entity.id,
-    );
-  }
+Map<String, dynamic>? getAppointmentExtraData(int appointmentId) {
+  return appointmentsExtraData[appointmentId];
+}
+Appointment _convertEntityToAppointment(GetApppointmentEntity entity) {
+  final startDateTime = DateTime.parse(entity.startDateTime);
+  final endDateTime = DateTime.parse(entity.endDateTime);
+  
+  // Guardamos los datos extra
+  appointmentsExtraData[entity.id] = {
+    'foto': entity.foto,
+    'clientId': entity.clientId,
+    'doctorId': entity.doctorId,
+    'doctorName': entity.doctorName,
+    'status': entity.status,
+    'doctorNotes': entity.doctorNotes,
+    'diagnosis': entity.diagnosis,
+    'cancellationReason': entity.cancellationReason,
+  };
+  
+  return Appointment(
+    subject: entity.clientName,
+    startTime: startDateTime,
+    endTime: endDateTime,
+    color: GerenaColors.accentColor,
+    notes: entity.consultationReason.isNotEmpty 
+        ? 'Procedimiento: ${entity.consultationReason}' 
+        : 'Sin motivo especificado',
+    location: entity.appointmentType,
+    id: entity.id,
+  );
+}
 
   void updateAppointments(List<Appointment> newAppointments) {
     appointments.assignAll(newAppointments);

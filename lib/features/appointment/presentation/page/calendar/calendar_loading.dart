@@ -85,10 +85,8 @@ class _CalendarLoadingState extends State<CalendarLoading>
   Widget _buildCalendarSkeleton() {
     return Column(
       children: [
-        // Header del calendario
         _buildCalendarHeaderSkeleton(),
         
-        // Botón de refresh
         Padding(
           padding: EdgeInsets.symmetric(horizontal: GerenaColors.paddingMedium),
           child: Row(
@@ -108,13 +106,11 @@ class _CalendarLoadingState extends State<CalendarLoading>
           ),
         ),
         
-        // Vista del calendario (mes)
         Expanded(
           flex: 5,
           child: _buildMonthViewSkeleton(),
         ),
         
-        // Sección de citas del día
         Expanded(
           flex: 3,
           child: _buildDayAppointmentsSkeleton(),
@@ -134,7 +130,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Chevron izquierdo
                     _buildShimmerBox(
                       child: Container(
                         width: 24,
@@ -146,7 +141,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                       ),
                     ),
                     SizedBox(width: 12),
-                    // Mes y año
                     _buildShimmerBox(
                       child: Container(
                         height: 20,
@@ -158,7 +152,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                       ),
                     ),
                     SizedBox(width: 12),
-                    // Chevron derecho
                     _buildShimmerBox(
                       child: Container(
                         width: 24,
@@ -172,7 +165,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                   ],
                 ),
               ),
-              // Fecha actual
               _buildShimmerBox(
                 child: Container(
                   height: 16,
@@ -196,16 +188,13 @@ class _CalendarLoadingState extends State<CalendarLoading>
       padding: EdgeInsets.symmetric(horizontal: GerenaColors.paddingMedium),
       child: Column(
         children: [
-          // Días de la semana
           _buildWeekDaysHeaderSkeleton(),
           SizedBox(height: 8),
-          // Separador
           Container(
             height: 1,
             color: GerenaColors.textSecondaryColor.withOpacity(0.1),
           ),
           SizedBox(height: 8),
-          // Días del mes (6 semanas)
           Expanded(
             child: _buildMonthDaysSkeleton(),
           ),
@@ -248,7 +237,7 @@ class _CalendarLoadingState extends State<CalendarLoading>
         crossAxisSpacing: 0,
         mainAxisSpacing: 0,
       ),
-      itemCount: 35, // 5 semanas x 7 días
+      itemCount: 35,
       itemBuilder: (context, index) {
         final weekRow = index ~/ 7;
         final isEvenRow = weekRow % 2 == 0;
@@ -265,7 +254,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
           ),
           child: Stack(
             children: [
-              // Número del día
               Positioned(
                 top: 4,
                 left: 6,
@@ -281,7 +269,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                 ),
               ),
               
-              // Simulación de cita (random)
               if (index % 4 == 0 || index % 7 == 0) ...[
                 Positioned(
                   top: 28,
@@ -298,7 +285,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                   ),
                 ),
                 
-                // Indicadores de múltiples citas
                 if (index % 7 == 0)
                   Positioned(
                     bottom: 4,
@@ -335,14 +321,12 @@ class _CalendarLoadingState extends State<CalendarLoading>
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Divider
           Divider(
             color: Colors.grey.withOpacity(0.3),
             thickness: 1,
             height: 16,
           ),
           
-          // Título "CITAS"
           Padding(
             padding: const EdgeInsets.only(left: 16.0, bottom: 8.0),
             child: _buildShimmerBox(
@@ -357,12 +341,11 @@ class _CalendarLoadingState extends State<CalendarLoading>
             ),
           ),
           
-          // Lista de citas
           Expanded(
             child: ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
-              itemCount: 2, // Mostrar 2 citas de skeleton
+              itemCount: 2,
               padding: EdgeInsets.symmetric(horizontal: GerenaColors.paddingMedium),
               itemBuilder: (context, index) {
                 return _buildAppointmentCardSkeleton();
@@ -398,7 +381,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Icono de doctor
                       _buildShimmerBox(
                         child: Container(
                           width: 36,
@@ -415,7 +397,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Nombre del paciente
                             _buildShimmerBox(
                               child: Container(
                                 height: 18,
@@ -428,7 +409,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                             ),
                             
                             SizedBox(height: 4),
-                            // Nombre del doctor
                             _buildShimmerBox(
                               child: Container(
                                 height: 16,
@@ -441,7 +421,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
                             ),
                             
                             SizedBox(height: 4),
-                            // Procedimiento
                             _buildShimmerBox(
                               child: Container(
                                 height: 12,
@@ -460,10 +439,9 @@ class _CalendarLoadingState extends State<CalendarLoading>
                   
                   SizedBox(height: 12),
                   
-                  // Fecha y hora
+               
                   Row(
                     children: [
-                      // Icono calendario
                       _buildShimmerBox(
                         child: Container(
                           width: 24,
@@ -475,7 +453,7 @@ class _CalendarLoadingState extends State<CalendarLoading>
                         ),
                       ),
                       SizedBox(width: 12),
-                      // Fecha
+                   
                       _buildShimmerBox(
                         child: Container(
                           height: 14,
@@ -493,7 +471,7 @@ class _CalendarLoadingState extends State<CalendarLoading>
                   
                   Row(
                     children: [
-                      // Icono reloj
+                   
                       _buildShimmerBox(
                         child: Container(
                           width: 24,
@@ -505,7 +483,7 @@ class _CalendarLoadingState extends State<CalendarLoading>
                         ),
                       ),
                       SizedBox(width: 12),
-                      // Hora
+                  
                       _buildShimmerBox(
                         child: Container(
                           height: 14,
@@ -517,7 +495,7 @@ class _CalendarLoadingState extends State<CalendarLoading>
                         ),
                       ),
                       SizedBox(width: 8),
-                      // Tipo de visita
+                  
                       _buildShimmerBox(
                         child: Container(
                           height: 18,
@@ -529,7 +507,7 @@ class _CalendarLoadingState extends State<CalendarLoading>
                         ),
                       ),
                       Spacer(),
-                      // Botón VER CITA
+                  
                       _buildShimmerBox(
                         child: Container(
                           height: 28,
@@ -551,7 +529,6 @@ class _CalendarLoadingState extends State<CalendarLoading>
     );
   }
   
-  // Método adicional para usar solo el contenido sin scaffold
   Widget buildContentOnly() {
     return AnimatedBuilder(
       animation: _shimmerAnimation,

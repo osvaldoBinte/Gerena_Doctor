@@ -13,4 +13,5 @@ class RoutesNames {
 
   static const String calendar = '/calendar-page';
   static const String historia = '/historia-page';
+  static const String passwordreset = '/password_reset';
 }

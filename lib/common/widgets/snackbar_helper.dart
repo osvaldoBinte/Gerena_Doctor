@@ -38,13 +38,18 @@ void showSnackBar(String message, Color color) {
     ),
   );
 }
-  void showSuccessSnackbar(String message) {
-    showSnackBar(message, GerenaColors.successColor);
+void showSuccessSnackbar(String message) {
+  showSnackBar(message, GerenaColors.successColor);
+}
 
-  }
+void showErrorSnackbar(String message) {
+  showSnackBar(message, GerenaColors.errorColor);
+}
 
-  void showErrorSnackbar(String message) {
-        showSnackBar(message, GerenaColors.errorColor);
+void showInfoSnackbar(String message) {
+  showSnackBar(message, GerenaColors.primaryColor);
+}
 
-  
-  }
+void showWarningSnackbar(String message) {
+  showSnackBar(message, Colors.orange);
+}

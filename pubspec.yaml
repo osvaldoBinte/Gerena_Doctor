@@ -164,6 +164,7 @@ flutter:
       - assets/icons/reacciones/Star.png
       - assets/icons/favorite_border.png
       - assets/icons/favorite.png
+      - assets/fondo/Mapa_de_fondo.png
       
       - assets/icons/WISHLIST.png
       - assets/icons/doctor.png

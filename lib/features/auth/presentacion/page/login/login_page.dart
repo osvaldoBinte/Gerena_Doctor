@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
 import 'package:get/get.dart';
@@ -51,7 +52,7 @@ class LoginPage extends StatelessWidget {
           _buildLoginForm(controller, isMobile: true),
           
           const SizedBox(height: 16),
-          
+          /*
           GerenaColors.createLoginButton(
             text: 'Ingresar con Face ID / Huella',
             onPressed: () {},
@@ -62,7 +63,7 @@ class LoginPage extends StatelessWidget {
             ),
             width: double.infinity,
           ),
-          
+          */
           const SizedBox(height: 5),
        
           
@@ -172,7 +173,9 @@ class LoginPage extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: GerenaColors.createLoginTextButton(
             text: 'Olvidé mi contraseña',
-            onPressed: () {},
+            onPressed: () {
+                Get.offAllNamed(RoutesNames.passwordreset);
+            },
             fontSize: 14,
           ),
         ),

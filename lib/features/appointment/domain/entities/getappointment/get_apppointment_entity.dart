@@ -12,6 +12,7 @@
     final String doctorNotes;
     final String diagnosis;
     final String cancellationReason;
+    final String?foto;
     GetApppointmentEntity({
       required this.id,
       required this.clientId,
@@ -26,5 +27,6 @@
       required this.doctorNotes,
       required this.diagnosis,
       required this.cancellationReason,
+      this.foto
     });
   }

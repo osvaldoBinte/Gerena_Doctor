@@ -10,5 +10,15 @@ class AuthRepositoryImp implements AuthRepository {
   Future<LoginResponseEntity> login(String email, String password) async {
     return await authDataSources.login(email, password);
   }
+  
+  @override
+  Future<void> confirmPasswordReset(String email, String code, String newpassword) async {
+    return await authDataSources.confirmPasswordReset(email, code, newpassword);
+  }
+  
+  @override
+  Future<void> requestPasswordCode(String email) async {
+    return authDataSources.requestPasswordCode(email);
+  }
  
 }

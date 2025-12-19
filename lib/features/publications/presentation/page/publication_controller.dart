@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/image_entity.dart';
@@ -19,33 +20,85 @@ class PublicationController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
+  
+  final RxInt currentPage = 1.obs;
+  final RxInt pageSize = 10.obs;
+  final RxBool hasMore = true.obs;
+  
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     super.onInit();
+    scrollController.addListener(_onScroll);
     loadFeedPosts();
   }
 
-  Future<void> loadFeedPosts() async {
+  void _onScroll() {
+    if (scrollController.position.pixels >= 
+        scrollController.position.maxScrollExtent * 0.8) {
+      if (!isLoading.value && hasMore.value) {
+        loadMorePosts();
+      }
+    }
+  }
+
+  Future<void> loadFeedPosts({bool refresh = true}) async {
     try {
+      if (refresh) {
+        currentPage.value = 1;
+        hasMore.value = true;
+        posts.clear();
+      }
+
+      if (isLoading.value) return;
+
       isLoading.value = true;
       hasError.value = false;
       errorMessage.value = '';
 
-      final result = await getFeedPostsUsecase.execute();
-      posts.value = result;
+      final result = await getFeedPostsUsecase.execute(
+        currentPage.value,
+        pageSize.value,
+      );
+
+      // Si trae menos posts de los esperados, ya no hay más
+      if (result.isEmpty || result.length < pageSize.value) {
+        hasMore.value = false;
+      }
+
+      if (result.isNotEmpty) {
+        if (refresh) {
+          posts.value = result;
+        } else {
+          posts.addAll(result);
+        }
+        currentPage.value++;
+      } else {
+        if (refresh) {
+          posts.clear();
+        }
+        hasMore.value = false;
+      }
       
     } catch (e) {
       hasError.value = true;
       errorMessage.value = e.toString();
       print('Error al cargar posts: $e');
+      showErrorSnackbar('Error al cargar publicaciones');
     } finally {
       isLoading.value = false;
     }
   }
 
+  Future<void> loadMorePosts() async {
+    if (isLoading.value || !hasMore.value) return;
+
+    await loadFeedPosts(refresh: false);
+  }
+
   Future<void> refreshPosts() async {
-    await loadFeedPosts();
+    await loadFeedPosts(refresh: true);
   }
 
   String? getImageByOrder(List<ImageEntity> images, int order) {
@@ -62,8 +115,6 @@ class PublicationController extends GetxController {
     return sortedImages.map((img) => img.imageUrl).toList();
   }
 
-  
-
   Future<void> toggleLike(int postId, String reactionType) async {
     try {
       final index = posts.indexWhere((p) => p.id == postId);
@@ -77,22 +128,29 @@ class PublicationController extends GetxController {
       } else {
         post.userreaction = reactionType;
       }
- print('  - Reacción actualizada localmente para el post $postId: ${post.userreaction}');
+      
+      print('Reacción actualizada localmente para el post $postId: ${post.userreaction}');
       posts.refresh();
+      
       await likePublicationUsecase.execute(postId, reactionType);
-    //  await refreshMyPosts();
       
     } catch (e) {
       print('Error al dar like: $e');
       showErrorSnackbar(
         'No se pudo registrar la reacción ${cleanExceptionMessage(e)}',
       );
-   //   await refreshMyPosts();
     }
   }
+
   String formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   bool isReview(PublicationEntity post) => post.isReview;
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
 }

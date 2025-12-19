@@ -4,7 +4,7 @@ import 'package:gerena/features/publications/domain/repositories/publication_rep
 class GetFeedPostsUsecase {
   final PublicationRepository publicationRepository;
   GetFeedPostsUsecase({required this.publicationRepository});
-  Future<List<PublicationEntity>> execute() async {
-    return await publicationRepository.getFeedPosts();  
+  Future<List<PublicationEntity>> execute(int page,int pagesize,) async {
+    return await publicationRepository.getFeedPosts(page,pagesize);  
   }
 }

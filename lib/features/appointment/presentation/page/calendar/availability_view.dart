@@ -34,12 +34,10 @@ class AvailabilityView extends GetView<AvailabilityController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Sección de agregar nueva disponibilidad
               _buildAddAvailabilitySection(),
               
               const SizedBox(height: GerenaColors.paddingLarge),
               
-              // Lista de disponibilidades existentes
               _buildAvailabilityList(),
             ],
           ),
@@ -61,7 +59,6 @@ class AvailabilityView extends GetView<AvailabilityController> {
           ),
           const SizedBox(height: GerenaColors.paddingMedium),
           
-          // Selector de día
           Text(
             'Día de la semana',
             style: GerenaColors.bodyMedium,
@@ -71,7 +68,6 @@ class AvailabilityView extends GetView<AvailabilityController> {
           
           const SizedBox(height: GerenaColors.paddingMedium),
           
-          // Selectores de hora
           Row(
             children: [
               Expanded(
@@ -114,7 +110,6 @@ class AvailabilityView extends GetView<AvailabilityController> {
           
           const SizedBox(height: GerenaColors.paddingLarge),
           
-          // Botones de acción
           Row(
             children: [
               Expanded(
@@ -324,7 +319,6 @@ class AvailabilityView extends GetView<AvailabilityController> {
       ),
       child: Row(
         children: [
-          // Icono del día
           Container(
             width: 50,
             height: 50,
@@ -341,7 +335,6 @@ class AvailabilityView extends GetView<AvailabilityController> {
           
           const SizedBox(width: GerenaColors.paddingMedium),
           
-          // Información del día y horario
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,8 +368,7 @@ class AvailabilityView extends GetView<AvailabilityController> {
               ],
             ),
           ),
-          
-          // Botón de eliminar
+        
           IconButton(
             icon: Icon(
               Icons.delete_outline,

@@ -4,7 +4,7 @@ import 'package:gerena/features/publications/domain/entities/myposts/publication
 
 abstract class PublicationRepository {
   Future<List<PublicationEntity>> getMyPosts();
-  Future<List<PublicationEntity>> getFeedPosts();
+  Future<List<PublicationEntity>> getFeedPosts(int page,int pagesize,);
   Future<void> createPublication(CreatePublicationsEntity publication);
   Future<void> likePublication(int publicationId,String tipoReaccion,);
   Future<void> updatePublication(String descripcion, int publicationId);

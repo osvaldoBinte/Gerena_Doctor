@@ -24,10 +24,10 @@ class PublicationRepositoryImp extends PublicationRepository {
   }
 
   @override
-  Future<List<PublicationEntity>> getFeedPosts() async {
+  Future<List<PublicationEntity>> getFeedPosts(int page,int pagesize) async {
     final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
 
-    return publicationDateSourcesImp.getFeedPosts(token);
+    return publicationDateSourcesImp.getFeedPosts(page,pagesize,token);
   }
 
   @override

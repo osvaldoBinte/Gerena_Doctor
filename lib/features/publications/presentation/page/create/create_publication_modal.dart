@@ -12,6 +12,7 @@ class CreatePublication extends StatelessWidget {
 
     return Scaffold(   
       backgroundColor: GerenaColors.colorFondo,
+      resizeToAvoidBottomInset: false,
       body: Material(
         color: Colors.transparent,
         child: Container(
@@ -466,23 +467,24 @@ class CreatePublication extends StatelessWidget {
     );
   }
 
-  Widget _buildFloatingActionButton(CreatePublicationController controller) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: GerenaColors.colorFondo,
-        boxShadow: [
-          BoxShadow(
-            color: GerenaColors.primaryColor.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, -10),
-          ),
-        ],
-      ),
+Widget _buildFloatingActionButton(CreatePublicationController controller) {
+  return Container(
+    padding: const EdgeInsets.all(24),
+    decoration: BoxDecoration(
+      color: GerenaColors.colorFondo,
+      boxShadow: [
+        BoxShadow(
+          color: GerenaColors.primaryColor.withOpacity(0.1),
+          blurRadius: 20,
+          offset: const Offset(0, -10),
+        ),
+      ],
+    ),
+    child: SafeArea(  // ✅ Agregar esto
+      top: false,    // No necesitas padding arriba
       child: Obx(
-        () =>
-            controller.isLoading.value
-                ? Container(
+        () => controller.isLoading.value
+            ? Container(
                   height: 60,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -528,6 +530,7 @@ class CreatePublication extends StatelessWidget {
                   ),
                 ),
       ),
+    ),
     );
   }
 }

@@ -15,7 +15,8 @@ class GetAppointmentModel extends GetApppointmentEntity {
       required super.consultationReason,
       required super.doctorNotes,
       required super.diagnosis,
-      required super.cancellationReason});
+      required super.cancellationReason,
+      super.foto});
 
   factory GetAppointmentModel.fromJson(Map<String, dynamic> json) {
     return GetAppointmentModel(
@@ -32,6 +33,7 @@ class GetAppointmentModel extends GetApppointmentEntity {
       doctorNotes: json['notasDoctor'] ?? '',
       diagnosis: json['diagnostico'] ?? '',
       cancellationReason: json['motivoCancelacion'] ?? '',
+      foto: json['foto'] ?? ''
     );
   }
 }

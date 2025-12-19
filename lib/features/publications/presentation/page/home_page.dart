@@ -55,11 +55,14 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     _pageController = PageController();
     
     _internalScrollController.addListener(_scrollListener);
+    
+    _pageController.addListener(_pageViewListener);
   }
 
   @override
   void dispose() {
     _internalScrollController.removeListener(_scrollListener);
+    _pageController.removeListener(_pageViewListener);
     _internalScrollController.dispose();
     _pageController.dispose();
     super.dispose();
@@ -69,6 +72,23 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     if (_internalScrollController.position.pixels >=
         _internalScrollController.position.maxScrollExtent - 50) {
     }
+  }
+
+  void _pageViewListener() {
+    if (!_pageController.hasClients) return;
+    
+    final currentPage = _pageController.page ?? 0;
+    final totalItems = _getTotalPageViewItems();
+    
+    if (currentPage >= totalItems - 3 &&
+        !publicationController.isLoading.value &&
+        publicationController.hasMore.value) {
+      publicationController.loadMorePosts();
+    }
+  }
+
+  int _getTotalPageViewItems() {
+    return 1 + publicationController.posts.length;
   }
 
   @override
@@ -94,7 +114,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                 letterSpacing: 1.5,
               ),
             ),
-             const Spacer(),
+            const Spacer(),
             Container(
               width: 140,
               child: GerenaColors.createSearchContainer(
@@ -112,14 +132,21 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         ),
       ),
       body: Obx(() {
-        if (profileController.showPatientProfile.value) {
-          return PatientProfileScreen(
-            appointment: profileController.selectedAppointment.value,
-            onClose: () {
-              profileController.hidePatientProfileView();
-            },
-          );
-        }
+    // En el build donde muestras PatientProfileScreen
+if (profileController.showPatientProfile.value) {
+  final appointment = profileController.selectedAppointment.value;
+  final photoUrl = calendarController.getAppointmentPhoto(appointment.id);
+  final extraData = calendarController.getAppointmentExtraData(appointment.id);
+  
+  return PatientProfileScreen(
+    appointment: appointment,
+    photoUrl: photoUrl,
+    extraData: extraData,
+    onClose: () {
+      profileController.hidePatientProfileView();
+    },
+  );
+}
 
         if (publicationController.isLoading.value &&
             publicationController.posts.isEmpty) {
@@ -142,6 +169,22 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
                   child: _buildPostFromEntity(post),
                 )),
           );
+          
+          if (publicationController.hasMore.value) {
+            allItems.add(
+              Container(
+                height: availableHeight,
+                child: _buildLoadingMoreIndicator(),
+              ),
+            );
+          } else {
+            allItems.add(
+              Container(
+                height: availableHeight,
+                child: _buildNoMorePostsMessage(),
+              ),
+            );
+          }
         } else {
           allItems.add(
             Container(
@@ -351,6 +394,58 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     );
   }
 
+  Widget _buildLoadingMoreIndicator() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: GerenaColors.primaryColor,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Cargando más publicaciones...',
+            style: GoogleFonts.rubik(
+              fontSize: 14,
+              color: GerenaColors.textSecondaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoMorePostsMessage() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.check_circle_outline,
+            size: 60,
+            color: GerenaColors.primaryColor,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Has visto todas las publicaciones',
+            style: GoogleFonts.rubik(
+              fontSize: 16,
+              color: GerenaColors.textSecondaryColor,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Desliza hacia abajo para refrescar',
+            style: GoogleFonts.rubik(
+              fontSize: 12,
+              color: GerenaColors.textTertiaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPostFromEntity(PublicationEntity post) {
     final PostController postController = Get.find<PostController>();
 
@@ -393,148 +488,144 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
     );
   }
 
-
-Widget _buildCitasSection() {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                'CITAS',
-                style: GoogleFonts.rubik(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: GerenaColors.textPrimaryColor,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: Obx(() => calendarController.isLoading.value
-                  ? Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: GerenaColors.primaryColor,
-                        ),
-                      ),
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.refresh, size: 20),
-                      onPressed: () {
-                        calendarController.loadAppointmentsForDate(
-                          calendarController.focusedDate.value,
-                        );
-                      },
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints(),
-                      iconSize: 20,
-                    )),
-            ),
-          ],
-        ),
-        SizedBox(height: GerenaColors.paddingSmall),
-        
-        // USAMOS LAYOUTBUILDER AQUÍ
-        LayoutBuilder(
-          builder: (context, constraints) {
-            return Obx(() {
-              if (calendarController.isLoading.value &&
-                  calendarController.appointments.isEmpty) {
-                return CitasLoading();
-              }
-
-              final upcomingAppointments = _getUpcomingAppointments();
-
-              if (upcomingAppointments.isEmpty) {
-                return Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: GerenaColors.backgroundColor,
-                    borderRadius: GerenaColors.mediumBorderRadius,
-                    boxShadow: [GerenaColors.lightShadow],
+  Widget _buildCitasSection() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  'CITAS',
+                  style: GoogleFonts.rubik(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: GerenaColors.textPrimaryColor,
                   ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 48,
-                          color: GerenaColors.textSecondaryColor,
-                        ),
-                        SizedBox(height: 12),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text(
-                            'No tienes citas próximas',
-                            style: GoogleFonts.rubik(
-                              fontSize: 14,
-                              color: GerenaColors.textSecondaryColor,
-                            ),
-                            textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: Obx(() => calendarController.isLoading.value
+                    ? Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: GerenaColors.primaryColor,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              // Calculamos altura disponible más conservadora
-              final hasIndicators = upcomingAppointments.length > 1;
-              final indicatorSpace = hasIndicators ? 30.0 : 0.0; // espacio para indicadores
-              final availableHeight = constraints.maxHeight;
-              
-              // Altura de la tarjeta dejando espacio para indicadores
-              final citaCardHeight = hasIndicators 
-                  ? (availableHeight - indicatorSpace).clamp(150.0, 200.0)
-                  : availableHeight.clamp(150.0, 220.0);
-
-              return SizedBox(
-                height: citaCardHeight + indicatorSpace, // altura total fija
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: PageView.builder(
-                        controller: PageController(viewportFraction: 0.85),
-                        itemCount: upcomingAppointments.length,
-                        itemBuilder: (context, index) {
-                          final appointment = upcomingAppointments[index];
-                          return Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            child: _buildCitaCard(appointment),
+                      )
+                    : IconButton(
+                        icon: Icon(Icons.refresh, size: 20),
+                        onPressed: () {
+                          calendarController.loadAppointmentsForDate(
+                            calendarController.focusedDate.value,
                           );
                         },
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(),
+                        iconSize: 20,
+                      )),
+              ),
+            ],
+          ),
+          SizedBox(height: GerenaColors.paddingSmall),
+          
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Obx(() {
+                if (calendarController.isLoading.value &&
+                    calendarController.appointments.isEmpty) {
+                  return CitasLoading();
+                }
+
+                final upcomingAppointments = _getUpcomingAppointments();
+
+                if (upcomingAppointments.isEmpty) {
+                  return Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: GerenaColors.backgroundColor,
+                      borderRadius: GerenaColors.mediumBorderRadius,
+                      boxShadow: [GerenaColors.lightShadow],
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 48,
+                            color: GerenaColors.textSecondaryColor,
+                          ),
+                          SizedBox(height: 12),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Text(
+                              'No tienes citas próximas',
+                              style: GoogleFonts.rubik(
+                                fontSize: 14,
+                                color: GerenaColors.textSecondaryColor,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (hasIndicators) ...[
-                      SizedBox(height: 8),
-                      SizedBox(
-                        height: 20, // altura fija para indicadores
-                        child: _buildPageIndicators(upcomingAppointments.length),
+                  );
+                }
+
+                final hasIndicators = upcomingAppointments.length > 1;
+                final indicatorSpace = hasIndicators ? 30.0 : 0.0;
+                final availableHeight = constraints.maxHeight;
+                
+                final citaCardHeight = hasIndicators 
+                    ? (availableHeight - indicatorSpace).clamp(150.0, 200.0)
+                    : availableHeight.clamp(150.0, 220.0);
+
+                return SizedBox(
+                  height: citaCardHeight + indicatorSpace,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: PageController(viewportFraction: 0.85),
+                          itemCount: upcomingAppointments.length,
+                          itemBuilder: (context, index) {
+                            final appointment = upcomingAppointments[index];
+                            return Container(
+                              margin: const EdgeInsets.only(right: 12),
+                              child: _buildCitaCard(appointment),
+                            );
+                          },
+                        ),
                       ),
+                      if (hasIndicators) ...[
+                        SizedBox(height: 8),
+                        SizedBox(
+                          height: 20,
+                          child: _buildPageIndicators(upcomingAppointments.length),
+                        ),
+                      ],
                     ],
-                  ],
-                ),
-              );
-            });
-          },
-        ),
-      ],
-    ),
-  );
-}
+                  ),
+                );
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   List<dynamic> _getUpcomingAppointments() {
     final allAppointments = calendarController.appointments.toList();
@@ -547,13 +638,17 @@ Widget _buildCitasSection() {
 
     return allAppointments.take(5).toList();
   }
-Widget _buildCitaCard(dynamic appointment) {
+
+  Widget _buildCitaCard(dynamic appointment) {
   final String formattedTime = _formatTime(appointment.startTime);
   final String formattedDate = _formatDate(appointment.startTime);
 
   final String doctorName = appointment.subject ?? 'Sin nombre';
   final String appointmentType = appointment.location ?? 'Cita general';
   final String treatment = appointment.notes ?? 'Sin descripción';
+  
+  // NUEVO: Obtenemos la foto desde el controller
+  final String? photoUrl = calendarController.getAppointmentPhoto(appointment.id);
 
   return Container(
     decoration: BoxDecoration(
@@ -624,17 +719,35 @@ Widget _buildCitaCard(dynamic appointment) {
                           boxShadow: [GerenaColors.lightShadow],
                         ),
                         child: ClipOval(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: GerenaColors.primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              color: GerenaColors.textLightColor,
-                              size: 25,
-                            ),
-                          ),
+                          child: photoUrl != null && photoUrl.isNotEmpty
+                              ? Image.network(
+                                  photoUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: GerenaColors.primaryColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.person,
+                                        color: GerenaColors.textLightColor,
+                                        size: 25,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    color: GerenaColors.primaryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: GerenaColors.textLightColor,
+                                    size: 25,
+                                  ),
+                                ),
                         ),
                       ),
                       SizedBox(height: 8),

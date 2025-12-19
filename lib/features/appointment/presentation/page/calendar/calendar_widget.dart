@@ -77,19 +77,15 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header con botón de toggle
             _buildCalendarHeaderWithToggle(calendarController),
 
-            // Contenido que cambia según la vista actual
             Expanded(
               child: Obx(() {
-                // Vista de disponibilidad
                 if (availabilityController.currentView.value ==
                     'availability') {
                   return _buildAvailabilityView();
                 }
 
-                // Vista de citas normales
                 return Column(
                   children: [
                     Expanded(
@@ -114,7 +110,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
  Widget _buildCalendarHeaderWithToggle(CalendarControllerGetx controller) {
   return LayoutBuilder(
     builder: (context, constraints) {
-      // Detectar si es pantalla pequeña
       final isSmallScreen = constraints.maxWidth < 600;
 
       return Container(
@@ -124,7 +119,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Navegación del calendario (arriba) - CORREGIDO
                   Obx(() => Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -166,7 +160,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         ],
                       )),
 
-                  // Botón de toggle (abajo)
                   Obx(() => Container(
                         decoration: BoxDecoration(
                           color: availabilityController.currentView.value ==
@@ -224,7 +217,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Navegación del calendario - TAMBIÉN CORREGIDO PARA DESKTOP
                   Obx(() => Row(
                         children: [
                           IconButton(
@@ -263,7 +255,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                         ],
                       )),
 
-                  // Botón de toggle
                   Obx(() => Container(
                         decoration: BoxDecoration(
                           color: availabilityController.currentView.value ==
@@ -331,12 +322,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Sección de agregar nueva disponibilidad
             _buildAddAvailabilitySection(),
 
             const SizedBox(height: GerenaColors.paddingLarge),
 
-            // Lista de disponibilidades existentes
             _buildAvailabilityList(),
           ],
         ),
@@ -357,7 +346,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           ),
           const SizedBox(height: GerenaColors.paddingMedium),
 
-          // Selector de día
           Text(
             'Día de la semana',
             style: GerenaColors.bodyMedium,
@@ -367,7 +355,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
           const SizedBox(height: GerenaColors.paddingMedium),
 
-          // Selectores de hora
           Row(
             children: [
               Expanded(
@@ -410,7 +397,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
           const SizedBox(height: GerenaColors.paddingLarge),
 
-          // Botones de acción
           Obx(() => Row(
                 children: [
                   Expanded(
@@ -637,7 +623,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     );
   }
 
-  // Helper method para extraer propiedades de manera segura
   String _getProperty(
       dynamic obj, List<String> possibleNames, String defaultValue) {
     for (var name in possibleNames) {
@@ -687,7 +672,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       ),
       child: Row(
         children: [
-          // Icono del día
           Container(
             width: 50,
             height: 50,
@@ -704,7 +688,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
 
           const SizedBox(width: GerenaColors.paddingMedium),
 
-          // Información del día y horario
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -739,7 +722,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ),
           ),
 
-          // Botón de eliminar
           IconButton(
             icon: Icon(
               Icons.delete_outline,
@@ -1177,7 +1159,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     final appointmentsForDay =
         controller.getAppointmentsForDate(controller.selectedDate.value!);
 
-    // Cuando NO hay citas
     if (appointmentsForDay.isEmpty) {
       return Stack(
         children: [
@@ -1202,7 +1183,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               ),
             ),
           ),
-          // Botón flotante cuando NO hay citas
           Positioned(
             bottom: 16,
             right: 16,
@@ -1227,10 +1207,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   size: 40,
                 ),
                 onPressed: () {
-                  // Abrir el modal
                   ModalAgregarCita.show(
-                    clienteId: 123, // Reemplaza con el ID real del cliente
-                    doctorId: 456, // Reemplaza con el ID real del doctor
+                    clienteId: 123, 
+                    doctorId: 456, 
                   );
                 },
               ),
@@ -1240,7 +1219,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       );
     }
 
-    // Cuando hay UNA sola cita
     if (appointmentsForDay.length == 1) {
       return Stack(
         children: [
@@ -1250,7 +1228,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             child: buildAppointmentCard(
                 appointmentsForDay[0], controller, dashboardController),
           ),
-          // Botón flotante cuando hay UNA cita
           Positioned(
             bottom: 16,
             right: 16,
@@ -1275,10 +1252,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   size: 40,
                 ),
                 onPressed: () {
-                  // Abrir el modal
                   ModalAgregarCita.show(
-                    clienteId: 123, // Reemplaza con el ID real del cliente
-                    doctorId: 456, // Reemplaza con el ID real del doctor
+                    clienteId: 123,
+                    doctorId: 456, 
                   );
                 },
               ),
@@ -1288,7 +1264,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       );
     }
 
-    // Cuando hay MÚLTIPLES citas
     return Stack(
       children: [
         Container(
@@ -1323,7 +1298,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ],
           ),
         ),
-        // Botón flotante cuando hay MÚLTIPLES citas
         Positioned(
           bottom: 16,
           right: 16,
@@ -1348,10 +1322,9 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 size: 40,
               ),
               onPressed: () {
-                // Abrir el modal
                 ModalAgregarCita.show(
-                  clienteId: 123, // Reemplaza con el ID real del cliente
-                  doctorId: 456, // Reemplaza con el ID real del doctor
+                  clienteId: 123,
+                  doctorId: 456,
                 );
               },
             ),
@@ -1420,7 +1393,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     }
 
 return MouseRegion(
-  cursor: SystemMouseCursors.click, // 👈 Cambia el cursor
+  cursor: SystemMouseCursors.click,
   child: GestureDetector(
     onTap: () {
       final appointmentsForDay =

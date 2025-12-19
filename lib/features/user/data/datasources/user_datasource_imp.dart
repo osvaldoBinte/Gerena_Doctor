@@ -80,18 +80,14 @@ class UserDatasourceImp {
       }
       throw Exception('$e');
     }
-  }Future<List<SearchProfileEntity>> searchProfile(
+  }
+  
+  Future<List<SearchProfileEntity>> searchProfile(
   SearchProfileRequestEntity entity,
   String token,
 ) async {
   try {
     final url = Uri.parse('$defaultApiServer/Seguidores/buscar');
-
-    debugPrint('📡 [searchProfile] URL: $url');
-    debugPrint('📤 [searchProfile] Request body: '
-        '${jsonEncode(SearchProfileRequestModel.fromEntity(entity).toJson())}');
-    debugPrint('🔐 [searchProfile] Token: Bearer ${token.substring(0, 10)}...');
-
     final response = await http.post(
       url,
       headers: <String, String>{
@@ -102,34 +98,16 @@ class UserDatasourceImp {
         SearchProfileRequestModel.fromEntity(entity).toJson(),
       ),
     );
-
-    debugPrint('📥 [searchProfile] Status code: ${response.statusCode}');
-    debugPrint('📥 [searchProfile] Raw body: ${response.body}');
-
     if (response.statusCode == 200) {
       final dataUTF8 = utf8.decode(response.bodyBytes);
-      debugPrint('📥 [searchProfile] UTF8 body: $dataUTF8');
-
       final responseDecode = jsonDecode(dataUTF8);
-      debugPrint(
-        '📥 [searchProfile] Decoded type: ${responseDecode.runtimeType}',
-      );
-
       final List data = responseDecode;
-
-      debugPrint('📊 [searchProfile] Items count: ${data.length}');
-
       return data.map((json) {
-        debugPrint('➡️ Item: $json');
         return SearchProfileModel.fromJson(json);
       }).toList();
     }
-
-    debugPrint('❌ [searchProfile] Error response: ${response.body}');
     throw ApiExceptionCustom(response: response);
   } catch (e, stackTrace) {
-    debugPrint('🔥 [searchProfile] Exception: $e');
-    debugPrint('🧵 StackTrace: $stackTrace');
 
     if (e is SocketException ||
         e is http.ClientException ||

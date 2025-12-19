@@ -4,6 +4,7 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_widget.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_page.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_page.dart';
+import 'package:gerena/features/auth/presentacion/page/passwordreset/password_reset_page.dart';
 import 'package:gerena/features/doctors/presentation/page/patientVie/patient_view_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/historial_de_pedidos_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
@@ -53,6 +54,8 @@ class AppPages {
     GetPage(name: RoutesNames.productDetail, page: () =>ProductDetailPage()),
     GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),
     GetPage(name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
+    GetPage(name: RoutesNames.passwordreset, page: () => PasswordResetPage()),
+
     GetPage(
       name: '/home',
       page: () => Scaffold(

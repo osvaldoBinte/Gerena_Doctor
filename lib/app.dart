@@ -9,6 +9,7 @@ import 'package:gerena/features/appointment/presentation/page/addappointment/app
 import 'package:gerena/features/appointment/presentation/page/calendar/availability_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/Splash/splash_controller.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_controller.dart';
+import 'package:gerena/features/auth/presentacion/page/passwordreset/password_reset_controller.dart';
 import 'package:gerena/features/banners/presentation/controller/banner_controller.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_controller.dart';
 import 'package:gerena/features/doctorprocedures/presentation/page/procedures_controller.dart';
@@ -69,6 +70,8 @@ class App extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(AuthService(), permanent: true);
         Get.put(usecaseConfig.loginUsecase!, permanent: true);
+        Get.put(usecaseConfig.requestPasswordCodeUsecase!, permanent: true);
+        Get.put(usecaseConfig.confirmPasswordResetUsecase!, permanent:  true);
         Get.put(usecaseConfig.doctorProfileUsecase!, permanent: true);
         Get.put(usecaseConfig.getAppointmentsUsecase!, permanent: true);      
         Get.put(usecaseConfig.getMedicineByIdUsecase!, permanent: true);
@@ -182,7 +185,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() =>SearchProfileController(searchProfileUsecase:  Get.find()),fenix: true);
         Get.lazyPut(() => DoctorProfilebyidController(getProceduresByDoctorUsecase: Get.find(), getPostDoctorUsecase: Get.find(), fetchDoctorByIdUsecase: Get.find(), getPostsUserUsecase: Get.find()),fenix: true);
              Get.lazyPut(() => CommentController( getPostCommentsUsecase: Get.find(),  addCommentUsecase: Get.find(), deleteCommentUsecase: Get.find(),),fenix: true);
-
+        Get.lazyPut(() => PasswordResetController(confirmPasswordResetUsecase: Get.find(), requestPasswordCodeUsecase: Get.find()),fenix: true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

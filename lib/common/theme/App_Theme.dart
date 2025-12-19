@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/marketplace/presentation/page/widget/image_placeholder_widget.dart';
@@ -15,6 +16,10 @@ class GerenaColors {
   static const Color textUsername = Color(
     0xFF009FE0,
   ); // Verde azulado oscuro principal
+
+  static const Color modalBackgroundColor = Color(0xFFF5F5F5);
+  static const Color labelTextColor = Color(0xFF666666);
+    static const Color inputBorderColor = Color(0xFF00597D);
 
   static const Color accentColor =
       Color(0xFF00A99D); // Color de acento verde azulado medio
@@ -1551,7 +1556,368 @@ class GerenaColors {
       ),
     );
   }
+ static Widget createTextField({
+    required String label,
+    required TextEditingController controller,
+    String? helpText,
+    String? hintText,
+    bool obscureText = false,
+    bool readOnly = false,
+    TextInputType keyboardType = TextInputType.text,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+    int maxLines = 1,
+    List<TextInputFormatter>? inputFormatters,
+    FocusNode? focusNode,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
+    RxnString? errorText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.rubik(
+            color: GerenaColors.labelTextColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+          overflow: TextOverflow.visible,
+          softWrap: false,
+        ),
+        SizedBox(height: 8),
 
+        // ← SOLO USA OBX SI errorText NO ES NULL
+        errorText != null
+            ? Obx(
+              () => _buildTextField(
+                controller: controller,
+                obscureText: obscureText,
+                readOnly: readOnly,
+                keyboardType: keyboardType,
+                validator: validator,
+                maxLines: maxLines,
+                inputFormatters: inputFormatters,
+                focusNode: focusNode,
+                textInputAction: textInputAction,
+                onFieldSubmitted: onFieldSubmitted,
+                hintText: hintText,
+                suffixIcon: suffixIcon,
+                hasError: errorText.value != null,
+              ),
+            )
+            : _buildTextField(
+              controller: controller,
+              obscureText: obscureText,
+              readOnly: readOnly,
+              keyboardType: keyboardType,
+              validator: validator,
+              maxLines: maxLines,
+              inputFormatters: inputFormatters,
+              focusNode: focusNode,
+              textInputAction: textInputAction,
+              onFieldSubmitted: onFieldSubmitted,
+              hintText: hintText,
+              suffixIcon: suffixIcon,
+              hasError: false,
+            ),
+
+        // ← MENSAJE DE ERROR O HELP TEXT
+        errorText != null
+            ? Obx(() {
+              if (errorText.value != null) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 4),
+                  child: Text(
+                    errorText.value!,
+                    style: GoogleFonts.rubik(
+                      color: GerenaColors.errorColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+              }
+
+              if (helpText != null) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 4),
+                  child: Text(
+                    helpText,
+                    style: GoogleFonts.rubik(
+                      color: GerenaColors.labelTextColor,
+                      fontSize: 12,
+                    ),
+                  ),
+                );
+              }
+
+              return SizedBox.shrink();
+            })
+            : helpText != null
+            ? Padding(
+              padding: const EdgeInsets.only(top: 4, left: 4),
+              child: Text(
+                helpText,
+                style: GoogleFonts.rubik(
+                  color: GerenaColors.labelTextColor,
+                  fontSize: 12,
+                ),
+              ),
+            )
+            : SizedBox.shrink(),
+      ],
+    );
+  }
+   // ← NUEVO MÉTODO AUXILIAR
+  static Widget _buildTextField({
+    required TextEditingController controller,
+    required bool obscureText,
+    required bool readOnly,
+    required TextInputType keyboardType,
+    required int maxLines,
+    required bool hasError,
+    String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
+    FocusNode? focusNode,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
+    String? hintText,
+    Widget? suffixIcon,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      readOnly: readOnly,
+      keyboardType: keyboardType,
+      validator: validator,
+      maxLines: maxLines,
+      inputFormatters: inputFormatters,
+      focusNode: focusNode,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onFieldSubmitted,
+      style: GoogleFonts.rubik(
+        fontSize: 14,
+        color: GerenaColors.textPrimaryColor,
+      ),
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: GoogleFonts.rubik(
+          color: GerenaColors.textSecondaryColor,
+          fontSize: 14,
+        ),
+        filled: true,
+        fillColor:
+            readOnly
+                ? GerenaColors.modalBackgroundColor
+                : GerenaColors.backgroundColor,
+        suffixIcon: suffixIcon,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(
+            color:
+                hasError
+                    ? GerenaColors.errorColor
+                    : GerenaColors.inputBorderColor,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(
+            color:
+                hasError
+                    ? GerenaColors.errorColor
+                    : GerenaColors.inputBorderColor,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(
+            color: hasError ? GerenaColors.errorColor : GerenaColors.primaryColor,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(color: GerenaColors.errorColor),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(0),
+          borderSide: BorderSide(color: GerenaColors.errorColor, width: 2),
+        ),
+        isDense: true,
+      ),
+    );
+  }
+
+  static Widget buildPasswordField({
+    required String label,
+    required TextEditingController controller,
+    required bool obscureText,
+    required VoidCallback onToggleVisibility,
+    FocusNode? focusNode,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
+    RxnString? errorText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.rubik(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: GerenaColors.labelTextColor,
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // ← SOLO USA OBX SI errorText NO ES NULL
+        errorText != null
+            ? Obx(
+              () => _buildPasswordTextField(
+                controller: controller,
+                obscureText: obscureText,
+                onToggleVisibility: onToggleVisibility,
+                focusNode: focusNode,
+                textInputAction: textInputAction,
+                onFieldSubmitted: onFieldSubmitted,
+                hasError: errorText.value != null,
+              ),
+            )
+            : _buildPasswordTextField(
+              controller: controller,
+              obscureText: obscureText,
+              onToggleVisibility: onToggleVisibility,
+              focusNode: focusNode,
+              textInputAction: textInputAction,
+              onFieldSubmitted: onFieldSubmitted,
+              hasError: false,
+            ),
+
+        // ← MENSAJE DE ERROR
+        if (errorText != null)
+          Obx(() {
+            if (errorText.value != null) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 4, left: 4),
+                child: Text(
+                  errorText.value!,
+                  style: GoogleFonts.rubik(
+                    color: GerenaColors.errorColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          }),
+      ],
+    );
+  }
+// ← NUEVO MÉTODO AUXILIAR
+  static Widget _buildPasswordTextField({
+    required TextEditingController controller,
+    required bool obscureText,
+    required VoidCallback onToggleVisibility,
+    required bool hasError,
+    FocusNode? focusNode,
+    TextInputAction? textInputAction,
+    void Function(String)? onFieldSubmitted,
+  }) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          focusNode: focusNode,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
+          style: GoogleFonts.rubik(
+            fontSize: 14,
+            color: GerenaColors.textPrimaryColor,
+          ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: GerenaColors.backgroundColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 4,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(0),
+              borderSide: BorderSide(
+                color:
+                    hasError
+                        ? GerenaColors.errorColor
+                        : GerenaColors.inputBorderColor,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(0),
+              borderSide: BorderSide(
+                color:
+                    hasError
+                        ? GerenaColors.errorColor
+                        : GerenaColors.inputBorderColor,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(0),
+              borderSide: BorderSide(
+                color:
+                    hasError
+                        ? GerenaColors.errorColor
+                        : GerenaColors.primaryColor,
+                width: 2,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(0),
+              borderSide: BorderSide(color: GerenaColors.errorColor),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(0),
+              borderSide: BorderSide(color: GerenaColors.errorColor, width: 2),
+            ),
+            isDense: true,
+          ),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          bottom: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color:
+                    hasError
+                        ? GerenaColors.errorColor
+                        : GerenaColors.inputBorderColor,
+                width: 1,
+              ),
+              color: GerenaColors.backgroundColor,
+            ),
+            child: IconButton(
+              onPressed: onToggleVisibility,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              constraints: const BoxConstraints(),
+              icon: Icon(
+                obscureText ? Icons.visibility_off : Icons.visibility,
+                color: GerenaColors.labelTextColor,
+                size: 16,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
   static Widget createDoctorCard(
     Map<String, dynamic> doctor, {
     bool buttonAtBottom = false,
