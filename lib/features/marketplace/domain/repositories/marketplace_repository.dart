@@ -21,6 +21,7 @@ abstract class MarketplaceRepository {
   Future<ShoppingCartResponseEntity> validatecart(ShoppingCartItemsEntity shoppingcartpostentity);
   Future<void> payorder(int orderId,String paymentMethodId);
 
+  Future<void> deletepayorder(int orderId,String paymentMethodId);
 
   Future<OrderEntity> getMylastpaidorder() ;
 

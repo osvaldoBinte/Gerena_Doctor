@@ -1,19 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/features/appointment/domain/entities/getappointment/get_apppointment_entity.dart';
+import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PatientProfileScreen extends StatelessWidget {
-  final dynamic appointment;
+  final GetApppointmentEntity appointmentEntity;
   final VoidCallback onClose;
-  final String? photoUrl; 
-  final Map<String, dynamic>? extraData; 
 
   const PatientProfileScreen({
     Key? key,
-    required this.appointment,
+    required this.appointmentEntity,
     required this.onClose,
-    this.photoUrl,
-    this.extraData,
   }) : super(key: key);
+
+  void _navigateToDoctorProfile() {
+    final startController = Get.find<StartController>();
+    startController.showDoctorProfilePage(
+      doctorData: {
+        'userId': appointmentEntity.doctorId,
+        'doctorName': appointmentEntity.doctorName,
+        'specialty': '',
+        'location': '',
+        'profileImage': appointmentEntity.foto ?? 'assets/logo/logo.png',
+        'rating': 0.0,
+        'reviews': '',
+        'info': '',
+      },
+    );
+  }
+
+  void _navigateToUserProfile() {
+    final startController = Get.find<StartController>();
+    startController.showUserProfilePage(
+      userData: {
+        'userId': appointmentEntity.clientId,
+        'userName': appointmentEntity.clientName,
+        'username': appointmentEntity.clientName.toLowerCase().replaceAll(' ', ''),
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,79 +62,97 @@ class PatientProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child:Column(
-  children: [
-    // Botón de cerrar en la parte superior
-    Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          GestureDetector(
-            onTap: onClose,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.close,
-                size: 20,
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-    // Información del paciente
-    Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  appointment.subject ?? 'Sin nombre',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A5F7A),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'ID: ${appointment.id ?? 'N/A'}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.teal[400],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          CircleAvatar(
-            radius: 35,
-            backgroundColor: Colors.grey[300],
-            backgroundImage: photoUrl != null && photoUrl!.isNotEmpty
-                ? NetworkImage(photoUrl!)
-                : null,
-            child: photoUrl == null || photoUrl!.isEmpty
-                ? Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.grey[600],
-                  )
-                : null,
-          ),
-        ],
-      ),
-    ),
-    const SizedBox(height: 20),
-    // Resto del contenido...
+                child: Column(
+                  children: [
+                    // Botón de cerrar
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: onClose,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 20,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Información del paciente - AHORA CLICKEABLE
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                GestureDetector(
+                                  onTap: _navigateToUserProfile,
+                                  child: Text(
+                                    appointmentEntity.clientName,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF1A5F7A),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'ID: ${appointmentEntity.clientId}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.teal[400],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _navigateToUserProfile,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.teal[400]!,
+                                  width: 2,
+                                ),
+                              ),
+                              child: CircleAvatar(
+                                radius: 35,
+                                backgroundColor: Colors.grey[300],
+                                backgroundImage: appointmentEntity.foto != null && appointmentEntity.foto!.isNotEmpty
+                                    ? NetworkImage(appointmentEntity.foto!)
+                                    : null,
+                                child: appointmentEntity.foto == null || appointmentEntity.foto!.isEmpty
+                                    ? Icon(
+                                        Icons.person,
+                                        size: 40,
+                                        color: Colors.grey[600],
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    
+                    // Tipo de cita
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -121,7 +165,7 @@ class PatientProfileScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            appointment.location ?? 'Tipo de cita',
+                            appointmentEntity.appointmentType,
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black87,
@@ -130,6 +174,8 @@ class PatientProfileScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    
+                    // Motivo y hora
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(
@@ -137,8 +183,8 @@ class PatientProfileScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              appointment.notes?.isNotEmpty == true
-                                  ? appointment.notes
+                              appointmentEntity.consultationReason.isNotEmpty
+                                  ? appointmentEntity.consultationReason
                                   : 'Sin motivo especificado',
                               style: const TextStyle(
                                 fontSize: 14,
@@ -148,7 +194,7 @@ class PatientProfileScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 16),
                           Text(
-                            _formatTime(appointment.startTime),
+                            _formatTime(DateTime.parse(appointmentEntity.startDateTime)),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -158,63 +204,72 @@ class PatientProfileScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    
                     const Divider(height: 1),
+                    
+                    // Detalles de la cita
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         children: [
-                          _buildInfoRow(
+                          _buildPatientInfoRow(
                             'Paciente',
-                            appointment.subject ?? 'Sin nombre',
+                            appointmentEntity.clientName,
                             'Estado',
-                            extraData?['status'] ?? 'Confirmada',
+                            appointmentEntity.status,
                           ),
                           const SizedBox(height: 16),
                           _buildInfoRow(
                             'Fecha',
-                            _formatDate(appointment.startTime),
+                            _formatDate(DateTime.parse(appointmentEntity.startDateTime)),
                             'Hora',
-                            _formatTime(appointment.startTime),
+                            _formatTime(DateTime.parse(appointmentEntity.startDateTime)),
                           ),
                           const SizedBox(height: 16),
                           _buildSingleInfoRow(
                             'Tipo de cita',
-                            appointment.location ?? 'N/A',
+                            appointmentEntity.appointmentType,
                           ),
-                          if (appointment.notes?.isNotEmpty == true) ...[
+                          if (appointmentEntity.consultationReason.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSingleInfoRow(
                               'Motivo de consulta',
-                              appointment.notes ?? '',
+                              appointmentEntity.consultationReason,
                             ),
                           ],
-                          if (extraData?['doctorName'] != null) ...[
-                            const SizedBox(height: 16),
-                            _buildSingleInfoRow(
-                              'Doctor',
-                              extraData!['doctorName'],
-                            ),
-                          ],
-                          if (extraData?['doctorNotes'] != null && 
-                              extraData!['doctorNotes'].toString().isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          _buildDoctorInfoRow(
+                            'Doctor',
+                            appointmentEntity.doctorName,
+                          ),
+                          if (appointmentEntity.doctorNotes.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSingleInfoRow(
                               'Notas del doctor',
-                              extraData!['doctorNotes'],
+                              appointmentEntity.doctorNotes,
                             ),
                           ],
-                          if (extraData?['diagnosis'] != null && 
-                              extraData!['diagnosis'].toString().isNotEmpty) ...[
+                          if (appointmentEntity.diagnosis.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             _buildSingleInfoRow(
                               'Diagnóstico',
-                              extraData!['diagnosis'],
+                              appointmentEntity.diagnosis,
+                            ),
+                          ],
+                          if (appointmentEntity.cancellationReason.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            _buildSingleInfoRow(
+                              'Razón de cancelación',
+                              appointmentEntity.cancellationReason,
                             ),
                           ],
                         ],
                       ),
                     ),
+                    
                     const Divider(height: 1),
+                    
+                    // Información adicional
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -222,18 +277,21 @@ class PatientProfileScreen extends StatelessWidget {
                         children: [
                           _buildMedicalSection(
                             'ID de Cita',
-                            '#${appointment.id ?? 'N/A'}',
+                            '#${appointmentEntity.id}',
                           ),
                           const SizedBox(height: 16),
                           _buildMedicalSection(
                             'Inicio',
-                            _formatFullDateTime(appointment.startTime),
+                            _formatFullDateTime(DateTime.parse(appointmentEntity.startDateTime)),
                           ),
                           const SizedBox(height: 16),
                           _buildMedicalSection(
                             'Fin',
-                            _formatFullDateTime(appointment.endTime),
+                            _formatFullDateTime(DateTime.parse(appointmentEntity.endDateTime)),
                           ),
+                          const SizedBox(height: 20),
+                          // Sección del doctor
+                          _buildDoctorSection(),
                         ],
                       ),
                     ),
@@ -244,6 +302,176 @@ class PatientProfileScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDoctorSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.grey[200]!,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: _navigateToDoctorProfile,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.teal[400]!,
+                  width: 2,
+                ),
+              ),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: appointmentEntity.foto != null && appointmentEntity.foto!.isNotEmpty
+                    ? NetworkImage(appointmentEntity.foto!)
+                    : null,
+                child: appointmentEntity.foto == null || appointmentEntity.foto!.isEmpty
+                    ? Icon(
+                        Icons.person,
+                        size: 30,
+                        color: Colors.grey[600],
+                      )
+                    : null,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Médico asignado',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                GestureDetector(
+                  onTap: _navigateToDoctorProfile,
+                  child: Text(
+                    appointmentEntity.doctorName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal[700],
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          GestureDetector(
+            onTap: _navigateToDoctorProfile,
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 20,
+              color: Colors.teal[400],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // NUEVO: Widget específico para la fila del paciente con nombre clickeable
+  Widget _buildPatientInfoRow(
+    String label1,
+    String patientName,
+    String label2,
+    String value2,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label1,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 4),
+              GestureDetector(
+                onTap: _navigateToUserProfile,
+                child: Text(
+                  patientName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF1A5F7A),
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label2,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value2,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDoctorInfoRow(String label, String doctorName) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: _navigateToDoctorProfile,
+          child: Text(
+            doctorName,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.teal[700],
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

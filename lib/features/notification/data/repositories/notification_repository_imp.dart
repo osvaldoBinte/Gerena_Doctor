@@ -12,4 +12,12 @@ class NotificationRepositoryImp extends NotificationRepository {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await notificationDataSourcesImp.getnotification(token);
   }
+    
+  @override
+  Future<void> savetokenFCM(String fcm,String dispositivo,) async {
+    final token = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
+
+    return await notificationDataSourcesImp.savetokenFCM(fcm,dispositivo, token);
+  }
+ 
 }

@@ -1,3 +1,4 @@
+import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/features/auth/data/datasources/auth_data_sources_imp.dart';
 import 'package:gerena/features/auth/domain/entities/response/login_response_entity.dart';
 import 'package:gerena/features/auth/domain/repositories/auth_repository.dart';
@@ -5,6 +6,7 @@ import 'package:gerena/features/auth/domain/repositories/auth_repository.dart';
 class AuthRepositoryImp implements AuthRepository {
   final AuthDataSourcesImp authDataSources;
   AuthRepositoryImp({required this.authDataSources});
+  AuthService authService = AuthService();
 
   @override
   Future<LoginResponseEntity> login(String email, String password) async {
@@ -20,5 +22,6 @@ class AuthRepositoryImp implements AuthRepository {
   Future<void> requestPasswordCode(String email) async {
     return authDataSources.requestPasswordCode(email);
   }
+
  
 }

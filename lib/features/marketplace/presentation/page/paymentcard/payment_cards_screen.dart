@@ -14,11 +14,11 @@ class PaymentCardsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<PaymentCartController>();
-        final navigationController = Get.find<ShopNavigationController>();
+    final navigationController = Get.find<ShopNavigationController>();
 
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorFondo,
-       appBar: PreferredSize(
+      appBar: PreferredSize(
         preferredSize: const Size.fromHeight(0),
         child: AppBar(
           backgroundColor: GerenaColors.backgroundColorFondo,
@@ -30,46 +30,46 @@ class PaymentCardsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-             Row(
-                  children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(25),
-                      onTap: () {
-                        if (GetPlatform.isMobile) {
-                          Get.offAllNamed(RoutesNames.shoppdingcart);
-                        } else {
-                          navigationController.navigateToStore();
-                        }
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: GerenaColors.secondaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: EdgeInsets.all(8.0),
-                            child: const Icon(
-                              Icons.arrow_back,
-                              color: GerenaColors.textLightColor,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'BILLETERA',
-                            style: GoogleFonts.rubik(
-                              color: GerenaColors.textPrimaryColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+            Row(
+              children: [
+                InkWell(
+                  borderRadius: BorderRadius.circular(25),
+                  onTap: () {
+                    if (GetPlatform.isMobile) {
+                      Get.offAllNamed(RoutesNames.shoppdingcart);
+                    } else {
+                      navigationController.navigateToStore();
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: GerenaColors.secondaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                        padding: EdgeInsets.all(8.0),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          color: GerenaColors.textLightColor,
+                          size: 24,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Text(
+                        'BILLETERA',
+                        style: GoogleFonts.rubik(
+                          color: GerenaColors.textPrimaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ],
+            ),
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
@@ -231,22 +231,21 @@ class PaymentCardsScreen extends StatelessWidget {
   Widget _buildAddCardButton(BuildContext context, PaymentCartController controller) {
     return GestureDetector(
       onTap: () {
-      // Donde llamas al modal, cambia de showModalBottomSheet a showDialog:
-showDialog(
-  context: context,
-  builder: (context) => Dialog(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: 500, // Ancho máximo para escritorio
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-      ),
-      child: AddCardModal(),
-    ),
-  ),
-);
+        showDialog(
+          context: context,
+          builder: (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 500,
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
+              ),
+              child: AddCardModal(),
+            ),
+          ),
+        );
       },
       child: Container(
         width: double.infinity,
@@ -272,50 +271,54 @@ showDialog(
     );
   }
   
-  void _showEditOptions(
-    BuildContext context,
-    PaymentCartController controller,
-    PaymentMethodEntity pm,
-  ) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.delete, color: GerenaColors.errorColor),
-              title: Text('Eliminar tarjeta'),
-              onTap: () {
-                Navigator.pop(context);
-                Get.dialog(
-                  AlertDialog(
-                    title: Text('Confirmar'),
-                    content: Text('¿Deseas eliminar esta tarjeta?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Get.back(),
-                        child: Text('Cancelar'),
+void _showEditOptions(
+  BuildContext context,
+  PaymentCartController controller,
+  PaymentMethodEntity pm,
+) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) => Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: Icon(Icons.delete, color: GerenaColors.errorColor),
+            title: Text('Eliminar tarjeta'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.dialog(
+                AlertDialog(
+                  title: Text('Confirmar'),
+                  content: Text('¿Deseas eliminar esta tarjeta?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: Text('Cancelar'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        // ✅ Pasar el ID del backend
+                        controller.deletePaymentMethod(
+                          pm.id, // Backend ID
+                          stripeId: pm.paymentMethodId, // Stripe ID (opcional)
+                        );
+                        Get.back();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: GerenaColors.errorColor,
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          controller.deletePaymentMethod(pm.id);
-                          Get.back();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: GerenaColors.errorColor,
-                        ),
-                        child: Text('Eliminar'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
+                      child: Text('Eliminar'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

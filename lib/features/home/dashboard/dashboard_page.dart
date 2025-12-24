@@ -28,8 +28,6 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(DashboardController());
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 1100;
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -54,72 +52,19 @@ class DashboardPage extends StatelessWidget {
             )
           : null,
       drawer: const SidebarWidget(),
-      body: isSmallScreen
-          ? SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Obx(() => _buildMobileContent(controller)),
-              ),
-            )
-          : Container(
-              child: showAppBar
-                  ? Row(
-                      children: [
-                        if (showAppBar) const SidebarWidget(),
-                        Expanded(
-                          child: _buildDashboardContent(controller),
-                        ),
-                      ],
-                    )
-                  : _buildDashboardContent(controller),
-            ),
+      body: Container(
+        child: showAppBar
+            ? Row(
+                children: [
+                  if (showAppBar) const SidebarWidget(),
+                  Expanded(
+                    child: _buildDashboardContent(controller),
+                  ),
+                ],
+              )
+            : _buildDashboardContent(controller),
+      ),
     );
-  }
-
-  Widget _buildMobileContent(DashboardController controller) {
-    return Obx(() {
-      switch (controller.currentView.value) {
-        case 'doctor_profile':
-          return Column(
-            children: [
-              _buildBackButton(controller),
-              const SizedBox(height: 16),
-              _buildDoctorProfileContent(),
-            ],
-          );
-        case 'user_profile':
-          return Column(
-            children: [
-              const SizedBox(height: 16),
-              _buildUserProfileContent(),
-            ],
-          );
-        case 'membresia':
-          return Column(
-            children: [
-              _buildBackButtonMembresia(controller),
-              const SizedBox(height: 16),
-              _buildMembresia(),
-            ],
-          );
-        case 'appointments':
-          return Column(
-            children: [
-              _buildCalendarOrAppointmentsSection(controller),
-            ],
-          );
-        default:
-          return Column(
-            children: [
-              if (controller.currentView.value == 'calendar') ...[
-                const NewsFeedWidget(),
-                const SizedBox(height: 16),
-              ],
-              _buildCalendarOrAppointmentsSection(controller),
-            ],
-          );
-      }
-    });
   }
 
   Widget _buildDashboardContent(DashboardController controller) {
@@ -444,10 +389,9 @@ class DashboardPage extends StatelessWidget {
                       size: 40,
                     ),
                     onPressed: () {
-                      // Abrir el modal
                       ModalAgregarCita.show(
-                        clienteId: 123, // Reemplaza con el ID real del cliente
-                        doctorId: 456, // Reemplaza con el ID real del doctor
+                        clienteId: 123,
+                        doctorId: 456,
                       );
                     },
                   ),
@@ -535,171 +479,168 @@ class DashboardPage extends StatelessWidget {
   }
 
   Widget _buildAppointmentCardFromData(Appointment appointment) {
-  final hour = appointment.startTime.hour;
-  final minute = appointment.startTime.minute;
-  final period = hour < 12 ? 'A.M.' : 'P.M.';
-  final formattedHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-  final formattedTime =
-      '$formattedHour:${minute.toString().padLeft(2, '0')} $period';
+    final hour = appointment.startTime.hour;
+    final minute = appointment.startTime.minute;
+    final period = hour < 12 ? 'A.M.' : 'P.M.';
+    final formattedHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final formattedTime =
+        '$formattedHour:${minute.toString().padLeft(2, '0')} $period';
 
-  String patientName = appointment.subject;
-  String procedure = appointment.notes ?? 'Procedimiento no especificado';
-  String additionalInfo = appointment.location ?? 'Seguimiento';
+    String patientName = appointment.subject;
+    String procedure = appointment.notes ?? 'Procedimiento no especificado';
+    String additionalInfo = appointment.location ?? 'Seguimiento';
 
-  if (procedure.startsWith('Procedimiento: ')) {
-    procedure = procedure.replaceFirst('Procedimiento: ', '');
-  }
-
-  // ✅ Convertir el ID a int de forma segura
-  int appointmentId = 0;
-  if (appointment.id != null) {
-    if (appointment.id is int) {
-      appointmentId = appointment.id as int;
-    } else if (appointment.id is String) {
-      appointmentId = int.tryParse(appointment.id.toString()) ?? 0;
-    } else {
-      appointmentId = int.tryParse(appointment.id.toString()) ?? 0;
+    if (procedure.startsWith('Procedimiento: ')) {
+      procedure = procedure.replaceFirst('Procedimiento: ', '');
     }
-  }
 
-  return Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: Colors.transparent,
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: GerenaColors.mediumBorderRadius,
-              boxShadow: [GerenaColors.lightShadow],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 120,
-                      child: Center(
-                        child: Container(
-                          width: 120,
-                          height: 120,
-                          child: _buildDefaultAvatar(),
+    int appointmentId = 0;
+    if (appointment.id != null) {
+      if (appointment.id is int) {
+        appointmentId = appointment.id as int;
+      } else if (appointment.id is String) {
+        appointmentId = int.tryParse(appointment.id.toString()) ?? 0;
+      } else {
+        appointmentId = int.tryParse(appointment.id.toString()) ?? 0;
+      }
+    }
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: GerenaColors.mediumBorderRadius,
+                boxShadow: [GerenaColors.lightShadow],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: Center(
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            child: _buildDefaultAvatar(),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Nombre Del Paciente',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: GerenaColors.textPrimaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              patientName,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: GerenaColors.textSecondaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Procedimiento',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: GerenaColors.textPrimaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              procedure,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: GerenaColors.textSecondaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Información Adicional',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: GerenaColors.textPrimaryColor,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              additionalInfo,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: GerenaColors.textSecondaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            'Nombre Del Paciente',
-                            style: TextStyle(
+                            formattedTime,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: GerenaColors.textPrimaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            patientName,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: GerenaColors.textSecondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Procedimiento',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: GerenaColors.textPrimaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            procedure,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: GerenaColors.textSecondaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Información Adicional',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: GerenaColors.textPrimaryColor,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            additionalInfo,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: GerenaColors.textSecondaryColor,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          formattedTime,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: GerenaColors.textPrimaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // ✅ Botón completar cita
-            _buildActionButton(
-              icon: Icons.check_circle,
-              color: GerenaColors.successColor,
-              onPressed: () {
-                ModalCompletarCita.show(appointmentId);
-              },
-            ),
-            const SizedBox(height: 12),
-            // ✅ Botón cancelar cita
-            _buildActionButton(
-              icon: Icons.cancel,
-              color: GerenaColors.errorColor,
-              onPressed: () {
-                ModalCancelarCita.show(appointmentId);
-              },
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(width: 16),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildActionButton(
+                icon: Icons.check_circle,
+                color: GerenaColors.successColor,
+                onPressed: () {
+                  ModalCompletarCita.show(appointmentId);
+                },
+              ),
+              const SizedBox(height: 12),
+              _buildActionButton(
+                icon: Icons.cancel,
+                color: GerenaColors.errorColor,
+                onPressed: () {
+                  ModalCancelarCita.show(appointmentId);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildDefaultAvatar() {
     return Container(
@@ -710,43 +651,44 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-Widget _buildActionButton({
-  String? assetPath,
-  IconData? icon,
-  Color? color,
-  required VoidCallback onPressed,
-}) {
-  return Container(
-    width: 40,
-    height: 40,
-    decoration: BoxDecoration(
-      color: color?.withOpacity(0.1) ?? Colors.grey.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
+  Widget _buildActionButton({
+    String? assetPath,
+    IconData? icon,
+    Color? color,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: color?.withOpacity(0.1) ?? Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
-        child: Center(
-          child: icon != null
-              ? Icon(
-                  icon,
-                  color: color ?? GerenaColors.textSecondaryColor,
-                  size: 24,
-                )
-              : Image.asset(
-                  assetPath!,
-                  width: 20,
-                  height: 20,
-                  fit: BoxFit.contain,
-                  color: color,
-                ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Center(
+            child: icon != null
+                ? Icon(
+                    icon,
+                    color: color ?? GerenaColors.textSecondaryColor,
+                    size: 24,
+                  )
+                : Image.asset(
+                    assetPath!,
+                    width: 20,
+                    height: 20,
+                    fit: BoxFit.contain,
+                    color: color,
+                  ),
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   String _formatDate(DateTime date) {
     final months = [
       'Enero',
@@ -792,7 +734,6 @@ Widget _buildActionButton({
 
   Widget _buildCalendarAndAppointments(DashboardController controller) {
     return CalendarWidget(
-      // ✅ Elimina la Column innecesaria
       onDateSelected: controller.onDateSelected,
     );
   }

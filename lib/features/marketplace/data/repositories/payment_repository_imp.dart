@@ -1,5 +1,5 @@
 import 'package:gerena/common/services/auth_service.dart';
-import 'package:gerena/features/marketplace/data/datasources/Payment_data_sources_imp.dart';
+import 'package:gerena/features/marketplace/data/datasources/payment_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
 import 'package:gerena/features/marketplace/domain/repositories/payment_repository.dart';
 class PaymentRepositoryImpl implements PaymentRepository {
@@ -83,6 +83,13 @@ class PaymentRepositoryImpl implements PaymentRepository {
   Future<void> createPaymentMethodback(String paymentMethodId) async {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await paymentDataSourcesImp.savecard( paymentMethodId,token);
+  }
+  
+  @override
+  Future<void> deletePaymentMethodback(int id) async {
+    final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+
+    return await paymentDataSourcesImp.deletePaymentback(id, token);
   }
   
  

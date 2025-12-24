@@ -1,0 +1,2 @@
+-dontwarn javax.xml.stream.**
+-dontwarn org.apache.tika.**

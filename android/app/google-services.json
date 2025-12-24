@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913727559148",
+    "project_id": "gerena-de29f",
+    "storage_bucket": "gerena-de29f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913727559148:android:d36524d3d54ddbdbba9cc9",
+        "android_client_info": {
+          "package_name": "dev.binteconsulting.gerena"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA04X84ZycQ9e9ZLHSi4w-rIqkgJsoOYF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

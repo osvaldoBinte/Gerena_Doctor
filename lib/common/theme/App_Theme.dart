@@ -1929,7 +1929,7 @@ class GerenaColors {
     // Validaciones de datos
     final String doctorName = doctor['doctorName'] ?? 'Sin nombre';
     final String profileImage =
-        doctor['profileImage'] ?? 'assets/logo/logoAPP.png';
+        doctor['profileImage'] ?? 'assets/logo/logoAPP.jpg';
     final String specialty = doctor['specialty'] ?? '';
     final double rating = (doctor['rating'] ?? 0.0).toDouble();
     final String reviews = doctor['reviews'] ?? '';
@@ -2082,7 +2082,7 @@ class GerenaColors {
                             },
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/logo/logoAPP.png',
+                                'assets/logo/logoAPP.jpg',
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,
@@ -2098,7 +2098,7 @@ class GerenaColors {
                             alignment: Alignment.topCenter,
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
-                                'assets/logo/logoAPP.png',
+                                'assets/logo/logoAPP.jpg',
                                 width: 80,
                                 height: 80,
                                 fit: BoxFit.cover,

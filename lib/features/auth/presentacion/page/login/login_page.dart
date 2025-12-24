@@ -181,18 +181,18 @@ class LoginPage extends StatelessWidget {
         ),
         
         const SizedBox(height: 24),
-        
-        Center(
-          child: controller.isLoading.value
-            ? const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              )
-            : GerenaColors.createLoginButton(
-                text: 'Iniciar sesión',
-                onPressed: controller.onLoginTap,
-                width: isMobile ? double.infinity : 300.0,
-              ),
+           Center(
+  child: Obx(() => IgnorePointer(
+        ignoring: controller.isLoading.value,
+        child: GerenaColors.createLoginButton(
+          text: controller.isLoading.value
+              ? 'Cargando...'
+              : 'Iniciar sesión',
+          onPressed: controller.onLoginTap,
         ),
+      )),
+),
+       
       ],
     ));
   }

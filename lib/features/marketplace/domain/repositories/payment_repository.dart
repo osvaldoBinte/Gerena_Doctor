@@ -17,6 +17,8 @@ abstract class PaymentRepository {
   });
 
   Future<void> deletePaymentMethod(String paymentMethodId);
+    Future<void> deletePaymentMethodback(int id);
+
  Future<void> createPayment(String paymentMethodId) ;
  
 

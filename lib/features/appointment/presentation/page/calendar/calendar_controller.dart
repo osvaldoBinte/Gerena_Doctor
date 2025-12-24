@@ -25,7 +25,9 @@ class CalendarControllerGetx extends GetxController {
 
   final RxInt currentAppointmentIndex = 0.obs;
   late PageController pageController;
-  final RxMap<int, Map<String, dynamic>> appointmentsExtraData = <int, Map<String, dynamic>>{}.obs;
+  
+  // NUEVO: Guardamos las entidades originales
+  final RxMap<int, GetApppointmentEntity> appointmentEntities = <int, GetApppointmentEntity>{}.obs;
 
   late CalendarController calendarController;
 
@@ -106,9 +108,16 @@ class CalendarControllerGetx extends GetxController {
       
       print('Cargando citas para: $dateString con $daysInMonth días en el mes');
       
-      final appointmentEntities = await getAppointmentsUsecase.execute(dateString, daysInMonth.toString());
+      final appointmentEntitiesList = await getAppointmentsUsecase.execute(dateString, daysInMonth.toString());
       
-      final appointmentsList = appointmentEntities.map((entity) {
+      // Guardamos las entidades originales
+      appointmentEntities.clear();
+      for (var entity in appointmentEntitiesList) {
+        appointmentEntities[entity.id] = entity;
+      }
+      
+      // Convertimos a Appointment solo para el calendario visual
+      final appointmentsList = appointmentEntitiesList.map((entity) {
         return _convertEntityToAppointment(entity);
       }).toList();
       
@@ -119,6 +128,7 @@ class CalendarControllerGetx extends GetxController {
     } catch (e) {
       print('Error al cargar citas: $e');
       appointments.clear();
+      appointmentEntities.clear();
     } finally {
       isLoading.value = false;
     }
@@ -129,41 +139,49 @@ class CalendarControllerGetx extends GetxController {
     final lastDayCurrentMonth = firstDayNextMonth.subtract(const Duration(days: 1));
     return lastDayCurrentMonth.day;
   }
-String? getAppointmentPhoto(int appointmentId) {
-  return appointmentsExtraData[appointmentId]?['foto'];
-}
 
-Map<String, dynamic>? getAppointmentExtraData(int appointmentId) {
-  return appointmentsExtraData[appointmentId];
-}
-Appointment _convertEntityToAppointment(GetApppointmentEntity entity) {
-  final startDateTime = DateTime.parse(entity.startDateTime);
-  final endDateTime = DateTime.parse(entity.endDateTime);
-  
-  // Guardamos los datos extra
-  appointmentsExtraData[entity.id] = {
-    'foto': entity.foto,
-    'clientId': entity.clientId,
-    'doctorId': entity.doctorId,
-    'doctorName': entity.doctorName,
-    'status': entity.status,
-    'doctorNotes': entity.doctorNotes,
-    'diagnosis': entity.diagnosis,
-    'cancellationReason': entity.cancellationReason,
-  };
-  
-  return Appointment(
-    subject: entity.clientName,
-    startTime: startDateTime,
-    endTime: endDateTime,
-    color: GerenaColors.accentColor,
-    notes: entity.consultationReason.isNotEmpty 
-        ? 'Procedimiento: ${entity.consultationReason}' 
-        : 'Sin motivo especificado',
-    location: entity.appointmentType,
-    id: entity.id,
-  );
-}
+  // NUEVO: Método simplificado para obtener la entidad
+  GetApppointmentEntity? getAppointmentEntity(int appointmentId) {
+    return appointmentEntities[appointmentId];
+  }
+
+  // Métodos de compatibilidad (si los necesitas en otros lugares)
+  String? getAppointmentPhoto(int appointmentId) {
+    return appointmentEntities[appointmentId]?.foto;
+  }
+
+  Map<String, dynamic>? getAppointmentExtraData(int appointmentId) {
+    final entity = appointmentEntities[appointmentId];
+    if (entity == null) return null;
+    
+    return {
+      'foto': entity.foto,
+      'clientId': entity.clientId,
+      'doctorId': entity.doctorId,
+      'doctorName': entity.doctorName,
+      'status': entity.status,
+      'doctorNotes': entity.doctorNotes,
+      'diagnosis': entity.diagnosis,
+      'cancellationReason': entity.cancellationReason,
+    };
+  }
+
+  Appointment _convertEntityToAppointment(GetApppointmentEntity entity) {
+    final startDateTime = DateTime.parse(entity.startDateTime);
+    final endDateTime = DateTime.parse(entity.endDateTime);
+    
+    return Appointment(
+      subject: entity.clientName,
+      startTime: startDateTime,
+      endTime: endDateTime,
+      color: GerenaColors.accentColor,
+      notes: entity.consultationReason.isNotEmpty 
+          ? 'Procedimiento: ${entity.consultationReason}' 
+          : 'Sin motivo especificado',
+      location: entity.appointmentType,
+      id: entity.id,
+    );
+  }
 
   void updateAppointments(List<Appointment> newAppointments) {
     appointments.assignAll(newAppointments);

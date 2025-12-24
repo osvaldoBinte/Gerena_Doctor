@@ -1,10 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gerena/app.dart';
 import 'package:gerena/common/constants/constants.dart';
+import 'package:gerena/common/services/notification_service.dart';
 import 'package:gerena/common/settings/enviroment.dart';
+import 'package:gerena/firebase_options.dart';
 import 'package:gerena/framework/preferences_service.dart';
 import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
@@ -17,7 +20,10 @@ void main() async {
   await dotenv.load(fileName: enviromentSelect);
     Stripe.publishableKey = AppConstants.stripePublishableKey  ;
 
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await PreferencesUser().initiPrefs();
+    await NotificationService().initialize();
+
  FlutterError.onError = (FlutterErrorDetails details) {
     if (details.exception.toString().contains('KeyDownEvent') ||
         details.exception.toString().contains('hardware_keyboard') ||

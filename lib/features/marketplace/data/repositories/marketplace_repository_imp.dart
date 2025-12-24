@@ -85,5 +85,11 @@ class MarketplaceRepositoryImp extends MarketplaceRepository {
     final token = await authService.getToken() ?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await marketplaceDataSourcesImp.calculatediscountpoints(monto, puntosAUsar, token);
   }
+  
+  @override
+  Future<void> deletepayorder(int orderId, String paymentMethodId) {
+    // TODO: implement deletepayorder
+    throw UnimplementedError();
+  }
  
 }

@@ -70,6 +70,7 @@ class App extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(AuthService(), permanent: true);
         Get.put(usecaseConfig.loginUsecase!, permanent: true);
+        Get.put(usecaseConfig.saveTokenFcmUsecase!,permanent: true);
         Get.put(usecaseConfig.requestPasswordCodeUsecase!, permanent: true);
         Get.put(usecaseConfig.confirmPasswordResetUsecase!, permanent:  true);
         Get.put(usecaseConfig.doctorProfileUsecase!, permanent: true);
@@ -92,6 +93,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.createPaymentMethodUsecase!,permanent:  true);
         Get.put(usecaseConfig.getBannersUsecase!, permanent: true);
         Get.put(usecaseConfig.paymentMethodsDefaulUsecase!, permanent: true);
+        Get.put(usecaseConfig.deletePaymentMethodBackUsecase! ,permanent: true);
         Get.put(usecaseConfig.payOrderUsecase!, permanent: true);
         Get.put(usecaseConfig.getAddressesUsecase!, permanent: true);
         Get.put(usecaseConfig.createOrderUsecase!, permanent: true);
@@ -152,7 +154,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.deleteCommentUsecase!,permanent: true);
         Get.put(usecaseConfig.getPostCommentsUsecase!,permanent: true);
 
-        Get.lazyPut(() => LoginController(loginUsecase: Get.find()), fenix: true);
+        Get.lazyPut(() => LoginController(loginUsecase: Get.find(), saveTokenFcmUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => HistoryController(getMyOrderUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => GetMyLastPaidOrderController(getMyLastPaidOrderUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => ReviewController(myReviewUsecase: Get.find()), fenix: true);
@@ -166,7 +168,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => AppointmentController(appointmentCompletedUsecase: Get.find(), cancelAppointmentUsecase: Get.find()), fenix:  true);
-        Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(), savecardUsecase: Get.find(),), fenix: true,);
+        Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(), savecardUsecase: Get.find(), deletePaymentMethodBackUsecase:  Get.find(),), fenix: true,);
         Get.lazyPut(() => AddressesController(getAddressesUsecase:  Get.find(), postAddressesUsecase: Get.find(), putAddressesUsecase: Get.find(), deleteAddressesUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
         Get.lazyPut(() => SubscriptionController( getAllPlansUsecase: Get.find(), postSubscribeToPlanUsecase: Get.find(), getMySubscriptionUsecase: Get.find(), changeSubscriptionPlanUsecase: Get.find(), postCancelSubcriptionUsecase: Get.find(), ), fenix: true,);

@@ -35,7 +35,9 @@ class AuthDataSourcesImp {
        
       }
       
-      throw ApiExceptionCustom(response: response);
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
     } catch (e) {
        if (e is SocketException || e is http.ClientException || e is TimeoutException) {
 
@@ -46,64 +48,32 @@ class AuthDataSourcesImp {
     }
   }
 
-  Future<void> confirmPasswordReset(String email, String code, String newpassword) async {
-     try {
-      Uri url = Uri.parse('$defaultApiServer/Auth/recuperar-contrasena');
+  Future<void> savetokenFCM(String fcm, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/auth/login');
       final bodyData = jsonEncode({
-        'email': email, 
-        'codigo': code, 
-        'nuevaContrasena': newpassword
-      });
-      
-      final response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: bodyData
-      );
-      
-     if (response.statusCode == 200) {
-      final dataUTF8 = utf8.decode(response.bodyBytes);
-      final responseDecode = jsonDecode(dataUTF8);
-      debugPrint(responseDecode);
-      
-      
-      }
-      
-      throw ApiExceptionCustom(response: response);
-    } catch (e) {
-       if (e is SocketException || e is http.ClientException || e is TimeoutException) {
+      'token': fcm,
+    });
 
-        throw Exception(convertMessageException(error: e));
-      }
-      throw Exception('$e');
-  
-    }
-  }
-  
-  Future<void> requestPasswordCode(String email) async {
-     try {
-      Uri url = Uri.parse('$defaultApiServer/Auth/solicitar-codigo');
-     
-  final bodyData = jsonEncode(email);
-      
-      final response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: bodyData
-      );
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+    );
       
      if (response.statusCode == 200) {
       final dataUTF8 = utf8.decode(response.bodyBytes);
       final responseDecode = jsonDecode(dataUTF8);
       
+      return ;
        
       }
       
-      throw ApiExceptionCustom(response: response);
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
     } catch (e) {
        if (e is SocketException || e is http.ClientException || e is TimeoutException) {
 
@@ -113,4 +83,91 @@ class AuthDataSourcesImp {
   
     }
   }
+Future<void> confirmPasswordReset(
+  String email,
+  String code,
+  String newpassword,
+) async {
+  try {
+  
+    Uri url = Uri.parse('$defaultApiServer/Auth/recuperar-contrasena');
+
+
+    final bodyData = jsonEncode({
+      'email': email,
+      'codigo': code,
+      'nuevaContrasena': newpassword,
+    });
+
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+    );
+
+    if (response.statusCode == 200) {
+      final dataUTF8 = utf8.decode(response.bodyBytes);
+
+      final responseDecode = jsonDecode(dataUTF8);
+
+      return; 
+    }
+
+   ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+  } catch (e, stackTrace) {
+    print('🔥 EXCEPTION: $e');
+    print('📌 STACKTRACE: $stackTrace');
+
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+
+    throw Exception('$e');
+  }
+}
+
+  
+  Future<void> requestPasswordCode(String email) async {
+  try {
+
+    Uri url = Uri.parse('$defaultApiServer/Auth/solicitar-codigo');
+
+    final bodyData = jsonEncode(email);
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: bodyData,
+    );
+
+    if (response.statusCode == 200) {
+      final dataUTF8 = utf8.decode(response.bodyBytes);
+
+      final responseDecode = jsonDecode(dataUTF8);
+      return; 
+    }
+
+   ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+  } catch (e, stackTrace) {
+
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      throw Exception(convertMessageException(error: e));
+    }
+
+    throw Exception('$e');
+  }
+}
+
 }

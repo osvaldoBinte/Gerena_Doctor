@@ -59,7 +59,9 @@ dependencies:
   camera: ^0.11.2+1
   photo_manager: ^3.8.2
   ffmpeg_kit_flutter_new: ^4.1.0
-
+  firebase_core: ^4.3.0
+  firebase_messaging: ^16.1.0
+  permission_handler: ^12.0.1
 
 
 
@@ -84,17 +86,22 @@ flutter_native_splash:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/logo/logoAPP.png"
+  image_path: "assets/logo/gerenalogo.jpg"
+
+  image_path_ios: "assets/logo/gerenalogo.jpg"
+  image_path_android: "assets/logo/gerenalogo.jpg"
+  adaptive_icon_foreground: "assets/logo/gerenalogo.jpg"
+  adaptive_icon_background: "#FFFFFF"
   macos:
     generate: true
-    image_path: "assets/logo/logoAPP.png"
+    image_path: "assets/logo/logoAPP.jpg"
   windows:
     generate: true
-    image_path: "assets/logo/logoAPP.png"
+    image_path: "assets/logo/logoAPP.jpg"
     icon_size: 48 # min:48, max:256, default: 48
   linux:
     generate: true
-    image_path: "assets/logo/logoAPP.png"
+    image_path: "assets/logo/logoAPP.jpg"
 
 
 dev_dependencies:
@@ -131,7 +138,8 @@ flutter:
       - dev.env
       - test.env
       - assets/gerena-logo.png
-      - assets/logo/logoAPP.png
+      - assets/logo/logoAPP.jpg
+      - assets/logo/gerenalogo.jpg
 
       - assets/Webinar.png
       - assets/gerena-logo-home.png

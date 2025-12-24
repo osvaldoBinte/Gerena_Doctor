@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/errors/convert_message.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/auth/domain/usecase/confirm_password_reset_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/request_password_code_usecase.dart';
@@ -100,7 +102,7 @@ class PasswordResetController extends GetxController {
       isFirstScreen.value = false;
     } catch (e) {
       print(e);
-      showErrorSnackbar('No se pudo enviar el código. Verifica tu correo.');
+      showErrorSnackbar('No se pudo enviar el código. Verifica tu correo.${cleanExceptionMessage(e)}');
     } finally {
       isLoading.value = false;
     }
@@ -120,10 +122,10 @@ class PasswordResetController extends GetxController {
       showSuccessSnackbar('Contraseña actualizada correctamente');
 
       await Future.delayed(const Duration(seconds: 1));
-      Get.offAllNamed('/login');
+        Get.offAllNamed( RoutesNames.loginPage);
       
     } catch (e) {
-      showErrorSnackbar('No se pudo actualizar la contraseña. Verifica el código.');
+      showErrorSnackbar('No se pudo actualizar la contraseña. Verifica el código. ${cleanExceptionMessage(e)}');
     } finally {
       isLoading.value = false;
     }

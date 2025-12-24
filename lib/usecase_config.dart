@@ -13,6 +13,7 @@ import 'package:gerena/features/auth/data/repositories/auth_repository_imp.dart'
 import 'package:gerena/features/auth/domain/usecase/confirm_password_reset_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/request_password_code_usecase.dart';
+import 'package:gerena/features/notification/domain/usecase/save_token_fcm_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
 import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
 import 'package:gerena/features/banners/domain/usecase/get_banners_usecase.dart';
@@ -46,9 +47,9 @@ import 'package:gerena/features/followers/domain/usecase/follow_user_usecase.dar
 import 'package:gerena/features/followers/domain/usecase/get_follow_status_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/get_follows_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/unfollow_user_usecase.dart';
-import 'package:gerena/features/marketplace/data/datasources/Payment_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/addresses_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
+import 'package:gerena/features/marketplace/data/datasources/payment_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/addresses_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/marketplace_repository_imp.dart';
 import 'package:gerena/features/marketplace/data/repositories/payment_repository_imp.dart';
@@ -66,6 +67,7 @@ import 'package:gerena/features/marketplace/domain/usecase/get_my_order_usecase.
 import 'package:gerena/features/marketplace/domain/usecase/get_order_by_id_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/pay_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/attach_payment_method_to_customer_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_back_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/payment_methods_defaul_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/create_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_usecase.dart';
@@ -130,6 +132,7 @@ class UsecaseConfig {
   UserRepositoryImp?userRepositoryImp;
 
 
+
   UserDatasourceImp?userDatasourceImp;
    AuthDataSourcesImp? authDataSources;
    MarketplaceDataSourcesImp?marketplaceDataSourcesImp;
@@ -148,6 +151,7 @@ class UsecaseConfig {
 
 
    LoginUsecase? loginUsecase;
+   SaveTokenFcmUsecase? saveTokenFcmUsecase;
    RequestPasswordCodeUsecase?requestPasswordCodeUsecase;
    ConfirmPasswordResetUsecase?confirmPasswordResetUsecase;
 
@@ -192,6 +196,7 @@ class UsecaseConfig {
    GetPaymentMethodsUsecase? getPaymentMethodsUsecase;
    PaymentMethodsDefaulUsecase? paymentMethodsDefaulUsecase;
    SavecardUsecase? savecardUsecase;
+   DeletePaymentMethodBackUsecase? deletePaymentMethodBackUsecase;
 
    GetBannersUsecase? getBannersUsecase;
 
@@ -295,6 +300,7 @@ class UsecaseConfig {
       getPostsUserUsecase = GetPostsUserUsecase(publicationRepository: publicationRepositoryImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
+     saveTokenFcmUsecase = SaveTokenFcmUsecase(notificationRepository: notificationRepositoryImp!);
      requestPasswordCodeUsecase =RequestPasswordCodeUsecase(authRepository: authRepositoryImp!);
      confirmPasswordResetUsecase = ConfirmPasswordResetUsecase(authRepository: authRepositoryImp!);
      doctorProfileUsecase = DoctorProfileUsecase(doctorRepository: doctorRepositoryImp!);
@@ -323,6 +329,7 @@ class UsecaseConfig {
      shoppingCartUsecase = ShoppingCartUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      createOrderUsecase = CreateOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
      payOrderUsecase = PayOrderUsecase(marketplaceRepository: marketplaceRepositoryImp!);
+     
      calculateDiscountPointsUsecase =CalculateDiscountPointsUsecase(marketplaceRepository: marketplaceRepositoryImp!);
 
 
@@ -338,6 +345,8 @@ class UsecaseConfig {
       deletePaymentMethodUsecase = DeletePaymentMethodUsecase(repository: paymentRepositoryImp!);
       getPaymentMethodsUsecase = GetPaymentMethodsUsecase(repository: paymentRepositoryImp!);
       paymentMethodsDefaulUsecase = PaymentMethodsDefaulUsecase(repository: paymentRepositoryImp!);
+
+     deletePaymentMethodBackUsecase = DeletePaymentMethodBackUsecase(repository: paymentRepositoryImp!);
       savecardUsecase = SavecardUsecase(paymentRepository: paymentRepositoryImp!);
       
       getBannersUsecase = GetBannersUsecase(repository: bannersRepositoryImp!);

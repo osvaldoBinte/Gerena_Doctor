@@ -130,7 +130,7 @@ class NotificationPage extends StatelessWidget {
         iconPath = 'assets/icons/campaigndart.png';
         break;
       default:
-        iconPath = 'assets/icons/warning.png';
+        iconPath = 'assets/icons/campaigndart.png';
     }
 
     // Determinar si tiene botones de acción (para videollamadas)

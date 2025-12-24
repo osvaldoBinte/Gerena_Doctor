@@ -6,6 +6,7 @@ import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/attach_payment_method_to_customer_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/create_payment_method_usecase.dart';
+import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_back_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/delete_payment_method_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/get_payment_methods_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/savecard_usecase.dart';
@@ -18,6 +19,7 @@ class PaymentCartController extends GetxController {
   final CreatePaymentMethodUsecase createPaymentMethodUsecase;
   final AttachPaymentMethodToCustomerUsecase attachPaymentMethodToCustomerUsecase;
   final DeletePaymentMethodUsecase deletePaymentMethodUsecase;
+  final DeletePaymentMethodBackUsecase deletePaymentMethodBackUsecase;
   final SavecardUsecase savecardUsecase;
   final AuthService authService = AuthService();
 
@@ -27,6 +29,7 @@ class PaymentCartController extends GetxController {
     required this.attachPaymentMethodToCustomerUsecase,
     required this.deletePaymentMethodUsecase,
     required this.savecardUsecase,
+    required this.deletePaymentMethodBackUsecase
   });
 
   // Observables
@@ -252,23 +255,51 @@ class PaymentCartController extends GetxController {
     }
   }
 
-  /// Eliminar payment method
-  Future<void> deletePaymentMethod(String paymentMethodId) async {
-    try {
-      print('🗑️ Eliminando tarjeta $paymentMethodId...');
-      isLoading.value = true;
+/// Eliminar payment method (tanto de Stripe como del backend)
+Future<void> deletePaymentMethod(String backendId, {String? stripeId}) async {
+  try {
+    print('🗑️ Eliminando tarjeta...');
+    print('📍 Backend ID: $backendId');
+    print('📍 Stripe ID: $stripeId');
+    isLoading.value = true;
 
-      await deletePaymentMethodUsecase.execute(paymentMethodId);
-      paymentMethods.removeWhere((pm) => pm.id == paymentMethodId);
+    // Buscar la tarjeta en la lista para obtener el Stripe ID si no se proporcionó
+    final paymentMethod = paymentMethods.firstWhere(
+      (pm) => pm.id == backendId,
+      orElse: () => throw Exception('Tarjeta no encontrada'),
+    );
 
-      showSuccessSnackbar('Tarjeta eliminada correctamente');
-    } catch (e) {
-      print('❌ Error: $e');
-      showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
-    } finally {
-      isLoading.value = false;
+    final stripePaymentId = stripeId ?? paymentMethod.paymentMethodId;
+
+    if (stripePaymentId == null) {
+      throw Exception('No se encontró el ID de Stripe para esta tarjeta');
     }
+
+    // ✅ Paso 1: Eliminar de Stripe
+    print('🔹 Paso 1: Eliminando de Stripe ($stripePaymentId)...');
+    await deletePaymentMethodUsecase.execute(stripePaymentId);
+    print('✅ Eliminado de Stripe');
+
+    // ✅ Paso 2: Eliminar del backend
+    print('🔹 Paso 2: Eliminando del backend (ID: $backendId)...');
+    final backendIdInt = int.tryParse(backendId);
+    if (backendIdInt == null) {
+      throw Exception('ID del backend inválido');
+    }
+    await deletePaymentMethodBackUsecase.execute(backendIdInt);
+    print('✅ Eliminado del backend');
+
+    // ✅ Paso 3: Remover de la lista local
+    paymentMethods.removeWhere((pm) => pm.id == backendId);
+
+    showSuccessSnackbar('Tarjeta eliminada correctamente');
+  } catch (e) {
+    print('❌ Error al eliminar: $e');
+    showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
+  } finally {
+    isLoading.value = false;
   }
+}
 
   /// Formatear número de tarjeta para display
   String formatCardNumber(String last4, String brand) {

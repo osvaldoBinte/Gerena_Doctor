@@ -132,20 +132,18 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         ),
       ),
       body: Obx(() {
-    // En el build donde muestras PatientProfileScreen
 if (profileController.showPatientProfile.value) {
   final appointment = profileController.selectedAppointment.value;
-  final photoUrl = calendarController.getAppointmentPhoto(appointment.id);
-  final extraData = calendarController.getAppointmentExtraData(appointment.id);
+  final appointmentEntity = calendarController.getAppointmentEntity(appointment.id);
   
-  return PatientProfileScreen(
-    appointment: appointment,
-    photoUrl: photoUrl,
-    extraData: extraData,
-    onClose: () {
-      profileController.hidePatientProfileView();
-    },
-  );
+  if (appointmentEntity != null) {
+    return PatientProfileScreen(
+      appointmentEntity: appointmentEntity,
+      onClose: () {
+        profileController.hidePatientProfileView();
+      },
+    );
+  }
 }
 
         if (publicationController.isLoading.value &&
@@ -216,63 +214,74 @@ if (profileController.showPatientProfile.value) {
   }
 
   Widget _buildFirstPageWithScroll(double availableHeight) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (scrollNotification) {
-        if (scrollNotification is ScrollEndNotification) {
-          if (_internalScrollController.position.pixels >=
-              _internalScrollController.position.maxScrollExtent - 10) {
-            Future.delayed(Duration(milliseconds: 100), () {
-              if (_pageController.hasClients && mounted) {
-                _pageController.nextPage(
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                );
-              }
-            });
-          }
+  return NotificationListener<ScrollNotification>(
+    onNotification: (scrollNotification) {
+      if (scrollNotification is ScrollEndNotification) {
+        if (_internalScrollController.position.pixels >=
+            _internalScrollController.position.maxScrollExtent - 10) {
+          Future.delayed(Duration(milliseconds: 100), () {
+            if (_pageController.hasClients && mounted) {
+              _pageController.nextPage(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }
+          });
         }
-        return false;
-      },
-      child: Container(
-        height: availableHeight,
-        child: Column(
-          children: [
-            Container(
-              height: 100,
-              color: GerenaColors.backgroundColorFondo,
-              child: Obx(() {
-                if (storyController.isLoading.value &&
-                    storyController.allStories.isEmpty) {
-                  return const StoryRingLoading(multiple: true);
-                }
+      }
+      return false;
+    },
+    child: Container(
+      height: availableHeight,
+      child: Column(
+        children: [
+          Container(
+            height: 100,
+            color: GerenaColors.backgroundColorFondo,
+            child: Obx(() {
+              if (storyController.isLoading.value &&
+                  storyController.allStories.isEmpty) {
+                return const StoryRingLoading(multiple: true);
+              }
 
-                final totalStories = storyController.allStories.length;
+              final totalStories = storyController.allStories.length;
 
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: totalStories + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return MyStoryRingWidget(
-                        size: 80,
-                      );
-                    }
-
-                    return Container(
-                      margin: const EdgeInsets.only(
-                          right: 12, top: 8, bottom: 8),
-                      child: StoryRingWidget(
-                        index: index - 1,
-                        size: 80,
-                      ),
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: totalStories + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return MyStoryRingWidget(
+                      size: 80,
                     );
-                  },
-                );
-              }),
-            ),
+                  }
 
-            Expanded(
+                  return Container(
+                    margin: const EdgeInsets.only(
+                        right: 12, top: 8, bottom: 8),
+                    child: StoryRingWidget(
+                      index: index - 1,
+                      size: 80,
+                    ),
+                  );
+                },
+              );
+            }),
+          ),
+
+          // NUEVO: RefreshIndicator envolviendo el Expanded
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await publicationController.refreshPosts();
+                await calendarController.loadAppointmentsForDate(
+                  calendarController.focusedDate.value,
+                );
+              },
+              // IMPORTANTE: Necesario para que funcione en la parte superior
+              displacement: 40,
+              edgeOffset: 0,
               child: SingleChildScrollView(
                 controller: _internalScrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -322,11 +331,12 @@ if (profileController.showPatientProfile.value) {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildLoadingState(double availableHeight) {
     return Container(
