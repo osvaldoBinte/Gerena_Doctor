@@ -5,5 +5,6 @@ abstract class FollowerRepository {
   Future<void> followUser(int userId);
   Future<void> unfollowUser(int userId);
   Future<FollowStatusEntity> getFollowStatus(int userId);
-  Future<List<FollowUserEntity>> getFollows();
+  Future<List<FollowUserEntity>> getFollowingByUser(int userid);
+  Future<List<FollowUserEntity>> getUserFollowers(int userid);
 }

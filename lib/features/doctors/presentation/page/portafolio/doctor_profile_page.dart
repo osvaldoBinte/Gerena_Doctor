@@ -10,6 +10,7 @@ import 'package:gerena/features/doctors/presentation/widget/share_and_procedures
 import 'package:gerena/features/home/dashboard/widget/appbar/gerena_app_bar_controller.dart';
 import 'package:gerena/common/controller/mediacontroller/media_controller.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
+import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:get/get.dart';
 
 class DoctorProfileContent extends StatefulWidget {
@@ -24,6 +25,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
   final appBarController = Get.put(GerenaAppBarController());
   final MediaController mediaController = Get.put(MediaController());
   final ProceduresController proceduresController = Get.find<ProceduresController>();
+  final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
 
   @override
   void dispose() {
@@ -41,14 +43,29 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
           _buildDoctorInfoCard(),
           const SizedBox(height: 16),
          
-          ShareAndProceduresWidget(),
-          const SizedBox(height: 16),
+          Obx(() {
+            final subscription = subscriptionController.currentSubscription.value;
+            final planId = subscription?.subscriptionplanId;
+            final shouldShowPortfolio = planId == 3 || planId == 4;
+            
+            if (!shouldShowPortfolio) {
+              return SizedBox.shrink();
+            }
+            
+            return Column(
+              children: [
+                ShareAndProceduresWidget(),
+                const SizedBox(height: 16),
+              ],
+            );
+          }),
+          
           Text(
             'Reseñas de tus pacientes',
             style: GerenaColors.headingSmall,
           ),
           const SizedBox(height: 16),
-         ReviewsWidget(),
+          ReviewsWidget(),
         ],
       ),
     );

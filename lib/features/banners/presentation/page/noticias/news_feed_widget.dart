@@ -5,6 +5,7 @@ import 'package:gerena/features/banners/presentation/page/noticias/wigget/feed_w
 import 'package:gerena/features/banners/presentation/widgets/loading/news_feed_loading.dart';
 import 'package:gerena/features/blog/presentation/widget/mixed_blog_feed.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
+import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:get/get.dart'; 
 import 'package:gerena/common/theme/App_Theme.dart';
 
@@ -18,15 +19,15 @@ class NewsFeedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isCompact) {
-      return _buildCompactNewsFeed();
-    } else {
-      return _buildFullNewsFeed();
-    }
+   return _buildFullNewsFeed();
   }
 
   Widget _buildFullNewsFeed() {
     final BannerController controller = Get.find<BannerController>();
+    
+    final SubscriptionController? subscriptionController = Get.isRegistered<SubscriptionController>() 
+        ? Get.find<SubscriptionController>() 
+        : null;
     
     return Obx(() {
       if (controller.isLoading.value) {
@@ -56,6 +57,10 @@ class NewsFeedWidget extends StatelessWidget {
         );
       }
 
+      final subscription = subscriptionController?.currentSubscription.value;
+      final planId = subscription?.subscriptionplanId;
+      final shouldShowBlog = planId == 4;
+
       return ListView(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -65,94 +70,9 @@ class NewsFeedWidget extends StatelessWidget {
             maxBanners: 2, 
           ),
           const SizedBox(height: 30),
-          MixedBlogFeed()
+          
+          if (shouldShowBlog) MixedBlogFeed(),
         ],
-      );
-    });
-  }
-
-  Widget _buildCompactNewsFeed() {
-    final BannerController controller = Get.find<BannerController>();
-    
-    return Obx(() {
-      if (controller.isLoading.value) {
-        return NewsFeedLoading(isCompact: true);
-      }
-      
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
-              child: Row(
-                children: [
-                  Text(
-                    'NOTICIAS',
-                    style: TextStyle(
-                      color: GerenaColors.textLightColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            if (controller.banners.isEmpty)
-              buildCompactNewsCard(
-                'BLOG',
-                'Aplicaciones de tóxina botulínica',
-                'Dr. Juan Pérez',
-                onTap: () {
-                  _navigateToForum();
-                },
-              )
-            else
-              ...controller.banners.take(2).map((banner) => Column(
-                children: [
-                  buildCompactNewsCard(
-                    'PROMO',
-                    banner.nombre ?? 'Promoción especial',
-                    'Ver detalles',
-                    onTap: () {
-                      _navigateToForum();
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                ],
-              )),
-            
-            const SizedBox(height: 8),
-            buildCompactNewsCard(
-              'BLOG',
-              'Aplicaciones de tóxina botulínica',
-              'Dr. Juan Pérez',
-              onTap: () {
-                _navigateToForum();
-              },
-            ),
-            const SizedBox(height: 8),
-            buildCompactNewsCard(
-              'FORO',
-              '¿Recomendación de marcas para ácido hialurónico?',
-              '82 comentarios',
-              onTap: () {
-                _navigateToForum();
-              },
-            ),
-            const SizedBox(height: 8),
-            buildCompactNewsCard(
-              'BLOG',
-              'Casos reales: cómo fidelicé a mis pacientes',
-              'Blog Social',
-              onTap: () {
-                _navigateToForum();
-              },
-            ),
-          ],
-        ),
       );
     });
   }

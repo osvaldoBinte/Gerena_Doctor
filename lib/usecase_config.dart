@@ -13,6 +13,8 @@ import 'package:gerena/features/auth/data/repositories/auth_repository_imp.dart'
 import 'package:gerena/features/auth/domain/usecase/confirm_password_reset_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/request_password_code_usecase.dart';
+import 'package:gerena/features/followers/domain/usecase/get_following_by_user_usecase.dart';
+import 'package:gerena/features/followers/domain/usecase/get_user_followers_usecase.dart';
 import 'package:gerena/features/notification/domain/usecase/save_token_fcm_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
 import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
@@ -45,7 +47,6 @@ import 'package:gerena/features/followers/data/datasources/follower_data_sources
 import 'package:gerena/features/followers/data/repositories/follower_repository_imp.dart';
 import 'package:gerena/features/followers/domain/usecase/follow_user_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/get_follow_status_usecase.dart';
-import 'package:gerena/features/followers/domain/usecase/get_follows_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/unfollow_user_usecase.dart';
 import 'package:gerena/features/marketplace/data/datasources/addresses_data_sources_imp.dart';
 import 'package:gerena/features/marketplace/data/datasources/marketplace_data_sources_imp.dart';
@@ -256,7 +257,8 @@ class UsecaseConfig {
    FollowUserUsecase? followUserUsecase;
    UnfollowUserUsecase? unfollowUserUsecase;
    GetFollowStatusUsecase? getFollowStatusUsecase;
-   GetFollowsUsecase? getFollowsUsecase;
+   GetUserFollowersUsecase? getUserFollowersUsecase;
+   GetFollowingByUserUsecase?getFollowingByUserUsecase;
 
    GetUserDetailsByIdUsecase? getUserDetailsByIdUsecase;
    SearchProfileUsecase? searchProfileUsecase;
@@ -407,7 +409,8 @@ class UsecaseConfig {
       followUserUsecase = FollowUserUsecase(followerRepository: followerRepositoryImp!);
       unfollowUserUsecase = UnfollowUserUsecase(followerRepository: followerRepositoryImp!);
       getFollowStatusUsecase = GetFollowStatusUsecase(followerRepository: followerRepositoryImp!);
-      getFollowsUsecase = GetFollowsUsecase(followerRepository: followerRepositoryImp!);
+      getFollowingByUserUsecase = GetFollowingByUserUsecase(followerRepository: followerRepositoryImp!);
+      getUserFollowersUsecase = GetUserFollowersUsecase(followerRepository: followerRepositoryImp!);
 
 
       getUserDetailsByIdUsecase = GetUserDetailsByIdUsecase(userRepository: userRepositoryImp!);

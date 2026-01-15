@@ -6,6 +6,8 @@ import 'package:gerena/features/auth/presentacion/page/Splash/splash_page.dart';
 import 'package:gerena/features/auth/presentacion/page/login/login_page.dart';
 import 'package:gerena/features/auth/presentacion/page/passwordreset/password_reset_page.dart';
 import 'package:gerena/features/doctors/presentation/page/patientVie/patient_view_page.dart';
+import 'package:gerena/features/followers/presentation/page/followers_following_page.dart';
+import 'package:gerena/features/followers/presentation/page/user_followers_following_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/historial_de_pedidos_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/get_medications_page.dart';
@@ -55,7 +57,30 @@ class AppPages {
     GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),
     GetPage(name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
     GetPage(name: RoutesNames.passwordreset, page: () => PasswordResetPage()),
+ GetPage(
+      name: RoutesNames.followersFollowing,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>?;
+        final initialTab = args?['initialTab'] as int? ?? 0;
 
+        return FollowersFollowingPage(initialTab: initialTab);
+      },
+    ),
+    GetPage(
+      name: RoutesNames.followersFollowingGeneric,
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>;
+        final userId = args['userId'] as int;
+        final userName = args['userName'] as String;
+        final initialTab = args['initialTab'] as int? ?? 0;
+
+        return FollowersFollowingGenericPage(
+          userId: userId,
+          userName: userName,
+          initialTab: initialTab,
+        );
+      },
+    ),
     GetPage(
       name: '/home',
       page: () => Scaffold(

@@ -12,9 +12,10 @@ import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/doctors/presentation/widget/loading/doctor_profile_loading.dart';
 import 'package:gerena/features/doctors/presentation/widget/share_and_procedures_widget.dart';
-import 'package:gerena/features/followers/presentation/page/follower_controller.dart';
+import 'package:gerena/features/followers/presentation/controller/follower_controller.dart';
 import 'package:gerena/features/publications/presentation/page/create/create_publication_modal.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
+import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/procedure_Widget.dart';
 import 'package:gerena/movil/widgets/review_widget.dart';
@@ -28,15 +29,17 @@ class DoctorProfilePage extends StatefulWidget {
   @override
   _DoctorProfilePageState createState() => _DoctorProfilePageState();
 }
-
 class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final StartController controller = Get.find<StartController>();
   final MediaController mediaController = Get.put(MediaController());
-  final PromotionController promotionController = Get.put(PromotionController());
-  final PrefilDortorController doctorController = Get.find<PrefilDortorController>();
+  final PromotionController promotionController =
+      Get.put(PromotionController());
+  final PrefilDortorController doctorController =
+      Get.find<PrefilDortorController>();
   final ControllerPerfilConfiguration perfilConfiguration =
       Get.put(ControllerPerfilConfiguration(), tag: 'doctor');
   final FollowerController followerController = Get.find<FollowerController>();
+  final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +71,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
         return RefreshIndicator(
           onRefresh: () async {
             await Future.wait([
-             // doctorController.loadDoctorProfile(),
+              // doctorController.loadDoctorProfile(),
               followerController.refreshFollowStatus(),
             ]);
           },
@@ -84,7 +87,6 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 const SizedBox(height: 16),
-                // NUEVA SECCIÓN DE ESTADÍSTICAS
                 _buildStatsSection(),
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
@@ -105,18 +107,38 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    'PORTAFOLIO',
-                    style: GerenaColors.headingSmall,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: ShareAndProceduresWidget(),
-                ),
+                
+                Obx(() {
+                  final subscription = subscriptionController.currentSubscription.value;
+                  final planId = subscription?.subscriptionplanId;
+                  final shouldShowPortfolio = planId == 3 || planId == 4;
+                  
+                  if (!shouldShowPortfolio) {
+                    return SizedBox.shrink();
+                  }
+                  
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          'PORTAFOLIO',
+                          style: GerenaColors.headingSmall,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: ShareAndProceduresWidget(),
+                      ),
+                      const SizedBox(height: 16),
+                      Divider(height: 2, color: GerenaColors.dividerColor),
+                      const SizedBox(height: 16),
+                    ],
+                  );
+                }),
+                
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -149,7 +171,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                                 Get.toNamed(RoutesNames.loginPage);
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
                                 child: Row(
                                   children: [
                                     Text(
@@ -177,12 +200,13 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     );
   }
 
+
   // 🔥 NUEVA SECCIÓN DE ESTADÍSTICAS
   Widget _buildStatsSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
-      final isLoadingStats = followerController.isLoading.value && 
-                             followerController.followStatus.value == null;
+      final isLoadingStats = followerController.isLoading.value &&
+          followerController.followStatus.value == null;
 
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -217,6 +241,10 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                     label: 'Seguidores',
                     value: '${followerController.totalFollowers}',
                     color: GerenaColors.secondaryColor,
+                    onTap: () {
+                      Get.toNamed(RoutesNames.followersFollowing,
+                          arguments: {'initialTab': 0});
+                    },
                   ),
                   _buildVerticalDivider(),
                   _buildStatItem(
@@ -224,6 +252,10 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                     label: 'Siguiendo',
                     value: '${followerController.totalFollowing}',
                     color: GerenaColors.accentColor,
+                    onTap: () {
+                      Get.toNamed(RoutesNames.followersFollowing,
+                          arguments: {'initialTab': 1});
+                    },
                   ),
                 ],
               ),
@@ -236,41 +268,46 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     required String label,
     required String value,
     required Color color,
+    VoidCallback? onTap,
   }) {
     return Expanded(
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 24,
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: GoogleFonts.rubik(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: GerenaColors.textPrimaryColor,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: GoogleFonts.rubik(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: GerenaColors.textPrimaryColor,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: GoogleFonts.rubik(
+                fontSize: 12,
+                color: GerenaColors.textSecondaryColor,
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.rubik(
-              fontSize: 12,
-              color: GerenaColors.textSecondaryColor,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -445,7 +482,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: doctorController.selectedImageFile.value != null
+                            child: doctorController.selectedImageFile.value !=
+                                    null
                                 ? Image.file(
                                     doctorController.selectedImageFile.value!,
                                     fit: BoxFit.cover,
@@ -454,9 +492,11 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                                     ? Image.network(
                                         doctor.foto!,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) {
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
                                           return Container(
-                                            color: GerenaColors.backgroundColorfondo,
+                                            color: GerenaColors
+                                                .backgroundColorfondo,
                                             child: const Icon(
                                               Icons.person,
                                               size: 50,
@@ -466,7 +506,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                                         },
                                       )
                                     : Container(
-                                        color: GerenaColors.backgroundColorfondo,
+                                        color:
+                                            GerenaColors.backgroundColorfondo,
                                         child: const Icon(
                                           Icons.person,
                                           size: 50,
@@ -499,7 +540,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                               : Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () => doctorController.pickAndUploadProfilePhoto(),
+                                    onTap: () => doctorController
+                                        .pickAndUploadProfilePhoto(),
                                     borderRadius: BorderRadius.circular(20),
                                     child: Container(
                                       padding: EdgeInsets.all(8),
@@ -527,7 +569,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       ],
                     ),
                     SizedBox(height: GerenaColors.paddingExtraLarge),
-                    GerenaColors.createStarRating(rating: doctor.calificaion ?? 0),
+                    GerenaColors.createStarRating(
+                        rating: doctor.calificaion ?? 0),
                     const SizedBox(width: 4),
                     Row(
                       children: [
@@ -613,7 +656,6 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       },
                     ),
                   ),
-                 
                 ],
               ),
             ),
@@ -629,15 +671,16 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                       text: 'PUBLICAR',
                       borderRadius: 30,
                       onPressed: () {
-                       Get.bottomSheet(
-                    Container(
-                      height: MediaQuery.of(Get.context!).size.height * 0.9,
-                      child: const CreatePublication(),
-                    ),
-                    isScrollControlled: true,
-                    isDismissible: true,
-                    enableDrag: true,
-                  );
+                        Get.bottomSheet(
+                          Container(
+                            height:
+                                MediaQuery.of(Get.context!).size.height * 0.9,
+                            child: const CreatePublication(),
+                          ),
+                          isScrollControlled: true,
+                          isDismissible: true,
+                          enableDrag: true,
+                        );
                       },
                     ),
                   ),

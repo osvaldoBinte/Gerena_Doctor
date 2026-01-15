@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
@@ -552,60 +553,95 @@ class _DoctorProfilePageState extends State<DoctorProfileByidPage> {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Reseñas
           _buildStatColumn(
             'Reseñas',
             "$reviews ${reviews == 1 ? 'reseña' : 'reseñas'}",
             GerenaColors.primaryColor,
           ),
 
-          // Seguidores
           _buildStatColumn(
             'Seguidores',
             isLoading
                 ? '...'
                 : "$followers ${followers == 1 ? 'seguidor' : 'seguidores'}",
             GerenaColors.primaryColor,
+             onTap: () {
+              final id = doctorController.doctorId;
+              if (id != null) {
+                Get.toNamed(
+                  RoutesNames.followersFollowingGeneric,
+                  arguments: {
+                    'userId': id,
+                    'userName': doctorController.doctorName,
+                    'initialTab': 0,
+                  },
+                );
+              }
+            },
           ),
 
-          // Siguiendo
           _buildStatColumn(
             'Siguiendo',
             isLoading ? '...' : "$following seguidos",
             GerenaColors.primaryColor,
+             onTap: () {
+              final id = doctorController.doctorId;
+              if (id != null) {
+                Get.toNamed(
+                  RoutesNames.followersFollowingGeneric,
+                  arguments: {
+                    'userId': id,
+                    'userName': doctorController.doctorName,
+                    'initialTab': 1,
+                  },
+                );
+              }
+            },
           ),
         ],
       );
     });
   }
 
-  Widget _buildStatColumn(String label, String value, Color color) {
+  Widget _buildStatColumn(
+    String label,
+    String value,
+    Color color, {
+    VoidCallback? onTap,
+  }) {
     return Flexible(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Rubik',
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: GerenaColors.textTertiary,
-            ),
-            overflow: TextOverflow.ellipsis,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Rubik',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: GerenaColors.textTertiary,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 4),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: color,
+                  fontWeight: FontWeight.w500,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
           ),
-          SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w500,
-            ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ],
+        ),
       ),
     );
   }

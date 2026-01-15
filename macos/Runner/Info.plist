@@ -12,7 +12,8 @@
 	<string>Gerena</string>
 	<key>CFBundleName</key>
 	<string>Gerena</string>
-
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -32,7 +33,20 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.utilities</string>
+	<string>public.app-category.social-networking</string>
+
+	<!-- AGREGAR ESTAS LÍNEAS -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Gerena necesita acceso a tu biblioteca de fotos para que puedas compartir imágenes en tus publicaciones y actualizar tu foto de perfil.</string>
+	
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Gerena necesita guardar fotos en tu biblioteca para que puedas descargar imágenes compartidas.</string>
+	
+	<key>NSCameraUsageDescription</key>
+	<string>Gerena necesita acceso a tu cámara para que puedas tomar fotos y compartirlas en la aplicación.</string>
+	
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Gerena necesita acceso a tu micrófono para grabación de audio en tus publicaciones.</string>
 
 </dict>
 </plist>

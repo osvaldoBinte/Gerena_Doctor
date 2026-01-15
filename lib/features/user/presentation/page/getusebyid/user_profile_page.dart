@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
@@ -259,47 +260,81 @@ class UserProfilePage extends StatelessWidget {
             'Seguidores',
             '$followersCount ${followersCount == 1 ? 'seguidor' : 'seguidores'}',
             GerenaColors.primaryColor,
+             onTap: () {
+              final id = controller.userId;
+              if (id != null) {
+                Get.toNamed(
+                  RoutesNames.followersFollowingGeneric,
+                  arguments: {
+                    'userId': id,
+                    'userName': controller.userName,
+                    'initialTab': 0,
+                  },
+                );
+              }
+            },
           ),
           _buildStatColumn(
             'Seguidos',
             '$followingCount seguidos',
             GerenaColors.primaryColor,
+            onTap: () {
+              final id = controller.userId;
+              if (id != null) {
+                Get.toNamed(
+                  RoutesNames.followersFollowingGeneric,
+                  arguments: {
+                    'userId': id,
+                    'userName': controller.userName,
+                    'initialTab': 1,
+                  },
+                );
+              }
+            },
           ),
         ],
       );
     });
   }
 
-  Widget _buildStatColumn(String label, String value, Color color) {
-    return Flexible(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Rubik',
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: GerenaColors.textTertiary,
+ 
+Widget _buildStatColumn(String label, String value, Color color, {VoidCallback? onTap}) {
+  return Flexible(
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Rubik',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: GerenaColors.textTertiary,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 12,
-              color: color,
-              fontWeight: FontWeight.w500,
+            SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ],
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPublicationsSection() {
     return Obx(() {

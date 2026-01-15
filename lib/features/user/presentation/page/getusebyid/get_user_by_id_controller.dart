@@ -1,6 +1,6 @@
 
 import 'package:gerena/common/widgets/snackbar_helper.dart';
-import 'package:gerena/features/followers/presentation/page/follower_user_controller.dart';
+import 'package:gerena/features/followers/presentation/controller/follower_user_controller.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/image_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';

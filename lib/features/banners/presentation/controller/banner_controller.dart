@@ -7,13 +7,10 @@ class BannerController extends GetxController {
   
   BannerController({required this.getBannersUsecase});
 
-  // Observable list de banners
   final RxList<BannersEntity> banners = <BannersEntity>[].obs;
   
-  // Loading state
   final RxBool isLoading = false.obs;
   
-  // Error state
   final RxString errorMessage = ''.obs;
 
   @override

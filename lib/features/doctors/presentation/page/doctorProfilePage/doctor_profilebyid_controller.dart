@@ -5,7 +5,7 @@ import 'package:gerena/features/doctorprocedures/domain/usecase/get_procedures_b
 import 'package:gerena/features/doctorprocedures/domain/usecase/get_procedures_usecase.dart';
 import 'package:gerena/features/doctors/domain/entities/finddoctors/docotor_by_id_entity.dart';
 import 'package:gerena/features/doctors/domain/usecase/fetch_doctor_by_id_usecase.dart';
-import 'package:gerena/features/followers/presentation/page/follower_user_controller.dart';
+import 'package:gerena/features/followers/presentation/controller/follower_user_controller.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_doctor_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';

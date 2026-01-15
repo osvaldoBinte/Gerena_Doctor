@@ -56,24 +56,3 @@ Widget buildWishlistButton({
     ),
   );
 }
-
-  Widget buildWebinarCard() {
-    return ClipRRect(
-    borderRadius: GerenaColors.smallBorderRadius,
-    child: Image.asset(
-      'assets/Webinar.png',
-      fit: BoxFit.cover,
-      width: double.infinity,
-    ),
-  );
-  }
-Widget buildPromoCard() {
-  return ClipRRect(
-    borderRadius: GerenaColors.smallBorderRadius,
-    child: Image.asset(
-      'assets/example/promocion.png',
-      fit: BoxFit.cover,
-      width: double.infinity,
-    ),
-  );
-}

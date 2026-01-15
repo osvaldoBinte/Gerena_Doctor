@@ -21,6 +21,16 @@ class LoginController extends GetxController {
   final LoginUsecase loginUsecase;
   final SaveTokenFcmUsecase saveTokenFcmUsecase;
 
+  // Mapeo de roles a rutas
+  static const Map<String, String> _areaRoutes = {
+    'doctor': RoutesNames.homePage,
+  };
+
+  // NUEVO: Mapeo de roles a rutas para desktop/web
+  static const Map<String, String> _areaRoutesDesktop = {
+    'doctor': RoutesNames.dashboardSPage,
+  };
+
   LoginController({
     required this.loginUsecase,
     required this.saveTokenFcmUsecase,
@@ -68,16 +78,43 @@ class LoginController extends GetxController {
 
       await _authService.saveLoginResponse(loginResponse);
 
-      // NUEVO: Guardar token FCM después del login exitoso
+      // Guardar token FCM después del login exitoso
       await _saveDeviceToken();
 
       _clearFields();
       await _resetControllersForNewSession();
       
+      // Obtener rol del usuario
+      final rol = await _authService.getRol();
+      
+      // MODIFICADO: Validar rol según la plataforma
       if (GetPlatform.isMobile) {
-        Get.offAllNamed(RoutesNames.homePage, arguments: 0);
+        final route = _areaRoutes[rol];
+
+        if (route == null) {
+          await _authService.logout();
+          _showErrorAlert(
+            'ACCESO DENEGADO',
+            'No tiene acceso a esta aplicación.\n\nContacta al administrador para obtener los permisos necesarios.',
+          );
+          return;
+        }
+
+        Get.offAllNamed(route);
       } else {
-        Get.toNamed(RoutesNames.dashboardSPage);
+        // Desktop/Web
+        final route = _areaRoutesDesktop[rol];
+
+        if (route == null) {
+          await _authService.logout();
+          _showErrorAlert(
+            'ACCESO DENEGADO',
+            'No tiene acceso a esta aplicación.\n\nContacta al administrador para obtener los permisos necesarios.',
+          );
+          return;
+        }
+
+        Get.toNamed(route);
       }
     } catch (e) {
       _showErrorAlert(
@@ -90,7 +127,6 @@ class LoginController extends GetxController {
     }
   }
 
-  // NUEVO: Método para guardar el token FCM
   Future<void> _saveDeviceToken() async {
     try {
       // Solo guardar token en dispositivos móviles
@@ -111,21 +147,17 @@ class LoginController extends GetxController {
       String deviceType = _getDeviceType();
 
       print('📤 Guardando token FCM en el servidor...');
-      print('   - Token: ${fcmToken}...');
+      print('   - Token: ${fcmToken.substring(0, 20)}...');
       print('   - Dispositivo: $deviceType');
 
-      // Guardar el token en el backend
       await saveTokenFcmUsecase.execute(fcmToken, deviceType);
 
       print('✅ Token FCM guardado exitosamente');
     } catch (e) {
-      // No bloqueamos el login si falla el guardado del token
       print('❌ Error al guardar token FCM: $e');
-      // Opcional: podrías enviar esto a un servicio de logging
     }
   }
 
-  // NUEVO: Detectar el tipo de dispositivo
   String _getDeviceType() {
     if (GetPlatform.isAndroid) {
       return 'Android';

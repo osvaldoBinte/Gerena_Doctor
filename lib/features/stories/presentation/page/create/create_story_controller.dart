@@ -3,8 +3,8 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+//import 'package:ffmpeg_kit_min_gpl/ffmpeg_kit.dart';
+//import 'package:ffmpeg_kit_min_gpl/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -275,7 +275,7 @@ class CreateStoryController extends GetxController {
       debugPrint('   Output: $outputPath');
 
       // Ejecutar FFmpeg
-      final session = await FFmpegKit.execute(command);
+     /* final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
       final output = await session.getOutput();
 
@@ -303,7 +303,7 @@ class CreateStoryController extends GetxController {
         
         isProcessingVideo.value = false;
         return capturedFile.value;
-      }
+      }*/
     } catch (e, stackTrace) {
       debugPrint('💥 Error: $e');
       debugPrint('📚 Stack: $stackTrace');

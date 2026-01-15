@@ -12,23 +12,23 @@ class StartPage extends StatelessWidget {
 
     return WillPopScope(
       onWillPop: () async {
-        // Manejar el botón de retroceso
         return await controller.handleBackButton();
       },
-      child: Obx(() => GerenaColors.createMainScaffold(
-        body: controller.currentPage,
-        currentIndex: controller.selectedIndex.value,
-        onNavigationTap: controller.changePage,
-        iconPaths: [
-          controller.getIconPath(0),
-          controller.getIconPath(1),
-          controller.getIconPath(2),
-          controller.getIconPath(3),
-          controller.getIconPath(4),
-        ],
-        backgroundColor: GerenaColors.backgroundColorFondo,
-        bottomNavBackgroundColor: GerenaColors.backgroundColor,
-      )),
+      child: Obx(() {
+        final _ = controller.shouldShowBlog;
+        
+        return GerenaColors.createMainScaffold(
+          body: controller.currentPage,
+          currentIndex: controller.selectedIndex.value,
+          onNavigationTap: controller.changePage,
+          iconPaths: List.generate(
+            controller.iconPaths.length,
+            (index) => controller.getIconPath(index),
+          ),
+          backgroundColor: GerenaColors.backgroundColorFondo,
+          bottomNavBackgroundColor: GerenaColors.backgroundColor,
+        );
+      }),
     );
   }
 }

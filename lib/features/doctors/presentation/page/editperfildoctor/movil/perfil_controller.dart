@@ -33,11 +33,7 @@ class PerfilController extends GetxController {
         title: '¡Encantada con el doctor!',
         content: 'Te explica súper bien todo el tratamiento, resuelve todas tus dudas, es amable y usa productos de calidad. Me encantaron los resultados.',
         images: [
-          'assets/before/before_after_1.png',
-          'assets/before/before_after.png',
-          'assets/before/image3.png',
-          'assets/before/image4.png',
-          'assets/before/image5.png',
+          'assets/icons/FOTOGRAFIA.png',
         ],
         userRole: 'Dr. Juan González',
         rating: 5.0,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/services/notification_service.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profilebyid_controller.dart';
 import 'package:gerena/features/doctors/presentation/page/doctorProfilePage/doctor_profile_page.dart';
@@ -7,12 +8,12 @@ import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
 import 'package:gerena/features/publications/presentation/page/home_page.dart';
+import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/get_user_by_id_controller.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/user_profile_page.dart';
 import 'package:gerena/features/user/presentation/page/search/search_profile_page.dart';
 import 'package:get/get.dart';
 
-// NUEVO: Enum para identificar tipos de página
 enum PageType {
   home,
   blog,
@@ -24,7 +25,6 @@ enum PageType {
   search,
 }
 
-// NUEVO: Clase para el historial de navegación
 class NavigationHistoryItem {
   final PageType pageType;
   final int? pageIndex;
@@ -37,43 +37,158 @@ class NavigationHistoryItem {
   });
 }
 
-class StartController extends GetxController {
-  final List<Widget> pages = [
-    const HomePageMovil(),
-    const BlogGerena(),
-    CategoryPage(),
-    NotificationPage(),
-    DoctorProfilePage(),
-  ];
+class StartController extends GetxController with WidgetsBindingObserver {
+  SubscriptionController? get _subscriptionController {
+    try {
+      return Get.find<SubscriptionController>();
+    } catch (e) {
+      print('⚠️ SubscriptionController no encontrado: $e');
+      return null;
+    }
+  }
 
-  final List<String> iconPaths = [
-    'assets/icons/home/Home.png',
-    'assets/icons/home/Blog.png',
-    'assets/icons/home/carrito.png', 
-    'assets/icons/home/notificaciones.png',
-    'assets/icons/home/Perfil.png',
-  ];
+  bool get shouldShowBlog {
+    final subscription = _subscriptionController?.currentSubscription.value;
+    final planId = subscription?.subscriptionplanId;
+    return planId == 4;
+  }
 
-  final List<String> selectedIconPaths = [
-    'assets/icons/home/select/Home.png',
-    'assets/icons/home/select/Blog.png',
-    'assets/icons/home/select/carrito.png', 
-    'assets/icons/home/select/notificacione.png', 
-    'assets/icons/home/select/Perfil.png',
-  ];
+  List<Widget> get pages {
+    if (shouldShowBlog) {
+      return [
+        const HomePageMovil(),
+        const BlogGerena(),  
+        CategoryPage(),
+        NotificationPage(),
+        DoctorProfilePage(),
+      ];
+    } else {
+      return [
+        const HomePageMovil(),
+        CategoryPage(),       
+        NotificationPage(),
+        DoctorProfilePage(),
+      ];
+    }
+  }
 
-  // NUEVO: Historial de navegación
+  List<String> get iconPaths {
+    if (shouldShowBlog) {
+      return [
+        'assets/icons/home/Home.png',
+        'assets/icons/home/Blog.png',
+        'assets/icons/home/carrito.png', 
+        'assets/icons/home/notificaciones.png',
+        'assets/icons/home/Perfil.png',
+      ];
+    } else {
+      return [
+        'assets/icons/home/Home.png',
+        'assets/icons/home/carrito.png',  
+        'assets/icons/home/notificaciones.png',
+        'assets/icons/home/Perfil.png',
+      ];
+    }
+  }
+
+  List<String> get selectedIconPaths {
+    if (shouldShowBlog) {
+      return [
+        'assets/icons/home/select/Home.png',
+        'assets/icons/home/select/Blog.png',
+        'assets/icons/home/select/carrito.png', 
+        'assets/icons/home/select/notificacione.png', 
+        'assets/icons/home/select/Perfil.png',
+      ];
+    } else {
+      return [
+        'assets/icons/home/select/Home.png',
+        'assets/icons/home/select/carrito.png',  
+        'assets/icons/home/select/notificacione.png', 
+        'assets/icons/home/select/Perfil.png',
+      ];
+    }
+  }
+
+  List<String> get notificationIconPaths {
+    if (shouldShowBlog) {
+      return [
+        'assets/icons/home/notificaciones.png',
+        'assets/icons/home/notification_new.png',
+      ];
+    } else {
+      return [
+        'assets/icons/home/notificaciones.png',
+        'assets/icons/home/notification_new.png',
+      ];
+    }
+  }
+
+  List<String> get selectedNotificationIconPaths {
+    if (shouldShowBlog) {
+      return [
+        'assets/icons/home/select/notificacione.png',
+        'assets/icons/home/select/notification_new.png',
+      ];
+    } else {
+      return [
+        'assets/icons/home/select/notificacione.png',
+        'assets/icons/home/select/notification_new.png',
+      ];
+    }
+  }
+
   final RxList<NavigationHistoryItem> navigationHistory = <NavigationHistoryItem>[].obs;
   
-  // NUEVO: Control para doble toque para salir
   DateTime? _lastBackPress;
   final Duration _exitTimeLimit = const Duration(seconds: 2);
+
+  final RxInt selectedIndex = 0.obs;
+  
+  final RxBool showDoctorProfile = false.obs;
+  final RxBool showUserProfile = false.obs;
+  final RxBool showSearchPage = false.obs;
+
+  final Rx<Map<String, dynamic>?> selectedDoctorData = Rx<Map<String, dynamic>?>(null);
+  final Rx<Map<String, dynamic>?> selectedUserData = Rx<Map<String, dynamic>?>(null);
+
+  final notificationService = NotificationService();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    print('🔄 Estado de app cambió a: $state');
+    
+    if (state == AppLifecycleState.resumed) {
+      print('📱 App regresó a primer plano - recargando notificaciones');
+      _reloadNotificationState();
+    } else if (state == AppLifecycleState.paused) {
+      print('⏸️ App fue a segundo plano');
+    } else if (state == AppLifecycleState.inactive) {
+      print('💤 App inactiva');
+    } else if (state == AppLifecycleState.detached) {
+      print('🗑️ App detached');
+    }
+  }
+
+  Future<void> _reloadNotificationState() async {
+    try {
+      await notificationService.reloadFromStorage();
+      print('✅ Estado de notificaciones recargado');
+      print('📬 Contador actual: ${notificationService.unreadNotificationsCount.value}');
+      print('🔔 Tiene nuevas: ${notificationService.hasNewNotifications.value}');
+      
+      update();
+    } catch (e) {
+      print('❌ Error recargando notificaciones: $e');
+    }
+  }
 
   void setInitialIndex(int index) {
     if (index >= 0 && index < pages.length) {
       selectedIndex.value = index;
       
-      // NUEVO: Agregar al historial
       _addToHistory(NavigationHistoryItem(
         pageType: _getPageTypeFromIndex(index),
         pageIndex: index,
@@ -83,26 +198,16 @@ class StartController extends GetxController {
     }
   }
 
-  final RxInt selectedIndex = 0.obs;
-  
   void hideUserPage() {
     showUserProfile.value = false;
     selectedUserData.value = null;
   }
-
-  final RxBool showDoctorProfile = false.obs;
-  final RxBool showUserProfile = false.obs;
-  final RxBool showSearchPage = false.obs;
-
-  final Rx<Map<String, dynamic>?> selectedDoctorData = Rx<Map<String, dynamic>?>(null);
-  final Rx<Map<String, dynamic>?> selectedUserData = Rx<Map<String, dynamic>?>(null);
 
   void showSearch() {
     showSearchPage.value = true;
     showDoctorProfile.value = false;
     showUserProfile.value = false;
     
-    // NUEVO: Agregar al historial
     _addToHistory(NavigationHistoryItem(
       pageType: PageType.search,
     ));
@@ -121,7 +226,13 @@ class StartController extends GetxController {
     selectedUserData.value = null;
     _hideAllOverlayPages();
     
-    // NUEVO: Agregar al historial
+    final notificationIndex = shouldShowBlog ? 3 : 2;
+    
+    if (index == notificationIndex) {
+      notificationService.clearUnreadCount();
+      print('🔔 Usuario en página de notificaciones - contador limpiado');
+    }
+    
     _addToHistory(NavigationHistoryItem(
       pageType: _getPageTypeFromIndex(index),
       pageIndex: index,
@@ -141,7 +252,6 @@ class StartController extends GetxController {
     showDoctorProfile.value = false;
     showSearchPage.value = false;
 
-    // NUEVO: Agregar al historial
     _addToHistory(NavigationHistoryItem(
       pageType: PageType.userProfile,
       data: userData,
@@ -165,7 +275,6 @@ class StartController extends GetxController {
     showDoctorProfile.value = true;
     showSearchPage.value = false;
 
-    // NUEVO: Agregar al historial
     _addToHistory(NavigationHistoryItem(
       pageType: PageType.doctorProfile,
       data: doctorData,
@@ -209,6 +318,27 @@ class StartController extends GetxController {
     !showSearchPage.value;
 
   String getIconPath(int index) {
+    // ✅ Ajustar índice de notificaciones según si hay blog
+    final notificationIndex = shouldShowBlog ? 3 : 2;
+    
+    if (index == notificationIndex) {
+      final hasNewNotifications = notificationService.hasNewNotifications.value;
+      
+      if (showUserProfile.value || showDoctorProfile.value || showSearchPage.value) {
+        return hasNewNotifications 
+            ? notificationIconPaths[1]
+            : notificationIconPaths[0];
+      }
+      
+      return selectedIndex.value == index
+          ? (hasNewNotifications 
+              ? selectedNotificationIconPaths[1]
+              : selectedNotificationIconPaths[0])
+          : (hasNewNotifications 
+              ? notificationIconPaths[1]
+              : notificationIconPaths[0]);
+    }
+    
     if (showUserProfile.value || showDoctorProfile.value || showSearchPage.value) {
       return iconPaths[index];
     }
@@ -221,45 +351,35 @@ class StartController extends GetxController {
   Map<String, dynamic>? get currentDoctorData => selectedDoctorData.value;
   Map<String, dynamic>? get currentUserData => selectedUserData.value;
 
-  // NUEVO: Método para manejar el botón de retroceso
   Future<bool> handleBackButton() async {
     print('🔙 Botón de retroceso presionado');
     print('📚 Historial actual: ${navigationHistory.length} páginas');
     
-    // Si hay más de una página en el historial
     if (navigationHistory.length > 1) {
-      // Remover la página actual
       navigationHistory.removeLast();
       
-      // Obtener la página anterior
       final previousPage = navigationHistory.last;
       
       print('⬅️ Navegando a: ${previousPage.pageType}');
       
-      // Navegar a la página anterior
       _navigateToHistoryItem(previousPage);
       
-      // No salir de la app
       return false;
     }
     
-    // Si solo hay una página (la inicial), verificar doble toque para salir
     final now = DateTime.now();
     
     if (_lastBackPress == null || now.difference(_lastBackPress!) > _exitTimeLimit) {
-      // Primer toque - mostrar mensaje
       _lastBackPress = now;
       showWarningSnackbar('Presiona de nuevo para salir de la aplicación');
       print('⚠️ Primer toque - esperando segundo toque');
       return false;
     }
     
-    // Segundo toque dentro del tiempo límite - permitir salir
     print('🚪 Segundo toque - saliendo de la aplicación');
     return true;
   }
 
-  // NUEVO: Navegar a un item del historial
   void _navigateToHistoryItem(NavigationHistoryItem item) {
     _hideAllOverlayPages();
     
@@ -296,9 +416,7 @@ class StartController extends GetxController {
     }
   }
 
-  // NUEVO: Agregar al historial (evita duplicados consecutivos)
   void _addToHistory(NavigationHistoryItem item) {
-    // Si el último item es el mismo, no agregarlo
     if (navigationHistory.isNotEmpty) {
       final lastItem = navigationHistory.last;
       if (lastItem.pageType == item.pageType && 
@@ -312,32 +430,51 @@ class StartController extends GetxController {
     print('➕ Agregado al historial: ${item.pageType} (Total: ${navigationHistory.length})');
   }
 
-  // NUEVO: Convertir índice a PageType
+  // ✅ Ajustar PageType según si hay blog
   PageType _getPageTypeFromIndex(int index) {
-    switch (index) {
-      case 0:
-        return PageType.home;
-      case 1:
-        return PageType.blog;
-      case 2:
-        return PageType.category;
-      case 3:
-        return PageType.notification;
-      case 4:
-        return PageType.profile;
-      default:
-        return PageType.home;
+    if (shouldShowBlog) {
+      switch (index) {
+        case 0:
+          return PageType.home;
+        case 1:
+          return PageType.blog;
+        case 2:
+          return PageType.category;
+        case 3:
+          return PageType.notification;
+        case 4:
+          return PageType.profile;
+        default:
+          return PageType.home;
+      }
+    } else {
+      switch (index) {
+        case 0:
+          return PageType.home;
+        case 1:
+          return PageType.category;
+        case 2:
+          return PageType.notification;
+        case 3:
+          return PageType.profile;
+        default:
+          return PageType.home;
+      }
     }
   }
 
   @override
   void onInit() {
     super.onInit();
+    
+    WidgetsBinding.instance.addObserver(this);
+    
+    _reloadNotificationState();
+    
     final arguments = Get.arguments;
     if (arguments is int) {
       setInitialIndex(arguments);
     } else {
-      // Agregar página inicial al historial si no se especifica
       _addToHistory(NavigationHistoryItem(
         pageType: PageType.home,
         pageIndex: 0,
@@ -347,6 +484,8 @@ class StartController extends GetxController {
 
   @override
   void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    
     navigationHistory.clear();
     _lastBackPress = null;
     super.onClose();

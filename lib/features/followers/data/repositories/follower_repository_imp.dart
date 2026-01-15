@@ -20,10 +20,15 @@ class FollowerRepositoryImp  extends FollowerRepository{
     return followerDataSourcesImp.getFollowStatus(userId,token);
   }
 
-  @override
-  Future<List<FollowUserEntity>> getFollows() async {
+  Future<List<FollowUserEntity>> getFollowingByUser(int userid)  async {
     final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
-    return followerDataSourcesImp.getFollows(token);
+    return await followerDataSourcesImp.getFollowingByUser(userid, token);
+  }
+  
+  @override
+  Future<List<FollowUserEntity>> getUserFollowers(int userid) async {
+    final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await followerDataSourcesImp.getUserFollowers(userid, token);
   }
 
   @override

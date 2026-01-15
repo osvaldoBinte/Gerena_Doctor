@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.3+1
 
 environment:
   sdk: ^3.5.3
@@ -36,21 +36,14 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   window_manager: ^0.4.3
-  sqflite: ^2.4.1
-  file_selector: ^1.0.3
-  flutter_bloc: ^9.1.0
   shared_preferences: ^2.5.3
   get: ^4.7.2
-  fl_chart: ^0.68.0
-  dotted_border: ^2.1.0
   path_provider: ^2.1.5
 
   flutter_dotenv: ^5.2.1
   syncfusion_flutter_calendar: ^29.1.38
-  calendar_view: ^1.4.0
   carousel_slider: ^5.0.0
   file_picker: ^10.1.9
-  bubble: ^1.2.1
   google_fonts: ^6.1.0
   url_launcher: ^6.3.2
   flutter_stripe: ^12.1.0
@@ -58,61 +51,60 @@ dependencies:
   image_picker: ^1.2.1
   camera: ^0.11.2+1
   photo_manager: ^3.8.2
-  ffmpeg_kit_flutter_new: ^4.1.0
+  #ffmpeg_kit_min_gpl: ^6.0.3+2-LTS
   firebase_core: ^4.3.0
   firebase_messaging: ^16.1.0
-  permission_handler: ^12.0.1
 
 
 
 
-flutter_native_splash:
-  color: "#004346"
-  image:  assets/logo/logo_ios.png
-  android: true
-  ios: true
-  ios_content_mode: scaleAspectFit 
-  android_12:
-    image: assets/logo/logo_ios.png
-    icon_background_color: "#004346"
-    image_dark: assets/logo/logo_ios.png
-    icon_background_color_dark: "#004346"
+#flutter_native_splash:
+ # color: "#004346"
+  #image:  assets/logo/logo_ios.png
+  #android: true
+  #ios: true
+  #ios_content_mode: scaleAspectFit 
+  #android_12:
+   # image: assets/logo/logo_ios.png
+   # icon_background_color: "#004346"
+    #image_dark: assets/logo/logo_ios.png
+    #icon_background_color_dark: "#004346"
 
 
 
 
 
 
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: "assets/logo/gerenalogo.jpg"
+#flutter_launcher_icons:
+ # android: true
+  #ios: true
+  #image_path: "assets/logo/gerenalogo.jpg"
 
-  image_path_ios: "assets/logo/gerenalogo.jpg"
-  image_path_android: "assets/logo/gerenalogo.jpg"
-  adaptive_icon_foreground: "assets/logo/gerenalogo.jpg"
-  adaptive_icon_background: "#FFFFFF"
-  macos:
-    generate: true
-    image_path: "assets/logo/logoAPP.jpg"
-  windows:
-    generate: true
-    image_path: "assets/logo/logoAPP.jpg"
-    icon_size: 48 # min:48, max:256, default: 48
-  linux:
-    generate: true
-    image_path: "assets/logo/logoAPP.jpg"
+  #image_path_ios: "assets/logo/gerenalogo.jpg"
+  #image_path_android: "assets/logo/gerenalogo.jpg"
+  #adaptive_icon_foreground: "assets/logo/gerenalogo.jpg"
+  #adaptive_icon_background: "#FFFFFF"
+  #macos:
+  #  generate: true
+  #  image_path: "assets/logo/logoAPP.jpg"
+  #windows:
+  #  generate: true
+  #  image_path: "assets/logo/logoAPP.jpg"
+  #  icon_size: 48 
+  #linux:
+   # generate: true
+    #image_path: "assets/logo/logoAPP.jpg"
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_localizations: # AGREGAR ESTA LÍNEA
+  flutter_localizations: 
     sdk: flutter
-  rename: ^3.0.1
-  change_app_package_name: ^1.1.0
-  flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.4.4
+  #rename: ^3.0.1
+ # change_app_package_name: ^1.1.0
+#  flutter_launcher_icons: ^0.13.1
+ # flutter_native_splash: ^2.4.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -161,9 +153,6 @@ flutter:
 
       - assets/categoryItem/categoryItembackground.png
       - assets/categoryItem/producto.png
-      - assets/before/before_after.png
-      - assets/before/before_after_1.png
-      - assets/before/beforeAndAfter.jpg
 
       - assets/icons/reacciones/recomendar.png
       - assets/icons/reacciones/meencanta.png
@@ -184,7 +173,6 @@ flutter:
       - assets/icons/preparando.png
       - assets/icons/logo_gerena.jpg
       - assets/icons/guardar.png
-      - assets/blog/example.png
       - assets/menu/MENUGERENA.png
       - assets/icons/headset_mic.png
       - assets/icons/close.png
@@ -208,7 +196,6 @@ flutter:
       - assets/icons/arrow_back_ios.png
       - assets/icons/camera_alt.png
       - assets/logo/logo_ios.png
-      - assets/example/promocion.png
 
 
       - assets/icons/home/Calendario.png
@@ -217,6 +204,7 @@ flutter:
       - assets/icons/home/Perfil.png
       - assets/icons/home/Blog.png
       - assets/icons/home/carrito.png
+      - assets/icons/home/notification_new.png
       - assets/icons/aadHistory.png
 
       - assets/icons/home/select/Calendario.png
@@ -225,6 +213,7 @@ flutter:
       - assets/icons/home/select/Perfil.png
       - assets/icons/home/select/Blog.png
       - assets/icons/home/select/carrito.png
+      - assets/icons/home/select/notification_new.png
 
       
   # An image asset can refer to one or more resolution-specific "variants", see
