@@ -7,6 +7,7 @@ import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/perfil/widgets_pefil.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/promotion_preview_widget.dart';
 import 'package:gerena/common/widgets/shareProcedureWidget/share_procedure_widget.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/controller_perfil_configuration.dart';
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_edit_page.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
@@ -29,6 +30,7 @@ class DoctorProfilePage extends StatefulWidget {
   @override
   _DoctorProfilePageState createState() => _DoctorProfilePageState();
 }
+
 class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final StartController controller = Get.find<StartController>();
   final MediaController mediaController = Get.put(MediaController());
@@ -39,7 +41,8 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final ControllerPerfilConfiguration perfilConfiguration =
       Get.put(ControllerPerfilConfiguration(), tag: 'doctor');
   final FollowerController followerController = Get.find<FollowerController>();
-  final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
+  final SubscriptionController subscriptionController =
+      Get.find<SubscriptionController>();
 
   @override
   Widget build(BuildContext context) {
@@ -107,16 +110,16 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 const SizedBox(height: 16),
-                
                 Obx(() {
-                  final subscription = subscriptionController.currentSubscription.value;
+                  final subscription =
+                      subscriptionController.currentSubscription.value;
                   final planId = subscription?.subscriptionplanId;
                   final shouldShowPortfolio = planId == 3 || planId == 4;
-                  
+
                   if (!shouldShowPortfolio) {
                     return SizedBox.shrink();
                   }
-                  
+
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -138,7 +141,6 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                     ],
                   );
                 }),
-                
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -199,7 +201,6 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
       }),
     );
   }
-
 
   // 🔥 NUEVA SECCIÓN DE ESTADÍSTICAS
   Widget _buildStatsSection() {
@@ -694,6 +695,29 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                         perfilConfiguration.showConfigurationView();
                       },
                     ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: GerenaColors.mediumRadius,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: GerenaColors.widgetButton(
+                          showShadow: false,
+                          text: 'Agendar Cita',
+                             borderRadius: 30,
+                          onPressed: () {
+                            ModalAgregarCita.show();
+                          },
+                        )),
                   ),
                 ],
               ),

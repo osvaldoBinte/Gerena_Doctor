@@ -10,12 +10,14 @@ class SearchProfileModel extends SearchProfileEntity {
       super.address,
       super.bibliography,
       super.averagerating,
+      super.username,
       super.rol});
 
   factory SearchProfileModel.fromJson(Map<String, dynamic> json) {
     return SearchProfileModel(
         userId: json['userId'] ?? 0,
         fullName: json['nombreCompleto'] ?? 'Sin nombre',
+        username: json['usuario'] ?? '',
         specialty: json['especialidad'],
         profilePictureUrl: json['foto'],
         expreriecetime: json['experienciaTiempo'],
@@ -30,6 +32,7 @@ class SearchProfileModel extends SearchProfileEntity {
       'userId': userId,
       'nombreCompleto': fullName,
       'especialidad': specialty,
+      'supername': username,
       'foto': profilePictureUrl,
       'experienciaTiempo': expreriecetime,
       'direccion': address,

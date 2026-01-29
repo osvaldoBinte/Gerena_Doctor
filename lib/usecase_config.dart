@@ -15,6 +15,7 @@ import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/request_password_code_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/get_following_by_user_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/get_user_followers_usecase.dart';
+import 'package:gerena/features/notification/domain/usecase/mark_all_notifications_as_read_usecase.dart';
 import 'package:gerena/features/notification/domain/usecase/save_token_fcm_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
 import 'package:gerena/features/banners/data/repositories/banners_repository_imp.dart';
@@ -132,7 +133,7 @@ class UsecaseConfig {
   FollowerRepositoryImp? followerRepositoryImp;
   UserRepositoryImp?userRepositoryImp;
 
-
+  
 
   UserDatasourceImp?userDatasourceImp;
    AuthDataSourcesImp? authDataSources;
@@ -225,6 +226,7 @@ class UsecaseConfig {
    MyReviewUsecase?myReviewUsecase;
 
    GetNotificationUsecase? getnotificationUsecase;
+   MarkAllNotificationsAsReadUsecase? markAllNotificationsAsReadUsecase;
 
    GetBlogGerenaUsecase? getBlogGerenaUsecase;
    GetBlogGerenaByIdUsecase? getBlogGerenaByIdUsecase;
@@ -374,7 +376,7 @@ class UsecaseConfig {
       myReviewUsecase = MyReviewUsecase(reviewRepository: reviewRepositoryImp!);
 
       getnotificationUsecase = GetNotificationUsecase(notificationRepository: notificationRepositoryImp!);
-
+      markAllNotificationsAsReadUsecase = MarkAllNotificationsAsReadUsecase(notificationRepository: notificationRepositoryImp!);
 
 
       

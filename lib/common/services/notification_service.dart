@@ -44,6 +44,10 @@ class NotificationService {
   final RxInt unreadNotificationsCount = 0.obs;
   final RxBool hasNewNotifications = false.obs;
   
+  // 🆕 Callbacks
+  Function? onNotificationReceived;  // Para actualizar UI
+  Function? onFetchNotifications;    // Para fetch desde servidor
+
   SharedPreferences? _prefs;
   static const String _keyUnreadCount = 'unread_notifications';
   static const String _keyHasNew = 'has_new_notifications';
@@ -53,7 +57,7 @@ class NotificationService {
     
     await _loadPersistedCount();
     
-    // 🆕 iOS requiere configuración diferente
+    // iOS requiere configuración diferente
     if (Platform.isIOS) {
       await _setupiOSNotifications();
     }
@@ -74,7 +78,7 @@ class NotificationService {
     _setupMessageListeners();
   }
 
-  // 🆕 Configuración específica para iOS
+  // Configuración específica para iOS
   Future<void> _setupiOSNotifications() async {
     await FirebaseMessaging.instance.requestPermission(
       alert: true,
@@ -180,10 +184,10 @@ class NotificationService {
   }
 
   void _setupMessageListeners() {
-    // 🆕 Para iOS: manejar notificaciones cuando la app está en foreground
+    // Para iOS: manejar notificaciones cuando la app está en foreground
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
     
-    // 🆕 Para iOS: manejar cuando el usuario toca la notificación (app en background)
+    // Para iOS: manejar cuando el usuario toca la notificación (app en background)
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageOpenedApp);
     
     _checkInitialMessage();
@@ -196,15 +200,24 @@ class NotificationService {
     if (message.notification != null) {
       print('📬 Message also contained a notification: ${message.notification}');
       incrementUnreadCount();
+      
+      // ✅ Notificar que llegó una nueva notificación (actualizar UI)
+      onNotificationReceived?.call();
+      
+      // 🆕 Fetch las notificaciones desde el servidor usando callback
+      onFetchNotifications?.call();
     }
   }
 
-  // 🆕 En iOS, este se llama cuando el usuario toca la notificación
   void _handleMessageOpenedApp(RemoteMessage message) {
     print('📱 Message opened app from background: ${message.data}');
-    
-    // 🆕 IMPORTANTE: Incrementar el contador aquí también para iOS
     incrementUnreadCount();
+    
+    // ✅ Notificar que llegó una nueva notificación
+    onNotificationReceived?.call();
+    
+    // 🆕 Fetch las notificaciones desde el servidor
+    onFetchNotifications?.call();
   }
 
   Future<void> _checkInitialMessage() async {
@@ -214,8 +227,11 @@ class NotificationService {
     if (initialMessage != null) {
       print('🚀 App opened from terminated state by notification: ${initialMessage.data}');
       
-      // 🆕 Incrementar contador si la app se abrió desde una notificación
+      // Incrementar contador si la app se abrió desde una notificación
       await incrementUnreadCount();
+      
+      // 🆕 Fetch las notificaciones desde el servidor
+      onFetchNotifications?.call();
     }
   }
 

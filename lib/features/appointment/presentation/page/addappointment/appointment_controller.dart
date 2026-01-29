@@ -1,6 +1,8 @@
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/appointment/domain/usecase/appointment_completed_usecase.dart';
 import 'package:gerena/features/appointment/domain/usecase/cancel_appointment_usecase.dart';
+import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
+import 'package:gerena/features/home/dashboard/dashboard_controller.dart';
 import 'package:get/get.dart';
 
 class AppointmentController extends GetxController {
@@ -12,6 +14,7 @@ class AppointmentController extends GetxController {
     required this.cancelAppointmentUsecase,
   });
 
+    final controller = Get.put(DashboardController());
   final RxBool isCancelingAppointment = false.obs;
   final RxBool isCompletingAppointment = false.obs;
 
@@ -52,10 +55,12 @@ class AppointmentController extends GetxController {
       diagnosticoError.value = '';
     }
   }
+
   void resetCancelValidations() {
     showMotivoError.value = false;
     motivoError.value = '';
   }
+
   void resetCompleteValidations() {
     showNotasError.value = false;
     notasError.value = '';
@@ -63,8 +68,22 @@ class AppointmentController extends GetxController {
     diagnosticoError.value = '';
   }
 
+  // 🔥 Método helper para recargar el calendario
+  Future<void> _reloadCalendar() async {
+    try {
+      final calendarController = Get.find<CalendarControllerGetx>();
+      final currentDate = calendarController.selectedDate.value ?? DateTime.now();
+      
+      // Recargar las citas del mes actual
+      await calendarController.loadAppointmentsForDate(currentDate);
+      
+      print('✅ Calendario recargado exitosamente');
+    } catch (e) {
+      print('⚠️ Error al recargar calendario: $e');
+    }
+  }
+
   Future<void> cancelAppointment(int appointmentId, String motivoCancelacion) async {
-  
     validateMotivo(motivoCancelacion);
     
     if (showMotivoError.value) {
@@ -76,9 +95,13 @@ class AppointmentController extends GetxController {
       
       await cancelAppointmentUsecase.execute(appointmentId, motivoCancelacion);
       
-      Get.back();
+      Get.back(); // Cerrar el modal
+      
+      // 🔥 Recargar el calendario después de cancelar
+      await _reloadCalendar();
+       controller.showCalendar();
       showSuccessSnackbar('La cita ha sido cancelada correctamente');
-      resetCancelValidations(); // Limpiar validaciones
+      resetCancelValidations();
       
     } catch (e) {
       showErrorSnackbar('No se pudo cancelar la cita: ${e.toString()}');
@@ -109,8 +132,11 @@ class AppointmentController extends GetxController {
       );
       
       Get.back();
+      
+      await _reloadCalendar();
+       controller.showCalendar();
       showSuccessSnackbar('La cita ha sido completada correctamente');
-      resetCompleteValidations(); // Limpiar validaciones
+      resetCompleteValidations();
       
     } catch (e) {
       showErrorSnackbar('No se pudo completar la cita: ${e.toString()}');

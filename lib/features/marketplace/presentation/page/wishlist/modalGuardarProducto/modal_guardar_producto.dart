@@ -40,6 +40,8 @@ class ModalGuardarProducto extends StatelessWidget {
                     onPressed: () => Navigator.of(context).pop(),
                     icon: Image.asset(
                       'assets/icons/close.png',
+                                      width: 20,
+    height: 20,
                     ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

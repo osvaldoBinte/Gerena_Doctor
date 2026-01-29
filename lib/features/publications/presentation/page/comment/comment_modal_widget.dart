@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gerena/common/services/auth_service.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/custom_alert_type.dart';
 import 'package:gerena/features/publications/domain/entities/comments/get_comments_entity.dart';
 import 'package:gerena/features/publications/presentation/page/comment/comment_controller.dart';
+import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -247,8 +250,7 @@ class _CommentModalWidgetState extends State<CommentModalWidget> {
       ),
     );
   }
-
- Widget _buildCommentCard(GetCommentsEntity comment) {
+Widget _buildCommentCard(GetCommentsEntity comment) {
   final isAuthor = comment.esAutor == true;
   
   return GestureDetector(
@@ -258,17 +260,21 @@ class _CommentModalWidgetState extends State<CommentModalWidget> {
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: comment.authorEntity?.profilePhoto != null &&
-                  comment.authorEntity!.profilePhoto!.isNotEmpty &&
-                  comment.authorEntity!.profilePhoto!.startsWith('http')
-              ? NetworkImage(comment.authorEntity!.profilePhoto!)
-              : null,
-          child: comment.authorEntity?.profilePhoto == null ||
-                  comment.authorEntity!.profilePhoto!.isEmpty
-              ? Icon(Icons.person, size: 20)
-              : null,
+        // ✅ Avatar clickeable
+        GestureDetector(
+          onTap: () => _navigateToProfile(comment),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundImage: comment.authorEntity?.profilePhoto != null &&
+                    comment.authorEntity!.profilePhoto!.isNotEmpty &&
+                    comment.authorEntity!.profilePhoto!.startsWith('http')
+                ? NetworkImage(comment.authorEntity!.profilePhoto!)
+                : null,
+            child: comment.authorEntity?.profilePhoto == null ||
+                    comment.authorEntity!.profilePhoto!.isEmpty
+                ? Icon(Icons.person, size: 20)
+                : null,
+          ),
         ),
         SizedBox(width: 12),
 
@@ -284,15 +290,20 @@ class _CommentModalWidgetState extends State<CommentModalWidget> {
               children: [
                 Row(
                   children: [
+                    // ✅ Nombre clickeable
                     Flexible(
-                      child: Text(
-                        comment.authorEntity?.name ?? 'Usuario',
-                        style: GoogleFonts.rubik(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      child: GestureDetector(
+                        onTap: () => _navigateToProfile(comment),
+                        child: Text(
+                          comment.authorEntity?.name ?? 'Usuario',
+                          style: GoogleFonts.rubik(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: GerenaColors.primaryColor, // ✅ Color para indicar que es clickeable
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
                       ),
                     ),
                     SizedBox(width: 8),
@@ -304,8 +315,8 @@ class _CommentModalWidgetState extends State<CommentModalWidget> {
                         fontSize: 12,
                         color: Colors.grey.shade600,
                       ),
-                       overflow: TextOverflow.ellipsis,
-                        maxLines: 1
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                     if (isAuthor)
                       Container(
@@ -321,8 +332,8 @@ class _CommentModalWidgetState extends State<CommentModalWidget> {
                             color: GerenaColors.primaryColor,
                             fontWeight: FontWeight.w600,
                           ),
-                           overflow: TextOverflow.ellipsis,
-                        maxLines: 1
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
                   ],
@@ -343,6 +354,64 @@ class _CommentModalWidgetState extends State<CommentModalWidget> {
     ),
   );
 }
+
+// ✅ NUEVO MÉTODO: Navegar al perfil del autor del comentario
+Future<void> _navigateToProfile(GetCommentsEntity comment) async {
+  if (comment.authorEntity == null) {
+    print('❌ No hay información del autor');
+    return;
+  }
+
+  try {
+    // Obtener el ID del usuario logueado
+    AuthService authService = AuthService();
+    int? loggedUserId = await authService.getUsuarioId();
+    int authorId = comment.authorEntity!.id;
+
+    // Si es el usuario logueado, ir a su perfil
+    if (loggedUserId == authorId) {
+      Get.offAllNamed(RoutesNames.homePage, arguments: 4);
+      return;
+    }
+
+    // Obtener el rol del autor
+    final rol = comment.authorEntity!.rol;
+    final startController = Get.find<StartController>();
+
+    if (rol == 'cliente') {
+      // ✅ Navegar al perfil de usuario
+      startController.showUserProfilePage(
+        userData: {
+          'userId': comment.authorEntity!.id,
+         
+        },
+      );
+      
+      // Cerrar el modal de comentarios
+      Get.back();
+      
+    } else if (rol == 'doctor') {
+      // ✅ Navegar al perfil de doctor
+      print('📋 Navegando a perfil de doctor');
+      startController.showDoctorProfilePage(
+        doctorData: {
+          'userId': comment.authorEntity!.id,
+          'doctorName': comment.authorEntity!.name ?? 'Doctor',
+         
+        },
+      );
+      
+      // Cerrar el modal de comentarios
+      Get.back();
+    } else {
+      print('⚠️ Rol desconocido: $rol');
+    }
+    
+  } catch (e) {
+    print('❌ Error al navegar al perfil: $e');
+  }
+}
+
 void _showDeleteConfirmation(int commentId) {
   HapticFeedback.mediumImpact();
   

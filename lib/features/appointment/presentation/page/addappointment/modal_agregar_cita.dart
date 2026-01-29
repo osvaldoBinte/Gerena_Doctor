@@ -611,16 +611,10 @@ class ModalAgregarCita extends StatelessWidget {
     );
   }
 
-  static void show({
-    required int clienteId,
-    required int doctorId,
-  }) {
+  static void show() {
     Get.dialog(
       const ModalAgregarCita(),
-      arguments: {
-        'clienteId': clienteId,
-        'doctorId': doctorId,
-      },
+    
       barrierDismissible: true,
     );
   }

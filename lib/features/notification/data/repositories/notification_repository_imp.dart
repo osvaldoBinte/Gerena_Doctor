@@ -19,5 +19,11 @@ class NotificationRepositoryImp extends NotificationRepository {
 
     return await notificationDataSourcesImp.savetokenFCM(fcm,dispositivo, token);
   }
+  
+  @override
+  Future<void> markAllNotificationsAsRead() async {
+        final token = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await notificationDataSourcesImp.markAllNotificationsAsRead(token);
+  }
  
 }

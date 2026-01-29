@@ -16,7 +16,6 @@ class PatientViewPage extends StatefulWidget {
 }
 
 class _DoctorProfilePageState extends State<PatientViewPage> {
-  // ✅ AGREGAR: Obtener el controller
   final PrefilDortorController controller = Get.find<PrefilDortorController>();
 
   @override
@@ -32,7 +31,6 @@ class _DoctorProfilePageState extends State<PatientViewPage> {
         ),
       ),
       body: Obx(() {
-        // ✅ AGREGAR: Observar cambios
         if (controller.isLoading.value) {
           return Center(
             child: CircularProgressIndicator(
@@ -107,14 +105,12 @@ class _DoctorProfilePageState extends State<PatientViewPage> {
                   ],
                 ),
               ),
-             
-              
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                   /* Text(
+                    /* Text(
                       'PROMOCIONES Y DESCUENTOS',
                       style: GerenaColors.subtitleLarge.copyWith(
                         color: GerenaColors.textSecondary,
@@ -149,7 +145,7 @@ class _DoctorProfilePageState extends State<PatientViewPage> {
                 margin: const EdgeInsets.only(top: 13, right: 16),
                 child: GestureDetector(
                   onTap: () {
-                   Get.offAllNamed(RoutesNames.homePage);
+                    Get.offAllNamed(RoutesNames.homePage);
                   },
                   child: Image.asset(
                     'assets/icons/close.png',
@@ -242,10 +238,8 @@ class _DoctorProfilePageState extends State<PatientViewPage> {
                             return;
                           }
 
-                          // Codificar la dirección para URL
                           final encodedAddress = Uri.encodeComponent(address);
 
-                          // URL para Google Maps
                           final googleMapsUrl = Uri.parse(
                               'https://www.google.com/maps/search/?api=1&query=$encodedAddress');
 
@@ -290,7 +284,7 @@ class _DoctorProfilePageState extends State<PatientViewPage> {
                 GerenaColors.widgetButton(
                   showShadow: false,
                   text: 'AGENDAR CITA',
-                    backgroundColor: GerenaColors.rowColorCalendar,
+                  backgroundColor: GerenaColors.rowColorCalendar,
                 ),
               ],
             ),

@@ -11,7 +11,7 @@ class RoutesNames {
   static const String paymentCardsPage = '/payment-cards-page';
   static const String patientView = '/PatientViewPage';
 
-  static const String calendar = '/calendar-page';
+  static const String calendar = '/calendarpage';
   static const String historia = '/historia-page';
   static const String passwordreset = '/password_reset';
   static const String followersFollowing = '/followers-following';

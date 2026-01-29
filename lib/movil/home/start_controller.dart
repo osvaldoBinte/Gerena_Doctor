@@ -7,6 +7,7 @@ import 'package:gerena/features/notification/presentation/page/notificasiones/no
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/Category/category_page.dart';
 import 'package:gerena/features/blog/presentation/page/blogGerena/blog_gerena.dart';
+import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
 import 'package:gerena/features/publications/presentation/page/home_page.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/get_user_by_id_controller.dart';
@@ -47,10 +48,25 @@ class StartController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  NotificationController? get _notificationController {
+    try {
+      return Get.find<NotificationController>();
+    } catch (e) {
+      print('⚠️ NotificationController no encontrado: $e');
+      return null;
+    }
+  }
+
   bool get shouldShowBlog {
     final subscription = _subscriptionController?.currentSubscription.value;
     final planId = subscription?.subscriptionplanId;
     return planId == 4;
+  }
+
+  RxBool get hasAnyNotifications {
+    final hasUnread = _notificationController?.hasUnreadNotifications.value ?? false;
+    final hasNew = notificationService.hasNewNotifications.value;
+    return (hasUnread || hasNew).obs;
   }
 
   List<Widget> get pages {
@@ -172,12 +188,20 @@ class StartController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  // ✅ MEJORADO: Recargar tanto del storage como del servidor
   Future<void> _reloadNotificationState() async {
     try {
+      // Recargar contador de Firebase desde storage
       await notificationService.reloadFromStorage();
+      
+      // 🆕 Fetch desde el servidor para sincronizar
+      await _notificationController?.fetchNotifications();
+      
       print('✅ Estado de notificaciones recargado');
-      print('📬 Contador actual: ${notificationService.unreadNotificationsCount.value}');
-      print('🔔 Tiene nuevas: ${notificationService.hasNewNotifications.value}');
+      print('📬 Firebase contador: ${notificationService.unreadNotificationsCount.value}');
+      print('🔔 Firebase tiene nuevas: ${notificationService.hasNewNotifications.value}');
+      print('📬 Controller total: ${_notificationController?.notifications.length ?? 0}');
+      print('🔔 Controller no leídas: ${_notificationController?.hasUnreadNotifications.value ?? false}');
       
       update();
     } catch (e) {
@@ -229,8 +253,10 @@ class StartController extends GetxController with WidgetsBindingObserver {
     final notificationIndex = shouldShowBlog ? 3 : 2;
     
     if (index == notificationIndex) {
+      // Limpiar AMBOS contadores cuando el usuario vea las notificaciones
+      _notificationController?.markAllAsRead();
       notificationService.clearUnreadCount();
-      print('🔔 Usuario en página de notificaciones - contador limpiado');
+      print('🔔 Usuario en página de notificaciones - marcando todas como leídas en ambos servicios');
     }
     
     _addToHistory(NavigationHistoryItem(
@@ -318,25 +344,27 @@ class StartController extends GetxController with WidgetsBindingObserver {
     !showSearchPage.value;
 
   String getIconPath(int index) {
-    // ✅ Ajustar índice de notificaciones según si hay blog
     final notificationIndex = shouldShowBlog ? 3 : 2;
     
     if (index == notificationIndex) {
-      final hasNewNotifications = notificationService.hasNewNotifications.value;
+      // Combinar ambas fuentes de estado de notificaciones
+      final hasUnreadFromController = _notificationController?.hasUnreadNotifications.value ?? false;
+      final hasNewFromService = notificationService.hasNewNotifications.value;
+      final hasAnyNotification = hasUnreadFromController || hasNewFromService;
       
       if (showUserProfile.value || showDoctorProfile.value || showSearchPage.value) {
-        return hasNewNotifications 
-            ? notificationIconPaths[1]
+        return hasAnyNotification 
+            ? notificationIconPaths[1] 
             : notificationIconPaths[0];
       }
       
       return selectedIndex.value == index
-          ? (hasNewNotifications 
-              ? selectedNotificationIconPaths[1]
-              : selectedNotificationIconPaths[0])
-          : (hasNewNotifications 
-              ? notificationIconPaths[1]
-              : notificationIconPaths[0]);
+          ? (hasAnyNotification 
+              ? selectedNotificationIconPaths[1] 
+              : selectedNotificationIconPaths[0]) 
+          : (hasAnyNotification 
+              ? notificationIconPaths[1] 
+              : notificationIconPaths[0]); 
     }
     
     if (showUserProfile.value || showDoctorProfile.value || showSearchPage.value) {
@@ -430,7 +458,6 @@ class StartController extends GetxController with WidgetsBindingObserver {
     print('➕ Agregado al historial: ${item.pageType} (Total: ${navigationHistory.length})');
   }
 
-  // ✅ Ajustar PageType según si hay blog
   PageType _getPageTypeFromIndex(int index) {
     if (shouldShowBlog) {
       switch (index) {
@@ -463,6 +490,38 @@ class StartController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  // 🆕 MEJORADO: Método para escuchar cambios del NotificationService
+  void _setupNotificationServiceListener() {
+    // Callback para actualizar UI cuando llega notificación
+    notificationService.onNotificationReceived = () {
+      print('🔔 Nueva notificación recibida - actualizando UI');
+      update();
+    };
+    
+    // 🆕 Callback para fetch de notificaciones desde servidor
+    notificationService.onFetchNotifications = () {
+      print('📥 Fetching notificaciones desde el servidor...');
+      if (Get.isRegistered<NotificationController>()) {
+        final controller = Get.find<NotificationController>();
+        controller.fetchNotifications();
+        print('✅ Notificaciones sincronizadas con el servidor');
+      } else {
+        print('⚠️ NotificationController no registrado aún');
+      }
+    };
+    
+    // Escuchar cambios en el estado de notificaciones
+    ever(notificationService.hasNewNotifications, (hasNew) {
+      print('🔔 Firebase - Estado cambió: hasNew=$hasNew');
+      update();
+    });
+    
+    ever(notificationService.unreadNotificationsCount, (count) {
+      print('📬 Firebase - Contador cambió: $count');
+      update();
+    });
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -470,6 +529,9 @@ class StartController extends GetxController with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     
     _reloadNotificationState();
+    
+    // Escuchar cambios en el NotificationService
+    _setupNotificationServiceListener();
     
     final arguments = Get.arguments;
     if (arguments is int) {
@@ -485,6 +547,10 @@ class StartController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     WidgetsBinding.instance.removeObserver(this);
+    
+    // 🆕 Limpiar AMBOS callbacks
+    notificationService.onNotificationReceived = null;
+    notificationService.onFetchNotifications = null;
     
     navigationHistory.clear();
     _lastBackPress = null;

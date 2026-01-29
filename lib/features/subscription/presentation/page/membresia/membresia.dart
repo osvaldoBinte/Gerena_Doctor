@@ -14,6 +14,7 @@ class Membresia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SubscriptionController>();
+    final bool isIOS = GetPlatform.isIOS; // ← USAR GetPlatform
 
     return Container(
       color: GerenaColors.backgroundColorfondo,
@@ -88,7 +89,7 @@ class Membresia extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (controller.hasActiveSubscription.value) ...[
-                      _buildCurrentSubscriptionBanner(controller),
+                      _buildCurrentSubscriptionBanner(controller, isIOS),
                       const SizedBox(height: 24),
                     ],
 
@@ -109,7 +110,7 @@ class Membresia extends StatelessWidget {
                         return _buildMembershipCard(
                           type: plan.name,
                           title: plan.description,
-                          price: '\$${plan.price.toStringAsFixed(2)} MXN / ${plan.interval == 'month' ? 'mensual' : plan.interval}',
+                          price: isIOS ? '' : '\$${plan.price.toStringAsFixed(2)} MXN / ${plan.interval == 'month' ? 'mensual' : plan.interval}',
                           benefits: plan.caracteristicas.beneficios,
                           buttonText: controller.getButtonText(plan.id, plan.name),
                           buttonColor: controller.getButtonColor(plan.name),
@@ -118,10 +119,53 @@ class Membresia extends StatelessWidget {
                           hasGradientBorder: controller.hasGradientBorder(plan.name),
                           hasGradientButton: controller.hasGradientButton(plan.name),
                           screenWidth: constraints.maxWidth,
-                          onTap: () => _handlePlanTap(context, controller, plan),
+                          isIOS: isIOS,
+                          onTap: isIOS ? null : () => _handlePlanTap(context, controller, plan),
                         );
                       },
                     ),
+
+                    if (isIOS) ...[
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: GerenaColors.cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: GerenaColors.primaryColor.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: GerenaColors.textSecondaryColor,
+                              size: 32,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '¿No tienes cuenta?',
+                              style: GerenaColors.headingMedium.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Visita nuestro sitio web',
+                              style: GerenaColors.bodySmall.copyWith(
+                                fontSize: 12,
+                                color: GerenaColors.textSecondaryColor,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -132,184 +176,185 @@ class Membresia extends StatelessWidget {
     );
   }
 
-  Widget _buildCurrentSubscriptionBanner(SubscriptionController controller) {
-  final subscription = controller.currentSubscription.value;
-  if (subscription == null) return SizedBox.shrink();
+  Widget _buildCurrentSubscriptionBanner(SubscriptionController controller, bool isIOS) {
+    final subscription = controller.currentSubscription.value;
+    if (subscription == null) return SizedBox.shrink();
 
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          GerenaColors.primaryColor,
-          GerenaColors.primaryColor.withOpacity(0.8),
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: GerenaColors.primaryColor.withOpacity(0.3),
-          blurRadius: 10,
-          offset: Offset(0, 4),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.stars, color: Colors.white, size: 24),
-            const SizedBox(width: 8),
-            Text(
-              'Tu Plan Actual',
-              style: GerenaColors.headingMedium.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            GerenaColors.primaryColor,
+            GerenaColors.primaryColor.withOpacity(0.8),
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    subscription.planname,
-                    style: GerenaColors.headingLarge.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: GerenaColors.primaryColor.withOpacity(0.3),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.stars, color: Colors.white, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                'Tu Plan Actual',
+                style: GerenaColors.headingMedium.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      subscription.planname,
+                      style: GerenaColors.headingLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
+                    if (!isIOS) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$${subscription.planprice.toStringAsFixed(2)} MXN / mes',
+                        style: GerenaColors.bodyMedium.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  subscription.state.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '\$${subscription.planprice.toStringAsFixed(2)} MXN / mes',
-                    style: GerenaColors.bodyMedium.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.8), size: 16),
+              const SizedBox(width: 6),
+              Text(
+                'Renovación: ${_formatDate(subscription.currentPeriodEnddate)}',
+                style: GerenaColors.bodySmall.copyWith(
+                  color: Colors.white.withOpacity(0.9),
+                ),
+              ),
+            ],
+          ),
+          
+          if (subscription.cancelledAtPeriodEnd) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.5)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Tu suscripción se cancelará al finalizar el período el ${_formatDate(subscription.currentPeriodEnddate)}',
+                      style: GerenaColors.bodySmall.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                subscription.state.toUpperCase(),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
           ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Icon(Icons.calendar_today, color: Colors.white.withOpacity(0.8), size: 16),
-            const SizedBox(width: 6),
-            Text(
-              'Renovación: ${_formatDate(subscription.currentPeriodEnddate)}',
-              style: GerenaColors.bodySmall.copyWith(
-                color: Colors.white.withOpacity(0.9),
-              ),
-            ),
-          ],
-        ),
-        
-        if (subscription.cancelledAtPeriodEnd) ...[
+
+          const SizedBox(height: 16),
+          const Divider(color: Colors.white24, thickness: 1),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.orange.withOpacity(0.5)),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.warning_amber, color: Colors.white, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Tu suscripción se cancelará al finalizar el período el ${_formatDate(subscription.currentPeriodEnddate)}',
-                    style: GerenaColors.bodySmall.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                showDialog(
+                  context: Get.context!,
+                  builder: (context) => CancelSubscriptionDialog(),
+                );
+              },
+              icon: Icon(
+                subscription.cancelledAtPeriodEnd 
+                    ? Icons.refresh 
+                    : Icons.cancel_outlined,
+                size: 18,
+              ),
+              label: Text(
+                subscription.cancelledAtPeriodEnd 
+                    ? 'Reactivar suscripción' 
+                    : 'Cancelar suscripción',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: BorderSide(color: Colors.white.withOpacity(0.5), width: 1.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
           ),
         ],
-
-        const SizedBox(height: 16),
-        const Divider(color: Colors.white24, thickness: 1),
-        const SizedBox(height: 12),
-
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () {
-              showDialog(
-                context: Get.context!,
-                builder: (context) => CancelSubscriptionDialog(),
-              );
-            },
-            icon: Icon(
-              subscription.cancelledAtPeriodEnd 
-                  ? Icons.refresh 
-                  : Icons.cancel_outlined,
-              size: 18,
-            ),
-            label: Text(
-              subscription.cancelledAtPeriodEnd 
-                  ? 'Reactivar suscripción' 
-                  : 'Cancelar suscripción',
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withOpacity(0.5), width: 1.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-void _handlePlanTap(BuildContext context, SubscriptionController controller, ViewAllPlansEntity plan) {
-  final action = controller.getButtonAction(plan.id);
-
-  if (action == 'current') {
-            showSuccessSnackbar( 'Este es tu plan actual. Usa el botón "Cancelar suscripción" en el banner superior si deseas cancelar.');
-
-  } else if (action == 'change') {
-   
-    showDialog(
-      context: context,
-      builder: (context) => ChangePlanDialog(newPlan: plan),
+      ),
     );
-  } else {
-    _showSubscriptionDialog(context, plan);
   }
-}
+
+  void _handlePlanTap(BuildContext context, SubscriptionController controller, ViewAllPlansEntity plan) {
+    final action = controller.getButtonAction(plan.id);
+
+    if (action == 'current') {
+      showSuccessSnackbar('Este es tu plan actual. Usa el botón "Cancelar suscripción" en el banner superior si deseas cancelar.');
+    } else if (action == 'change') {
+      showDialog(
+        context: context,
+        builder: (context) => ChangePlanDialog(newPlan: plan),
+      );
+    } else {
+      _showSubscriptionDialog(context, plan);
+    }
+  }
 
   void _showSubscriptionDialog(BuildContext context, ViewAllPlansEntity plan) {
     showDialog(
@@ -334,6 +379,7 @@ void _handlePlanTap(BuildContext context, SubscriptionController controller, Vie
     bool hasGradientBorder = false,
     bool hasGradientButton = false,
     required double screenWidth,
+    required bool isIOS,
     VoidCallback? onTap,
   }) {
     double titleFontSize = screenWidth < 600 ? 18 : 15;
@@ -386,6 +432,7 @@ void _handlePlanTap(BuildContext context, SubscriptionController controller, Vie
             benefitFontSize: benefitFontSize,
             buttonFontSize: buttonFontSize,
             cardPadding: cardPadding,
+            isIOS: isIOS,
             onTap: onTap,
           ),
         ),
@@ -418,6 +465,7 @@ void _handlePlanTap(BuildContext context, SubscriptionController controller, Vie
         benefitFontSize: benefitFontSize,
         buttonFontSize: buttonFontSize,
         cardPadding: cardPadding,
+        isIOS: isIOS,
         onTap: onTap,
       ),
     );
@@ -442,6 +490,7 @@ void _handlePlanTap(BuildContext context, SubscriptionController controller, Vie
     required double benefitFontSize,
     required double buttonFontSize,
     required double cardPadding,
+    required bool isIOS,
     VoidCallback? onTap,
   }) {
     return Padding(
@@ -479,15 +528,17 @@ void _handlePlanTap(BuildContext context, SubscriptionController controller, Vie
                   ),
                 ),
               ],
-              const SizedBox(height: 8),
-              Text(
-                price,
-                style: GerenaColors.bodyMedium.copyWith(
-                  fontSize: priceFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: titleColor ?? GerenaColors.textPrimaryColor,
+              if (!isIOS && price.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  price,
+                  style: GerenaColors.bodyMedium.copyWith(
+                    fontSize: priceFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: titleColor ?? GerenaColors.textPrimaryColor,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
           const SizedBox(height: 16),
@@ -554,60 +605,62 @@ void _handlePlanTap(BuildContext context, SubscriptionController controller, Vie
             ),
             const SizedBox(height: 8),
           ],
-          SizedBox(
-            width: double.infinity,
-            height: 40,
-            child: hasGradientButton
-                ? Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFC2639C),
-                          Color(0xFFFF0101),
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: onTap,
+          if (!isIOS) ...[
+            SizedBox(
+              width: double.infinity,
+              height: 40,
+              child: hasGradientButton
+                  ? Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFC2639C),
+                            Color(0xFFFF0101),
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
                         borderRadius: BorderRadius.circular(4),
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            buttonText,
-                            style: TextStyle(
-                              fontSize: buttonFontSize,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: onTap,
+                          borderRadius: BorderRadius.circular(4),
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Text(
+                              buttonText,
+                              style: TextStyle(
+                                fontSize: buttonFontSize,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                : ElevatedButton(
-                    onPressed: onTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4),
+                    )
+                  : ElevatedButton(
+                      onPressed: onTap,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: buttonColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        elevation: 0,
                       ),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      buttonText,
-                      style: TextStyle(
-                        fontSize: buttonFontSize,
-                        fontWeight: FontWeight.bold,
+                      child: Text(
+                        buttonText,
+                        style: TextStyle(
+                          fontSize: buttonFontSize,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-          ),
+            ),
+          ],
         ],
       ),
     );

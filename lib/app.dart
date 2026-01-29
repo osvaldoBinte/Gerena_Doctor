@@ -115,6 +115,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.myReviewUsecase!, permanent:  true);
         Get.put(usecaseConfig.postAddressesUsecase!, permanent: true);
         Get.put(usecaseConfig.getnotificationUsecase!, permanent: true);
+        Get.put(usecaseConfig.markAllNotificationsAsReadUsecase!, permanent: true);
         Get.put(usecaseConfig.putAddressesUsecase!,permanent: true);
         Get.put(usecaseConfig.deleteAddressesUsecase!,permanent: true);
         Get.put(usecaseConfig.addAvailabilityUsecase!, permanent: true);
@@ -175,7 +176,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => SubscriptionController( getAllPlansUsecase: Get.find(), postSubscribeToPlanUsecase: Get.find(), getMySubscriptionUsecase: Get.find(), changeSubscriptionPlanUsecase: Get.find(), postCancelSubcriptionUsecase: Get.find(), ), fenix: true,);
         Get.lazyPut(() => GetMedicationsByIdController(  getMedicineByIdUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => ProceduresController(getProceduresUsecase:  Get.find(), createProcedureUsecase:  Get.find(), updateProcedureUsecase: Get.find(), addImagenesUsecase: Get.find(), deleteProcedureUsecase: Get.find(), deleteImgUsecase: Get.find(),), fenix: true,);
-        Get.lazyPut(() => NotificationController(getNotificationUsecase: Get.find()), fenix:  true);
+        Get.lazyPut(() => NotificationController(getNotificationUsecase: Get.find(), markAllNotificationsAsReadUsecase: Get.find()), fenix:  true);
         Get.lazyPut(() => AvailabilityController(addAvailabilityUsecase:  Get.find(), deleteAvailabilityUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => BlogController(getBlogGerenaUsecase: Get.find(), getBlogGerenaByIdUsecase: Get.find(), getBlogSocialUsecase: Get.find(), getBlogSocialByIdUsecase: Get.find(), createBlogSocialUsecase: Get.find(), postAnswerBlogUsecase: Get.find()), fenix: true,);
         Get.lazyPut(() => StoryController(fetchStoriesUsecase:  Get.find(), addLikeToStoryUsecase:  Get.find(), fetchStoriesByIdUsecase: Get.find(), removeStoryUsecase: Get.find(), createStroryUsecase: Get.find(), setStoryAsSeenUsecase:  Get.find()), fenix:  true);

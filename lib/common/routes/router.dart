@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_widget.dart';
@@ -16,18 +15,17 @@ import 'package:gerena/features/marketplace/presentation/page/paymentcard/paymen
 import 'package:gerena/movil/home/start_page.dart';
 import 'package:gerena/features/home/dashboard/dashboard_page.dart';
 import 'package:get/get.dart';
+
 class AppPages {
   static final routes = [
-   
     GetPage(
       name: RoutesNames.welcomePage,
       page: () => SplashPage(),
     ),
-    GetPage(name: RoutesNames.categoryById, page: ()=>GetMedicationsPage()),
+    GetPage(name: RoutesNames.categoryById, page: () => GetMedicationsPage()),
     GetPage(
       name: RoutesNames.loginPage,
       page: () => LoginPage(),
-
     ),
     GetPage(
       name: RoutesNames.homePage,
@@ -49,15 +47,16 @@ class AppPages {
       name: RoutesNames.paymentCardsPage,
       page: () => PaymentCardsScreen(),
     ),
-      GetPage(
+    GetPage(
       name: RoutesNames.patientView,
       page: () => PatientViewPage(),
     ),
-    GetPage(name: RoutesNames.productDetail, page: () =>ProductDetailPage()),
+    GetPage(name: RoutesNames.productDetail, page: () => ProductDetailPage()),
     GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),
-    GetPage(name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
+    GetPage(
+        name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
     GetPage(name: RoutesNames.passwordreset, page: () => PasswordResetPage()),
- GetPage(
+    GetPage(
       name: RoutesNames.followersFollowing,
       page: () {
         final args = Get.arguments as Map<String, dynamic>?;

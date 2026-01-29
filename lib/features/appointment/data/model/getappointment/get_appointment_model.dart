@@ -16,7 +16,15 @@ class GetAppointmentModel extends GetApppointmentEntity {
       required super.doctorNotes,
       required super.diagnosis,
       required super.cancellationReason,
-      super.foto});
+      super.foto,
+      required super.clientPhone,
+      required super.doctorPhone,
+          super.alergias,
+    super.padecimientos,
+    super.enfermedadesCirugias,
+    super.pruebasEstudios,
+    super.comentarios,
+      });
 
   factory GetAppointmentModel.fromJson(Map<String, dynamic> json) {
     return GetAppointmentModel(
@@ -33,7 +41,12 @@ class GetAppointmentModel extends GetApppointmentEntity {
       doctorNotes: json['notasDoctor'] ?? '',
       diagnosis: json['diagnostico'] ?? '',
       cancellationReason: json['motivoCancelacion'] ?? '',
-      foto: json['foto'] ?? ''
+      foto: json['foto'] ?? '',
+            alergias: json['alergias'],
+      padecimientos: json['padecimientos'],
+      enfermedadesCirugias: json['enfermedadesCirugias'],
+      pruebasEstudios: json['pruebasEstudios'],
+      comentarios: json['comentarios'], clientPhone: json['clienteTelefono'] ?? '', doctorPhone: json['doctorTelefono'] ?? '',
     );
   }
 }

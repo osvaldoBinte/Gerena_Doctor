@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgts.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/modal_agregar_cita.dart';
 import 'package:gerena/features/appointment/presentation/page/calendar/calendar_controller.dart';
 import 'package:gerena/features/appointment/presentation/page/perfil/PatientProfileScreen.dart';
 import 'package:gerena/features/appointment/presentation/widget/citas_loading.dart';
@@ -43,19 +44,19 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
       Get.find<PublicationController>();
 
   final ScrollController _internalScrollController = ScrollController();
-  
+
   late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
-    final fechaInicial = DateTime(2025, 9, 1);
-    calendarController.loadAppointmentsForDate(fechaInicial);
-    
+    //final fechaInicial = DateTime(2025, 9, 1);
+    // calendarController.loadAppointmentsForDate(fechaInicial);
+
     _pageController = PageController();
-    
+
     _internalScrollController.addListener(_scrollListener);
-    
+
     _pageController.addListener(_pageViewListener);
   }
 
@@ -70,16 +71,15 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
 
   void _scrollListener() {
     if (_internalScrollController.position.pixels >=
-        _internalScrollController.position.maxScrollExtent - 50) {
-    }
+        _internalScrollController.position.maxScrollExtent - 50) {}
   }
 
   void _pageViewListener() {
     if (!_pageController.hasClients) return;
-    
+
     final currentPage = _pageController.page ?? 0;
     final totalItems = _getTotalPageViewItems();
-    
+
     if (currentPage >= totalItems - 3 &&
         !publicationController.isLoading.value &&
         publicationController.hasMore.value) {
@@ -132,19 +132,20 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
         ),
       ),
       body: Obx(() {
-if (profileController.showPatientProfile.value) {
-  final appointment = profileController.selectedAppointment.value;
-  final appointmentEntity = calendarController.getAppointmentEntity(appointment.id);
-  
-  if (appointmentEntity != null) {
-    return PatientProfileScreen(
-      appointmentEntity: appointmentEntity,
-      onClose: () {
-        profileController.hidePatientProfileView();
-      },
-    );
-  }
-}
+        if (profileController.showPatientProfile.value) {
+          final appointment = profileController.selectedAppointment.value;
+          final appointmentEntity =
+              calendarController.getAppointmentEntity(appointment.id);
+
+          if (appointmentEntity != null) {
+            return PatientProfileScreen(
+              appointmentEntity: appointmentEntity,
+              onClose: () {
+                profileController.hidePatientProfileView();
+              },
+            );
+          }
+        }
 
         if (publicationController.isLoading.value &&
             publicationController.posts.isEmpty) {
@@ -167,7 +168,7 @@ if (profileController.showPatientProfile.value) {
                   child: _buildPostFromEntity(post),
                 )),
           );
-          
+
           if (publicationController.hasMore.value) {
             allItems.add(
               Container(
@@ -214,129 +215,129 @@ if (profileController.showPatientProfile.value) {
   }
 
   Widget _buildFirstPageWithScroll(double availableHeight) {
-  return NotificationListener<ScrollNotification>(
-    onNotification: (scrollNotification) {
-      if (scrollNotification is ScrollEndNotification) {
-        if (_internalScrollController.position.pixels >=
-            _internalScrollController.position.maxScrollExtent - 10) {
-          Future.delayed(Duration(milliseconds: 100), () {
-            if (_pageController.hasClients && mounted) {
-              _pageController.nextPage(
-                duration: Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            }
-          });
-        }
-      }
-      return false;
-    },
-    child: Container(
-      height: availableHeight,
-      child: Column(
-        children: [
-          Container(
-            height: 100,
-            color: GerenaColors.backgroundColorFondo,
-            child: Obx(() {
-              if (storyController.isLoading.value &&
-                  storyController.allStories.isEmpty) {
-                return const StoryRingLoading(multiple: true);
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        if (scrollNotification is ScrollEndNotification) {
+          if (_internalScrollController.position.pixels >=
+              _internalScrollController.position.maxScrollExtent - 10) {
+            Future.delayed(Duration(milliseconds: 100), () {
+              if (_pageController.hasClients && mounted) {
+                _pageController.nextPage(
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
               }
+            });
+          }
+        }
+        return false;
+      },
+      child: Container(
+        height: availableHeight,
+        child: Column(
+          children: [
+            Container(
+              height: 100,
+              color: GerenaColors.backgroundColorFondo,
+              child: Obx(() {
+                if (storyController.isLoading.value &&
+                    storyController.allStories.isEmpty) {
+                  return const StoryRingLoading(multiple: true);
+                }
 
-              final totalStories = storyController.allStories.length;
+                final totalStories = storyController.allStories.length;
 
-              return ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: totalStories + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return MyStoryRingWidget(
-                      size: 80,
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: totalStories + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return MyStoryRingWidget(
+                        size: 80,
+                      );
+                    }
+
+                    return Container(
+                      margin:
+                          const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+                      child: StoryRingWidget(
+                        index: index - 1,
+                        size: 80,
+                      ),
                     );
-                  }
+                  },
+                );
+              }),
+            ),
 
-                  return Container(
-                    margin: const EdgeInsets.only(
-                        right: 12, top: 8, bottom: 8),
-                    child: StoryRingWidget(
-                      index: index - 1,
-                      size: 80,
-                    ),
+            // NUEVO: RefreshIndicator envolviendo el Expanded
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await publicationController.refreshPosts();
+                  await calendarController.loadAppointmentsForDate(
+                    calendarController.focusedDate.value,
                   );
                 },
-              );
-            }),
-          ),
-
-          // NUEVO: RefreshIndicator envolviendo el Expanded
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                await publicationController.refreshPosts();
-                await calendarController.loadAppointmentsForDate(
-                  calendarController.focusedDate.value,
-                );
-              },
-              // IMPORTANTE: Necesario para que funcione en la parte superior
-              displacement: 40,
-              edgeOffset: 0,
-              child: SingleChildScrollView(
-                controller: _internalScrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    SizedBox(height: GerenaColors.paddingMedium),
-                    _buildCitasSection(),
-                    SizedBox(height: GerenaColors.paddingMedium),
-                    BannersListWidget(
-                      height: 200,
-                      maxBanners: 2,
-                    ),
-                    SizedBox(height: 20),
-                    GestureDetector(
-                      onVerticalDragEnd: (details) {
-                        if (details.primaryVelocity! < -500) {
-                          if (_pageController.hasClients) {
-                            _pageController.nextPage(
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
+                // IMPORTANTE: Necesario para que funcione en la parte superior
+                displacement: 40,
+                edgeOffset: 0,
+                child: SingleChildScrollView(
+                  controller: _internalScrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      SizedBox(height: GerenaColors.paddingMedium),
+                      _buildCitasSection(),
+                      SizedBox(height: GerenaColors.paddingMedium),
+                      BannersListWidget(
+                        height: 200,
+                        maxBanners: 2,
+                      ),
+                      SizedBox(height: 20),
+                      GestureDetector(
+                        onVerticalDragEnd: (details) {
+                          if (details.primaryVelocity! < -500) {
+                            if (_pageController.hasClients) {
+                              _pageController.nextPage(
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            }
                           }
-                        }
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              color: GerenaColors.textSecondaryColor,
-                              size: 32,
-                            ),
-                            Text(
-                              'Desliza para ver publicaciones',
-                              style: GoogleFonts.rubik(
-                                fontSize: 12,
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.keyboard_arrow_down,
                                 color: GerenaColors.textSecondaryColor,
+                                size: 32,
                               ),
-                            ),
-                          ],
+                              Text(
+                                'Desliza para ver publicaciones',
+                                style: GoogleFonts.rubik(
+                                  fontSize: 12,
+                                  color: GerenaColors.textSecondaryColor,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 100),
-                  ],
+                      SizedBox(height: 100),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildLoadingState(double availableHeight) {
     return Container(
@@ -547,7 +548,6 @@ if (profileController.showPatientProfile.value) {
             ],
           ),
           SizedBox(height: GerenaColors.paddingSmall),
-          
           LayoutBuilder(
             builder: (context, constraints) {
               return Obx(() {
@@ -587,6 +587,19 @@ if (profileController.showPatientProfile.value) {
                               textAlign: TextAlign.center,
                             ),
                           ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: GerenaColors.widgetButton(
+                                showShadow: false,
+                                text: 'Agendar Cita',
+                                onPressed: () {
+                                  ModalAgregarCita.show();
+                                },
+                              )),
                         ],
                       ),
                     ),
@@ -596,8 +609,8 @@ if (profileController.showPatientProfile.value) {
                 final hasIndicators = upcomingAppointments.length > 1;
                 final indicatorSpace = hasIndicators ? 30.0 : 0.0;
                 final availableHeight = constraints.maxHeight;
-                
-                final citaCardHeight = hasIndicators 
+
+                final citaCardHeight = hasIndicators
                     ? (availableHeight - indicatorSpace).clamp(150.0, 200.0)
                     : availableHeight.clamp(150.0, 220.0);
 
@@ -623,7 +636,8 @@ if (profileController.showPatientProfile.value) {
                         SizedBox(height: 8),
                         SizedBox(
                           height: 20,
-                          child: _buildPageIndicators(upcomingAppointments.length),
+                          child:
+                              _buildPageIndicators(upcomingAppointments.length),
                         ),
                       ],
                     ],
@@ -644,162 +658,170 @@ if (profileController.showPatientProfile.value) {
       return [];
     }
 
-    allAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
+    final confirmedAppointments = allAppointments.where((appointment) {
+      final appointmentId = appointment.id as int;
+      final entity = calendarController.getAppointmentEntity(appointmentId);
 
-    return allAppointments.take(5).toList();
+      return entity != null && entity.status.toLowerCase() == 'confirmada';
+    }).toList();
+
+    confirmedAppointments.sort((a, b) => a.startTime.compareTo(b.startTime));
+
+    return confirmedAppointments.take(5).toList();
   }
 
   Widget _buildCitaCard(dynamic appointment) {
-  final String formattedTime = _formatTime(appointment.startTime);
-  final String formattedDate = _formatDate(appointment.startTime);
+    final String formattedTime = _formatTime(appointment.startTime);
+    final String formattedDate = _formatDate(appointment.startTime);
 
-  final String doctorName = appointment.subject ?? 'Sin nombre';
-  final String appointmentType = appointment.location ?? 'Cita general';
-  final String treatment = appointment.notes ?? 'Sin descripción';
-  
-  // NUEVO: Obtenemos la foto desde el controller
-  final String? photoUrl = calendarController.getAppointmentPhoto(appointment.id);
+    final String doctorName = appointment.subject ?? 'Sin nombre';
+    final String appointmentType = appointment.location ?? 'Cita general';
+    final String treatment = appointment.notes ?? 'Sin descripción';
 
-  return Container(
-    decoration: BoxDecoration(
-      color: GerenaColors.backgroundColor,
-      borderRadius: GerenaColors.mediumBorderRadius,
-      boxShadow: [GerenaColors.lightShadow],
-    ),
-    child: ClipRRect(
-      borderRadius: GerenaColors.mediumBorderRadius,
-      child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+    // NUEVO: Obtenemos la foto desde el controller
+    final String? photoUrl =
+        calendarController.getAppointmentPhoto(appointment.id);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: GerenaColors.backgroundColor,
+        borderRadius: GerenaColors.mediumBorderRadius,
+        boxShadow: [GerenaColors.lightShadow],
+      ),
+      child: ClipRRect(
+        borderRadius: GerenaColors.mediumBorderRadius,
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            doctorName,
+                            style: GoogleFonts.rubik(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: GerenaColors.textPrimaryColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            appointmentType,
+                            style: GoogleFonts.rubik(
+                              fontSize: 12,
+                              color: GerenaColors.textSecondaryColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            treatment,
+                            style: GoogleFonts.rubik(
+                              fontSize: 11,
+                              color: GerenaColors.textTertiaryColor,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          doctorName,
-                          style: GoogleFonts.rubik(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: GerenaColors.textPrimaryColor,
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [GerenaColors.lightShadow],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          child: ClipOval(
+                            child: photoUrl != null && photoUrl.isNotEmpty
+                                ? Image.network(
+                                    photoUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          color: GerenaColors.primaryColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.person,
+                                          color: GerenaColors.textLightColor,
+                                          size: 25,
+                                        ),
+                                      );
+                                    },
+                                  )
+                                : Container(
+                                    decoration: BoxDecoration(
+                                      color: GerenaColors.primaryColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.person,
+                                      color: GerenaColors.textLightColor,
+                                      size: 25,
+                                    ),
+                                  ),
+                          ),
                         ),
                         SizedBox(height: 8),
                         Text(
-                          appointmentType,
+                          formattedTime,
                           style: GoogleFonts.rubik(
                             fontSize: 12,
-                            color: GerenaColors.textSecondaryColor,
+                            color: GerenaColors.textQuaternary,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: 4),
                         Text(
-                          treatment,
+                          formattedDate,
                           style: GoogleFonts.rubik(
-                            fontSize: 11,
+                            fontSize: 10,
                             color: GerenaColors.textTertiaryColor,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [GerenaColors.lightShadow],
-                        ),
-                        child: ClipOval(
-                          child: photoUrl != null && photoUrl.isNotEmpty
-                              ? Image.network(
-                                  photoUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        color: GerenaColors.primaryColor,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.person,
-                                        color: GerenaColors.textLightColor,
-                                        size: 25,
-                                      ),
-                                    );
-                                  },
-                                )
-                              : Container(
-                                  decoration: BoxDecoration(
-                                    color: GerenaColors.primaryColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.person,
-                                    color: GerenaColors.textLightColor,
-                                    size: 25,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        formattedTime,
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: GerenaColors.textQuaternary,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        formattedDate,
-                        style: GoogleFonts.rubik(
-                          fontSize: 10,
-                          color: GerenaColors.textTertiaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 12),
-              Center(
-                child: IntrinsicWidth(
-                  child: GerenaColors.widgetButton(
-                    onPressed: () {
-                      profileController.showPatientProfileView(appointment);
-                    },
-                    text: 'Ver Ficha',
-                    showShadow: false,
-                    borderRadius: 20,
+                  ],
+                ),
+                SizedBox(height: 12),
+                Center(
+                  child: IntrinsicWidth(
+                    child: GerenaColors.widgetButton(
+                      onPressed: () {
+                        profileController.showPatientProfileView(appointment);
+                      },
+                      text: 'Ver Ficha',
+                      showShadow: false,
+                      borderRadius: 20,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildPageIndicators(int count) {
     if (count <= 1) return SizedBox.shrink();

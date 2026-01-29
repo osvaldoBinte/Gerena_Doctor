@@ -46,6 +46,8 @@ class ImageViewerDialog extends StatelessWidget {
                                 icon: Image.asset(
                                   'assets/icons/close.png',
                                   color: GerenaColors.textSecondaryColor,
+                                  width: 24,
+                                  height: 24,
                                 ),
                                 padding: EdgeInsets.zero,
                                 constraints: BoxConstraints(),
@@ -53,7 +55,6 @@ class ImageViewerDialog extends StatelessWidget {
                             ],
                           ),
                         ),
-
                         Flexible(
                           child: Container(
                             decoration: BoxDecoration(

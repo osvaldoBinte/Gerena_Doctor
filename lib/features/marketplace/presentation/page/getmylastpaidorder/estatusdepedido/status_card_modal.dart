@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
-import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/estatusdepedido/estatus_de_pedido.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/get_my_last_paid_order_controller.dart';
+import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widget/status_card_loading.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/widgets_status_pedido.dart';
 import 'package:get/get.dart';
- class StatusCardModal extends StatelessWidget {
+
+class StatusCardModal extends StatelessWidget {
   const StatusCardModal({Key? key}) : super(key: key);
 
   @override
@@ -12,57 +14,67 @@ import 'package:get/get.dart';
       onTap: () => Navigator.of(context).pop(),
       child: Material(
         color: Colors.black54,
-        child: Align(
-          alignment: Alignment.topLeft,
+        child: Center(
           child: GestureDetector(
             onTap: () {},
             child: Container(
               width: MediaQuery.of(context).size.width < 800 
                   ? MediaQuery.of(context).size.width * 0.9  
-                  : MediaQuery.of(context).size.width * 0.4,  
-              height: MediaQuery.of(context).size.height * 0.7, 
-              margin: EdgeInsets.only(
-                top: 130,
-                left: MediaQuery.of(context).size.width < 800 ? 16 : 16,
-                right: MediaQuery.of(context).size.width < 800 ? 16 : 0,
+                  : MediaQuery.of(context).size.width * 0.5,
+              margin: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              child: TweenAnimationBuilder<Offset>(
-                tween: Tween<Offset>(
-                  begin: const Offset(0, 1),
-                  end: Offset.zero,
-                ),
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeOut,
-                builder: (context, offset, child) {
-                  return Transform.translate(
-                    offset: Offset(0, offset.dy * MediaQuery.of(context).size.height),
-                    child: Transform.scale(
-                      scale: MediaQuery.of(context).size.width < 800 ? 0.9 : 0.8,
-                      child: child,
-                    ),
-                  );
-                },
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: double.infinity,
-                      minHeight: 200,
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.topLeft,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width < 800 
-                              ? MediaQuery.of(context).size.width * 0.85
-                              : 400, 
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.withOpacity(0.2),
+                          width: 1,
                         ),
-                        child: StatusCardWidget(),
                       ),
                     ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Estado de tu pedido',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: GerenaColors.textPrimaryColor,
+                          ),
+                        ),
+                      IconButton(
+  icon: Image.asset(
+    'assets/icons/close.png',
+                 width: 20,
+    height: 20,
+  ),
+  onPressed: () => Navigator.of(context).pop(),
+  splashRadius: 20,
+)
+
+                      ],
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: StatusCardWidget(),
+                  ),
+                ],
               ),
             ),
           ),
@@ -70,4 +82,5 @@ import 'package:get/get.dart';
       ),
     );
   }
+
 }

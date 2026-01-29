@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/features/appointment/domain/entities/getappointment/get_apppointment_entity.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/modal_cancelar_cita.dart';
+import 'package:gerena/features/appointment/presentation/page/addappointment/modal_completar_cita.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PatientProfileScreen extends StatelessWidget {
   final GetApppointmentEntity appointmentEntity;
@@ -41,10 +44,44 @@ class PatientProfileScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _callPhoneNumber() async {
+    final phoneNumber = '+${appointmentEntity.clientPhone}';
+    final phoneUri = Uri.parse('tel:$phoneNumber');
+
+    try {
+      await launchUrl(
+        phoneUri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      print('❌ Error al intentar llamar: $e');
+    }
+  }
+void _showCompleteAppointmentDialog() {
+  ModalCompletarCita.show(appointmentEntity.id);
+}
+
+void _showCancelAppointmentDialog() {
+  ModalCancelarCita.show(appointmentEntity.id);
+}
+
   @override
   Widget build(BuildContext context) {
+    final isCompleted = appointmentEntity.status.toLowerCase() == 'completada';
+    final isCancelled = appointmentEntity.status.toLowerCase() == 'cancelada';
+    final isPending = appointmentEntity.status.toLowerCase() == 'pendiente' || 
+                      appointmentEntity.status.toLowerCase() == 'confirmada';
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      floatingActionButton: FloatingActionButton(
+        onPressed: _callPhoneNumber,
+        backgroundColor: Colors.teal[400],
+        child: const Icon(
+          Icons.phone,
+          color: Colors.white,
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -64,7 +101,6 @@ class PatientProfileScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // Botón de cerrar
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -89,7 +125,6 @@ class PatientProfileScreen extends StatelessWidget {
                       ),
                     ),
                     
-                    // Información del paciente - AHORA CLICKEABLE
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
@@ -152,7 +187,6 @@ class PatientProfileScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     
-                    // Tipo de cita
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -175,7 +209,6 @@ class PatientProfileScreen extends StatelessWidget {
                       ),
                     ),
                     
-                    // Motivo y hora
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(
@@ -207,7 +240,6 @@ class PatientProfileScreen extends StatelessWidget {
                     
                     const Divider(height: 1),
                     
-                    // Detalles de la cita
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -267,9 +299,146 @@ class PatientProfileScreen extends StatelessWidget {
                       ),
                     ),
                     
+                    // 🔥 SECCIÓN DE BOTONES DE ACCIÓN
+                    if (isPending) ...[
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _showCompleteAppointmentDialog,
+                                icon: const Icon(Icons.check_circle_outline, size: 20),
+                                label: const Text(
+                                  'Completar',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green[600],
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: _showCancelAppointmentDialog,
+                                icon: const Icon(Icons.cancel_outlined, size: 20),
+                                label: const Text(
+                                  'Cancelar',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[600],
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 2,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    
+                    // INFORMACIÓN MÉDICA DEL PACIENTE
+                    if (_hasMedicalInfo()) ...[
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.medical_information,
+                                  size: 20,
+                                  color: Colors.teal[700],
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Historial Médico del Paciente',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.teal[700],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            if (appointmentEntity.alergias != null && appointmentEntity.alergias!.isNotEmpty) ...[
+                              _buildMedicalInfoCard(
+                                'Alergias',
+                                appointmentEntity.alergias!,
+                                Icons.warning_amber_rounded,
+                                Colors.orange,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            
+                            if (appointmentEntity.padecimientos != null && appointmentEntity.padecimientos!.isNotEmpty) ...[
+                              _buildMedicalInfoCard(
+                                'Padecimientos',
+                                appointmentEntity.padecimientos!,
+                                Icons.medical_services,
+                                Colors.red,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            
+                            if (appointmentEntity.enfermedadesCirugias != null && appointmentEntity.enfermedadesCirugias!.isNotEmpty) ...[
+                              _buildMedicalInfoCard(
+                                'Enfermedades y Cirugías',
+                                appointmentEntity.enfermedadesCirugias!,
+                                Icons.local_hospital,
+                                Colors.purple,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            
+                            if (appointmentEntity.pruebasEstudios != null && appointmentEntity.pruebasEstudios!.isNotEmpty) ...[
+                              _buildMedicalInfoCard(
+                                'Pruebas y Estudios',
+                                appointmentEntity.pruebasEstudios!,
+                                Icons.science,
+                                Colors.blue,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            
+                            if (appointmentEntity.comentarios != null && appointmentEntity.comentarios!.isNotEmpty) ...[
+                              _buildMedicalInfoCard(
+                                'Comentarios Adicionales',
+                                appointmentEntity.comentarios!,
+                                Icons.comment,
+                                Colors.teal,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                    
                     const Divider(height: 1),
                     
-                    // Información adicional
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -290,7 +459,6 @@ class PatientProfileScreen extends StatelessWidget {
                             _formatFullDateTime(DateTime.parse(appointmentEntity.endDateTime)),
                           ),
                           const SizedBox(height: 20),
-                          // Sección del doctor
                           _buildDoctorSection(),
                         ],
                       ),
@@ -301,6 +469,75 @@ class PatientProfileScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  bool _hasMedicalInfo() {
+    return (appointmentEntity.alergias != null && appointmentEntity.alergias!.isNotEmpty) ||
+        (appointmentEntity.padecimientos != null && appointmentEntity.padecimientos!.isNotEmpty) ||
+        (appointmentEntity.enfermedadesCirugias != null && appointmentEntity.enfermedadesCirugias!.isNotEmpty) ||
+        (appointmentEntity.pruebasEstudios != null && appointmentEntity.pruebasEstudios!.isNotEmpty) ||
+        (appointmentEntity.comentarios != null && appointmentEntity.comentarios!.isNotEmpty);
+  }
+
+  Widget _buildMedicalInfoCard(
+    String title,
+    String content,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              size: 22,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: color.withOpacity(0.9),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  content,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[800],
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -385,7 +622,6 @@ class PatientProfileScreen extends StatelessWidget {
     );
   }
 
-  // NUEVO: Widget específico para la fila del paciente con nombre clickeable
   Widget _buildPatientInfoRow(
     String label1,
     String patientName,

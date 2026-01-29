@@ -143,22 +143,21 @@ class SearchProfileController extends GetxController {
     currentRol.value = '';
     await loadAllProfiles();
   }
-
-  // Convertir SearchProfileEntity a Map para createDoctorCard
-  Map<String, dynamic> entityToMap(SearchProfileEntity entity) {
-    return {
-      'userId': entity.userId,
-      'doctorName': entity.fullName,
-      'specialty': entity.specialty ?? '',
-      'profileImage': entity.profilePictureUrl ?? '',
-      'rating': entity.averagerating ?? 0.0,
-      'reviews': '', 
-      'location': entity.address ?? '',
-      'info': entity.bibliography ?? '',
-      'experienceTime': entity.expreriecetime,
-      'rol': entity.rol,
-    };
-  }
+Map<String, dynamic> entityToMap(SearchProfileEntity entity) {
+  return {
+    'userId': entity.userId,
+    'doctorName': entity.fullName,
+    'username': entity.username, // ✨ AGREGAR ESTO
+    'specialty': entity.specialty ?? '',
+    'profileImage': entity.profilePictureUrl ?? '',
+    'rating': entity.averagerating ?? 0.0,
+    'reviews': '', 
+    'location': entity.address ?? '',
+    'info': entity.bibliography ?? '',
+    'experienceTime': entity.expreriecetime,
+    'rol': entity.rol,
+  };
+}
 
   @override
   void onClose() {

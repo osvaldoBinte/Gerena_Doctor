@@ -92,17 +92,15 @@ class _SearchProfilePageState extends State<SearchProfilePage> {
         ),
       ),
       body: Container(
-        // ✅ Imagen de fondo
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/fondo/Mapa_de_fondo.png'),
-            fit: BoxFit.cover, // Cubre toda la pantalla
-            opacity: 0.3, // Opcional: ajusta la opacidad (0.0 a 1.0)
+            fit: BoxFit.cover, 
+            opacity: 0.3, 
           ),
         ),
         child: Column(
           children: [
-            // Barra de búsqueda
             Container(
               color: GerenaColors.backgroundColorfondo.withOpacity(0.9), // Semi-transparente
               padding: const EdgeInsets.all(16),

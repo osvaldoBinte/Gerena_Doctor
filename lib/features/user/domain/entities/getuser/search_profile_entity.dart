@@ -1,6 +1,7 @@
 class SearchProfileEntity {
   final int userId;
   final String fullName;
+  final String? username;
   final String? specialty;  
   final String? profilePictureUrl;  
   final int? expreriecetime;
@@ -12,6 +13,7 @@ class SearchProfileEntity {
   SearchProfileEntity({
     required this.userId,
     required this.fullName,
+    this.username,
     this.specialty,
     this.profilePictureUrl,
     this.expreriecetime,

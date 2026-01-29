@@ -1928,6 +1928,7 @@ class GerenaColors {
 
     // Validaciones de datos
     final String doctorName = doctor['doctorName'] ?? 'Sin nombre';
+    final String? username = doctor['username']; // ✨ NUEVO
     final String profileImage =
         doctor['profileImage'] ?? 'assets/logo/logoAPP.jpg';
     final String specialty = doctor['specialty'] ?? '';
@@ -1947,6 +1948,7 @@ class GerenaColors {
     final bool hasInfo = info.isNotEmpty;
     final bool hasRol = rol != null && rol.isNotEmpty;
     final bool hasExperience = experienceTime != null && experienceTime > 0;
+    final bool hasUsername = username != null && username.isNotEmpty; // ✨ NUEVO
 
     // Función para obtener color del rol
     Color _getRolColor(String rol) {
@@ -1997,13 +1999,11 @@ class GerenaColors {
                   final AuthService authService = AuthService();
                   final int? loggedUserId = await authService.getUsuarioId();
 
-                  // Si es el mismo usuario logueado, ir a su perfil
                   if (loggedUserId == userId) {
-                    Get.offAllNamed(RoutesNames.homePage, arguments: 3);
+                    Get.offAllNamed(RoutesNames.homePage, arguments: 4);
                     return;
                   }
 
-                  // Obtener el StartController
                   if (!Get.isRegistered<StartController>()) {
                     print('❌ StartController no está registrado');
                     return;
@@ -2018,11 +2018,11 @@ class GerenaColors {
                     if (rolLower == 'doctor') {
                       print(
                           '📋 Navegando a perfil de doctor: $doctorName (ID: $userId)');
-                      // Navegar al perfil de doctor
                       startController.showDoctorProfilePage(
                         doctorData: {
                           'userId': userId,
                           'doctorName': doctorName,
+                          'username': username, // ✨ Pasar username
                           'specialty': specialty,
                           'location': location,
                           'profileImage': profileImage,
@@ -2037,13 +2037,11 @@ class GerenaColors {
                         rolLower == 'paciente') {
                       print(
                           '📋 Navegando a perfil de usuario: $doctorName (ID: $userId)');
-                      // Navegar al perfil de usuario
                       startController.showUserProfilePage(
                         userData: {
                           'userId': userId,
                           'userName': doctorName,
-                          'username':
-                              profileImage, // Esto debería ser el username real
+                          'username': username, // ✨ Usar el username real
                           'rol': rol,
                         },
                       );
@@ -2118,65 +2116,75 @@ class GerenaColors {
                   children: [
                     // Nombre con navegación
                     GestureDetector(
-                     onTap: () async {
-                  final AuthService authService = AuthService();
-                  final int? loggedUserId = await authService.getUsuarioId();
+                      onTap: () async {
+                        final AuthService authService = AuthService();
+                        final int? loggedUserId =
+                            await authService.getUsuarioId();
 
-                  // Si es el mismo usuario logueado, ir a su perfil
-                  if (loggedUserId == userId) {
-                    Get.offAllNamed(RoutesNames.homePage, arguments: 3);
-                    return;
-                  }
+                        if (loggedUserId == userId) {
+                          Get.offAllNamed(RoutesNames.homePage, arguments: 4);
+                          return;
+                        }
 
-                  // Obtener el StartController
-                  if (!Get.isRegistered<StartController>()) {
-                    print('❌ StartController no está registrado');
-                    return;
-                  }
+                        if (!Get.isRegistered<StartController>()) {
+                          print('❌ StartController no está registrado');
+                          return;
+                        }
 
-                  final StartController startController =
-                      Get.find<StartController>();
+                        final StartController startController =
+                            Get.find<StartController>();
 
-                  if (rol != null) {
-                    final String rolLower = rol.toLowerCase();
+                        if (rol != null) {
+                          final String rolLower = rol.toLowerCase();
 
-                    if (rolLower == 'doctor') {
-                      print(
-                          '📋 Navegando a perfil de doctor: $doctorName (ID: $userId)');
-                      // Navegar al perfil de doctor
-                      startController.showDoctorProfilePage(
-                        doctorData: {
-                          'userId': userId,
-                          'doctorName': doctorName,
-                          'specialty': specialty,
-                          'location': location,
-                          'profileImage': profileImage,
-                          'rating': rating,
-                          'reviews': reviews,
-                          'info': info,
-                          'experienceTime': experienceTime,
-                          'rol': rol,
-                        },
-                      );
-                    } else if (rolLower == 'cliente' ||
-                        rolLower == 'paciente') {
-                      print(
-                          '📋 Navegando a perfil de usuario: $doctorName (ID: $userId)');
-                      // Navegar al perfil de usuario
-                      startController.showUserProfilePage(
-                        userData: {
-                          'userId': userId,
-                          'userName': doctorName,
-                          'username':
-                              profileImage, // Esto debería ser el username real
-                          'rol': rol,
-                        },
-                      );
-                    }
-                  }
-                },
+                          if (rolLower == 'doctor') {
+                            print(
+                                '📋 Navegando a perfil de doctor: $doctorName (ID: $userId)');
+                            startController.showDoctorProfilePage(
+                              doctorData: {
+                                'userId': userId,
+                                'doctorName': doctorName,
+                                'username': username, // ✨ Pasar username
+                                'specialty': specialty,
+                                'location': location,
+                                'profileImage': profileImage,
+                                'rating': rating,
+                                'reviews': reviews,
+                                'info': info,
+                                'experienceTime': experienceTime,
+                                'rol': rol,
+                              },
+                            );
+                          } else if (rolLower == 'cliente' ||
+                              rolLower == 'paciente') {
+                            print(
+                                '📋 Navegando a perfil de usuario: $doctorName (ID: $userId)');
+                            startController.showUserProfilePage(
+                              userData: {
+                                'userId': userId,
+                                'userName': doctorName,
+                                'username': username, // ✨ Usar el username real
+                                'rol': rol,
+                              },
+                            );
+                          }
+                        }
+                      },
                       child: Text(doctorName, style: headingSmall),
                     ),
+
+                    // ✨ USERNAME - Justo debajo del nombre
+                    if (hasUsername) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        '@$username',
+                        style: bodySmall.copyWith(
+                          color: textSecondaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
 
                     // Rol Badge
                     if (hasRol) ...[

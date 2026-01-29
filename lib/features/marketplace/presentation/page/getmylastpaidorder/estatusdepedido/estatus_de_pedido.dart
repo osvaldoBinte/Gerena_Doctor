@@ -56,7 +56,8 @@ class EstatusDePedido extends StatelessWidget {
                         ),
                         child: Image.asset(
                           'assets/icons/close.png',
-                          
+                                          width: 20,
+    height: 20,
                         ),
                       ),
                     ),

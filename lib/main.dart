@@ -13,7 +13,7 @@ import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;
 
-String enviromentSelect = Enviroment.testing.value; 
+String enviromentSelect = Enviroment.production.value; 
 
 void main() async {
   

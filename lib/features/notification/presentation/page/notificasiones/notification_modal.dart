@@ -52,7 +52,10 @@ class NotificationModal extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () => Get.back(),
-                    icon: Image.asset('assets/icons/close.png'),
+                    icon: Image.asset('assets/icons/close.png',
+                                    width: 20,
+    height: 20,),
+                    
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
