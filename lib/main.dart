@@ -13,24 +13,24 @@ import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;
 
-String enviromentSelect = Enviroment.production.value; 
+String enviromentSelect = Enviroment.production.value;
 
 void main() async {
-  
   await dotenv.load(fileName: enviromentSelect);
-    Stripe.publishableKey = AppConstants.stripePublishableKey  ;
+  Stripe.publishableKey = AppConstants.stripePublishableKey;
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await PreferencesUser().initiPrefs();
-    await NotificationService().initialize();
+  await NotificationService().initialize();
 
- FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.onError = (FlutterErrorDetails details) {
     if (details.exception.toString().contains('KeyDownEvent') ||
         details.exception.toString().contains('hardware_keyboard') ||
         details.exception.toString().contains('MouseTracker') ||
         details.exception.toString().contains('mouse_tracker') ||
         details.exception.toString().contains('_debugDuringDeviceUpdate')) {
-      print('INFO: Error de entrada ignorado en desarrollo: ${details.exception}');
+      print(
+          'INFO: Error de entrada ignorado en desarrollo: ${details.exception}');
       return;
     }
     FlutterError.presentError(details);
@@ -48,10 +48,10 @@ void main() async {
     await windowManager.ensureInitialized();
 
     final screenSize = await windowManager.getSize();
-    
-    final windowWidth = (screenSize.width * 0.8).clamp(1200.0, 1920.0); 
+
+    final windowWidth = (screenSize.width * 0.8).clamp(1200.0, 1920.0);
     final windowHeight = (screenSize.height * 0.8).clamp(800.0, 1080.0);
-    
+
     final minWidth = (screenSize.width * 0.8).clamp(1000.0, 1400.0);
     final minHeight = (screenSize.height * 0.8).clamp(700.0, 900.0);
 
@@ -62,16 +62,15 @@ void main() async {
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,
-      
     );
 
     await windowManager.setSize(Size(windowWidth, windowHeight));
-    await windowManager.setMinimumSize(Size(minWidth, minHeight)); 
+    await windowManager.setMinimumSize(Size(minWidth, minHeight));
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
-       await windowManager.maximize(); 
+      await windowManager.maximize();
     });
   }
 
