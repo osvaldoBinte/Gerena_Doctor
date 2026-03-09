@@ -407,7 +407,7 @@ Widget _buildStatColumn(String label, String value, Color color, {VoidCallback? 
       postId: post.id,
       userName: post.author?.name ?? controller.userName,
       date: controller.formatDate(post.createdAt),
-      title: _extractTitle(post.description),
+      title: post.description,
       content: '',
       images: controller.getOrderedImages(post),
       isReview: post.isReview,

@@ -90,6 +90,7 @@ import 'package:gerena/features/publications/domain/usecase/get_feed_posts_useca
 import 'package:gerena/features/publications/domain/usecase/get_my_posts_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_comments_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_doctor_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_post_reaction_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/like_publication_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/update_publication_usecase.dart';
@@ -106,6 +107,7 @@ import 'package:gerena/features/stories/domain/usecase/remove_story_usecase.dart
 import 'package:gerena/features/stories/domain/usecase/set_story_as_seen_usecase.dart';
 import 'package:gerena/features/subscription/data/datasources/subscription_data_sources_imp.dart';
 import 'package:gerena/features/subscription/data/repositories/subscription_repository_imp.dart';
+import 'package:gerena/features/subscription/domain/usecase/VerifyIapReceiptUsecase.dart';
 import 'package:gerena/features/subscription/domain/usecase/change_subscription_plan_usecase.dart';
 import 'package:gerena/features/subscription/domain/usecase/get_all_plans_usecase.dart';
 import 'package:gerena/features/subscription/domain/usecase/get_my_subscription_usecase.dart';
@@ -209,7 +211,7 @@ class UsecaseConfig {
    PostSubscribeToPlanUsecase? postSubscribeToPlanUsecase;
    GetAllPlansUsecase? getAllPlansUsecase;
    GetMySubscriptionUsecase? getMySubscriptionUsecase;
-
+   VerifyIAPPurchaseUsecase?verifyIapReceiptUsecase;
 
    AddImagenesUsecase? addImagenesUsecase;
    CreateProcedureUsecase? createProcedureUsecase;
@@ -242,6 +244,7 @@ class UsecaseConfig {
 
   CreatePublicationUsecase? createPublicationUsecase;
   DeletePublicationUsecase? deletePublicationUsecase;
+  GetPostReactionUsecase? getPostReactionUsecase;
   GetFeedPostsUsecase? getFeedPostsUsecase;
   GetMyPostsUsecase? getMyPostsUsecase;
   LikePublicationUsecase? likePublicationUsecase;
@@ -361,7 +364,7 @@ class UsecaseConfig {
       postSubscribeToPlanUsecase = PostSubscribeToPlanUsecase(subscriptionRepository: subscriptionRepositoryImp!);
       getAllPlansUsecase = GetAllPlansUsecase(subscriptionRepository: subscriptionRepositoryImp!);
       getMySubscriptionUsecase = GetMySubscriptionUsecase(subscriptionRepository: subscriptionRepositoryImp!);
-
+      verifyIapReceiptUsecase = VerifyIAPPurchaseUsecase(subscriptionRepository: subscriptionRepositoryImp!);
 
 
       addImagenesUsecase = AddImagenesUsecase(proceduresRepository: procedureRepositoryImp!);
@@ -389,6 +392,7 @@ class UsecaseConfig {
 
 
       createPublicationUsecase = CreatePublicationUsecase(publicationRepository: publicationRepositoryImp!);
+      getPostReactionUsecase = GetPostReactionUsecase(publicationRepository: publicationRepositoryImp!);
       deletePublicationUsecase = DeletePublicationUsecase(publicationRepository: publicationRepositoryImp!);
       getFeedPostsUsecase = GetFeedPostsUsecase(publicationRepository: publicationRepositoryImp!);
       getMyPostsUsecase = GetMyPostsUsecase(publicationRepository: publicationRepositoryImp!);

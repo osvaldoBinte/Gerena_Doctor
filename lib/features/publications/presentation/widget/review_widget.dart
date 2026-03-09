@@ -58,6 +58,8 @@ class ReviewWidget extends StatefulWidget {
 class _ReviewWidgetState extends State<ReviewWidget> {
   late PostController postController;
   bool _initialized = false;
+bool _isTitleExpanded = false;
+bool _isContentExpanded = false;
   final PublicationController publicationController =
       Get.find<PublicationController>();
   @override
@@ -136,24 +138,102 @@ class _ReviewWidgetState extends State<ReviewWidget> {
             ],
           ),
           const SizedBox(height: 12),
-          if (widget.title.isNotEmpty) ...[
-            Text(
-              widget.title,
-              style: GerenaColors.storyText.copyWith(
-                color: GerenaColors.textSecondary,
+        if (widget.title.isNotEmpty) ...[
+  LayoutBuilder(
+    builder: (context, constraints) {
+      const maxLines = 2;
+      final textSpan = TextSpan(
+        text: widget.title,
+        style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        maxLines: maxLines,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: constraints.maxWidth);
+
+      final isOverflowing = textPainter.didExceedMaxLines;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.title,
+            maxLines: _isTitleExpanded ? null : maxLines,
+            overflow: _isTitleExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
+          ),
+          if (isOverflowing)
+            GestureDetector(
+              onTap: () => setState(() => _isTitleExpanded = !_isTitleExpanded),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  _isTitleExpanded ? 'Ver menos' : 'Ver más',
+                  style: GoogleFonts.rubik(
+                    fontSize: 12,
+                    color: GerenaColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                    decorationColor: GerenaColors.primaryColor,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-          ],
-          if (widget.content.isNotEmpty) ...[
-            Text(
-              widget.content,
-              style: GerenaColors.storyText.copyWith(
-                color: GerenaColors.textSecondary,
+        ],
+      );
+    },
+  ),
+  const SizedBox(height: 8),
+],
+if (widget.content.isNotEmpty) ...[
+  LayoutBuilder(
+    builder: (context, constraints) {
+      const maxLines = 3;
+      final textSpan = TextSpan(
+        text: widget.content,
+        style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        maxLines: maxLines,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: constraints.maxWidth);
+
+      final isOverflowing = textPainter.didExceedMaxLines;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.content,
+            maxLines: _isContentExpanded ? null : maxLines,
+            overflow: _isContentExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+            style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
+          ),
+          if (isOverflowing)
+            GestureDetector(
+              onTap: () => setState(() => _isContentExpanded = !_isContentExpanded),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  _isContentExpanded ? 'Ver menos' : 'Ver más',
+                  style: GoogleFonts.rubik(
+                    fontSize: 12,
+                    color: GerenaColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                    decorationColor: GerenaColors.primaryColor,
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-          ],
+        ],
+      );
+    },
+  ),
+  const SizedBox(height: 16),
+],
           if (widget.images.isNotEmpty) ...[
             buildImageGallery(widget.images),
             const SizedBox(height: 16),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/publications/presentation/page/create/create_publication_controller.dart';
 import 'package:get/get.dart';
+import 'package:video_player/video_player.dart';
 
 class CreatePublication extends StatelessWidget {
   const CreatePublication({super.key});
@@ -10,7 +11,7 @@ class CreatePublication extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CreatePublicationController>();
 
-    return Scaffold(   
+    return Scaffold(
       backgroundColor: GerenaColors.colorFondo,
       resizeToAvoidBottomInset: false,
       body: Material(
@@ -24,7 +25,6 @@ class CreatePublication extends StatelessWidget {
           child: Column(
             children: [
               _buildModernHeader(controller),
-              
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -39,7 +39,6 @@ class CreatePublication extends StatelessWidget {
                   ),
                 ),
               ),
-              
               _buildFloatingActionButton(controller),
             ],
           ),
@@ -47,7 +46,7 @@ class CreatePublication extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildModernHeader(CreatePublicationController controller) {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
@@ -81,7 +80,6 @@ class CreatePublication extends StatelessWidget {
               ),
             ),
           ),
-
           Row(
             children: [
               Container(
@@ -154,40 +152,39 @@ class CreatePublication extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-         Padding(
-  padding: const EdgeInsets.fromLTRB(22, 20, 22, 12),
-  child: Row(
-    children: [
-      Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          gradient: GerenaColors.primaryGradient,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(
-          Icons.edit_rounded,
-          color: GerenaColors.textLightColor,
-          size: 18,
-        ),
-      ),
-      const SizedBox(width: 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: GerenaColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.edit_rounded,
+                    color: GerenaColors.textLightColor,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
 
-      // ⬇️ Esto evita el overflow
-      Expanded(
-        child: Text(
-          'Escribe tu mensaje',
-          style: GerenaColors.headingSmall.copyWith(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
+                // ⬇️ Esto evita el overflow
+                Expanded(
+                  child: Text(
+                    'Escribe tu mensaje',
+                    style: GerenaColors.headingSmall.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2, // opcional
+                    overflow: TextOverflow.ellipsis, // opcional
+                  ),
+                ),
+              ],
+            ),
           ),
-          maxLines: 2,         // opcional
-          overflow: TextOverflow.ellipsis,  // opcional
-        ),
-      ),
-    ],
-  ),
-)
-,
           Container(
             height: 1,
             margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -272,7 +269,7 @@ class CreatePublication extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Galería de Imágenes',
+                      'Galería de Fotos y Videos',
                       style: GerenaColors.headingSmall.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -280,7 +277,7 @@ class CreatePublication extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Añade hasta 5 fotos',
+                      'Añade hasta 5 fotos o videos',
                       style: GerenaColors.bodySmall.copyWith(
                         color: GerenaColors.textSecondaryColor,
                         fontSize: 12,
@@ -296,15 +293,14 @@ class CreatePublication extends StatelessWidget {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    gradient:
-                        controller.selectedImages.length >= 5
-                            ? LinearGradient(
-                              colors: [
-                                GerenaColors.errorColor,
-                                GerenaColors.errorColor.withOpacity(0.8),
-                              ],
-                            )
-                            : GerenaColors.primaryGradient,
+                    gradient: controller.selectedImages.length >= 5
+                        ? LinearGradient(
+                            colors: [
+                              GerenaColors.errorColor,
+                              GerenaColors.errorColor.withOpacity(0.8),
+                            ],
+                          )
+                        : GerenaColors.primaryGradient,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -320,11 +316,10 @@ class CreatePublication extends StatelessWidget {
                   child: Text(
                     '${controller.selectedImages.length}/5',
                     style: GerenaColors.bodyMedium.copyWith(
-                      color: GerenaColors.textLightColor,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      overflow: TextOverflow.ellipsis
-                    ),
+                        color: GerenaColors.textLightColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        overflow: TextOverflow.ellipsis),
                     maxLines: 1,
                   ),
                 ),
@@ -342,8 +337,7 @@ class CreatePublication extends StatelessWidget {
                 mainAxisSpacing: 12,
                 childAspectRatio: 1,
               ),
-              itemCount:
-                  controller.selectedImages.length +
+              itemCount: controller.selectedImages.length +
                   (controller.selectedImages.length < 5 ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == controller.selectedImages.length) {
@@ -397,8 +391,7 @@ class CreatePublication extends StatelessWidget {
                     ),
                   );
                 }
-
-                final imageFile = controller.selectedImages[index];
+                final mediaFile = controller.selectedImages[index];
                 return Stack(
                   children: [
                     Container(
@@ -418,12 +411,43 @@ class CreatePublication extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(18),
-                        child: Image.file(
-                          imageFile,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
+                        child: mediaFile.isVideo
+                            ? Obx(() {
+                                if (!mediaFile.videoInitialized.value) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+                                return Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: SizedBox(
+                                        width: mediaFile
+                                            .videoController!.value.size.width,
+                                        height: mediaFile
+                                            .videoController!.value.size.height,
+                                        child: VideoPlayer(
+                                            mediaFile.videoController!),
+                                      ),
+                                    ),
+                                    // Icono de video encima
+                                    Container(
+                                      color: Colors.black26,
+                                      child: const Center(
+                                        child: Icon(Icons.play_circle_fill,
+                                            color: Colors.white, size: 36),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              })
+                            : Image.file(
+                                mediaFile.file,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              ),
                       ),
                     ),
                     Positioned(
@@ -449,14 +473,35 @@ class CreatePublication extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: Icon(
-                            Icons.close_rounded,
-                            size: 18,
-                            color: GerenaColors.textLightColor,
-                          ),
+                          child: Icon(Icons.close_rounded,
+                              size: 18, color: GerenaColors.textLightColor),
                         ),
                       ),
                     ),
+                    // Badge de video
+                    if (mediaFile.isVideo)
+                      Positioned(
+                        bottom: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.videocam,
+                                  color: Colors.white, size: 12),
+                              SizedBox(width: 3),
+                              Text('Video',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 10)),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 );
               },
@@ -467,24 +512,25 @@ class CreatePublication extends StatelessWidget {
     );
   }
 
-Widget _buildFloatingActionButton(CreatePublicationController controller) {
-  return Container(
-    padding: const EdgeInsets.all(24),
-    decoration: BoxDecoration(
-      color: GerenaColors.colorFondo,
-      boxShadow: [
-        BoxShadow(
-          color: GerenaColors.primaryColor.withOpacity(0.1),
-          blurRadius: 20,
-          offset: const Offset(0, -10),
-        ),
-      ],
-    ),
-    child: SafeArea(  // ✅ Agregar esto
-      top: false,    // No necesitas padding arriba
-      child: Obx(
-        () => controller.isLoading.value
-            ? Container(
+  Widget _buildFloatingActionButton(CreatePublicationController controller) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: GerenaColors.colorFondo,
+        boxShadow: [
+          BoxShadow(
+            color: GerenaColors.primaryColor.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -10),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        // ✅ Agregar esto
+        top: false, // No necesitas padding arriba
+        child: Obx(
+          () => controller.isLoading.value
+              ? Container(
                   height: 60,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -519,7 +565,7 @@ Widget _buildFloatingActionButton(CreatePublicationController controller) {
                     ),
                   ),
                 )
-                : GerenaColors.widgetButton(
+              : GerenaColors.widgetButton(
                   onPressed: controller.createPublication,
                   text: 'Crear Publicación',
                   fontSize: 17,
@@ -529,8 +575,8 @@ Widget _buildFloatingActionButton(CreatePublicationController controller) {
                     horizontal: 24,
                   ),
                 ),
+        ),
       ),
-    ),
     );
   }
 }

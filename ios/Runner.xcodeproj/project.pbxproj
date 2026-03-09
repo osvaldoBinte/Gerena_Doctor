@@ -16,6 +16,7 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A71607DEAE89C905B61E9090 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A659E04665DB92320FD84C0D /* Pods_Runner.framework */; };
+		B87DEFDA2F2C14F400FB19AF /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B87DEFD92F2C14F400FB19AF /* StoreKit.framework */; };
 		D788021DC024EE323ED6C4F0 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2E0ECDCBAAF17185D44255B /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +66,7 @@
 		A2E0ECDCBAAF17185D44255B /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A659E04665DB92320FD84C0D /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B83149942EFB9575001516CF /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		B87DEFD92F2C14F400FB19AF /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		C0FEEAEBEF84ACD0E201CF7B /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		C3034CF848440FA163093472 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		EC2937F734BEB16B0326FD35 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A71607DEAE89C905B61E9090 /* Pods_Runner.framework in Frameworks */,
+				B87DEFDA2F2C14F400FB19AF /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,6 +166,7 @@
 		D5F6BFD52C342E411B6DEE91 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B87DEFD92F2C14F400FB19AF /* StoreKit.framework */,
 				A659E04665DB92320FD84C0D /* Pods_Runner.framework */,
 				4C52F6056A236AF56761B964 /* Pods_RunnerTests.framework */,
 			);
@@ -517,7 +521,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 77SC2XJM66;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;

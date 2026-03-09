@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
@@ -14,7 +15,6 @@ class Membresia extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<SubscriptionController>();
-    final bool isIOS = GetPlatform.isIOS; // ← USAR GetPlatform
 
     return Container(
       color: GerenaColors.backgroundColorfondo,
@@ -89,7 +89,7 @@ class Membresia extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (controller.hasActiveSubscription.value) ...[
-                      _buildCurrentSubscriptionBanner(controller, isIOS),
+                      _buildCurrentSubscriptionBanner(controller),
                       const SizedBox(height: 24),
                     ],
 
@@ -110,7 +110,7 @@ class Membresia extends StatelessWidget {
                         return _buildMembershipCard(
                           type: plan.name,
                           title: plan.description,
-                          price: isIOS ? '' : '\$${plan.price.toStringAsFixed(2)} MXN / ${plan.interval == 'month' ? 'mensual' : plan.interval}',
+                          price: '\$${plan.price.toStringAsFixed(2)} MXN / ${plan.interval == 'month' ? 'mensual' : plan.interval}',
                           benefits: plan.caracteristicas.beneficios,
                           buttonText: controller.getButtonText(plan.id, plan.name),
                           buttonColor: controller.getButtonColor(plan.name),
@@ -119,53 +119,10 @@ class Membresia extends StatelessWidget {
                           hasGradientBorder: controller.hasGradientBorder(plan.name),
                           hasGradientButton: controller.hasGradientButton(plan.name),
                           screenWidth: constraints.maxWidth,
-                          isIOS: isIOS,
-                          onTap: isIOS ? null : () => _handlePlanTap(context, controller, plan),
+                          onTap: () => _handlePlanTap(context, controller, plan),
                         );
                       },
                     ),
-
-                    if (isIOS) ...[
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: GerenaColors.cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: GerenaColors.primaryColor.withOpacity(0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: GerenaColors.textSecondaryColor,
-                              size: 32,
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '¿No tienes cuenta?',
-                              style: GerenaColors.headingMedium.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Visita nuestro sitio web',
-                              style: GerenaColors.bodySmall.copyWith(
-                                fontSize: 12,
-                                color: GerenaColors.textSecondaryColor,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
@@ -176,7 +133,7 @@ class Membresia extends StatelessWidget {
     );
   }
 
-  Widget _buildCurrentSubscriptionBanner(SubscriptionController controller, bool isIOS) {
+  Widget _buildCurrentSubscriptionBanner(SubscriptionController controller) {
     final subscription = controller.currentSubscription.value;
     if (subscription == null) return SizedBox.shrink();
 
@@ -225,21 +182,19 @@ class Membresia extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      subscription.planname,
+                      subscription.planname??'',
                       style: GerenaColors.headingLarge.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (!isIOS) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        '\$${subscription.planprice.toStringAsFixed(2)} MXN / mes',
-                        style: GerenaColors.bodyMedium.copyWith(
-                          color: Colors.white.withOpacity(0.9),
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '\$${subscription.planprice?.toStringAsFixed(2)} MXN / mes',
+                      style: GerenaColors.bodyMedium.copyWith(
+                        color: Colors.white.withOpacity(0.9),
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
@@ -250,7 +205,7 @@ class Membresia extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  subscription.state.toUpperCase(),
+                  subscription.state?.toUpperCase() ?? 'N/A',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -274,7 +229,7 @@ class Membresia extends StatelessWidget {
             ],
           ),
           
-          if (subscription.cancelledAtPeriodEnd) ...[
+          if (subscription.cancelledAtPeriodEnd != null && subscription.cancelledAtPeriodEnd != '') ...[
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -315,13 +270,13 @@ class Membresia extends StatelessWidget {
                 );
               },
               icon: Icon(
-                subscription.cancelledAtPeriodEnd 
+                subscription.cancelledAtPeriodEnd != null && subscription.cancelledAtPeriodEnd != ''
                     ? Icons.refresh 
                     : Icons.cancel_outlined,
                 size: 18,
               ),
               label: Text(
-                subscription.cancelledAtPeriodEnd 
+                subscription.cancelledAtPeriodEnd != null && subscription.cancelledAtPeriodEnd != ''
                     ? 'Reactivar suscripción' 
                     : 'Cancelar suscripción',
                 style: TextStyle(fontWeight: FontWeight.w600),
@@ -336,6 +291,32 @@ class Membresia extends StatelessWidget {
               ),
             ),
           ),
+
+          // Botón de restaurar compras solo en iOS
+          if (Platform.isIOS) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await controller.restorePurchases();
+                },
+                icon: Icon(Icons.restore, size: 18),
+                label: Text(
+                  'Restaurar compras',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.5), width: 1.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -352,8 +333,157 @@ class Membresia extends StatelessWidget {
         builder: (context) => ChangePlanDialog(newPlan: plan),
       );
     } else {
-      _showSubscriptionDialog(context, plan);
+      // Diferenciar entre iOS con IAP y otros métodos
+      if (Platform.isIOS && controller.isIAPAvailable.value) {
+        // En iOS con IAP disponible, ir directo a la compra
+        _showIOSPurchaseConfirmation(context, controller, plan);
+      } else {
+        // En Android/Web o iOS sin IAP, mostrar selección de tarjeta Stripe
+        _showSubscriptionDialog(context, plan);
+      }
     }
+  }
+
+  // Nuevo método para confirmar compra en iOS
+  void _showIOSPurchaseConfirmation(BuildContext context, SubscriptionController controller, ViewAllPlansEntity plan) {
+    final product = controller.getIAPProduct(plan);
+    
+    if (product == null) {
+      showErrorSnackbar('Este plan no está disponible en App Store');
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.apple, color: GerenaColors.primaryColor, size: 28),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Confirmar suscripción',
+                style: GerenaColors.headingMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              plan.name,
+              style: GerenaColors.headingMedium.copyWith(
+                color: GerenaColors.primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              plan.description,
+              style: GerenaColors.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: GerenaColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Precio:',
+                    style: GerenaColors.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    product.price, // Precio desde App Store
+                    style: GerenaColors.headingMedium.copyWith(
+                      color: GerenaColors.primaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Se cobrará automáticamente cada ${plan.interval == 'month' ? 'mes' : plan.interval}.',
+              style: GerenaColors.bodySmall.copyWith(
+                color: GerenaColors.textSecondaryColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 16,
+                  color: GerenaColors.textSecondaryColor,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'La compra se realizará a través de tu cuenta de App Store.',
+                    style: GerenaColors.bodySmall.copyWith(
+                      color: GerenaColors.textSecondaryColor,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: GerenaColors.textSecondaryColor),
+            ),
+          ),
+          Obx(() => ElevatedButton(
+            onPressed: controller.isLoading.value
+                ? null
+                : () async {
+                    Navigator.pop(context);
+                    await controller.subscribeToPlan(plan.id);
+                  },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: GerenaColors.primaryColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: controller.isLoading.value
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    'Suscribirme',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+          )),
+        ],
+      ),
+    );
   }
 
   void _showSubscriptionDialog(BuildContext context, ViewAllPlansEntity plan) {
@@ -379,7 +509,6 @@ class Membresia extends StatelessWidget {
     bool hasGradientBorder = false,
     bool hasGradientButton = false,
     required double screenWidth,
-    required bool isIOS,
     VoidCallback? onTap,
   }) {
     double titleFontSize = screenWidth < 600 ? 18 : 15;
@@ -432,7 +561,6 @@ class Membresia extends StatelessWidget {
             benefitFontSize: benefitFontSize,
             buttonFontSize: buttonFontSize,
             cardPadding: cardPadding,
-            isIOS: isIOS,
             onTap: onTap,
           ),
         ),
@@ -465,7 +593,6 @@ class Membresia extends StatelessWidget {
         benefitFontSize: benefitFontSize,
         buttonFontSize: buttonFontSize,
         cardPadding: cardPadding,
-        isIOS: isIOS,
         onTap: onTap,
       ),
     );
@@ -490,7 +617,6 @@ class Membresia extends StatelessWidget {
     required double benefitFontSize,
     required double buttonFontSize,
     required double cardPadding,
-    required bool isIOS,
     VoidCallback? onTap,
   }) {
     return Padding(
@@ -528,17 +654,15 @@ class Membresia extends StatelessWidget {
                   ),
                 ),
               ],
-              if (!isIOS && price.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  price,
-                  style: GerenaColors.bodyMedium.copyWith(
-                    fontSize: priceFontSize,
-                    fontWeight: FontWeight.w600,
-                    color: titleColor ?? GerenaColors.textPrimaryColor,
-                  ),
+              const SizedBox(height: 8),
+              Text(
+                price,
+                style: GerenaColors.bodyMedium.copyWith(
+                  fontSize: priceFontSize,
+                  fontWeight: FontWeight.w600,
+                  color: titleColor ?? GerenaColors.textPrimaryColor,
                 ),
-              ],
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -605,60 +729,84 @@ class Membresia extends StatelessWidget {
             ),
             const SizedBox(height: 8),
           ],
-          if (!isIOS) ...[
-            SizedBox(
-              width: double.infinity,
-              height: 40,
-              child: hasGradientButton
-                  ? Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFC2639C),
-                            Color(0xFFFF0101),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(4),
+          
+          // Botón principal
+          SizedBox(
+            width: double.infinity,
+            height: 40,
+            child: hasGradientButton
+                ? Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFC2639C),
+                          Color(0xFFFF0101),
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: onTap,
-                          borderRadius: BorderRadius.circular(4),
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              buttonText,
-                              style: TextStyle(
-                                fontSize: buttonFontSize,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: onTap,
+                        borderRadius: BorderRadius.circular(4),
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            buttonText,
+                            style: TextStyle(
+                              fontSize: buttonFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                    )
-                  : ElevatedButton(
-                      onPressed: onTap,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: buttonColor,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        elevation: 0,
+                    ),
+                  )
+                : ElevatedButton(
+                    onPressed: onTap,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: buttonColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                      child: Text(
-                        buttonText,
-                        style: TextStyle(
-                          fontSize: buttonFontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      buttonText,
+                      style: TextStyle(
+                        fontSize: buttonFontSize,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                  ),
+          ),
+
+          // Indicador de App Store en iOS (solo si no es el plan actual)
+          if (Platform.isIOS && !isCurrentPlan) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.apple,
+                  size: 14,
+                  color: GerenaColors.textSecondaryColor,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Pago vía App Store',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: GerenaColors.textSecondaryColor,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ),
           ],
         ],
@@ -666,8 +814,8 @@ class Membresia extends StatelessWidget {
     );
   }
 
-  String _formatDate(String date) {
-    if (date.isEmpty) return 'N/A';
+  String _formatDate(String? date) {
+    if (date == null || date.isEmpty) return 'N/A';
     try {
       final parsedDate = DateTime.parse(date);
       return '${parsedDate.day}/${parsedDate.month}/${parsedDate.year}';

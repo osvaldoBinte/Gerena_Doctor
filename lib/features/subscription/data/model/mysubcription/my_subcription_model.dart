@@ -1,23 +1,38 @@
 import 'package:gerena/features/subscription/domain/entities/mysubcription/my_subcription_entity.dart';
 
 class MySubcriptionModel extends MySubscriptionEntity {
-  MySubcriptionModel({required super.id, required super.userid, required super.username, required super.subscriptionplanId, required super.planname, required super.planprice, required super.state, required super.startdate, required super.currentPeriodEnddate, required super.cancelledAtPeriodEnd,  super.cancellationdate});
+  MySubcriptionModel({
+    super.id,
+    super.userid,
+    super.username,
+    super.subscriptionplanId,
+    super.planname,
+    super.planprice,
+    super.state,
+    super.startdate,
+    super.currentPeriodEnddate,
+    super.cancelledAtPeriodEnd,
+    super.cancellationdate,
+  });
 
   factory MySubcriptionModel.fromJson(Map<String, dynamic> json) {
     return MySubcriptionModel(
-      id: json['id'],
-      userid: json['usuarioId'],
-      username: json['usuarioNombre'],
-      subscriptionplanId: json['planSuscripcionId'],
-      planname: json['planNombre'],
-      planprice: (json['planPrecio'] as num).toDouble(),
-      state: json['estado'],
-      startdate: json['fechaInicio'],
-      currentPeriodEnddate: json['fechaFinPeriodoActual'],
-      cancelledAtPeriodEnd: json['canceladaAlFinalDelPeriodo'],
-       cancellationdate: json['fechaCancelacion'],
+      id: json['id'] as int?,
+      userid: json['usuarioId'] as int?,
+      username: json['usuarioNombre'] as String?,
+      subscriptionplanId: json['planSuscripcionId'] as int?,
+      planname: json['planNombre'] as String?,
+
+      planprice: (json['planPrecio'] as num?)?.toDouble(),
+
+      state: json['estado'] as String?,
+      startdate: json['fechaInicio'] as String?,
+      currentPeriodEnddate: json['fechaFinPeriodoActual'] as String?,
+      cancelledAtPeriodEnd: json['canceladaAlFinalDelPeriodo'] as bool?,
+      cancellationdate: json['fechaCancelacion'] as String?,
     );
   }
+
   factory MySubcriptionModel.fromEntity(MySubscriptionEntity entity) {
     return MySubcriptionModel(
       id: entity.id,
@@ -27,12 +42,13 @@ class MySubcriptionModel extends MySubscriptionEntity {
       planname: entity.planname,
       planprice: entity.planprice,
       state: entity.state,
-      startdate:  entity.startdate,
+      startdate: entity.startdate,
       currentPeriodEnddate: entity.currentPeriodEnddate,
       cancelledAtPeriodEnd: entity.cancelledAtPeriodEnd,
-       cancellationdate: entity.cancellationdate,
+      cancellationdate: entity.cancellationdate,
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -45,7 +61,7 @@ class MySubcriptionModel extends MySubscriptionEntity {
       'fechaInicio': startdate,
       'fechaFinPeriodoActual': currentPeriodEnddate,
       'canceladaAlFinalDelPeriodo': cancelledAtPeriodEnd,
-       'fechaCancelacion': cancellationdate,
+      'fechaCancelacion': cancellationdate,
     };
   }
 }

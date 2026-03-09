@@ -9,25 +9,23 @@ import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shoppin
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_response_entity.dart' hide ItemEntity;
 import 'package:gerena/features/marketplace/domain/usecase/calculate_discount_points_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/create_order_usecase.dart';
-import 'package:gerena/features/marketplace/domain/usecase/pay_order_usecase.dart';
 import 'package:gerena/features/marketplace/domain/usecase/shopping_cart_usecase.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/desktop/GlobalShopInterface.dart';
 import 'package:gerena/framework/preferences_service.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ShoppingCartController extends GetxController {
   final ShoppingCartUsecase shoppingCartUsecase;
   final CreateOrderUsecase createOrderUsecase;
-  final PayOrderUsecase payOrderUsecase;
-  final CalculateDiscountPointsUsecase   calculateDiscountPointsUsecase;
+  final CalculateDiscountPointsUsecase calculateDiscountPointsUsecase;
   final PreferencesUser _prefs = PreferencesUser();
 
   ShoppingCartController({
     required this.shoppingCartUsecase,
     required this.createOrderUsecase,
-    required this.payOrderUsecase,
-    required this.calculateDiscountPointsUsecase
+    required this.calculateDiscountPointsUsecase,
   });
   
   final RxList<ShoppingCartPostEntity> cartItems = <ShoppingCartPostEntity>[].obs;
@@ -35,25 +33,24 @@ class ShoppingCartController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   
-  final RxString selectedPaymentMethodId = ''.obs;
+  // REMOVIDO: selectedPaymentMethodId ya no es necesario
   final RxString selectedAddressId = ''.obs;
-  final RxBool isProcessingPayment = false.obs;
+  final RxBool isProcessingOrder = false.obs; // Renombrado de isProcessingPayment
   
   final RxBool isBuyNowModeActive = false.obs;
   
   final RxBool usePoints = false.obs;
   final RxInt pointsToUse = 0.obs;
   final RxInt availablePoints = 0.obs;
-    final RxDouble pointsDiscount = 0.0.obs; // NUEVO: descuento real calculado
-  final RxBool isCalculatingDiscount = false.obs; // NUEVO: loading del cálculo
+  final RxDouble pointsDiscount = 0.0.obs;
+  final RxBool isCalculatingDiscount = false.obs;
   
   @override
   void onInit() {
     super.onInit();
     _checkAndLoadCart();
     _loadAvailablePoints();
-        loadAvailablePoints();  
-
+    loadAvailablePoints();
   }
 
   Future<void> loadAvailablePoints() async {
@@ -94,85 +91,75 @@ class ShoppingCartController extends GetxController {
     }
   }
  
-void toggleUsePoints(bool value) async {
-  usePoints.value = value;
-  
-  if (!value) {
-    pointsToUse.value = 0;
-    pointsDiscount.value = 0.0;
-  } else {
-    // REMOVIDO: ya no limitamos por el total de la orden
-    // Solo usamos el máximo de puntos disponibles
+  void toggleUsePoints(bool value) async {
+    usePoints.value = value;
+    
+    if (!value) {
+      pointsToUse.value = 0;
+      pointsDiscount.value = 0.0;
+    } else {
+      final maxPointsAvailable = availablePoints.value;
+      await updatePointsToUse(maxPointsAvailable);
+    }
+    
+    print('💳 Usar puntos: $value | Puntos a usar: ${pointsToUse.value} | Descuento: ${pointsDiscount.value}');
+  }
+
+  Future<void> updatePointsToUse(int points) async {
+    if (points < 0) {
+      pointsToUse.value = 0;
+      pointsDiscount.value = 0.0;
+      return;
+    }
+    
+    final totalOrder = cartResponse.value?.totalActual ?? 0.0;
     final maxPointsAvailable = availablePoints.value;
     
-    await updatePointsToUse(maxPointsAvailable);
+    if (points > maxPointsAvailable) {
+      showErrorSnackbar('No tienes suficientes puntos. Máximo disponible: $maxPointsAvailable');
+      pointsToUse.value = maxPointsAvailable;
+      points = maxPointsAvailable;
+    }
+    
+    if (points == 0) {
+      pointsToUse.value = 0;
+      pointsDiscount.value = 0.0;
+      return;
+    }
+    
+    try {
+      isCalculatingDiscount.value = true;
+      
+      final montoInt = totalOrder.toInt();
+      final discountEntity = await calculateDiscountPointsUsecase.execute(
+        montoInt, 
+        points,
+      );
+      
+      final calculatedDiscount = discountEntity.totalDiscount;
+      
+      pointsToUse.value = points;
+      pointsDiscount.value = calculatedDiscount;
+      
+      print('💰 Puntos: $points | Monto orden: \$${totalOrder.toStringAsFixed(2)} | Descuento calculado: \$${calculatedDiscount.toStringAsFixed(2)}');
+      
+    } catch (e) {
+      print('❌ Error al calcular descuento: $e');
+      showErrorSnackbar('No se pudo calcular el descuento con puntos');
+      pointsToUse.value = 0;
+      pointsDiscount.value = 0.0;
+    } finally {
+      isCalculatingDiscount.value = false;
+    }
   }
-  
-  print('💳 Usar puntos: $value | Puntos a usar: ${pointsToUse.value} | Descuento: ${pointsDiscount.value}');
-}
-
-
-Future<void> updatePointsToUse(int points) async {
-  if (points < 0) {
-    pointsToUse.value = 0;
-    pointsDiscount.value = 0.0;
-    return;
-  }
-  
-  final totalOrder = cartResponse.value?.totalActual ?? 0.0;
-  final maxPointsAvailable = availablePoints.value;
-  
-  // ÚNICA validación: que no exceda los puntos disponibles
-  if (points > maxPointsAvailable) {
-    showErrorSnackbar('No tienes suficientes puntos. Máximo disponible: $maxPointsAvailable');
-    pointsToUse.value = maxPointsAvailable;
-    points = maxPointsAvailable;
-  }
-  
-  if (points == 0) {
-    pointsToUse.value = 0;
-    pointsDiscount.value = 0.0;
-    return;
-  }
-  
-  // CALCULAR EL DESCUENTO REAL
-  try {
-    isCalculatingDiscount.value = true;
-    
-    final montoInt = totalOrder.toInt();
-    final discountEntity = await calculateDiscountPointsUsecase.execute(
-      montoInt, 
-      points,
-    );
-    
-    final calculatedDiscount = discountEntity.totalDiscount;
-    
-    // REMOVIDO: la validación que no permitía descuentos mayores al total
-    // Ahora el backend decide cómo manejar esto
-    
-    pointsToUse.value = points;
-    pointsDiscount.value = calculatedDiscount;
-    
-    print('💰 Puntos: $points | Monto orden: \$${totalOrder.toStringAsFixed(2)} | Descuento calculado: \$${calculatedDiscount.toStringAsFixed(2)}');
-    
-  } catch (e) {
-    print('❌ Error al calcular descuento: $e');
-    showErrorSnackbar('No se pudo calcular el descuento con puntos');
-    pointsToUse.value = 0;
-    pointsDiscount.value = 0.0;
-  } finally {
-    isCalculatingDiscount.value = false;
-  }
-}
   
   double get finalTotal {
     final subtotal = cartResponse.value?.totalActual ?? 0.0;
     final discount = usePoints.value ? pointsDiscount.value : 0.0;
-  
-    return subtotal - discount ;
+    return subtotal - discount;
   }
   
- Future<void> _checkAndLoadCart() async {
+  Future<void> _checkAndLoadCart() async {
     final buyNowJson = await _prefs.loadPrefs(
       type: String, 
       key: AppConstants.buynowKey
@@ -187,10 +174,7 @@ Future<void> updatePointsToUse(int points) async {
     }
   }
 
-  void selectPaymentMethod(String paymentMethodId) {
-    selectedPaymentMethodId.value = paymentMethodId;
-    print('💳 Método de pago seleccionado: $paymentMethodId');
-  }
+  // REMOVIDO: método selectPaymentMethod ya no es necesario
   
   void selectAddress(String? addressId) {
     if (addressId == null || addressId.isEmpty) {
@@ -202,14 +186,10 @@ Future<void> updatePointsToUse(int points) async {
     selectedAddressId.value = addressId;
     print('📍 Dirección seleccionada en controller: $addressId');
   }
-
   
-  
-  Future<void> confirmPurchase() async {
-    if (selectedPaymentMethodId.value.isEmpty) {
-      showErrorSnackbar('Por favor selecciona un método de pago');
-      return;
-    }
+  // NUEVO: Método para confirmar pedido (sin pago)
+  Future<void> confirmOrder() async {
+    // REMOVIDO: Validación de método de pago
     
     if (selectedAddressId.value.isEmpty) {
       showErrorSnackbar('Por favor selecciona una dirección de entrega');
@@ -248,7 +228,7 @@ Future<void> updatePointsToUse(int points) async {
     }
     
     try {
-      isProcessingPayment.value = true;
+      isProcessingOrder.value = true;
       
       final addressId = int.parse(selectedAddressId.value);
       
@@ -260,31 +240,34 @@ Future<void> updatePointsToUse(int points) async {
       final orderEntity = CreateNewOrderEntity(
         items: items,
         usepoints: usePoints.value,
-        pointstouse: usePoints.value ? pointsToUse.value : null,
+        pointstouse: usePoints.value ? pointsToUse.value : 0,
       );
       
-      print('📦 Creando orden con usepoints: ${orderEntity.usepoints}, pointstouse: ${orderEntity.pointstouse}, descuento: \$${pointsDiscount.value}');
+      print('📦 Creando pedido con usepoints: ${orderEntity.usepoints}, pointstouse: ${orderEntity.pointstouse}, descuento: \$${pointsDiscount.value}');
       
+      // SOLO CREAMOS EL PEDIDO - REMOVIDO: payOrderUsecase
       final orderResponse = await createOrderUsecase.createaneworder(
         orderEntity,
         addressId,
       );
       
-      await payOrderUsecase.execute(
-        orderResponse.orderId,
-        selectedPaymentMethodId.value, 
-      );
-      
-      print('✅ Pago procesado exitosamente');
+      print('✅ Pedido creado exitosamente. Order ID: ${orderResponse.orderId}');
       
       if (usePoints.value) {
-        print('💰 Se usaron ${pointsToUse.value} puntos con descuento de \$${pointsDiscount.value.toStringAsFixed(2)} en la compra');
+        print('💰 Se usaron ${pointsToUse.value} puntos con descuento de \$${pointsDiscount.value.toStringAsFixed(2)} en el pedido');
       }
       
-      showSuccessSnackbar('¡Compra confirmada exitosamente!');
+      showSuccessSnackbar('¡Pedido confirmado exitosamente!');
+      
+      // NUEVO: Enviar mensaje de WhatsApp al vendedor
+      await _sendWhatsAppToVendor(
+        orderId: orderResponse.orderId.toString(),
+        totalAmount: finalTotal,
+      );
       
       final wasBuyNowMode = isBuyNowModeActive.value;
       
+      // Resetear estado
       usePoints.value = false;
       pointsToUse.value = 0;
       pointsDiscount.value = 0.0;
@@ -309,14 +292,14 @@ Future<void> updatePointsToUse(int points) async {
           },
         );
       } else {
-        print('🎉 Compra desde carrito normal completada');
+        print('🎉 Pedido desde carrito normal completado');
       }
       
     } catch (e, stackTrace) {
-      print('❌ Error al confirmar compra: $e\n$stackTrace');
-      showErrorSnackbar('No se pudo procesar el pago: ${cleanExceptionMessage(e)}');
+      print('❌ Error al confirmar pedido: $e\n$stackTrace');
+      showErrorSnackbar('No se pudo crear el pedido: ${cleanExceptionMessage(e)}');
     } finally {
-      isProcessingPayment.value = false;
+      isProcessingOrder.value = false;
     }
   }
   
@@ -499,7 +482,6 @@ Future<void> updatePointsToUse(int points) async {
   Future<void> clearCart() async {
     cartItems.clear();
     cartResponse.value = null;
-    selectedPaymentMethodId.value = '';
     selectedAddressId.value = '';
     usePoints.value = false;
     pointsToUse.value = 0;
@@ -522,11 +504,11 @@ Future<void> updatePointsToUse(int points) async {
     return item?.cantidad ?? 0;
   }
   
-  bool get canConfirmPurchase {
+  // MODIFICADO: Ya no valida método de pago
+  bool get canConfirmOrder {
     return cartItems.isNotEmpty &&
-           selectedPaymentMethodId.value.isNotEmpty &&
            selectedAddressId.value.isNotEmpty &&
-           !isProcessingPayment.value &&
+           !isProcessingOrder.value &&
            !isLoading.value;
   }
   
@@ -633,6 +615,93 @@ Future<void> updatePointsToUse(int points) async {
       return buyNowJson != null && buyNowJson.isNotEmpty;
     } catch (e) {
       return false;
+    }
+  }
+
+  // NUEVO: Método para enviar mensaje de WhatsApp al vendedor
+  Future<void> _sendWhatsAppToVendor({
+    required String orderId,
+    required double totalAmount,
+  }) async {
+    try {
+      final doctorController = Get.find<PrefilDortorController>();
+      final doctorProfile = doctorController.doctorProfile.value;
+      
+      if (doctorProfile == null) {
+        print('⚠️ No se pudo obtener el perfil del doctor');
+        return;
+      }
+
+      final nombreVendedor = doctorProfile.nombreVendedor;
+      final whatsAppVendedor = doctorProfile.whatsAppVendedor;
+
+      if (whatsAppVendedor == null || whatsAppVendedor.isEmpty) {
+        print('⚠️ El vendedor no tiene WhatsApp configurado');
+        return;
+      }
+
+      // Limpiar el número de WhatsApp (quitar espacios, guiones, etc.)
+      final cleanPhone = whatsAppVendedor.replaceAll(RegExp(r'[^\d+]'), '');
+
+      // Construir el mensaje
+      final addressesController = Get.find<AddressesController>();
+      final selectedAddress = addressesController.selectedAddress.value;
+      
+      String mensaje = '¡Hola ${nombreVendedor ?? ""}! 👋\n\n';
+      mensaje += '✅ *Nuevo pedido confirmado*\n\n';
+      mensaje += '📦 *ID del pedido:* $orderId\n';
+      mensaje += '💰 *Total:* \$${totalAmount.toStringAsFixed(2)} MXN\n\n';
+      
+      if (usePoints.value && pointsToUse.value > 0) {
+        mensaje += '🎁 *Puntos usados:* ${pointsToUse.value} pts (-\$${pointsDiscount.value.toStringAsFixed(2)} MXN)\n\n';
+      }
+      
+      mensaje += '📍 *Dirección de entrega:*\n';
+      if (selectedAddress != null) {
+        mensaje += '${selectedAddress.fullName}\n';
+        mensaje += '${selectedAddress.street} ${selectedAddress.exteriorNumber}';
+        if (selectedAddress.interiorNumber.isNotEmpty) {
+          mensaje += ', Int. ${selectedAddress.interiorNumber}';
+        }
+        mensaje += '\n${selectedAddress.neighborhood}, ${selectedAddress.city}\n';
+        mensaje += '${selectedAddress.state}, C.P. ${selectedAddress.postalCode}\n';
+        mensaje += '📱 ${selectedAddress.phone}\n\n';
+      }
+      
+      mensaje += '🛒 *Productos:*\n';
+      final response = cartResponse.value;
+      if (response != null) {
+        for (var item in response.itenms) {
+          mensaje += '• ${item.nombreMedicamento} (x${item.cantidadSolicitada}) - \$${item.precioActual.toStringAsFixed(2)} MXN\n';
+        }
+      }
+      
+      mensaje += '\n¡Gracias por tu atención! 🙏';
+
+      // Codificar el mensaje para URL
+      final encodedMessage = Uri.encodeComponent(mensaje);
+      
+      // Crear la URL de WhatsApp
+      final whatsappUrl = 'https://wa.me/$cleanPhone?text=$encodedMessage';
+      
+      print('📱 Intentando abrir WhatsApp: $whatsappUrl');
+      
+      // Intentar abrir WhatsApp
+      final uri = Uri.parse(whatsappUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        print('✅ WhatsApp abierto correctamente');
+      } else {
+        print('❌ No se pudo abrir WhatsApp');
+        showErrorSnackbar('No se pudo abrir WhatsApp. Verifica que esté instalado.');
+      }
+      
+    } catch (e, stackTrace) {
+      print('❌ Error al enviar mensaje de WhatsApp: $e\n$stackTrace');
+      // No mostramos error al usuario para no interrumpir el flujo
     }
   }
 }

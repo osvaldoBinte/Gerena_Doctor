@@ -355,11 +355,10 @@ class SavedProductsContent extends StatelessWidget {
 
                InkWell(
   onTap: () async {
-    // Agregar al carrito
     await shoppingCartController.addToCart(
       medicamentoId: item.medicamentoId,
       precio: item.precioActual,
-      cantidad: 1, // o usa el valor del contador si lo tienes
+      cantidad: 1,
     );
   },
   child: Container(

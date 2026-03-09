@@ -16,5 +16,6 @@ class RoutesNames {
   static const String passwordreset = '/password_reset';
   static const String followersFollowing = '/followers-following';
   static const String followersFollowingGeneric = '/followers-following-generic';
+  static const String postReactionsPage = '/post-reactions-page';
 
 }

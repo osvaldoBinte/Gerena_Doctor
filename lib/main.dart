@@ -13,11 +13,18 @@ import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
 import 'dart:io' show Platform;
 
-String enviromentSelect = Enviroment.production.value;
+String enviromentSelect = Enviroment.testing.value;
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); 
+  
   await dotenv.load(fileName: enviromentSelect);
-  Stripe.publishableKey = AppConstants.stripePublishableKey;
+  
+  if (Platform.isAndroid || Platform.isIOS) {
+    Stripe.publishableKey = AppConstants.stripePublishableKey;
+    await Stripe.instance.applySettings();
+  }
+
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await PreferencesUser().initiPrefs();
@@ -35,8 +42,6 @@ void main() async {
     }
     FlutterError.presentError(details);
   };
-
-  WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

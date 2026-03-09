@@ -3,9 +3,11 @@ import 'package:gerena/common/errors/api_errors.dart';
 import 'package:gerena/features/publications/data/model/comments/get_comments_model.dart';
 import 'package:gerena/features/publications/data/model/create/create_publications_model.dart';
 import 'package:gerena/features/publications/data/model/myposts/publication_model.dart';
+import 'package:gerena/features/publications/data/model/postreaction/post_reaction_model.dart';
 import 'package:gerena/features/publications/domain/entities/comments/get_comments_entity.dart';
 import 'package:gerena/features/publications/domain/entities/create/create_publications_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
+import 'package:gerena/features/publications/domain/entities/postreaction/post_reaction_entity.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -30,6 +32,38 @@ class PublicationDateSourcesImp {
         final List data = responseDecode;
         return data
             .map((json) => PublicationModel.fromJson(json))
+            .toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+
+ Future<List<PostReactionEntity>> getpostReaction(int publicationId,String token) async {
+   try {
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones/$publicationId/reacciones');
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+   if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List data = responseDecode;
+        return data
+            .map((json) => PostReactionModel.fromJson(json))
             .toList();
       }
 

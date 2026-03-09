@@ -120,8 +120,6 @@ Future<void> confirmPasswordReset(
     exception.validateMesage();
     throw exception;
   } catch (e, stackTrace) {
-    print('🔥 EXCEPTION: $e');
-    print('📌 STACKTRACE: $stackTrace');
 
     if (e is SocketException ||
         e is http.ClientException ||

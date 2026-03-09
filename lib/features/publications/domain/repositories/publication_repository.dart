@@ -1,6 +1,7 @@
 import 'package:gerena/features/publications/domain/entities/comments/get_comments_entity.dart';
 import 'package:gerena/features/publications/domain/entities/create/create_publications_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
+import 'package:gerena/features/publications/domain/entities/postreaction/post_reaction_entity.dart';
 
 abstract class PublicationRepository {
   Future<List<PublicationEntity>> getMyPosts();
@@ -16,5 +17,7 @@ abstract class PublicationRepository {
   Future<List<GetCommentsEntity>> getPostComments(int publicacionId,int page);
   Future<void> addComment(int publicacionId,String comment);
   Future<void> deleteComment(int publicacionId,int idcomment);
+
+   Future<List<PostReactionEntity>> getpostReaction(int publicationId);
 
 }

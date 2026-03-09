@@ -10,6 +10,8 @@ import 'dart:io';
 import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/api_errors.dart';
 class SubscriptionDataSourcesImp {
+  get dio => null;
+
 
 
   Future<MySubscriptionEntity> fetchMySubscription(String token) async {
@@ -179,4 +181,27 @@ class SubscriptionDataSourcesImp {
       throw Exception('$e');
     }
   }
+
+Future<void> verifyIAPPurchase(
+  String receiptData,
+  String productId,
+  String platform,
+) async {
+  try {
+    final response = await dio.post(
+      '/subscriptions/verify-iap',
+      data: {
+        'receipt_data': receiptData,
+        'product_id': productId,
+        'platform': platform,
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error al verificar la compra');
+    }
+  } catch (e) {
+    throw Exception('Error verificando compra IAP: $e');
+    }
+}
 }

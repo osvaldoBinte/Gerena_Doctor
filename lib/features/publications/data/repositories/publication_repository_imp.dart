@@ -3,6 +3,7 @@ import 'package:gerena/features/publications/data/datasources/publication_date_s
 import 'package:gerena/features/publications/domain/entities/comments/get_comments_entity.dart';
 import 'package:gerena/features/publications/domain/entities/create/create_publications_entity.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
+import 'package:gerena/features/publications/domain/entities/postreaction/post_reaction_entity.dart';
 import 'package:gerena/features/publications/domain/repositories/publication_repository.dart';
 
 class PublicationRepositoryImp extends PublicationRepository {
@@ -81,6 +82,12 @@ class PublicationRepositoryImp extends PublicationRepository {
   Future<List<GetCommentsEntity>> getPostComments(int publicacionId, int page) async {
     final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await publicationDateSourcesImp.getPostComments(publicacionId, page, token);
+  }
+
+  @override
+  Future<List<PostReactionEntity>> getpostReaction(int publicationId) async {
+    final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await publicationDateSourcesImp.getpostReaction(publicationId, token);
   }
 
 }

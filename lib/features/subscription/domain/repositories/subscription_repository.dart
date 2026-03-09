@@ -9,6 +9,10 @@ abstract class SubscriptionRepository {
   Future<void> reactivateSubscription();
   Future<void> changeSubscriptionPlan(int newPlanId,bool immediatechange );
 
-  
+  Future<void> verifyIAPPurchase(
+  String receiptData,
+  String productId,
+  String platform,
+);
   
 }

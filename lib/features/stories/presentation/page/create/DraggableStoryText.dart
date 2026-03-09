@@ -793,10 +793,8 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
               });
             }).toList(),
 
-            // Header con botones
             _buildPreviewHeader(),
 
-            // ✅ NUEVO: Botón de agregar texto
             _buildAddTextButton(),
           ],
         ),

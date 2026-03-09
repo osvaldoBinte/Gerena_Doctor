@@ -12,6 +12,7 @@ import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/get_medications_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_detail_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
+import 'package:gerena/features/publications/presentation/page/getPostReaction/get_post_reaction_page.dart';
 import 'package:gerena/movil/home/start_page.dart';
 import 'package:gerena/features/home/dashboard/dashboard_page.dart';
 import 'package:get/get.dart';
@@ -50,6 +51,10 @@ class AppPages {
     GetPage(
       name: RoutesNames.patientView,
       page: () => PatientViewPage(),
+    ),
+     GetPage(
+      name: RoutesNames.postReactionsPage,
+      page: () => PostReactionsPage(),
     ),
     GetPage(name: RoutesNames.productDetail, page: () => ProductDetailPage()),
     GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),

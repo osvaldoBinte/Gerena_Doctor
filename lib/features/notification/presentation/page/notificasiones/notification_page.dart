@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/notification/domain/entities/notification_entity.dart';
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
 import 'package:gerena/features/notification/presentation/widget/notification_modal_loading.dart';
+import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -111,33 +114,59 @@ class NotificationPage extends StatelessWidget {
   }
 
   Widget _buildNotificationItem({
-    required NotificationEntity notification,
-    required NotificationController controller,
-  }) {
-    // Determinar icono según el tipo
-    String iconPath;
-    switch (notification.type.toLowerCase()) {
-      case 'solicitudvideollamada':
-        iconPath = 'assets/icons/phone.png';
-        break;
-      case 'recordatorio':
-        iconPath = 'assets/icons/warning.png';
-        break;
-      case 'alertawebinar':
-        iconPath = 'assets/icons/campaigndart.png';
-        break;
-      case 'promocionflash':
-        iconPath = 'assets/icons/campaigndart.png';
-        break;
-      default:
-        iconPath = 'assets/icons/campaigndart.png';
+  required NotificationEntity notification,
+  required NotificationController controller,
+}) {
+  // Determinar icono según el tipo
+  String iconPath;
+  switch (notification.type.toLowerCase()) {
+    case 'solicitudvideollamada':
+      iconPath = 'assets/icons/phone.png';
+      break;
+    case 'recordatorio':
+      iconPath = 'assets/icons/warning.png';
+      break;
+    case 'alertawebinar':
+      iconPath = 'assets/icons/campaigndart.png';
+      break;
+    case 'promocionflash':
+      iconPath = 'assets/icons/campaigndart.png';
+      break;
+    default:
+      iconPath = 'assets/icons/campaigndart.png';
+  }
+
+  bool hasActionButtons =
+      notification.type.toLowerCase() == 'solicitudvideollamada';
+
+  return GestureDetector(
+    onTap: () async {
+     try {
+    dynamic rawMetadata = notification.metadata;
+    Map metadata = {};
+
+    if (rawMetadata is String && rawMetadata.isNotEmpty) {
+      metadata = jsonDecode(rawMetadata);
+    } else if (rawMetadata is Map) {
+      metadata = rawMetadata;
     }
 
-    // Determinar si tiene botones de acción (para videollamadas)
-    bool hasActionButtons =
-        notification.type.toLowerCase() == 'solicitudvideollamada';
+    final int? userId = metadata['SeguidorId'] ?? metadata['UsuarioReacciono']?? metadata['UsuarioComenta'] ;
+    final String? rol = metadata['RolUsuario'] ?? metadata['UsuarioReaccionoRol']?? metadata['RolUsuarioComenta'];
 
-    return Container(
+    if (userId != null && rol != null) {
+      final startController = Get.find<StartController>();
+      if (rol == 'cliente') {
+        startController.showUserProfilePage(userData: {'userId': userId});
+      } else if (rol == 'doctor') {
+        startController.showDoctorProfilePage(doctorData: {'userId': userId});
+      }
+    }
+  } catch (e) {
+    print("Error procesando metadata: $e");
+  }
+    },
+    child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -213,8 +242,11 @@ class NotificationPage extends StatelessWidget {
                           color: GerenaColors.textTertiaryColor,
                         ),
                       ),
-                      // Mostrar metadata si existe
-                      if (notification.metadata.containsKey('Tema')) ...[
+
+                      // 🔹 Mostrar metadata opcional
+                      if (notification.metadata != null &&
+                          notification.metadata is Map &&
+                          notification.metadata.containsKey('Tema')) ...[
                         const SizedBox(height: 4),
                         Text(
                           notification.metadata['Tema'] ?? '',
@@ -224,8 +256,10 @@ class NotificationPage extends StatelessWidget {
                           ),
                         ),
                       ],
-                      // Mostrar fecha del evento si existe
-                      if (notification.metadata.containsKey('FechaEvento')) ...[
+
+                      if (notification.metadata != null &&
+                          notification.metadata is Map &&
+                          notification.metadata.containsKey('FechaEvento')) ...[
                         const SizedBox(height: 4),
                         Text(
                           _formatDateLong(
@@ -237,7 +271,7 @@ class NotificationPage extends StatelessWidget {
                           ),
                         ),
                       ],
-                      // Imagen si existe
+
                       if (notification.imageUrl != null &&
                           notification.imageUrl!.isNotEmpty) ...[
                         const SizedBox(height: 8),
@@ -258,10 +292,12 @@ class NotificationPage extends StatelessWidget {
                           ),
                         ),
                       ],
+
                       if (hasActionButtons) ...[
                         const SizedBox(height: 8),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment:
+                              MainAxisAlignment.spaceEvenly,
                           children: [
                             Expanded(
                               child: GestureDetector(
@@ -294,7 +330,6 @@ class NotificationPage extends StatelessWidget {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  print('Aceptar videollamada');
                                   controller.markAsRead(
                                       notification.notificationId);
                                 },
@@ -311,7 +346,6 @@ class NotificationPage extends StatelessWidget {
                           ],
                         ),
                       ],
-                    
                     ],
                   ),
                 ),
@@ -320,8 +354,10 @@ class NotificationPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   String _formatDateShort(String dateStr) {
     try {

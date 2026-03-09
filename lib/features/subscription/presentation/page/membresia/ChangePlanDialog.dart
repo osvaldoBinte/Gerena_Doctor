@@ -76,7 +76,7 @@ class ChangePlanDialog extends StatelessWidget {
                   _buildInfoRow('Plan actual:', currentSub?.planname ?? 'N/A'),
                   _buildInfoRow(
                     'Precio actual:',
-                    '\$${currentSub?.planprice.toStringAsFixed(2) ?? '0.00'} MXN',
+                    '\$${currentSub?.planprice?.toStringAsFixed(2) ?? '0.00'} MXN',
                   ),
                   const Divider(height: 24),
                   _buildInfoRow('Nuevo plan:', newPlan.name),

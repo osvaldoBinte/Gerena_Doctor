@@ -31,11 +31,13 @@ import 'package:gerena/features/marketplace/presentation/page/wishlist/wishlist_
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
 import 'package:gerena/features/publications/presentation/page/comment/comment_controller.dart';
 import 'package:gerena/features/publications/presentation/page/create/create_publication_controller.dart';
+import 'package:gerena/features/publications/presentation/page/getPostReaction/get_post_reaction_controller.dart';
 import 'package:gerena/features/publications/presentation/page/myposts/my_post_controller.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
 import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/features/review/presentation/page/review_controller.dart';
 import 'package:gerena/features/stories/presentation/page/story_controller.dart';
+import 'package:gerena/features/subscription/presentation/page/menbresia/iap_service.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/features/user/presentation/page/getusebyid/get_user_by_id_controller.dart';
 import 'package:gerena/features/user/presentation/page/search/search_profile_controller.dart';
@@ -69,6 +71,7 @@ class App extends StatelessWidget {
       theme: GerenaColors.themeData, 
       initialBinding: BindingsBuilder(() {
         Get.put(AuthService(), permanent: true);
+        Get.put(IAPService(), permanent: true);
         Get.put(usecaseConfig.loginUsecase!, permanent: true);
         Get.put(usecaseConfig.saveTokenFcmUsecase!,permanent: true);
         Get.put(usecaseConfig.requestPasswordCodeUsecase!, permanent: true);
@@ -103,6 +106,7 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.postSubscribeToPlanUsecase!, permanent: true);
         Get.put(usecaseConfig.getAllPlansUsecase!, permanent: true);
         Get.put(usecaseConfig.getMySubscriptionUsecase!, permanent: true);
+        Get.put(usecaseConfig.verifyIapReceiptUsecase!,permanent:  true);
         Get.put(usecaseConfig.savecardUsecase!, permanent: true);
         Get.put(usecaseConfig.updateDoctorProfileUsecase!, permanent: true);
         Get.put(usecaseConfig.updatefotoDoctorProfileUsecase!, permanent: true);
@@ -155,6 +159,8 @@ class App extends StatelessWidget {
         Get.put(usecaseConfig.addCommentUsecase!, permanent: true);
         Get.put(usecaseConfig.deleteCommentUsecase!,permanent: true);
         Get.put(usecaseConfig.getPostCommentsUsecase!,permanent: true);
+        Get.put(usecaseConfig.getPostReactionUsecase!, permanent: true);
+
 
         Get.lazyPut(() => LoginController(loginUsecase: Get.find(), saveTokenFcmUsecase: Get.find()), fenix: true);
         Get.lazyPut(() => HistoryController(getMyOrderUsecase: Get.find()), fenix: true);
@@ -166,14 +172,14 @@ class App extends StatelessWidget {
         Get.lazyPut(() => CategoryController(getCategoryUsecase: Get.find(), searchingForMedicationsUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => GetMedicationsController(searchingForMedicationsUsecase: Get.find(), getMedicinesOnSaleUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => ProductDetailController(getMedicineByIdUsecase: Get.find(),), fenix:  true);
-        Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), payOrderUsecase:  Get.find(), calculateDiscountPointsUsecase:  Get.find(),  ), fenix:  true,);
+        Get.lazyPut(() =>ShoppingCartController(shoppingCartUsecase: Get.find(), createOrderUsecase:  Get.find(), calculateDiscountPointsUsecase:  Get.find(),  ), fenix:  true,);
         Get.lazyPut(() => WishlistController(shoppingCartUsecase:  Get.find(),), fenix:  true,);
         Get.lazyPut(() => AddAppointmentController(postAppointmentUsecase:  Get.find(), getDoctorAvailabilityUsecase:  Get.find()), fenix:  true);
         Get.lazyPut(() => AppointmentController(appointmentCompletedUsecase: Get.find(), cancelAppointmentUsecase: Get.find()), fenix:  true);
         Get.lazyPut(() => PaymentCartController( getPaymentMethodsUsecase: Get.find(),createPaymentMethodUsecase: Get.find(),attachPaymentMethodToCustomerUsecase: Get.find(), deletePaymentMethodUsecase: Get.find(), savecardUsecase: Get.find(), deletePaymentMethodBackUsecase:  Get.find(),), fenix: true,);
         Get.lazyPut(() => AddressesController(getAddressesUsecase:  Get.find(), postAddressesUsecase: Get.find(), putAddressesUsecase: Get.find(), deleteAddressesUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => BannerController(getBannersUsecase: Get.find()), fenix: true,);
-        Get.lazyPut(() => SubscriptionController( getAllPlansUsecase: Get.find(), postSubscribeToPlanUsecase: Get.find(), getMySubscriptionUsecase: Get.find(), changeSubscriptionPlanUsecase: Get.find(), postCancelSubcriptionUsecase: Get.find(), ), fenix: true,);
+        Get.lazyPut(() => SubscriptionController( getAllPlansUsecase: Get.find(), postSubscribeToPlanUsecase: Get.find(), getMySubscriptionUsecase: Get.find(), changeSubscriptionPlanUsecase: Get.find(), postCancelSubcriptionUsecase: Get.find(), verifyIAPPurchaseUsecase:  Get.find(),   ), fenix: true,);
         Get.lazyPut(() => GetMedicationsByIdController(  getMedicineByIdUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => ProceduresController(getProceduresUsecase:  Get.find(), createProcedureUsecase:  Get.find(), updateProcedureUsecase: Get.find(), addImagenesUsecase: Get.find(), deleteProcedureUsecase: Get.find(), deleteImgUsecase: Get.find(),), fenix: true,);
         Get.lazyPut(() => NotificationController(getNotificationUsecase: Get.find(), markAllNotificationsAsReadUsecase: Get.find()), fenix:  true);
@@ -190,6 +196,7 @@ class App extends StatelessWidget {
         Get.lazyPut(() => DoctorProfilebyidController(getProceduresByDoctorUsecase: Get.find(), getPostDoctorUsecase: Get.find(), fetchDoctorByIdUsecase: Get.find(), getPostsUserUsecase: Get.find()),fenix: true);
         Get.lazyPut(() => CommentController( getPostCommentsUsecase: Get.find(),  addCommentUsecase: Get.find(), deleteCommentUsecase: Get.find(),),fenix: true);
         Get.lazyPut(() => PasswordResetController(confirmPasswordResetUsecase: Get.find(), requestPasswordCodeUsecase: Get.find()),fenix: true);
+        Get.lazyPut(() => GetPostReactionController(getPostReactionUsecase: Get.find()), fenix: true);
         Get.put(DashboardController());
         Get.put(ShopNavigationController());
         Get.put(PostController()); 

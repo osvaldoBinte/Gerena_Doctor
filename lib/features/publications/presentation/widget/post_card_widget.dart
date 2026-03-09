@@ -8,7 +8,7 @@ import 'package:gerena/features/publications/presentation/page/comment/comment_m
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
 import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
-import 'package:gerena/movil/homePage/posh_carousel.dart';
+import 'package:gerena/features/publications/presentation/widget/posh_carousel.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -50,6 +50,7 @@ class PostCardWidget extends StatefulWidget {
 class _PostCardWidgetState extends State<PostCardWidget> {
   late PostController postController;
   bool _initialized = false;
+  bool _isExpanded = false;
 
   final PublicationController publicationController =
       Get.find<PublicationController>();
@@ -128,7 +129,7 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                               print('roll es dcotor');
                               startController.showDoctorProfilePage(
                                 doctorData: {
-                                   'userId': widget.author!.id,
+                                  'userId': widget.author!.id,
                                   'userName': widget.author!.name ?? 'Usuario',
                                   'username': widget.author!.profilePhoto ??
                                       widget.author!.name
@@ -171,48 +172,57 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                               GestureDetector(
                                 onTap: widget.author != null
                                     ? () async {
-                                                                 AuthService authService = AuthService();
-                          int? loggedUserId = await authService.getUsuarioId();
-                          int authorId = widget.author!.id;
+                                        AuthService authService = AuthService();
+                                        int? loggedUserId =
+                                            await authService.getUsuarioId();
+                                        int authorId = widget.author!.id;
 
-                          if (loggedUserId == authorId) {
-                            Get.offAllNamed(RoutesNames.homePage, arguments: 4);
-                            return;
-                          }
+                                        if (loggedUserId == authorId) {
+                                          Get.offAllNamed(RoutesNames.homePage,
+                                              arguments: 4);
+                                          return;
+                                        }
 
-                          if (widget.author != null) {
-                            final rol = widget.author!.rol;
-                            final startController = Get.find<StartController>();
+                                        if (widget.author != null) {
+                                          final rol = widget.author!.rol;
+                                          final startController =
+                                              Get.find<StartController>();
 
-                            if (rol == 'cliente') {
-                              startController.showUserProfilePage(
-                                userData: {
-                                  'userId': widget.author!.id,
-                                  'userName': widget.author!.name ?? 'Usuario',
-                                  'username': widget.author!.profilePhoto ??
-                                      widget.author!.name
-                                          ?.toLowerCase()
-                                          .replaceAll(' ', '') ??
-                                      'usuario',
-                                },
-                              );
-                            } else if (rol == 'doctor') {
-                             
-                              startController.showDoctorProfilePage(
-                                doctorData: {
-                                   'userId': widget.author!.id,
-                                  'userName': widget.author!.name ?? 'Usuario',
-                                  'username': widget.author!.profilePhoto ??
-                                      widget.author!.name
-                                          ?.toLowerCase()
-                                          .replaceAll(' ', '') ??
-                                      'usuario',
-                                },
-                              );
-                            }
+                                          if (rol == 'cliente') {
+                                            startController.showUserProfilePage(
+                                              userData: {
+                                                'userId': widget.author!.id,
+                                                'userName':
+                                                    widget.author!.name ??
+                                                        'Usuario',
+                                                'username': widget
+                                                        .author!.profilePhoto ??
+                                                    widget.author!.name
+                                                        ?.toLowerCase()
+                                                        .replaceAll(' ', '') ??
+                                                    'usuario',
+                                              },
+                                            );
+                                          } else if (rol == 'doctor') {
+                                            startController
+                                                .showDoctorProfilePage(
+                                              doctorData: {
+                                                'userId': widget.author!.id,
+                                                'userName':
+                                                    widget.author!.name ??
+                                                        'Usuario',
+                                                'username': widget
+                                                        .author!.profilePhoto ??
+                                                    widget.author!.name
+                                                        ?.toLowerCase()
+                                                        .replaceAll(' ', '') ??
+                                                    'usuario',
+                                              },
+                                            );
+                                          }
 
-                            return;
-                          }
+                                          return;
+                                        }
                                       }
                                     : null,
                                 child: Text(
@@ -299,7 +309,6 @@ class _PostCardWidgetState extends State<PostCardWidget> {
           Expanded(
             child: Stack(
               children: [
-                // Columna principal con carousel y stats
                 Column(
                   children: [
                     Expanded(child: PostCarousel(images: widget.postImages)),
@@ -309,20 +318,7 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                       child: IntrinsicHeight(
                         child: Row(
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Container(height: 30),
-                                Text(
-                                  '${widget.likes} reacciones',
-                                  style: GoogleFonts.rubik(
-                                    fontSize: 12,
-                                    color: GerenaColors.textSecondaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
+                           
                             const Spacer(),
                             if (widget.rating != null)
                               Column(
@@ -357,7 +353,6 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black87,
-                                          // decoration: TextDecoration.underline, // Opcional: para indicar que es clickeable
                                           decorationColor: Colors.black87,
                                         ),
                                       ),
@@ -365,24 +360,7 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                   const SizedBox(height: 4),
                                   Container(height: 30),
                                   const SizedBox(height: 4),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'valoración',
-                                        style: GoogleFonts.rubik(
-                                          fontSize: 10,
-                                          color:
-                                              GerenaColors.textSecondaryColor,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      GerenaColors.createStarRating(
-                                        rating: widget.rating!,
-                                        size: 12,
-                                      ),
-                                    ],
-                                  ),
+                                  
                                 ],
                               ),
                           ],
@@ -391,151 +369,279 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                     ),
                   ],
                 ),
+            Positioned(
+  bottom: 0,
+  left: 0,
+  right: 0,
+  child: GerenaColors.createStoryOverlay(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Texto de descripción
+        AbsorbPointer(
+          absorbing: false,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final formattedText =
+                  _formatTextWithLineBreaks(widget.description);
+              final maxLines = 3;
 
-                // Overlay con descripción y botones
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: IgnorePointer(
-                    ignoring: false,
-                    child: GerenaColors.createStoryOverlay(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _formatTextWithLineBreaks(widget.description),
-                            softWrap: true,
-                            style: GoogleFonts.rubik(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
+              final textSpan = TextSpan(
+                text: formattedText,
+                style: GoogleFonts.rubik(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              );
+
+              final textPainter = TextPainter(
+                text: textSpan,
+                maxLines: maxLines,
+                textDirection: TextDirection.ltr,
+              )..layout(maxWidth: constraints.maxWidth);
+
+              final isOverflowing = textPainter.didExceedMaxLines;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    formattedText,
+                    maxLines: _isExpanded ? null : maxLines,
+                    overflow: _isExpanded
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
+                    style: GoogleFonts.rubik(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  if (isOverflowing)
+                    InkWell(
+                      onTap: () {
+                        print('Ver más clickeado');
+                        setState(() => _isExpanded = !_isExpanded);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          _isExpanded ? 'Ver menos' : 'Ver más',
+                          style: GoogleFonts.rubik(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.white70,
                           ),
-                          const SizedBox(height: 25),
-                          Container(
-                            child: IntrinsicHeight(
-                              child: Row(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Obx(
-                                        () => Opacity(
-                                          opacity: postController
-                                                  .isShowingReactionOptions(
-                                            widget.postId,
-                                          )
-                                              ? 0.0
-                                              : 1.0,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              print(
-                                                "Toggling reactions for post: ${widget.postId}",
-                                              );
-                                              postController
-                                                  .toggleReactionOptions(
-                                                widget.postId,
-                                              );
-                                            },
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                ColorFiltered(
-                                                  colorFilter: ColorFilter.mode(
-                                                    postController
-                                                            .hasUserReacted(
-                                                      widget.postId,
-                                                    )
-                                                        ? postController
-                                                            .getSelectedReactionColor(
-                                                            widget.postId,
-                                                          )
-                                                        : Color(0xFFF0F0F0),
-                                                    BlendMode.srcATop,
-                                                  ),
-                                                  child: Image.asset(
-                                                    postController
-                                                        .getSelectedReactionIcon(
-                                                      widget.postId,
-                                                    )!,
-                                                    width: 24,
-                                                    height: 24,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  postController
-                                                      .getSelectedReactionName(
-                                                    widget.postId,
-                                                  ),
-                                                  style: GoogleFonts.rubik(
-                                                    fontSize: 9,
-                                                    color: Color(0xFFF0F0F0),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                   SizedBox(width: 16), // Espacio entre botones
-                                  // BOTÓN DE COMENTARIOS
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          Get.bottomSheet(
-                                            CommentModalWidget(
-                                              postId: widget.postId,
-                                            ),
-                                            isScrollControlled: true,
-                                            backgroundColor: Colors.transparent,
-                                          );
-                                        },
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.comment_outlined,
-                                              color: Color(0xFFF0F0F0),
-                                              size: 24,
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Comentar',
-                                              style: GoogleFonts.rubik(
-                                                fontSize: 9,
-                                                color: Color(0xFFF0F0F0),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Botones de reacción y comentar
+        AbsorbPointer(
+          absorbing: false,
+          child: Row(
+            children: [
+              // Botón de reacción
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Obx(
+                    () => Opacity(
+                      opacity: postController.isShowingReactionOptions(
+                        widget.postId,
+                      )
+                          ? 0.0
+                          : 1.0,
+                      child: InkWell(
+                        onTap: () {
+                          print(
+                            "Toggling reactions for post: ${widget.postId}",
+                          );
+                          postController.toggleReactionOptions(
+                            widget.postId,
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ColorFiltered(
+                              colorFilter: ColorFilter.mode(
+                                postController.hasUserReacted(
+                                  widget.postId,
+                                )
+                                    ? postController
+                                        .getSelectedReactionColor(
+                                        widget.postId,
+                                      )
+                                    : Color(0xFFF0F0F0),
+                                BlendMode.srcATop,
+                              ),
+                              child: Image.asset(
+                                postController.getSelectedReactionIcon(
+                                  widget.postId,
+                                )!,
+                                width: 24,
+                                height: 24,
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              postController.getSelectedReactionName(
+                                widget.postId,
+                              ),
+                              style: GoogleFonts.rubik(
+                                fontSize: 9,
+                                color: Color(0xFFF0F0F0),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
+              ),
+              SizedBox(width: 16),
 
-                // OPCIONES DE REACCIÓN
+              // Botón de comentar
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Get.bottomSheet(
+                        CommentModalWidget(
+                          postId: widget.postId,
+                        ),
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.comment_outlined,
+                          color: Color(0xFFF0F0F0),
+                          size: 24,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Comentar',
+                          style: GoogleFonts.rubik(
+                            fontSize: 9,
+                            color: Color(0xFFF0F0F0),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            // Contador de reacciones
+            InkWell(
+              onTap: () {
+                print('Reacciones clickeadas');
+                Get.offAllNamed(
+                  RoutesNames.postReactionsPage,
+                  arguments: {'publicationId': widget.postId},
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  '${widget.likes} reacciones',
+                  style: GoogleFonts.rubik(
+                    fontSize: 12,
+                    color: GerenaColors.storyGradientEnd,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+
+            const Spacer(),
+
+            // Información de valoración
+            if (widget.rating != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (widget.taggedDoctor != null)
+                    InkWell(
+                      onTap: () {
+                        final startController = Get.find<StartController>();
+                        startController.showDoctorProfilePage(
+                          doctorData: {
+                            'userId': widget.taggedDoctor!.id,
+                            'doctorName': widget.taggedDoctor!.nombreCompleto,
+                            'specialty': widget.taggedDoctor!.especialidad ?? '',
+                            'location': '',
+                            'profileImage': widget.taggedDoctor!.fotoPerfil ?? 'assets/logo/logo.png',
+                            'rating': 0.0,
+                            'reviews': '',
+                            'info': '',
+                          },
+                        );
+                      },
+                      child: Text(
+                        'Dr./Dra ${widget.taggedDoctor!.nombreCompleto}',
+                        style: GoogleFonts.rubik(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 4),
+                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'valoración',
+                                        style: GoogleFonts.rubik(
+                                          fontSize: 10,
+                                          color:
+GerenaColors.storyGradientEnd,                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      GerenaColors.createStarRating(
+                                        rating: widget.rating!,
+                                        size: 12,
+                                      ),
+                                    ],
+                                  ),
+                ],
+              ),
+          ],
+        ),
+        
+        const SizedBox(height: 8),
+      ],
+    ),
+  ),
+),
                 Obx(() {
                   print(
                     "Estado de opciones para post ${widget.postId}: ${postController.isShowingReactionOptions(widget.postId)}",

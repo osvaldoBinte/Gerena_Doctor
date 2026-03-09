@@ -48,5 +48,11 @@ class SubscriptionRepositoryImp  implements SubscriptionRepository{
 
     return await subscriptionDataSourcesImp.subscribeToPlan(paymentMethodId, planId, token);
   }
- 
+  
+  @override
+  Future<void> verifyIAPPurchase(String receiptData, String productId, String platform) async {
+    return await subscriptionDataSourcesImp.verifyIAPPurchase(receiptData, productId, platform);
+  }
+  
+
 }

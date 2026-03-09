@@ -208,19 +208,28 @@ class StartController extends GetxController with WidgetsBindingObserver {
       print('❌ Error recargando notificaciones: $e');
     }
   }
-
-  void setInitialIndex(int index) {
-    if (index >= 0 && index < pages.length) {
-      selectedIndex.value = index;
-      
-      _addToHistory(NavigationHistoryItem(
-        pageType: _getPageTypeFromIndex(index),
-        pageIndex: index,
-      ));
-      
-      print('📍 Navegando a página inicial: $index');
-    }
+void setInitialIndex(int index) {
+  // ✅ Validar que el índice esté dentro del rango válido
+  if (index >= 0 && index < pages.length) {
+    selectedIndex.value = index;
+    
+    _addToHistory(NavigationHistoryItem(
+      pageType: _getPageTypeFromIndex(index),
+      pageIndex: index,
+    ));
+    
+    print('📍 Navegando a página inicial: $index');
+  } else {
+    // ❌ Índice fuera de rango - quedarse en HomePage (índice 0)
+    print('⚠️ Índice $index fuera de rango (0-${pages.length - 1}). Quedando en HomePage.');
+    selectedIndex.value = 0;
+    
+    _addToHistory(NavigationHistoryItem(
+      pageType: PageType.home,
+      pageIndex: 0,
+    ));
   }
+}
 
   void hideUserPage() {
     showUserProfile.value = false;
@@ -533,15 +542,22 @@ class StartController extends GetxController with WidgetsBindingObserver {
     // Escuchar cambios en el NotificationService
     _setupNotificationServiceListener();
     
-    final arguments = Get.arguments;
-    if (arguments is int) {
+     final arguments = Get.arguments;
+  if (arguments is int) {
+    // ✅ Validar el índice antes de usarlo
+    if (arguments >= 0 && arguments < pages.length) {
       setInitialIndex(arguments);
     } else {
-      _addToHistory(NavigationHistoryItem(
-        pageType: PageType.home,
-        pageIndex: 0,
-      ));
+      print('⚠️ Argumento $arguments fuera de rango. Usando HomePage por defecto.');
+      setInitialIndex(0); // HomePage por defecto
     }
+  } else {
+    // Sin argumentos, ir a HomePage
+    _addToHistory(NavigationHistoryItem(
+      pageType: PageType.home,
+      pageIndex: 0,
+    ));
+  }
   }
 
   @override
