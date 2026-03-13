@@ -2,7 +2,7 @@ import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
 import 'package:get/get.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+//import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SplashController extends GetxController {
   final RxBool isLoading = true.obs;
@@ -15,7 +15,7 @@ class SplashController extends GetxController {
   void onInit() async {
     super.onInit();
     if (GetPlatform.isMobile) {
-      await _requestNotificationPermission();
+    //  await _requestNotificationPermission();
     }
     await checkUserSession();
   }
@@ -38,7 +38,7 @@ class SplashController extends GetxController {
     }
   }
 
-  Future<void> _requestNotificationPermission() async {
+  /*Future<void> _requestNotificationPermission() async {
     final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     NotificationSettings settings = await messaging.requestPermission(
@@ -61,5 +61,5 @@ class SplashController extends GetxController {
     } else {
       print('Permisos de notificaciones denegados');
     }
-  }
+  }*/
 }

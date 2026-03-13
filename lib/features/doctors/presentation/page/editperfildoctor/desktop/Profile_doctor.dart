@@ -28,11 +28,13 @@ class _UserProfileContentState extends State<UserProfileContent> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(
-          child: DoctorProfileLoading(),
-        );
-      }
+     if (controller.isLoading.value) {
+  return SizedBox(
+    width: double.infinity,
+    height: MediaQuery.of(context).size.height,
+    child: const DoctorProfileLoading(),
+  );
+}
 
       if (controller.doctorProfile.value == null) {
         return Center(
@@ -376,6 +378,23 @@ Widget _buildAccountSettingsSection() {
                       widthFactor: 0.64,
                       child: Column(
                         children: [
+// ✅ OPCIÓN 1 - Sin Obx (lo más simple)
+GestureDetector(
+  onTap: () => controller.selectFechaNacimiento(context),
+  child: AbsorbPointer(
+    child: GerenaColors.buildLabeledTextField(
+      'Fecha de nacimiento',
+      controller.fechaNacimientoController.text,
+      hintText: 'AAAA-MM-DD',
+      controller: controller.fechaNacimientoController,
+      suffixIcon: Icon(
+        Icons.calendar_today,
+        color: GerenaColors.primaryColor,
+        size: 18,
+      ),
+    ),
+  ),
+),
                           GerenaColors.buildLabeledTextField(
                             'Profesión*',
                             controller.especialidadController.text,
@@ -383,6 +402,7 @@ Widget _buildAccountSettingsSection() {
                             controller: controller.especialidadController,
                           ),
                           const SizedBox(height: 15),
+                          
                           GerenaColors.buildLabeledTextField(
                             'Dirección',
                             controller.direccionController.text,

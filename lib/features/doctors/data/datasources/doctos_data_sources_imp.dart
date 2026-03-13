@@ -99,33 +99,52 @@ class DoctosDataSourcesImp {
     }
   }
   Future<void> updateDoctorProfile(DoctorEntity doctor, String token) async {
- try {
-      Uri url = Uri.parse('$defaultApiServer/Doctores/mi-perfil');
+  try {
+    Uri url = Uri.parse('$defaultApiServer/Doctores/mi-perfil');
 
-      final response = await http.put( url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
+    final body = jsonEncode(DoctorModel.fromEntity(doctor).toJson());
+
+    print('---- UPDATE DOCTOR PROFILE ----');
+    print('URL: $url');
+    print('BODY: $body');
+
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
-        },
-       body:
-            jsonEncode(DoctorModel.fromEntity(doctor).toJson()),
-      );
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return;
-      }
-      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
-      exception.validateMesage();
-      throw exception;
-    } catch (e) {
-      if (e is SocketException ||
-          e is http.ClientException ||
-          e is TimeoutException) {
-        throw Exception(convertMessageException(error: e));
-      }
-      print('error: $e');
-      throw Exception('$e');
+      },
+      body: body,
+    );
+
+    print('STATUS CODE: ${response.statusCode}');
+    print('RESPONSE BODY: ${response.body}');
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Perfil actualizado correctamente');
+      return;
     }
+
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+
+  } catch (e, stack) {
+
+    print('---- ERROR UPDATE DOCTOR PROFILE ----');
+    print('Error: $e');
+    print('StackTrace: $stack');
+
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      print('Network error detected');
+      throw Exception(convertMessageException(error: e));
+    }
+
+    throw Exception('$e');
   }
+}
 Future<void> updatefotoDoctorProfile(String fotoPath, String token) async {
   try {
     Uri url = Uri.parse('$defaultApiServer/Doctores/mi-perfil/foto');

@@ -33,30 +33,22 @@ class _DoctorProfileLoadingState extends State<DoctorProfileLoading>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: GerenaColors.backgroundColorFondo,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(0),
-        child: AppBar(
-          backgroundColor: GerenaColors.backgroundColorFondo,
-          elevation: 4,
-          shadowColor: GerenaColors.shadowColor,
-        ),
-      ),
-      body: AnimatedBuilder(
-        animation: _shimmerAnimation,
-        builder: (context, child) {
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: _buildDoctorHeaderSkeleton(),
-                ),
-                const SizedBox(height: 16),
+@override
+Widget build(BuildContext context) {
+  return Container(
+    color: GerenaColors.backgroundColorFondo,
+    child: AnimatedBuilder(
+      animation: _shimmerAnimation,
+      builder: (context, child) {
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: _buildDoctorHeaderSkeleton(),
+              ),
+            const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 const SizedBox(height: 16),
                 _buildWishlistButtonSkeleton(),
@@ -115,13 +107,13 @@ class _DoctorProfileLoadingState extends State<DoctorProfileLoading>
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 _buildMenuItemsSkeleton(),
                 const SizedBox(height: 32),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildShimmerBox({required Widget child}) {
     return AnimatedBuilder(

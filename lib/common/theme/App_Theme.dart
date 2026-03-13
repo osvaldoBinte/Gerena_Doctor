@@ -1346,56 +1346,19 @@ class GerenaColors {
       ),
     );
   }
-
-  static Widget buildLabeledTextField(
-    String label,
-    String initialValue, {
-    TextEditingController? controller,
-    String? hintText,
-    String? errorText,
-    bool showError = false,
-    bool readOnly = false,
-    int maxLines = 1, // ✅ Nuevo parámetro
-    ValueChanged<String>? onChanged, // ✅ Nuevo parámetro para detectar cambios
-  }) {
-    if (controller == null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.rubik(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: GerenaColors.textPrimaryColor,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Container(
-            height: 45,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              border: Border.all(
-                color: GerenaColors.colorinput.withOpacity(0.5),
-                width: 1,
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                initialValue.isEmpty ? (hintText ?? '') : initialValue,
-                style: GoogleFonts.rubik(
-                  fontSize: 16,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
+static Widget buildLabeledTextField(
+  String label,
+  String initialValue, {
+  TextEditingController? controller,
+  String? hintText,
+  String? errorText,
+  bool showError = false,
+  bool readOnly = false,
+  int maxLines = 1,
+  ValueChanged<String>? onChanged,
+  Widget? suffixIcon, // ✅ Nuevo parámetro
+}) {
+  if (controller == null) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1408,81 +1371,116 @@ class GerenaColors {
           ),
         ),
         const SizedBox(height: 5),
-        TextField(
-          key: ObjectKey(controller),
-          controller: controller,
-          readOnly: readOnly,
-          maxLines: maxLines, // ✅ Usar maxLines
-          onChanged: onChanged, // ✅ Callback para detectar cambios
-          style: GoogleFonts.rubik(
-            fontSize: 16,
-            color: readOnly ? Colors.grey.shade700 : Colors.black,
+        Container(
+          height: 45,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 9),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            border: Border.all(
+              color: GerenaColors.colorinput.withOpacity(0.5),
+              width: 1,
+            ),
           ),
-          decoration: InputDecoration(
-            hintText:
-                controller.text.isEmpty ? (hintText ?? initialValue) : null,
-            hintStyle: GoogleFonts.rubik(
-              color: GerenaColors.textSecondaryColor.withOpacity(0.6),
-              fontSize: 16,
-            ),
-            errorText: showError ? errorText : null,
-            errorStyle: GoogleFonts.rubik(
-              color: GerenaColors.errorColor,
-              fontSize: 12,
-            ),
-            filled: true,
-            fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 9,
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius:
-                  BorderRadius.circular(8), // ✅ Cambiado a 8 para los modales
-              borderSide: BorderSide(
-                color: GerenaColors.colorinput.withOpacity(0.5),
-                width: 1,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  initialValue.isEmpty ? (hintText ?? '') : initialValue,
+                  style: GoogleFonts.rubik(
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
               ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: showError
-                    ? GerenaColors.errorColor
-                    : GerenaColors.colorinput,
-                width: showError ? 1.5 : 1,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: showError
-                    ? GerenaColors.errorColor
-                    : GerenaColors.primaryColor,
-                width: 1.5,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: GerenaColors.errorColor,
-                width: 1.5,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: GerenaColors.errorColor,
-                width: 1.5,
-              ),
-            ),
-            isDense: true,
+              if (suffixIcon != null) suffixIcon,
+            ],
           ),
         ),
       ],
     );
   }
 
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: GoogleFonts.rubik(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: GerenaColors.textPrimaryColor,
+        ),
+      ),
+      const SizedBox(height: 5),
+      TextField(
+        key: ObjectKey(controller),
+        controller: controller,
+        readOnly: readOnly,
+        maxLines: maxLines,
+        onChanged: onChanged,
+        style: GoogleFonts.rubik(
+          fontSize: 16,
+          color: readOnly ? Colors.grey.shade700 : Colors.black,
+        ),
+        decoration: InputDecoration(
+          hintText: controller.text.isEmpty ? (hintText ?? initialValue) : null,
+          hintStyle: GoogleFonts.rubik(
+            color: GerenaColors.textSecondaryColor.withOpacity(0.6),
+            fontSize: 16,
+          ),
+          errorText: showError ? errorText : null,
+          errorStyle: GoogleFonts.rubik(
+            color: GerenaColors.errorColor,
+            fontSize: 12,
+          ),
+          suffixIcon: suffixIcon, // ✅ Agregado aquí
+          filled: true,
+          fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 9,
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: GerenaColors.colorinput.withOpacity(0.5),
+              width: 1,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: showError ? GerenaColors.errorColor : GerenaColors.colorinput,
+              width: showError ? 1.5 : 1,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: showError ? GerenaColors.errorColor : GerenaColors.primaryColor,
+              width: 1.5,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: GerenaColors.errorColor,
+              width: 1.5,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: GerenaColors.errorColor,
+              width: 1.5,
+            ),
+          ),
+          isDense: true,
+        ),
+      ),
+    ],
+  );
+}
   static Widget widgetButton({
     VoidCallback? onPressed,
     String text = 'AGENDAR CITA',

@@ -38,7 +38,7 @@ class PrefilDortorController extends GetxController {
   late final TextEditingController disciplinaController;
   late final TextEditingController institucionController;
   late final TextEditingController certificacionController;
-  
+  late final TextEditingController fechaNacimientoController;
   late final TextEditingController linkedinController;
   late final TextEditingController facebookController;
   late final TextEditingController twitterController;
@@ -69,7 +69,8 @@ class PrefilDortorController extends GetxController {
     disciplinaController = TextEditingController();
     institucionController = TextEditingController();
     certificacionController = TextEditingController();
-    
+    fechaNacimientoController = TextEditingController();
+
     linkedinController = TextEditingController();
     facebookController = TextEditingController();
     twitterController = TextEditingController();
@@ -78,9 +79,9 @@ class PrefilDortorController extends GetxController {
 
   void _populateControllers() {
     if (doctorProfile.value == null) return;
-    
+
     final doctor = doctorProfile.value!;
-    
+
     try {
       nombreController.text = doctor.nombre ?? '';
       apellidosController.text = doctor.apellidos ?? '';
@@ -93,7 +94,9 @@ class PrefilDortorController extends GetxController {
       disciplinaController.text = doctor.especialidad ?? '';
       institucionController.text = doctor.institucion ?? '';
       certificacionController.text = doctor.certificacion ?? '';
-      
+      fechaNacimientoController.text =
+          formatFechaNacimiento(doctor.fechaNacimiento);
+
       linkedinController.text = doctor.linkedIn ?? '';
       facebookController.text = doctor.facebook ?? '';
       twitterController.text = doctor.x ?? '';
@@ -103,9 +106,52 @@ class PrefilDortorController extends GetxController {
     }
   }
 
+  String formatFechaNacimiento(String? fecha) {
+    if (fecha == null || fecha.isEmpty) return '';
+    try {
+      final parsed = DateTime.parse(fecha);
+      return "${parsed.day.toString().padLeft(2, '0')}/${parsed.month.toString().padLeft(2, '0')}/${parsed.year}";
+    } catch (_) {
+      return fecha;
+    }
+  }
+
+  Future<void> selectFechaNacimiento(BuildContext context) async {
+    // Fecha máxima = hoy menos 18 años
+    final DateTime maxDate = DateTime(
+      DateTime.now().year - 18,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
+
+    DateTime initialDate = maxDate; // Por defecto muestra la fecha límite
+
+    if (fechaNacimientoController.text.isNotEmpty) {
+      try {
+        final parsed = DateTime.parse(fechaNacimientoController.text);
+        // Si la fecha guardada es válida (mayor de 18), úsala
+        initialDate = parsed.isBefore(maxDate) ? parsed : maxDate;
+      } catch (_) {}
+    }
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1920),
+      lastDate: maxDate, // ← Aquí está la magia
+      locale: const Locale('es', 'MX'),
+    );
+
+    if (picked != null) {
+      final formatted =
+          "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      fechaNacimientoController.text = formatted;
+    }
+  }
+
   String? getValueForSocial(String socialKey) {
     if (doctorProfile.value == null) return null;
-    
+
     switch (socialKey) {
       case 'linkedin':
         return doctorProfile.value!.linkedIn;
@@ -212,7 +258,9 @@ class PrefilDortorController extends GetxController {
         numeroLicencia: numeroLicenciaController.text,
         especialidad: especialidadController.text,
         experienciaTiempo: doctorProfile.value?.experienciaTiempo ?? 0,
-        fechaNacimiento: doctorProfile.value?.fechaNacimiento ?? '',
+        fechaNacimiento: fechaNacimientoController.text.isEmpty
+            ? doctorProfile.value?.fechaNacimiento
+            : fechaNacimientoController.text,
         telefono: telefonoController.text,
         direccion: direccionController.text,
         biografia: doctorProfile.value?.biografia ?? '',
@@ -222,12 +270,13 @@ class PrefilDortorController extends GetxController {
         institucion: doctorProfile.value?.institucion,
         certificacion: doctorProfile.value?.certificacion,
         institucionCertificacion: doctorProfile.value?.institucionCertificacion,
-    
-        linkedIn: linkedinController.text.isEmpty ? null : linkedinController.text,
-        facebook: facebookController.text.isEmpty ? null : facebookController.text,
+        linkedIn:
+            linkedinController.text.isEmpty ? null : linkedinController.text,
+        facebook:
+            facebookController.text.isEmpty ? null : facebookController.text,
         x: twitterController.text.isEmpty ? null : twitterController.text,
-        instagram: instagramController.text.isEmpty ? null : instagramController.text,
-       
+        instagram:
+            instagramController.text.isEmpty ? null : instagramController.text,
         nombreVendedor: doctorProfile.value?.nombreVendedor,
         whatsAppVendedor: doctorProfile.value?.whatsAppVendedor,
         correoVendedor: doctorProfile.value?.correoVendedor,
@@ -268,7 +317,6 @@ class PrefilDortorController extends GetxController {
         institucion: institucionController.text,
         certificacion: certificacionController.text,
         institucionCertificacion: doctorProfile.value?.institucionCertificacion,
-      
         linkedIn: doctorProfile.value?.linkedIn,
         facebook: doctorProfile.value?.facebook,
         x: doctorProfile.value?.x,
@@ -287,7 +335,7 @@ class PrefilDortorController extends GetxController {
 
   void openWhatsApp() async {
     final phoneNumber = doctorProfile.value?.whatsAppVendedor;
-    
+
     if (phoneNumber == null || phoneNumber.isEmpty) {
       showErrorSnackbar('No hay número de WhatsApp disponible');
       return;
@@ -322,8 +370,8 @@ class PrefilDortorController extends GetxController {
   }
 
   @override
-@override
-void onClose() {
-  super.onClose();
-}
+  @override
+  void onClose() {
+    super.onClose();
+  }
 }
