@@ -45,8 +45,7 @@ class AppointmentDataSourcesImp {
       }
       throw Exception('$e');
     }
-  }
-Future<void> addAvailability(
+  }Future<void> addAvailability(
   List<AddAvailabilityEntity> entities,
   String token,
 ) async {
@@ -59,6 +58,10 @@ Future<void> addAvailability(
           .toList(),
     });
 
+    print('URL: $url');
+    print('TOKEN: $token');
+    print('BODY: $body');
+
     final response = await http.post(
       url,
       headers: <String, String>{
@@ -68,19 +71,30 @@ Future<void> addAvailability(
       body: body,
     );
 
+    print('STATUS CODE: ${response.statusCode}');
+    print('RESPONSE BODY: ${response.body}');
+
     if (response.statusCode == 200 || response.statusCode == 201) {
+      print('Disponibilidad agregada correctamente');
       return;
     }
+
+    print('Error en la petición');
 
     ApiExceptionCustom exception = ApiExceptionCustom(response: response);
     exception.validateMesage();
     throw exception;
+
   } catch (e) {
+
+    print('ERROR EN addAvailability: $e');
+
     if (e is SocketException ||
         e is http.ClientException ||
         e is TimeoutException) {
       throw Exception(convertMessageException(error: e));
     }
+
     throw Exception('$e');
   }
 }

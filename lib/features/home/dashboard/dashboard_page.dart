@@ -743,7 +743,7 @@ Widget _buildAppointmentCardFromData(Appointment appointment) {
   Widget _buildDefaultAvatar() {
     return Container(
       child: Image.asset(
-        'assets/icons/FOTOGRAFIA.png',
+        'assets/logo/gerenalogo.jpg',
         fit: BoxFit.cover,
       ),
     );

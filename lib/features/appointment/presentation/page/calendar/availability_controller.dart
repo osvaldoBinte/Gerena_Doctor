@@ -68,14 +68,13 @@ class AvailabilityController extends GetxController {
 
   Future<void> addAvailability() async {
     if (selectedDay.value == null ||
-        selectedStartTime.value == null ||
-        selectedEndTime.value == null) {
-      showSnackBar(
-        'Por favor selecciona día, hora de inicio y hora de fin',
-        GerenaColors.warningColor,
-      );
-      return;
-    }
+      selectedStartTime.value == null ||
+      selectedEndTime.value == null) {
+    showSnackBar('Por favor selecciona día, hora de inicio y hora de fin',
+        GerenaColors.warningColor);
+    return;
+  }
+
 
     try {
       isLoading.value = true;
@@ -127,10 +126,18 @@ print('==========================');
         currentView.value == 'appointments' ? 'availability' : 'appointments';
   }
 
-  void selectDay(DateTime day) {
-    selectedDay.value = day;
-  }
-
+void selectDay(int dayIndex) {
+  // dayIndex 0=Lunes, 1=Martes, ... 6=Domingo
+  // Buscar el próximo día de la semana que coincida con ese índice
+  // weekday: 1=Lunes, 2=Martes, ... 7=Domingo
+  final targetWeekday = dayIndex + 1; // 1-7
+  final now = DateTime.now();
+  final daysUntilTarget = (targetWeekday - now.weekday + 7) % 7;
+  final targetDate = daysUntilTarget == 0
+      ? now
+      : now.add(Duration(days: daysUntilTarget));
+  selectedDay.value = targetDate;
+}
   void selectStartTime(String time) {
     selectedStartTime.value = time;
     if (selectedEndTime.value != null &&

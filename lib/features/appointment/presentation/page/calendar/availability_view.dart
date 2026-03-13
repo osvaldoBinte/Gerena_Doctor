@@ -149,7 +149,7 @@ class AvailabilityView extends GetView<AvailabilityController> {
             final isSelected = controller.selectedDay.value?.weekday == date.weekday;
             
             return InkWell(
-              onTap: () => controller.selectDay(date),
+              onTap: () => controller.selectDay(index),
               borderRadius: GerenaColors.smallBorderRadius,
               child: Container(
                 padding: const EdgeInsets.symmetric(

@@ -472,60 +472,59 @@ Widget _buildCalendarContainer(double availableHeight) {
       ),
     );
   }
+Widget _buildDaySelector() {
+  return Obx(() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: List.generate(
+        availabilityController.daysOfWeek.length,
+        (index) {
+          final day = availabilityController.daysOfWeek[index];
+          // ✅ CORRECTO — comparar directamente por índice (0=Lunes, 6=Domingo)
+          // weekday: 1=Lunes ... 7=Domingo, por eso restamos 1
+          final isSelected =
+              availabilityController.selectedDay.value != null &&
+              (availabilityController.selectedDay.value!.weekday - 1) == index;
 
-  Widget _buildDaySelector() {
-    return Obx(() {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: List.generate(
-          availabilityController.daysOfWeek.length,
-          (index) {
-            final day = availabilityController.daysOfWeek[index];
-            final date = DateTime.now().add(Duration(days: index));
-            final isSelected =
-                availabilityController.selectedDay.value?.weekday ==
-                    date.weekday;
-
-            return InkWell(
-              onTap: () => availabilityController.selectDay(date),
-              borderRadius: GerenaColors.smallBorderRadius,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
+          return InkWell(
+            onTap: () => availabilityController.selectDay(index), // ← pasa el índice
+            borderRadius: GerenaColors.smallBorderRadius,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? GerenaColors.secondaryColor
+                    : GerenaColors.backgroundColor,
+                borderRadius: GerenaColors.smallBorderRadius,
+                border: Border.all(
                   color: isSelected
                       ? GerenaColors.secondaryColor
-                      : GerenaColors.backgroundColor,
-                  borderRadius: GerenaColors.smallBorderRadius,
-                  border: Border.all(
-                    color: isSelected
-                        ? GerenaColors.secondaryColor
-                        : GerenaColors.dividerColor,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  day,
-                  style: GoogleFonts.rubik(
-                    color: isSelected
-                        ? GerenaColors.textLightColor
-                        : GerenaColors.textPrimaryColor,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 14,
-                  ),
+                      : GerenaColors.dividerColor,
+                  width: 1.5,
                 ),
               ),
-            );
-          },
-        ),
-      );
-    });
-  }
-
+              child: Text(
+                day,
+                style: GoogleFonts.rubik(
+                  color: isSelected
+                      ? GerenaColors.textLightColor
+                      : GerenaColors.textPrimaryColor,
+                  fontWeight:
+                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  });
+}
   Widget _buildTimeSelector({
     required List<String> times,
     required Rx<String?> selectedTime,
@@ -1511,7 +1510,7 @@ Widget _buildCalendarContainer(double availableHeight) {
   Widget _buildDefaultAvatar() {
     return Container(
       child: Image.asset(
-        'assets/icons/FOTOGRAFIA.png',
+        'assets/logo/gerenalogo.jpg',
         fit: BoxFit.cover,
       ),
     );
