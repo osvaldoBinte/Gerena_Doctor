@@ -5,6 +5,7 @@ import 'package:gerena/features/marketplace/presentation/page/paymentcard/paymen
 import 'package:gerena/features/subscription/domain/entities/view_all_plans_entity.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:get/get.dart';
+
 class SelectPaymentMethodDialog extends StatelessWidget {
   final ViewAllPlansEntity plan;
 
@@ -12,29 +13,29 @@ class SelectPaymentMethodDialog extends StatelessWidget {
     Key? key,
     required this.plan,
   }) : super(key: key);
-void _showAddCardModal(BuildContext context) {
-  try {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Evita cerrar tocando fuera
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: 500,
-            maxHeight: MediaQuery.of(context).size.height * 0.9,
+  void _showAddCardModal(BuildContext context) {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false, // Evita cerrar tocando fuera
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          child: AddCardModal(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 500,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
+            ),
+            child: AddCardModal(),
+          ),
         ),
-      ),
-    );
-  } catch (e) {
-    print('ERROR AL ABRIR MODAL: $e');
- 
+      );
+    } catch (e) {
+      print('ERROR AL ABRIR MODAL: $e');
+    }
   }
-}
+
   @override
   Widget build(BuildContext context) {
     final paymentController = Get.find<PaymentCartController>();
@@ -96,7 +97,7 @@ void _showAddCardModal(BuildContext context) {
               ),
             ),
             const SizedBox(height: 8),
-            
+
             TextButton.icon(
               onPressed: () => _showAddCardModal(context),
               icon: Icon(Icons.add_card),
@@ -105,7 +106,7 @@ void _showAddCardModal(BuildContext context) {
                 foregroundColor: GerenaColors.primaryColor,
               ),
             ),
-            
+
             const SizedBox(height: 8),
 
             // Lista de tarjetas
@@ -146,10 +147,11 @@ void _showAddCardModal(BuildContext context) {
                   shrinkWrap: true,
                   itemCount: paymentController.paymentMethods.length,
                   itemBuilder: (context, index) {
-                    final paymentMethod = paymentController.paymentMethods[index];
+                    final paymentMethod =
+                        paymentController.paymentMethods[index];
                     final isSelected =
                         subscriptionController.selectedPaymentMethodId.value ==
-                            paymentMethod.id;
+                            (paymentMethod.paymentMethodId ?? paymentMethod.id);
 
                     return Obx(() => Container(
                           margin: const EdgeInsets.only(bottom: 8),
@@ -188,18 +190,23 @@ void _showAddCardModal(BuildContext context) {
                               style: GerenaColors.bodySmall,
                             ),
                             trailing: Radio<String>(
-                              value: paymentMethod.id,
+                              value: paymentMethod.paymentMethodId ??
+                                  paymentMethod.id,
                               groupValue: subscriptionController
                                   .selectedPaymentMethodId.value,
                               onChanged: (value) {
-                                subscriptionController.selectedPaymentMethodId
-                                    .value = value ?? '';
+                                subscriptionController
+                                        .selectedPaymentMethodId.value =
+                                    paymentMethod.paymentMethodId ??
+                                        paymentMethod.id;
                               },
                               activeColor: GerenaColors.primaryColor,
                             ),
                             onTap: () {
-                              subscriptionController.selectedPaymentMethodId
-                                  .value = paymentMethod.id;
+                              subscriptionController
+                                      .selectedPaymentMethodId.value =
+                                  paymentMethod.paymentMethodId ??
+                                      paymentMethod.id;
                             },
                           ),
                         ));
