@@ -33,9 +33,10 @@ class ShoppingCartController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
   
-  // REMOVIDO: selectedPaymentMethodId ya no es necesario
+  
   final RxString selectedAddressId = ''.obs;
-  final RxBool isProcessingOrder = false.obs; // Renombrado de isProcessingPayment
+  final RxBool isProcessingOrder = false.obs; 
+  
   
   final RxBool isBuyNowModeActive = false.obs;
   
