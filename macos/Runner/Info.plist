@@ -4,49 +4,43 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Gerena</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
-	<key>CFBundleDisplayName</key>
-	<string>Gerena</string>
-	<key>CFBundleName</key>
-	<string>Gerena</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Gerena</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.social-networking</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Gerena necesita acceso a tu cámara para que puedas tomar fotos y compartirlas en la aplicación.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.social-networking</string>
-
-	<!-- AGREGAR ESTAS LÍNEAS -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Gerena necesita acceso a tu biblioteca de fotos para que puedas compartir imágenes en tus publicaciones y actualizar tu foto de perfil.</string>
-	
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Gerena necesita guardar fotos en tu biblioteca para que puedas descargar imágenes compartidas.</string>
-	
-	<key>NSCameraUsageDescription</key>
-	<string>Gerena necesita acceso a tu cámara para que puedas tomar fotos y compartirlas en la aplicación.</string>
-	
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Gerena necesita acceso a tu micrófono para grabación de audio en tus publicaciones.</string>
-
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Gerena necesita guardar fotos en tu biblioteca para que puedas descargar imágenes compartidas.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Gerena necesita acceso a tu biblioteca de fotos para que puedas compartir imágenes en tus publicaciones y actualizar tu foto de perfil.</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>

@@ -234,7 +234,7 @@ class SavedProductsContent extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '\$${item.precioActual.toStringAsFixed(2)}',
+                        '\$${item.precioActual.toStringAsFixed(2)} MXN',
                         style: GoogleFonts.rubik(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,

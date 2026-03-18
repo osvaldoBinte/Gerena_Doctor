@@ -48,9 +48,28 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
             final planId = subscription?.subscriptionplanId;
             final shouldShowPortfolio = planId == 3 || planId == 4;
             
-            if (!shouldShowPortfolio) {
-              return SizedBox.shrink();
-            }
+          if (!shouldShowPortfolio) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.lock_outline, color: Colors.grey, size: 40),
+          const SizedBox(height: 12),
+          Text(
+            'Para poder agregar procedimientos,\nactualiza tu membresía a Elite o Black',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
             
             return Column(
               children: [

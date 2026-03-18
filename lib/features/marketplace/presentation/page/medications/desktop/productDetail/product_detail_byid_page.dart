@@ -634,10 +634,10 @@ class RelatedProductsCarousel extends StatelessWidget {
       'image': (medication.images != null && medication.images!.isNotEmpty) 
           ? medication.images!.first 
           : '',
-      'price': 'MXN \$${medication.price?.toStringAsFixed(2) ?? '0.00'}',
+      'price': ' ${medication.price?.toStringAsFixed(2) ?? '0.00'} MXN',
       'hasDiscount': hasDiscount.toString(),
       'oldPrice': hasDiscount 
-          ? 'MXN \$${medication.previousPrice?.toStringAsFixed(2) ?? '0.00'}' 
+          ? ' ${medication.previousPrice?.toStringAsFixed(2) ?? '0.00'} MXN' 
           : '',
     };
   }

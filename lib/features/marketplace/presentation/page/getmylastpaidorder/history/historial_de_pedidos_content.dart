@@ -413,21 +413,21 @@ Widget _buildPlaceholderImage() {
 
             _buildResumenItem(
               'Subtotal',
-              '${currencyFormat.format(subtotal)} MXN',
+              '\$${currencyFormat.format(subtotal)} MXN',
               false,
             ),
             if (pointsUsed > 0) ...[
               const SizedBox(height: 8),
               _buildResumenItem(
                 'Puntos utilizados ($pointsUsed pts)',
-                '- ${currencyFormat.format(discounts)} MXN',
+                '- \$${currencyFormat.format(discounts)} ',
                 true,
               ),
             ],
             const SizedBox(height: 8),
             _buildResumenItem(
               'Gastos de envío',
-              '${currencyFormat.format(shipping)} MXN',
+              '\$${currencyFormat.format(shipping)} MXN',
               false,
             ),
             const SizedBox(height: 8),

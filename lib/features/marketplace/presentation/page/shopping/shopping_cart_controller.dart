@@ -650,7 +650,7 @@ class ShoppingCartController extends GetxController {
       
       String mensaje = '¡Hola ${nombreVendedor ?? ""}! 👋\n\n';
       mensaje += '✅ *Nuevo pedido confirmado*\n\n';
-      mensaje += '📦 *ID del pedido:* $orderId\n';
+      mensaje += '📦 *Folio del pedido:* $orderId\n';
       mensaje += '💰 *Total:* \$${totalAmount.toStringAsFixed(2)} MXN\n\n';
       
       if (usePoints.value && pointsToUse.value > 0) {

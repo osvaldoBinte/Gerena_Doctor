@@ -211,7 +211,7 @@ Widget _buildProductImage() {
             ),
           ] else ...[
             Text(
-              product['price'] ?? '\$0.00',
+              '\$${product['price'] ?? '\$0.00'}',
               style: GoogleFonts.rubik(
                 fontSize: 12,
                 color: GerenaColors.textDarkColor,

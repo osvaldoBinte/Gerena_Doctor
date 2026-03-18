@@ -179,7 +179,7 @@ class CartPageContent extends StatelessWidget {
                                                   item.nombreMedicamento,
                                                   item.alerta ?? '',
                                                   item.imagen ?? "",
-                                                  "${item.precioActual.toStringAsFixed(2)} MXN",
+                                                  "\$${item.precioActual.toStringAsFixed(2)} MXN",
                                                   medicamentoId:
                                                       item.medicamentoId,
                                                   cantidad:
@@ -190,7 +190,7 @@ class CartPageContent extends StatelessWidget {
                                                   originalPrice: item
                                                               .precioAnterior >
                                                           item.precioActual
-                                                      ? "${item.precioAnterior.toStringAsFixed(2)} MXN"
+                                                      ? "\$${item.precioAnterior.toStringAsFixed(2)} MXN"
                                                       : null,
                                                   sinStock: item.sinStock,
                                                   oferta: item.oferta ?? false,
@@ -475,7 +475,7 @@ class CartPageContent extends StatelessWidget {
                                       : "0.00 MXN"),
                               Divider(color: GerenaColors.textTertiaryColor),
 
-                              // Descuento por puntos
+
                               Obx(() {
                                 if (!cartController.usePoints.value ||
                                     cartController.pointsDiscount.value <= 0) {
@@ -495,27 +495,27 @@ class CartPageContent extends StatelessWidget {
                                 );
                               }),
 
-                              // Gastos de envío
+
                               _buildSummaryItem(
                                   "Gastos de envío",
                                   response != null
-                                      ? "${response.gastoEnvio.toStringAsFixed(2)} MXN"
+                                      ? "\$${response.gastoEnvio.toStringAsFixed(2)} MXN"
                                       : "0.00 MXN"),
                               Divider(color: GerenaColors.textTertiaryColor),
 
-                              // IVA
+
                               _buildSummaryItem(
                                   "IVA",
                                   response != null
-                                      ? "${response.iva.toStringAsFixed(2)} MXN"
+                                      ? "\$${response.iva.toStringAsFixed(2)} MXN"
                                       : "0.00 MXN"),
 
                               const Divider(height: 30),
 
-                              // Total final
+
                               Obx(() => _buildTotalRow(
                                     "TOTAL:",
-                                    "${cartController.finalTotal.toStringAsFixed(2)} MXN",
+                                    "\$${cartController.finalTotal.toStringAsFixed(2)} MXN",
                                   )),
 
                               const SizedBox(height: 100),
