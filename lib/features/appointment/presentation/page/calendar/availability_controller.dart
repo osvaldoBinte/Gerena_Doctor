@@ -33,10 +33,10 @@ class AvailabilityController extends GetxController {
   final daysOfWeek = [
     'LUNES',
     'MARTES',
-    'MIÉRCOLES',
+    'MIERCOLES',
     'JUEVES',
     'VIERNES',
-    'SÁBADO',
+    'SABADO',
     'DOMINGO'
   ];
 

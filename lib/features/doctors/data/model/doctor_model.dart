@@ -116,5 +116,4 @@ Map<String, dynamic> toJson() {
   };
 }
 
-  
 }

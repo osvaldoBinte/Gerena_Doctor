@@ -414,7 +414,7 @@ GestureDetector(
                             'Email',
                             controller.emailController.text,
                             hintText: 'doctor@ejemplo.com',
-                            controller: controller.emailController,
+                            controller: controller.emailController, readOnly: true,
                           ),
                           const SizedBox(height: 15),
                           GerenaColors.buildLabeledTextField(
