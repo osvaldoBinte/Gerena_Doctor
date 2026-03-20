@@ -204,7 +204,7 @@ class _DoctorProfilePageState extends State<DoctorProfileByidPage> {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/icons/whatsapp.png',
+                    'assets/icons/WHATSAPP.png',
                     width: 24,
                     height: 24,
                     color: Color(0xFF25D366),

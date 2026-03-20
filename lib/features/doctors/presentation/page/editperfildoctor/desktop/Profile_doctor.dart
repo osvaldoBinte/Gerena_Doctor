@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gerena/common/controller/promotionController/promotion_controller.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
@@ -418,11 +419,16 @@ GestureDetector(
                           ),
                           const SizedBox(height: 15),
                           GerenaColors.buildLabeledTextField(
-                            'Teléfono',
-                            controller.telefonoController.text,
-                            hintText: '33 1234 5678',
-                            controller: controller.telefonoController,
-                          ),
+  'Teléfono',
+  controller.telefonoController.text,
+  hintText: '9611234567  (10 dígitos con lada)',
+  controller: controller.telefonoController,
+  keyboardType: TextInputType.phone,
+  inputFormatters: [
+    FilteringTextInputFormatter.digitsOnly,
+    LengthLimitingTextInputFormatter(10),
+  ],
+),
                           const SizedBox(height: 15),
                         ],
                       ),

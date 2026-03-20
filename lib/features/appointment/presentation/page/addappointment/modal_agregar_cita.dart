@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/appointment/presentation/page/addappointment/add_appointment_controller.dart';
+import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -92,29 +93,48 @@ class ModalAgregarCita extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildDatePickerField(
-                              context,
-                              'Fecha de Nacimiento',
-                              controller.fechaNacimientoController,
-                              () => controller.selectBirthDate(context),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Obx(() => _buildDropdown(
-                                  'Tipo de Sangre',
-                                  controller.selectedTipoSangre.value,
-                                  controller.tiposSangre,
-                                  (value) {
-                                    controller.selectedTipoSangre.value = value;
-                                  },
-                                )),
-                          ),
-                        ],
-                      ),
+                   LayoutBuilder(
+  builder: (context, constraints) {
+    final isSmall = constraints.maxWidth < 500;
+
+    final fechaField = _buildDatePickerField(
+      context,
+      'Fecha de Nacimiento',
+      controller.fechaNacimientoController,
+      () => controller.selectBirthDate(context),
+    );
+
+    final tipoSangreField = Obx(() => _buildDropdown(
+          'Tipo de Sangre',
+          controller.selectedTipoSangre.value,
+          controller.tiposSangre,
+          (value) {
+            controller.selectedTipoSangre.value = value;
+          },
+        ));
+
+    if (isSmall) {
+      return Column(
+        children: [
+          fechaField,
+          const SizedBox(height: 12),
+          tipoSangreField,
+        ],
+      );
+    }
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(child: fechaField),
+          const SizedBox(width: 12),
+          Expanded(child: tipoSangreField),
+        ],
+      ),
+    );
+  },
+),
 
                       const SizedBox(height: 24),
 
@@ -611,11 +631,62 @@ class ModalAgregarCita extends StatelessWidget {
     );
   }
 
-  static void show() {
+ static void show() {
+  final subscriptionController = Get.find<SubscriptionController>();
+
+  if (!subscriptionController.hasActiveSubscription.value) {
     Get.dialog(
-      const ModalAgregarCita(),
-    
-      barrierDismissible: true,
-    );
+  Dialog(
+    backgroundColor: Colors.transparent,
+    child: Container(
+      constraints: const BoxConstraints(maxWidth: 400),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.lock_outline, color: Colors.grey, size: 40),
+                const SizedBox(height: 12),
+                Text(
+                  'Para poder agregar citas,\nverifica que tengas una membresía',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Positioned(
+            top: 8,
+            right: 8,
+            child: IconButton(
+              icon: Icon(Icons.close, color: Colors.grey),
+              onPressed: () {
+                Get.back(); 
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+  barrierDismissible: true,
+);
+    return;
   }
+
+  Get.dialog(
+    const ModalAgregarCita(),
+    barrierDismissible: true,
+  );
+}
 }

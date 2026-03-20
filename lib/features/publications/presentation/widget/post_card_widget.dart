@@ -105,7 +105,7 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                           int authorId = widget.author!.id;
 
                           if (loggedUserId == authorId) {
-                            Get.offAllNamed(RoutesNames.homePage, arguments: 4);
+                         //   Get.offAllNamed(RoutesNames.homePage, arguments: 4);
                             return;
                           }
 
@@ -178,8 +178,7 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                                         int authorId = widget.author!.id;
 
                                         if (loggedUserId == authorId) {
-                                          Get.offAllNamed(RoutesNames.homePage,
-                                              arguments: 4);
+                                        //  Get.offAllNamed(RoutesNames.homePage,arguments: 4);
                                           return;
                                         }
 

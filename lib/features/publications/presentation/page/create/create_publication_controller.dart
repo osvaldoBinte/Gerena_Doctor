@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
+import 'package:gerena/features/publications/presentation/page/myposts/my_post_controller.dart';
+import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -34,6 +36,9 @@ class CreatePublicationController extends GetxController {
   final CreatePublicationUsecase createPublicationUsecase;
 
   CreatePublicationController({required this.createPublicationUsecase});
+  final MyPostController myPostController = Get.find<MyPostController>();
+     final PublicationController publicationController = Get.find<PublicationController>();
+
 
   final RxBool isLoading = false.obs;
   final TextEditingController descriptionController = TextEditingController();
@@ -233,7 +238,12 @@ class CreatePublicationController extends GetxController {
         images: imagePaths,
       );
       await createPublicationUsecase.execute(entity);
+
+
       Get.back();
+     
+      myPostController.loadMyPosts();
+      publicationController.loadFeedPosts();
       showSuccessSnackbar('Publicación creada exitosamente');
       _resetForm();
     } catch (e) {

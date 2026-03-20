@@ -12,9 +12,11 @@ import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil
 import 'package:gerena/features/doctors/presentation/page/editperfildoctor/movil/perfil_edit_page.dart';
 import 'package:gerena/features/doctors/presentation/page/prefil_dortor_controller.dart';
 import 'package:gerena/features/doctors/presentation/widget/loading/doctor_profile_loading.dart';
+import 'package:gerena/features/doctors/presentation/widget/my_publications_widget.dart';
 import 'package:gerena/features/doctors/presentation/widget/share_and_procedures_widget.dart';
 import 'package:gerena/features/followers/presentation/controller/follower_controller.dart';
 import 'package:gerena/features/publications/presentation/page/create/create_publication_modal.dart';
+import 'package:gerena/features/publications/presentation/page/myposts/my_post_controller.dart';
 import 'package:gerena/features/review/presentation/page/reviews_widget.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:gerena/movil/home/start_controller.dart';
@@ -141,20 +143,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                     ],
                   );
                 }),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'RESEÑAS DE SUS PACIENTES',
-                        style: GerenaColors.headingSmall,
-                      ),
-                      ReviewsWidget(),
-                      const SizedBox(height: 16),
-                    ],
-                  ),
-                ),
+                _buildReviewsAndPublications(),
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 Padding(
@@ -201,8 +190,70 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
       }),
     );
   }
+  Widget _buildReviewsAndPublications() {
+  final RxInt selectedTab = 0.obs;
 
-  // 🔥 NUEVA SECCIÓN DE ESTADÍSTICAS
+  return Obx(() => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Tabs manuales
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          children: [
+            _buildTabItem('RESEÑAS', 0, selectedTab),
+            const SizedBox(width: 8),
+            _buildTabItem('PUBLICACIONES', 1, selectedTab),
+          ],
+        ),
+      ),
+      const Divider(height: 1),
+      const SizedBox(height: 8),
+
+      // Contenido según tab seleccionado
+      if (selectedTab.value == 0)
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: ReviewsWidget(),
+        )
+     else
+MyPublicationsWidget()
+    ],
+  ));
+}
+
+Widget _buildTabItem(String label, int index, RxInt selectedTab) {
+  return Obx(() {
+    final isSelected = selectedTab.value == index;
+    return GestureDetector(
+      onTap: () => selectedTab.value = index,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: isSelected
+                  ? GerenaColors.primaryColor
+                  : Colors.transparent,
+              width: 2,
+            ),
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.rubik(
+            fontSize: 13,
+            fontWeight:
+                isSelected ? FontWeight.w600 : FontWeight.w400,
+            color: isSelected
+                ? GerenaColors.primaryColor
+                : GerenaColors.textTertiaryColor,
+          ),
+        ),
+      ),
+    );
+  });
+}
   Widget _buildStatsSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;

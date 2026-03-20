@@ -1345,8 +1345,7 @@ class GerenaColors {
         ),
       ),
     );
-  }
-static Widget buildLabeledTextField(
+  }static Widget buildLabeledTextField(
   String label,
   String initialValue, {
   TextEditingController? controller,
@@ -1356,7 +1355,9 @@ static Widget buildLabeledTextField(
   bool readOnly = false,
   int maxLines = 1,
   ValueChanged<String>? onChanged,
-  Widget? suffixIcon, // ✅ Nuevo parámetro
+  Widget? suffixIcon,
+  TextInputType? keyboardType,                    // ← agregar
+  List<TextInputFormatter>? inputFormatters,      // ← agregar
 }) {
   if (controller == null) {
     return Column(
@@ -1418,6 +1419,8 @@ static Widget buildLabeledTextField(
         readOnly: readOnly,
         maxLines: maxLines,
         onChanged: onChanged,
+        keyboardType: keyboardType,              // ← agregar
+        inputFormatters: inputFormatters,        // ← agregar
         style: GoogleFonts.rubik(
           fontSize: 16,
           color: readOnly ? Colors.grey.shade700 : Colors.black,
@@ -1433,7 +1436,7 @@ static Widget buildLabeledTextField(
             color: GerenaColors.errorColor,
             fontSize: 12,
           ),
-          suffixIcon: suffixIcon, // ✅ Agregado aquí
+          suffixIcon: suffixIcon,
           filled: true,
           fillColor: readOnly ? Colors.grey.shade100 : Colors.white,
           contentPadding: const EdgeInsets.symmetric(
