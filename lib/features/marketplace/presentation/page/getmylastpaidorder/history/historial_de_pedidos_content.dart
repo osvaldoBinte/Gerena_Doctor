@@ -14,27 +14,26 @@ class HistorialDePedidosContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColor,
-     appBar: GetPlatform.isMobile
-    ? AppBar(
-        backgroundColor: GerenaColors.backgroundColorFondo,
-        elevation: 4,
-        shadowColor: GerenaColors.shadowColor,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: GerenaColors.textPrimaryColor,
-          ),
-          onPressed: () {
-                                      Get.offAllNamed(RoutesNames.homePage);
-
-          },
-        ),
-        title: Text(
-          'Historial de Pedidos',
-          style: GerenaColors.headingMedium.copyWith(fontSize: 18),
-        ),
-      )
-    : null,
+      appBar: GetPlatform.isMobile
+          ? AppBar(
+              backgroundColor: GerenaColors.backgroundColorFondo,
+              elevation: 4,
+              shadowColor: GerenaColors.shadowColor,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: GerenaColors.textPrimaryColor,
+                ),
+                onPressed: () {
+                  Get.offAllNamed(RoutesNames.homePage);
+                },
+              ),
+              title: Text(
+                'Historial de Pedidos',
+                style: GerenaColors.headingMedium.copyWith(fontSize: 18),
+              ),
+            )
+          : null,
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(
@@ -103,13 +102,13 @@ class HistorialDePedidosContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ...controller.orders.map((order) => Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: _buildOrderCard(controller, order),
-                )),
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: _buildOrderCard(controller, order),
+                    )),
 
                 const SizedBox(height: 30),
 
-             //   _buildResumenDelMes(controller),
+                //   _buildResumenDelMes(controller),
               ],
             ),
           ),
@@ -148,7 +147,7 @@ class HistorialDePedidosContent extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        order.hasFolio 
+                        order.hasFolio
                             ? 'Folio: ${order.folio}'
                             : 'Pedido #${order.id}',
                         style: GerenaColors.bodySmall,
@@ -157,7 +156,8 @@ class HistorialDePedidosContent extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: _getStatusColor(order.status).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -176,8 +176,8 @@ class HistorialDePedidosContent extends StatelessWidget {
                 ),
               ],
             ),
-
-            if (order.shippingStatus != null && order.shippingStatus!.isNotEmpty) ...[
+            if (order.shippingStatus != null &&
+                order.shippingStatus!.isNotEmpty) ...[
               const SizedBox(height: 8),
               Row(
                 children: [
@@ -197,18 +197,15 @@ class HistorialDePedidosContent extends StatelessWidget {
                 ],
               ),
             ],
-
             const SizedBox(height: 20),
-
             ...order.details.map((detail) => _buildProductoItem(
-            nombre: detail.medicationName,
-            precio: currencyFormat.format(detail.unitPrice),
-            cantidad: 'x${detail.quantity}',
-            subtotal: currencyFormat.format(detail.subtotal),
-            fotos: detail.fotos, 
-          )),
+                  nombre: detail.medicationName,
+                  precio: currencyFormat.format(detail.unitPrice),
+                  cantidad: 'x${detail.quantity}',
+                  subtotal: currencyFormat.format(detail.subtotal),
+                  fotos: detail.fotos,
+                )),
             const SizedBox(height: 16),
-
             if (order.hasDiscount) ...[
               _buildTotalRow(
                 'Subtotal:',
@@ -224,7 +221,6 @@ class HistorialDePedidosContent extends StatelessWidget {
               const Divider(),
               const SizedBox(height: 8),
             ],
-
             _buildTotalRow(
               'TOTAL:',
               '${currencyFormat.format(order.total)} MXN',
@@ -236,116 +232,114 @@ class HistorialDePedidosContent extends StatelessWidget {
     );
   }
 
- Widget _buildProductoItem({
-  required String nombre,
-  required String precio,
-  required String cantidad,
-  required String subtotal,
-  List<String>? fotos,
-}) {
-  final fotoUrl = fotos != null && fotos.isNotEmpty ? fotos.first : null;
+  Widget _buildProductoItem({
+    required String nombre,
+    required String precio,
+    required String cantidad,
+    required String subtotal,
+    List<String>? fotos,
+  }) {
+    final fotoUrl = fotos != null && fotos.isNotEmpty ? fotos.first : null;
 
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 16.0),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: GerenaColors.backgroundColorfondo,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [GerenaColors.lightShadow],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: GerenaColors.backgroundColorfondo,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [GerenaColors.lightShadow],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: fotoUrl != null && fotoUrl.isNotEmpty
+                  ? Image.network(
+                      fotoUrl,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                            strokeWidth: 2,
+                            color: GerenaColors.primaryColor,
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildPlaceholderImage();
+                      },
+                    )
+                  : _buildPlaceholderImage(),
+            ),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: fotoUrl != null && fotoUrl.isNotEmpty
-                ? Image.network(
-                    fotoUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                          strokeWidth: 2,
-                          color: GerenaColors.primaryColor,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return _buildPlaceholderImage();
-                    },
-                  )
-                : _buildPlaceholderImage(),
-          ),
-        ),
-
-        const SizedBox(width: 12),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                nombre,
-                style: GerenaColors.headingSmall.copyWith(fontSize: 14),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Precio unitario: $precio',
-                style: GerenaColors.bodySmall.copyWith(
-                  fontSize: 11,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  nombre,
+                  style: GerenaColors.headingSmall.copyWith(fontSize: 14),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Subtotal: $subtotal',
-                style: GerenaColors.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w600,
+                const SizedBox(height: 4),
+                Text(
+                  'Precio unitario: $precio',
+                  style: GerenaColors.bodySmall.copyWith(
+                    fontSize: 11,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 4),
+                Text(
+                  'Subtotal: $subtotal',
+                  style: GerenaColors.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-
-        const SizedBox(width: 8),
-
-        Text(
-          cantidad,
-          style: GerenaColors.bodyMedium.copyWith(
-            fontWeight: FontWeight.bold,
+          const SizedBox(width: 8),
+          Text(
+            cantidad,
+            style: GerenaColors.bodyMedium.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
-Widget _buildPlaceholderImage() {
-  return Image.asset(
-    '',
-    fit: BoxFit.cover,
-    errorBuilder: (context, error, stackTrace) {
-      return Container(
-        color: GerenaColors.backgroundColorfondo,
-        child: Icon(
-          Icons.inventory,
-          color: GerenaColors.textSecondaryColor,
-          size: 30,
-        ),
-      );
-    },
-  );
-}
+  Widget _buildPlaceholderImage() {
+    return Image.asset(
+      '',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: GerenaColors.backgroundColorfondo,
+          child: Icon(
+            Icons.inventory,
+            color: GerenaColors.textSecondaryColor,
+            size: 30,
+          ),
+        );
+      },
+    );
+  }
 
-  Widget _buildTotalRow(String label, String amount, {
+  Widget _buildTotalRow(
+    String label,
+    String amount, {
     bool isTotal = false,
     bool isDiscount = false,
     bool isSubtotal = false,
@@ -355,7 +349,7 @@ Widget _buildPlaceholderImage() {
       children: [
         Text(
           label,
-          style: isTotal 
+          style: isTotal
               ? GerenaColors.headingSmall.copyWith(fontSize: 16)
               : GerenaColors.bodyMedium.copyWith(
                   color: isDiscount ? GerenaColors.warningColor : null,
@@ -375,10 +369,9 @@ Widget _buildPlaceholderImage() {
   }
 
   Widget _buildResumenDelMes(HistoryController controller) {
-    
     final now = DateTime.now();
     final currentMonthYear = controller.getMonthYear(now);
-    
+
     final subtotal = controller.getSubtotalForMonth(currentMonthYear);
     final discounts = controller.getDiscountsForMonth(currentMonthYear);
     final total = controller.getTotalForMonth(currentMonthYear);
@@ -408,9 +401,7 @@ Widget _buildPlaceholderImage() {
               'RESUMEN DEL MES - $currentMonthYear',
               style: GerenaColors.headingSmall.copyWith(fontSize: 15),
             ),
-
             const SizedBox(height: 20),
-
             _buildResumenItem(
               'Subtotal',
               '\$${currencyFormat.format(subtotal)} MXN',
@@ -436,16 +427,12 @@ Widget _buildPlaceholderImage() {
               '${currencyFormat.format(iva)} MXN',
               false,
             ),
-
             const SizedBox(height: 16),
-
             Container(
               height: 1,
               color: GerenaColors.dividerColor,
             ),
-
             const SizedBox(height: 16),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

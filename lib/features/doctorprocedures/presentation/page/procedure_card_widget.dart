@@ -35,7 +35,7 @@ class ProcedureCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con título y acciones
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +52,7 @@ class ProcedureCardWidget extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Botón editar
+                    
                     GestureDetector(
                       onTap: onEdit ?? () => _showEditDialog(context, procedure, proceduresController),
                       child: Image.asset(
@@ -64,7 +64,7 @@ class ProcedureCardWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // Botón eliminar procedimiento
+                    
                     GestureDetector(
                       onTap: onDelete ??
                           () => proceduresController.showDeleteProcedureConfirmation(
@@ -83,22 +83,22 @@ class ProcedureCardWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Descripción con límite de líneas y "Continuar leyendo"
+
           _buildDescriptionSection(context),
 
           const SizedBox(height: 12),
 
-          // Galería de imágenes
+
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                // Imágenes existentes
+                
                 ...procedure.img.map((imagen) {
                   return _buildImageItem(imagen, proceduresController);
                 }),
 
-                // Botón para agregar más imágenes
+
                 if (showAddImageButton)
                   GestureDetector(
                     onTap: () => _showAddImagesDialog(context, procedure, proceduresController),
@@ -143,9 +143,8 @@ class ProcedureCardWidget extends StatelessWidget {
     );
   }
 
-  // Widget para la descripción con "Continuar leyendo"
+
   Widget _buildDescriptionSection(BuildContext context) {
-    final bool isLongDescription = procedure.description.length > 150; // Ajusta este valor según necesites
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,8 +155,7 @@ class ProcedureCardWidget extends StatelessWidget {
           maxLines: 4,
           overflow: TextOverflow.ellipsis,
         ),
-        if (isLongDescription) ...[
-          const SizedBox(height: 4),
+        const SizedBox(height: 4),
           GestureDetector(
             onTap: () => _showFullDescriptionDialog(context),
             child: Text(
@@ -172,12 +170,10 @@ class ProcedureCardWidget extends StatelessWidget {
               ),
             ),
           ),
-        ],
       ],
     );
   }
-
-  // Diálogo para mostrar la descripción completa
+  
   void _showFullDescriptionDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -198,7 +194,8 @@ class ProcedureCardWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Header con título y botón cerrar
+                    
+
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -226,7 +223,7 @@ class ProcedureCardWidget extends StatelessWidget {
                     
                     const SizedBox(height: 16),
                     
-                    // Descripción completa
+                    
                     Text(
                       procedure.description,
                       style: GoogleFonts.rubik(
@@ -237,7 +234,7 @@ class ProcedureCardWidget extends StatelessWidget {
                       ),
                     ),
                     
-                    // Galería de imágenes en el diálogo
+                    
                     if (procedure.img.isNotEmpty) ...[
                       const SizedBox(height: 20),
                       Text(
@@ -301,7 +298,7 @@ class ProcedureCardWidget extends StatelessWidget {
     );
   }
 
-  // Widget para cada imagen
+
   Widget _buildImageItem(ImagenesEntity imagen, ProceduresController controller) {
     return Container(
       width: 120,
@@ -360,7 +357,7 @@ class ProcedureCardWidget extends StatelessWidget {
               },
             ),
           ),
-          // Botón eliminar imagen (X roja en la esquina)
+          
           if (showActions)
             Positioned(
               top: 4,
@@ -393,7 +390,7 @@ class ProcedureCardWidget extends StatelessWidget {
     );
   }
 
-  // Dialog para editar procedimiento
+
   void _showEditDialog(
     BuildContext context,
     GetProceduresEntity procedure,
@@ -482,7 +479,7 @@ class ProcedureCardWidget extends StatelessWidget {
     );
   }
 
-  // Dialog para agregar imágenes
+
   void _showAddImagesDialog(
     BuildContext context,
     GetProceduresEntity procedure,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/widgets_gobal.dart';
+import 'package:gerena/features/publications/presentation/page/comment/comment_modal_widget.dart';
 import 'package:gerena/features/publications/presentation/page/post_controller.dart';
 import 'package:gerena/features/publications/presentation/page/publication_controller.dart';
 import 'package:gerena/movil/widgets/widgets_gobal.dart';
@@ -58,10 +59,12 @@ class ReviewWidget extends StatefulWidget {
 class _ReviewWidgetState extends State<ReviewWidget> {
   late PostController postController;
   bool _initialized = false;
-bool _isTitleExpanded = false;
-bool _isContentExpanded = false;
+  bool _isTitleExpanded = false;
+  bool _isContentExpanded = false;
+
   final PublicationController publicationController =
       Get.find<PublicationController>();
+
   @override
   void initState() {
     super.initState();
@@ -88,18 +91,20 @@ bool _isContentExpanded = false;
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Header usuario ────────────────────────────────────
           Row(
             children: [
               CircleAvatar(
                 radius: 20,
                 backgroundColor: GerenaColors.backgroundColorFondo,
-                backgroundImage:
-                    widget.avatarPath != null && widget.avatarPath!.isNotEmpty
-                        ? NetworkImage(widget.avatarPath!)
-                        : null,
-                child: (widget.avatarPath == null || widget.avatarPath!.isEmpty)
-                    ? Icon(Icons.person, color: GerenaColors.primaryColor)
+                backgroundImage: widget.avatarPath != null &&
+                        widget.avatarPath!.isNotEmpty
+                    ? NetworkImage(widget.avatarPath!)
                     : null,
+                child:
+                    (widget.avatarPath == null || widget.avatarPath!.isEmpty)
+                        ? Icon(Icons.person, color: GerenaColors.primaryColor)
+                        : null,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -132,294 +137,306 @@ bool _isContentExpanded = false;
                     size: 24,
                   ),
                   onPressed: widget.onDeletePressed,
-                  padding: EdgeInsets.all(8),
-                  constraints: BoxConstraints(),
+                  padding: const EdgeInsets.all(8),
+                  constraints: const BoxConstraints(),
                 ),
             ],
           ),
           const SizedBox(height: 12),
-        if (widget.title.isNotEmpty) ...[
-  LayoutBuilder(
-    builder: (context, constraints) {
-      const maxLines = 2;
-      final textSpan = TextSpan(
-        text: widget.title,
-        style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
-      );
-      final textPainter = TextPainter(
-        text: textSpan,
-        maxLines: maxLines,
-        textDirection: TextDirection.ltr,
-      )..layout(maxWidth: constraints.maxWidth);
 
-      final isOverflowing = textPainter.didExceedMaxLines;
+          // ── Título ────────────────────────────────────────────
+          if (widget.title.isNotEmpty) ...[
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const maxLines = 2;
+                final textSpan = TextSpan(
+                  text: widget.title,
+                  style: GerenaColors.storyText
+                      .copyWith(color: GerenaColors.textSecondary),
+                );
+                final textPainter = TextPainter(
+                  text: textSpan,
+                  maxLines: maxLines,
+                  textDirection: TextDirection.ltr,
+                )..layout(maxWidth: constraints.maxWidth);
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            widget.title,
-            maxLines: _isTitleExpanded ? null : maxLines,
-            overflow: _isTitleExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-            style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
-          ),
-          if (isOverflowing)
-            GestureDetector(
-              onTap: () => setState(() => _isTitleExpanded = !_isTitleExpanded),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  _isTitleExpanded ? 'Ver menos' : 'Ver más',
-                  style: GoogleFonts.rubik(
-                    fontSize: 12,
-                    color: GerenaColors.primaryColor,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
-                    decorationColor: GerenaColors.primaryColor,
-                  ),
-                ),
-              ),
+                final isOverflowing = textPainter.didExceedMaxLines;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      maxLines: _isTitleExpanded ? null : maxLines,
+                      overflow: _isTitleExpanded
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
+                      style: GerenaColors.storyText
+                          .copyWith(color: GerenaColors.textSecondary),
+                    ),
+                    if (isOverflowing)
+                      GestureDetector(
+                        onTap: () => setState(
+                            () => _isTitleExpanded = !_isTitleExpanded),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            _isTitleExpanded ? 'Ver menos' : 'Ver más',
+                            style: GoogleFonts.rubik(
+                              fontSize: 12,
+                              color: GerenaColors.primaryColor,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: GerenaColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
-        ],
-      );
-    },
-  ),
-  const SizedBox(height: 8),
-],
-if (widget.content.isNotEmpty) ...[
-  LayoutBuilder(
-    builder: (context, constraints) {
-      const maxLines = 3;
-      final textSpan = TextSpan(
-        text: widget.content,
-        style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
-      );
-      final textPainter = TextPainter(
-        text: textSpan,
-        maxLines: maxLines,
-        textDirection: TextDirection.ltr,
-      )..layout(maxWidth: constraints.maxWidth);
+            const SizedBox(height: 8),
+          ],
 
-      final isOverflowing = textPainter.didExceedMaxLines;
+          // ── Contenido ─────────────────────────────────────────
+          if (widget.content.isNotEmpty) ...[
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const maxLines = 3;
+                final textSpan = TextSpan(
+                  text: widget.content,
+                  style: GerenaColors.storyText
+                      .copyWith(color: GerenaColors.textSecondary),
+                );
+                final textPainter = TextPainter(
+                  text: textSpan,
+                  maxLines: maxLines,
+                  textDirection: TextDirection.ltr,
+                )..layout(maxWidth: constraints.maxWidth);
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            widget.content,
-            maxLines: _isContentExpanded ? null : maxLines,
-            overflow: _isContentExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-            style: GerenaColors.storyText.copyWith(color: GerenaColors.textSecondary),
-          ),
-          if (isOverflowing)
-            GestureDetector(
-              onTap: () => setState(() => _isContentExpanded = !_isContentExpanded),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  _isContentExpanded ? 'Ver menos' : 'Ver más',
-                  style: GoogleFonts.rubik(
-                    fontSize: 12,
-                    color: GerenaColors.primaryColor,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
-                    decorationColor: GerenaColors.primaryColor,
-                  ),
-                ),
-              ),
+                final isOverflowing = textPainter.didExceedMaxLines;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.content,
+                      maxLines: _isContentExpanded ? null : maxLines,
+                      overflow: _isContentExpanded
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
+                      style: GerenaColors.storyText
+                          .copyWith(color: GerenaColors.textSecondary),
+                    ),
+                    if (isOverflowing)
+                      GestureDetector(
+                        onTap: () => setState(
+                            () => _isContentExpanded = !_isContentExpanded),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            _isContentExpanded ? 'Ver menos' : 'Ver más',
+                            style: GoogleFonts.rubik(
+                              fontSize: 12,
+                              color: GerenaColors.primaryColor,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: GerenaColors.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
-        ],
-      );
-    },
-  ),
-  const SizedBox(height: 16),
-],
+            const SizedBox(height: 16),
+          ],
+
+          // ── Imágenes ──────────────────────────────────────────
           if (widget.images.isNotEmpty) ...[
             buildImageGallery(widget.images),
             const SizedBox(height: 16),
           ],
-          Stack(
+
+          // ── Botones reacción + comentar + lado derecho ────────
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                color: GerenaColors.backgroundColor,
-                child: IntrinsicHeight(
-                  child: Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Container(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Obx(
-                                  () => Opacity(
-                                    opacity:
-                                        postController.isShowingReactionOptions(
-                                                widget.postId)
-                                            ? 0.0
-                                            : 1.0,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        print(
-                                            "Toggling reactions for post: ${widget.postId}");
-                                        postController.toggleReactionOptions(
-                                            widget.postId);
-                                      },
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          ColorFiltered(
-                                            colorFilter: ColorFilter.mode(
-                                              postController.hasUserReacted(
-                                                      widget.postId)
-                                                  ? postController
-                                                      .getSelectedReactionColor(
-                                                          widget.postId)
-                                                  : GerenaColors
-                                                      .textSecondaryColor,
-                                              BlendMode.srcATop,
-                                            ),
-                                            child: Image.asset(
-                                              postController
-                                                  .getSelectedReactionIcon(
-                                                      widget.postId)!,
-                                              width: 24,
-                                              height: 24,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            postController
-                                                .getSelectedReactionName(
-                                                    widget.postId),
-                                            style: GoogleFonts.rubik(
-                                              fontSize: 9,
-                                              color: GerenaColors
-                                                  .textSecondaryColor,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '${widget.reactions} reacciones',
-                                  style: GerenaColors.bodySmall,
-                                ),
-                              ],
-                            ),
+              // ── Reacción ──────────────────────────────────────
+              Obx(
+                () => Opacity(
+                  opacity:
+                      postController.isShowingReactionOptions(widget.postId)
+                          ? 0.0
+                          : 1.0,
+                  child: GestureDetector(
+                    onTap: () =>
+                        postController.toggleReactionOptions(widget.postId),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ColorFiltered(
+                          colorFilter: ColorFilter.mode(
+                            postController.hasUserReacted(widget.postId)
+                                ? postController
+                                    .getSelectedReactionColor(widget.postId)
+                                : GerenaColors.textSecondaryColor,
+                            BlendMode.srcATop,
                           ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          if (widget.userRole.isNotEmpty)
-                            Text(
-                              widget.userRole,
-                              style: GerenaColors.bodySmall.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: GerenaColors.textTertiary,
-                              ),
-                            ),
-                          const SizedBox(height: 20),
-                          if (widget.isReview) ...[
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'valoración',
-                                  style: GerenaColors.bodySmall.copyWith(
-                                    fontSize: 10,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                GerenaColors.createStarRating(
-                                  rating: widget.rating,
-                                  size: 12,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
+                          child: Image.asset(
+                            postController
+                                .getSelectedReactionIcon(widget.postId)!,
+                            width: 24,
+                            height: 24,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          postController
+                              .getSelectedReactionName(widget.postId),
+                          style: GoogleFonts.rubik(
+                            fontSize: 9,
+                            color: GerenaColors.textSecondaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              Obx(() {
-                print(
-                    "Estado de opciones para post ${widget.postId}: ${postController.isShowingReactionOptions(widget.postId)}");
-                return postController.isShowingReactionOptions(widget.postId)
-                    ? Positioned(
-                        bottom: 16,
-                        left: -20,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: List.generate(
-                              postController.reactionIcons.length,
-                              (index) => GestureDetector(
-                                onTap: () {
-                                  print(
-                                      "Reacción seleccionada: ${postController.reactionNames[index]}");
-                                  postController.selectReaction(
-                                      widget.postId, index);
-                                  final reactionType =
-                                      postController.getCurrentReactionType(
-                                    widget.postId,
-                                  );
-                                  publicationController.toggleLike(
-                                      widget.postId, reactionType);
-                                },
-                                child: Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  padding: const EdgeInsets.all(8),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Image.asset(
-                                        postController.reactionIcons[index],
-                                        width: 24,
-                                        height: 24,
-                                      ),
-                                      Text(
-                                        postController.reactionNames[index],
-                                        style: GoogleFonts.rubik(
-                                          fontSize: 9,
-                                          color: Color(0xFFF0F0F0),
-                                        ),
-                                      ),
-                                    ],
+
+              const SizedBox(width: 16),
+
+              // ── Comentar ──────────────────────────────────────
+              GestureDetector(
+                onTap: () {
+                  Get.bottomSheet(
+                    CommentModalWidget(postId: widget.postId),
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                  );
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.comment_outlined,
+                      color: GerenaColors.textSecondaryColor,
+                      size: 24,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Comentar',
+                      style: GoogleFonts.rubik(
+                        fontSize: 9,
+                        color: GerenaColors.textSecondaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+
+              // ── Lado derecho ──────────────────────────────────
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (widget.userRole.isNotEmpty)
+                    Text(
+                      widget.userRole,
+                      style: GerenaColors.bodySmall.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: GerenaColors.textTertiary,
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  if (widget.isReview) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'valoración',
+                          style:
+                              GerenaColors.bodySmall.copyWith(fontSize: 10),
+                        ),
+                        const SizedBox(width: 4),
+                        GerenaColors.createStarRating(
+                          rating: widget.rating,
+                          size: 12,
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // ── Contador reacciones ───────────────────────────────
+          Text(
+            '${widget.reactions} reacciones',
+            style: GerenaColors.bodySmall,
+          ),
+
+          // ── Opciones de reacción (flotantes) ──────────────────
+          Obx(() {
+            return postController.isShowingReactionOptions(widget.postId)
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(
+                        postController.reactionIcons.length,
+                        (index) => GestureDetector(
+                          onTap: () {
+                            postController.selectReaction(
+                                widget.postId, index);
+                            final reactionType = postController
+                                .getCurrentReactionType(widget.postId);
+                            publicationController.toggleLike(
+                                widget.postId, reactionType);
+                          },
+                          child: Container(
+                            margin:
+                                const EdgeInsets.symmetric(horizontal: 4),
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  postController.reactionIcons[index],
+                                  width: 24,
+                                  height: 24,
+                                ),
+                                Text(
+                                  postController.reactionNames[index],
+                                  style: GoogleFonts.rubik(
+                                    fontSize: 9,
+                                    color: const Color(0xFFF0F0F0),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                      )
-                    : const SizedBox.shrink();
-              }),
-            ],
-          ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink();
+          }),
         ],
       ),
     );

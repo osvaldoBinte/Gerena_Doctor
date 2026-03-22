@@ -24,8 +24,10 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
   final TextEditingController _reviewController = TextEditingController();
   final appBarController = Get.put(GerenaAppBarController());
   final MediaController mediaController = Get.put(MediaController());
-  final ProceduresController proceduresController = Get.find<ProceduresController>();
-  final SubscriptionController subscriptionController = Get.find<SubscriptionController>();
+  final ProceduresController proceduresController =
+      Get.find<ProceduresController>();
+  final SubscriptionController subscriptionController =
+      Get.find<SubscriptionController>();
 
   @override
   void dispose() {
@@ -42,43 +44,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
         children: [
           _buildDoctorInfoCard(),
           const SizedBox(height: 16),
-         
-          Obx(() {
-            final subscription = subscriptionController.currentSubscription.value;
-            final planId = subscription?.subscriptionplanId;
-            final shouldShowPortfolio = planId == 3 || planId == 4;
-            
-          if (!shouldShowPortfolio) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.lock_outline, color: Colors.grey, size: 40),
-          const SizedBox(height: 12),
-          Text(
-            'Para poder agregar procedimientos,\nactualiza tu membresía a Elite o Black',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-            
-            return Column(
-              children: [
-                ShareAndProceduresWidget(),
-                const SizedBox(height: 16),
-              ],
-            );
-          }),
-          
+         ShareAndProceduresWidget(),
           Text(
             'Reseñas de tus pacientes',
             style: GerenaColors.headingSmall,
@@ -91,11 +57,12 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
   }
 
   Widget _buildDoctorInfoCard() {
-    final PrefilDortorController controller = Get.find<PrefilDortorController>();
-    
+    final PrefilDortorController controller =
+        Get.find<PrefilDortorController>();
+
     return Obx(() {
       final doctor = controller.doctorProfile.value;
-      
+
       if (controller.isLoading.value) {
         return Container(
           padding: const EdgeInsets.all(16),
@@ -105,7 +72,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
           ),
         );
       }
-      
+
       if (doctor == null) {
         return Container(
           padding: const EdgeInsets.all(16),
@@ -115,7 +82,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
           ),
         );
       }
-      
+
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: GerenaColors.cardDecoration,
@@ -166,9 +133,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                           ),
                   ),
                 ),
-                
                 const SizedBox(width: 16),
-                
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +152,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                           GestureDetector(
                             onTap: () {
                               print('Editando perfil');
-                              appBarController.navigateToProfile(); 
+                              appBarController.navigateToProfile();
                             },
                             child: Image.asset(
                               'assets/icons/edit.png',
@@ -199,21 +164,17 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                           ),
                         ],
                       ),
-                      
                       const SizedBox(height: 6),
-                      
                       Text(
-                        doctor.especialidad?? '',
+                        doctor.especialidad ?? '',
                         style: GerenaColors.subtitleMedium.copyWith(
                           color: GerenaColors.colorSubsCardSecondaryText,
                           fontSize: 14,
                         ),
                       ),
-                      
                       const SizedBox(height: 8),
-                      
                       Text(
-                        doctor.direccion?? '',
+                        doctor.direccion ?? '',
                         style: GerenaColors.bodySmall.copyWith(
                           fontSize: 12,
                           color: Colors.grey[700],
@@ -222,9 +183,7 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      
                       const SizedBox(height: 8),
-                      
                       Text(
                         'Cédula: ${doctor.numeroLicencia}',
                         style: GerenaColors.bodySmall.copyWith(
@@ -233,14 +192,12 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      
                       const SizedBox(height: 8),
                     ],
                   ),
                 ),
               ],
             ),
-            
             const SizedBox(height: 20),
           ],
         ),
@@ -316,5 +273,4 @@ class _DoctorProfileContentState extends State<DoctorProfileContent> {
       );
     });
   }
-
 }

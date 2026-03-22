@@ -1,5 +1,7 @@
 import 'package:gerena/common/errors/convert_message.dart';
+import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/notification/domain/entities/notification_entity.dart';
+import 'package:gerena/features/notification/domain/usecase/delete_all_notifications_usecase.dart';
 import 'package:gerena/features/notification/domain/usecase/get_notification_usecase.dart';
 import 'package:gerena/features/notification/domain/usecase/mark_all_notifications_as_read_usecase.dart';
 import 'package:get/get.dart';
@@ -7,18 +9,28 @@ import 'package:get/get.dart';
 class NotificationController extends GetxController {
   final GetNotificationUsecase getNotificationUsecase;
   final MarkAllNotificationsAsReadUsecase markAllNotificationsAsReadUsecase;
-  
+  final DeleteAllNotificationsUsecase deleteAllNotificationsUsecase;
+
   NotificationController({
     required this.getNotificationUsecase,
     required this.markAllNotificationsAsReadUsecase,
+    required this.deleteAllNotificationsUsecase,
   });
-  
+final Rx<Map<String, dynamic>?> activePost = Rx<Map<String, dynamic>?>(null);
+
+void openPost({required int postId, int? commentId}) {
+  activePost.value = {'postId': postId, 'commentId': commentId};
+}
+
+void closePost() {
+  activePost.value = null;
+}
   final RxList<NotificationEntity> notifications = <NotificationEntity>[].obs;
   final RxBool isLoading = false.obs;
   final RxString error = ''.obs;
-  
-  RxBool get hasUnreadNotifications => 
-    notifications.any((notification) => !notification.read).obs;
+
+  RxBool get hasUnreadNotifications =>
+      notifications.any((notification) => !notification.read).obs;
 
   @override
   void onInit() {
@@ -30,9 +42,9 @@ class NotificationController extends GetxController {
     try {
       isLoading.value = true;
       error.value = '';
-      
+
       final result = await getNotificationUsecase.execute();
-      
+
       result.sort((a, b) {
         if (a.createdAt != null && b.createdAt != null) {
           try {
@@ -44,18 +56,17 @@ class NotificationController extends GetxController {
             return 0;
           }
         }
-        
+
         if (a.createdAt != null) return -1;
         if (b.createdAt != null) return 1;
-        
+
         return 0;
       });
-      
+
       notifications.value = result;
-      
+
       print('📬 Notificaciones cargadas: ${notifications.length}');
       print('🔔 No leídas: ${notifications.where((n) => !n.read).length}');
-      
     } catch (e) {
       error.value = cleanExceptionMessage(e);
       print('Error fetching notifications: $e');
@@ -64,12 +75,9 @@ class NotificationController extends GetxController {
     }
   }
 
-  void clearAllNotifications() {
-    notifications.clear();
-  }
-
   void markAsRead(int notificationId) {
-    final index = notifications.indexWhere((n) => n.notificationId == notificationId);
+    final index =
+        notifications.indexWhere((n) => n.notificationId == notificationId);
     if (index != -1) {
       final notification = notifications[index];
       final updatedNotification = NotificationEntity(
@@ -83,21 +91,23 @@ class NotificationController extends GetxController {
         read: true,
         metadata: notification.metadata,
       );
-      
+
       notifications[index] = updatedNotification;
       notifications.refresh();
-      
+
       print('✅ Notificación $notificationId marcada como leída localmente');
     }
   }
+
   Future<void> markAllAsRead() async {
     try {
-      print('🔄 Marcando todas las notificaciones como leídas en el backend...');
-      
+      print(
+          '🔄 Marcando todas las notificaciones como leídas en el backend...');
+
       await markAllNotificationsAsReadUsecase.execute();
-      
+
       print('✅ Todas las notificaciones marcadas como leídas en el backend');
-      
+
       notifications.value = notifications.map((notification) {
         return NotificationEntity(
           notificationId: notification.notificationId,
@@ -107,42 +117,52 @@ class NotificationController extends GetxController {
           imageUrl: notification.imageUrl,
           linkUrl: notification.linkUrl,
           createdAt: notification.createdAt,
-          read: true, 
+          read: true,
           metadata: notification.metadata,
         );
       }).toList();
-      
+
       notifications.refresh();
-      
-      print('✅ Notificaciones actualizadas localmente (${notifications.length} totales)');
-      print('🔔 No leídas después de marcar: ${notifications.where((n) => !n.read).length}');
-      
+
+      print(
+          '✅ Notificaciones actualizadas localmente (${notifications.length} totales)');
+      print(
+          '🔔 No leídas después de marcar: ${notifications.where((n) => !n.read).length}');
     } catch (e) {
       print('❌ Error marcando notificaciones como leídas: $e');
       error.value = cleanExceptionMessage(e);
     }
   }
-  
+
   void sortByDate({bool descending = true}) {
     notifications.sort((a, b) {
       if (a.createdAt != null && b.createdAt != null) {
         try {
           final dateA = DateTime.parse(a.createdAt!);
           final dateB = DateTime.parse(b.createdAt!);
-          return descending 
-              ? dateB.compareTo(dateA)
-              : dateA.compareTo(dateB); 
+          return descending ? dateB.compareTo(dateA) : dateA.compareTo(dateB);
         } catch (e) {
           return 0;
         }
       }
-      
+
       if (a.createdAt != null) return descending ? -1 : 1;
       if (b.createdAt != null) return descending ? 1 : -1;
-      
+
       return 0;
     });
-    
+
     notifications.refresh();
+  }
+
+  Future<void> deleteAllNotifications() async {
+    try {
+      await deleteAllNotificationsUsecase.execute();
+      fetchNotifications();
+    } catch (e) {
+      showErrorSnackbar(
+          'Error eliminando notificaciones ${cleanExceptionMessage(e)}');
+      print('❌ Error eliminando notificaciones: $e');
+    }
   }
 }

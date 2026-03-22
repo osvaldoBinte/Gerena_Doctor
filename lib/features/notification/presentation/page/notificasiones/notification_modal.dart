@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/notification/domain/entities/notification_entity.dart';
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
 import 'package:gerena/features/notification/presentation/widget/notification_modal_loading.dart';
+import 'package:gerena/features/publications/presentation/page/postbyid/post_byId_page.dart';
+import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -40,7 +43,7 @@ class NotificationModal extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () => controller.clearAllNotifications(),
+                    onTap: () => controller.deleteAllNotifications(),
                     child: Text(
                       'Limpiar bandeja',
                       style: GoogleFonts.rubik(
@@ -52,10 +55,11 @@ class NotificationModal extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () => Get.back(),
-                    icon: Image.asset('assets/icons/close.png',
-                                    width: 20,
-    height: 20,),
-                    
+                    icon: Image.asset(
+                      'assets/icons/close.png',
+                      width: 20,
+                      height: 20,
+                    ),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -65,8 +69,7 @@ class NotificationModal extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                                   return const NotificatioLoading(); 
-
+                  return const NotificatioLoading();
                 }
 
                 if (controller.error.value.isNotEmpty) {
@@ -80,16 +83,13 @@ class NotificationModal extends StatelessWidget {
                         Text(
                           'No tienes notificaciones',
                           style: GoogleFonts.rubik(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                              fontSize: 16, color: Colors.grey),
                         ),
                       ],
                     ),
                   );
                 }
 
-                // Mostrar lista vacía
                 if (controller.notifications.isEmpty) {
                   return Center(
                     child: Column(
@@ -101,36 +101,25 @@ class NotificationModal extends StatelessWidget {
                         Text(
                           'No tienes notificaciones',
                           style: GoogleFonts.rubik(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                              fontSize: 16, color: Colors.grey),
                         ),
                       ],
                     ),
                   );
                 }
 
-                // Mostrar lista de notificaciones
                 return RefreshIndicator(
                   onRefresh: () => controller.fetchNotifications(),
                   child: ListView.separated(
                     padding: const EdgeInsets.all(20),
                     itemCount: controller.notifications.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 16),
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final notification = controller.notifications[index];
                       return _buildNotificationItem(
+                        context: context,
                         notification: notification,
-                        onTap: () {
-                          controller.markAsRead(notification.notificationId);
-                          // Si tiene enlace, puedes manejarlo aquí
-                          if (notification.linkUrl != null &&
-                              notification.linkUrl!.isNotEmpty) {
-                            print('Abrir: ${notification.linkUrl}');
-                            // Aquí puedes usar url_launcher o navegar
-                          }
-                        },
+                        controller: controller,
                       );
                     },
                   ),
@@ -144,10 +133,10 @@ class NotificationModal extends StatelessWidget {
   }
 
   Widget _buildNotificationItem({
+    required BuildContext context,
     required NotificationEntity notification,
-    required VoidCallback onTap,
+    required NotificationController controller,
   }) {
-    // Determinar icono según el tipo
     String iconPath;
     switch (notification.type.toLowerCase()) {
       case 'recordatorio':
@@ -164,7 +153,74 @@ class NotificationModal extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: () async {
+        try {
+          controller.markAsRead(notification.notificationId);
+
+          dynamic rawMetadata = notification.metadata;
+          Map metadata = {};
+          if (rawMetadata is String && rawMetadata.isNotEmpty) {
+            metadata = jsonDecode(rawMetadata);
+          } else if (rawMetadata is Map) {
+            metadata = rawMetadata;
+          }
+
+          // ── Reacción → cerrar modal + abrir post en bottom sheet ──
+          if (notification.type.toLowerCase() == 'reaccion') {
+            final int? publicacionId = metadata['PublicacionId'];
+            if (publicacionId != null) {
+              Get.back(); // cierra el modal
+              await Future.delayed(const Duration(milliseconds: 200));
+              _openPostBottomSheet(context, postId: publicacionId);
+            }
+            return;
+          }
+
+          // ── Comentario → cerrar modal + abrir post con highlight ──
+          if (notification.type.toLowerCase() == 'comentario') {
+            final int? publicacionId = metadata['PublicacionId'];
+            final int? comentarioId = metadata['ComentarioId'];
+            if (publicacionId != null) {
+              Get.back(); // cierra el modal
+              await Future.delayed(const Duration(milliseconds: 200));
+              _openPostBottomSheet(
+                context,
+                postId: publicacionId,
+                commentId: comentarioId,
+              );
+            }
+            return;
+          }
+
+          // ── Navegar a perfil ──────────────────────────────────────
+          final int? userId = metadata['SeguidorId'] ??
+              metadata['UsuarioReacciono'] ??
+              metadata['UsuarioComenta'];
+          final String? rol = metadata['RolUsuario'] ??
+              metadata['UsuarioReaccionoRol'] ??
+              metadata['RolUsuarioComenta'];
+
+          if (userId != null && rol != null) {
+            Get.back(); // cierra el modal
+            await Future.delayed(const Duration(milliseconds: 200));
+            final startController = Get.find<StartController>();
+            if (rol == 'cliente') {
+              startController.showUserProfilePage(userData: {'userId': userId});
+            } else if (rol == 'doctor') {
+              startController
+                  .showDoctorProfilePage(doctorData: {'userId': userId});
+            }
+          }
+
+          // ── Link genérico ─────────────────────────────────────────
+          if (notification.linkUrl != null &&
+              notification.linkUrl!.isNotEmpty) {
+            print('Abrir: ${notification.linkUrl}');
+          }
+        } catch (e) {
+          print("Error procesando notificación: $e");
+        }
+      },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(12),
@@ -174,86 +230,137 @@ class NotificationModal extends StatelessWidget {
               : GerenaColors.backgroundColorFondo,
           borderRadius: BorderRadius.circular(8),
         ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Image.asset(
+                iconPath,
+                width: 30,
+                height: 30,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.notifications,
+                  size: 30,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notification.type.toUpperCase(),
+                      style: GoogleFonts.rubik(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: GerenaColors.textPrimaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      notification.message,
+                      style: GoogleFonts.rubik(
+                        fontSize: 12,
+                        color: GerenaColors.textPrimaryColor,
+                      ),
+                    ),
+                    if (notification.createdAt != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatDate(notification.createdAt!),
+                        style: GoogleFonts.rubik(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: GerenaColors.textPrimaryColor,
+                        ),
+                      ),
+                    ],
+                    if (notification.imageUrl != null &&
+                        notification.imageUrl!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: GerenaColors.smallBorderRadius,
+                        child: Image.network(
+                          notification.imageUrl!,
+                          fit: BoxFit.fill,
+                          errorBuilder: (_, __, ___) => Container(
+                            height: 100,
+                            color: Colors.grey[300],
+                            child: const Center(
+                              child: Icon(Icons.image_not_supported),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openPostBottomSheet(
+    BuildContext context, {
+    required int postId,
+    int? commentId,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        height: MediaQuery.of(context).size.height * 0.92,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
         child: Column(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Image.asset(
-                    iconPath,
-                    width: 30,
-                    height: 30,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.notifications,
-                        size: 30,
-                        color: Colors.grey,
-                      );
-                    },
-                  ),
+            // ── Handle + header ──────────────────────────────────
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade200),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          notification.type.toUpperCase(),
-                          style: GoogleFonts.rubik(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: GerenaColors.textPrimaryColor,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          notification.message,
-                          style: GoogleFonts.rubik(
-                            fontSize: 12,
-                            color: GerenaColors.textPrimaryColor,
-                          ),
-                        ),
-                        if (notification.createdAt != null) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            _formatDate(notification.createdAt!),
-                            style: GoogleFonts.rubik(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: GerenaColors.textPrimaryColor,
-                            ),
-                          ),
-                        ],
-                        if (notification.imageUrl != null &&
-                            notification.imageUrl!.isNotEmpty) ...[
-                          const SizedBox(height: 8),
-                          ClipRRect(
-                            borderRadius: GerenaColors.smallBorderRadius,
-                            child: Image.network(
-                              notification.imageUrl!,
-                              fit: BoxFit.fill,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  height: 100,
-                                  color: Colors.grey[300],
-                                  child: const Center(
-                                    child: Icon(Icons.image_not_supported),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                        
-                      ],
-                    ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.close,
+                        color: GerenaColors.textPrimaryColor),
+                    onPressed: () => Navigator.of(context).pop(),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Text(
+                    'Publicación',
+                    style:
+                        GerenaColors.headingMedium.copyWith(fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+            // ── Contenido del post ───────────────────────────────
+            Expanded(
+              child: PostByIdPage(
+                postId: postId,
+                commentId: commentId,
+              ),
             ),
           ],
         ),
@@ -265,18 +372,8 @@ class NotificationModal extends StatelessWidget {
     try {
       final date = DateTime.parse(dateStr);
       final months = [
-        'Enero',
-        'Febrero',
-        'Marzo',
-        'Abril',
-        'Mayo',
-        'Junio',
-        'Julio',
-        'Agosto',
-        'Septiembre',
-        'Octubre',
-        'Noviembre',
-        'Diciembre'
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
       ];
       return '${date.day} de ${months[date.month - 1]} ${date.year}';
     } catch (e) {

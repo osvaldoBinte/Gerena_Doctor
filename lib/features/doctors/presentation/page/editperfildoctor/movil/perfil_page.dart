@@ -112,37 +112,10 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
                 const SizedBox(height: 16),
-                Obx(() {
-                  final subscription =
-                      subscriptionController.currentSubscription.value;
-                  final planId = subscription?.subscriptionplanId;
-                  final shouldShowPortfolio = planId == 3 || planId == 4;
-
-                  if (!shouldShowPortfolio) {
-                    return SizedBox.shrink();
-                  }
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          'PORTAFOLIO',
-                          style: GerenaColors.headingSmall,
+               ShareAndProceduresWidget(
+                           showShareSection: true,
+                           showProcedures: false,
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: ShareAndProceduresWidget(),
-                      ),
-                      const SizedBox(height: 16),
-                      Divider(height: 2, color: GerenaColors.dividerColor),
-                      const SizedBox(height: 16),
-                    ],
-                  );
-                }),
                 _buildReviewsAndPublications(),
                 const SizedBox(height: 16),
                 Divider(height: 2, color: GerenaColors.dividerColor),
@@ -190,70 +163,82 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
       }),
     );
   }
+
   Widget _buildReviewsAndPublications() {
-  final RxInt selectedTab = 0.obs;
+    final RxInt selectedTab = 0.obs;
 
-  return Obx(() => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Tabs manuales
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
+    return Obx(() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTabItem('RESEÑAS', 0, selectedTab),
-            const SizedBox(width: 8),
-            _buildTabItem('PUBLICACIONES', 1, selectedTab),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildTabItem('RESEÑAS', 0, selectedTab),
+                    const SizedBox(width: 8),
+                    _buildTabItem('PUBLICACIONES', 1, selectedTab),
+                    const SizedBox(width: 8),
+                    _buildTabItem('PROCEDIMIENTOS', 2, selectedTab),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            const SizedBox(height: 8),
+
+
+            if (selectedTab.value == 0)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                child: ReviewsWidget(),
+              )
+            else if (selectedTab.value == 1)
+              MyPublicationsWidget()
+            else
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ShareAndProceduresWidget(
+                  showShareSection:
+                      false, 
+                ),
+              ),
           ],
-        ),
-      ),
-      const Divider(height: 1),
-      const SizedBox(height: 8),
+        ));
+  }
 
-      // Contenido según tab seleccionado
-      if (selectedTab.value == 0)
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: ReviewsWidget(),
-        )
-     else
-MyPublicationsWidget()
-    ],
-  ));
-}
-
-Widget _buildTabItem(String label, int index, RxInt selectedTab) {
-  return Obx(() {
-    final isSelected = selectedTab.value == index;
-    return GestureDetector(
-      onTap: () => selectedTab.value = index,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
+  Widget _buildTabItem(String label, int index, RxInt selectedTab) {
+    return Obx(() {
+      final isSelected = selectedTab.value == index;
+      return GestureDetector(
+        onTap: () => selectedTab.value = index,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color:
+                    isSelected ? GerenaColors.primaryColor : Colors.transparent,
+                width: 2,
+              ),
+            ),
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.rubik(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               color: isSelected
                   ? GerenaColors.primaryColor
-                  : Colors.transparent,
-              width: 2,
+                  : GerenaColors.textTertiaryColor,
             ),
           ),
         ),
-        child: Text(
-          label,
-          style: GoogleFonts.rubik(
-            fontSize: 13,
-            fontWeight:
-                isSelected ? FontWeight.w600 : FontWeight.w400,
-            color: isSelected
-                ? GerenaColors.primaryColor
-                : GerenaColors.textTertiaryColor,
-          ),
-        ),
-      ),
-    );
-  });
-}
+      );
+    });
+  }
+
   Widget _buildStatsSection() {
     return Obx(() {
       final doctor = doctorController.doctorProfile.value;
@@ -764,7 +749,7 @@ Widget _buildTabItem(String label, int index, RxInt selectedTab) {
                         child: GerenaColors.widgetButton(
                           showShadow: false,
                           text: 'Agendar Cita',
-                             borderRadius: 30,
+                          borderRadius: 30,
                           onPressed: () {
                             ModalAgregarCita.show();
                           },

@@ -7,12 +7,15 @@ import 'package:gerena/features/auth/presentacion/page/passwordreset/password_re
 import 'package:gerena/features/doctors/presentation/page/patientVie/patient_view_page.dart';
 import 'package:gerena/features/followers/presentation/page/followers_following_page.dart';
 import 'package:gerena/features/followers/presentation/page/user_followers_following_page.dart';
+import 'package:gerena/features/home/dashboard/widget/preguntasFrecuentes/preguntas_frecuentes.dart';
 import 'package:gerena/features/marketplace/presentation/page/getmylastpaidorder/history/historial_de_pedidos_content.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/cart_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/get_medications_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/medications/mobil/product_detail_page.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cards_screen.dart';
 import 'package:gerena/features/publications/presentation/page/getPostReaction/get_post_reaction_page.dart';
+import 'package:gerena/features/publications/presentation/page/postbyid/post_byId_page.dart';
+import 'package:gerena/features/subscription/presentation/page/menbresia/menbreria_movil.dart';
 import 'package:gerena/movil/home/start_page.dart';
 import 'package:gerena/features/home/dashboard/dashboard_page.dart';
 import 'package:get/get.dart';
@@ -28,6 +31,7 @@ class AppPages {
       name: RoutesNames.loginPage,
       page: () => LoginPage(),
     ),
+    GetPage(name: RoutesNames.preguntasFrecuentes, page: () => PreguntasFrecuentes()),
     GetPage(
       name: RoutesNames.homePage,
       page: () => StartPage(),
@@ -56,8 +60,10 @@ class AppPages {
       name: RoutesNames.postReactionsPage,
       page: () => PostReactionsPage(),
     ),
+    GetPage(name: RoutesNames.postdetail, page: ()=>PostByIdPage()),
     GetPage(name: RoutesNames.productDetail, page: () => ProductDetailPage()),
     GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),
+    GetPage(name: RoutesNames.membresia, page: () => MembresiaPage()),
     GetPage(
         name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
     GetPage(name: RoutesNames.passwordreset, page: () => PasswordResetPage()),

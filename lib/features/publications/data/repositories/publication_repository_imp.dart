@@ -89,5 +89,11 @@ class PublicationRepositoryImp extends PublicationRepository {
     final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
     return await publicationDateSourcesImp.getpostReaction(publicationId, token);
   }
+  
+  @override
+  Future<PublicationEntity> getPostsByid(int postId) async {
+    final token = await authService.getToken()?? (throw Exception('No hay sesión activa. El usuario debe iniciar sesión.'));
+   return await publicationDateSourcesImp.getPostsByid(postId, token);
+  }
 
 }

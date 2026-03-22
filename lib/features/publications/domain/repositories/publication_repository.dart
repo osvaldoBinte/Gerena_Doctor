@@ -5,6 +5,8 @@ import 'package:gerena/features/publications/domain/entities/postreaction/post_r
 
 abstract class PublicationRepository {
   Future<List<PublicationEntity>> getMyPosts();
+    Future<PublicationEntity> getPostsByid(int publicationId);
+
   Future<List<PublicationEntity>> getFeedPosts(int page,int pagesize,);
   Future<void> createPublication(CreatePublicationsEntity publication);
   Future<void> likePublication(int publicationId,String tipoReaccion,);

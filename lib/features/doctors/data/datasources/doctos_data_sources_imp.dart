@@ -104,9 +104,6 @@ class DoctosDataSourcesImp {
 
     final body = jsonEncode(DoctorModel.fromEntity(doctor).toJson());
 
-    print('---- UPDATE DOCTOR PROFILE ----');
-    print('URL: $url');
-    print('BODY: $body');
 
     final response = await http.put(
       url,
@@ -116,9 +113,6 @@ class DoctosDataSourcesImp {
       },
       body: body,
     );
-
-    print('STATUS CODE: ${response.statusCode}');
-    print('RESPONSE BODY: ${response.body}');
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('Perfil actualizado correctamente');
@@ -131,14 +125,9 @@ class DoctosDataSourcesImp {
 
   } catch (e, stack) {
 
-    print('---- ERROR UPDATE DOCTOR PROFILE ----');
-    print('Error: $e');
-    print('StackTrace: $stack');
-
     if (e is SocketException ||
         e is http.ClientException ||
         e is TimeoutException) {
-      print('Network error detected');
       throw Exception(convertMessageException(error: e));
     }
 

@@ -25,5 +25,11 @@ class NotificationRepositoryImp extends NotificationRepository {
         final token = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
     return await notificationDataSourcesImp.markAllNotificationsAsRead(token);
   }
+  
+  @override
+  Future<void> deleteAllNotifications() async {
+    final token = await authService.getToken() ?? (throw Exception( 'No hay sesión activa. El usuario debe iniciar sesión.'));
+    return await notificationDataSourcesImp.deleteAllNotifications(token);
+  }
  
 }

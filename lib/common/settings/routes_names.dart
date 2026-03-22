@@ -17,5 +17,8 @@ class RoutesNames {
   static const String followersFollowing = '/followers-following';
   static const String followersFollowingGeneric = '/followers-following-generic';
   static const String postReactionsPage = '/post-reactions-page';
+  static const String preguntasFrecuentes = '/preguntas-frecuentes';
+  static const String membresia = '/membresia';
+  static const String postdetail = '/post-detail';
 
 }

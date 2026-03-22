@@ -15,30 +15,27 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class PublicationDateSourcesImp {
-    String defaultApiServer = AppConstants.serverBase;
+  String defaultApiServer = AppConstants.serverBase;
 
- Future<List<PublicationEntity>> getPostsUser(int userid,String token) async {
-   try {
+  Future<List<PublicationEntity>> getPostsUser(int userid, String token) async {
+    try {
       Uri url = Uri.parse('$defaultApiServer/Publicaciones/cliente/$userid');
       final response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       });
 
-   if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
 
         final List data = responseDecode;
-        return data
-            .map((json) => PublicationModel.fromJson(json))
-            .toList();
+        return data.map((json) => PublicationModel.fromJson(json)).toList();
       }
 
       ApiExceptionCustom exception = ApiExceptionCustom(response: response);
       exception.validateMesage();
       throw exception;
-
     } catch (e) {
       if (e is SocketException ||
           e is http.ClientException ||
@@ -49,28 +46,59 @@ class PublicationDateSourcesImp {
     }
   }
 
- Future<List<PostReactionEntity>> getpostReaction(int publicationId,String token) async {
-   try {
-      Uri url = Uri.parse('$defaultApiServer/Publicaciones/$publicationId/reacciones');
+  Future<PublicationEntity> getPostsByid(int postId, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones/$postId');
       final response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       });
 
-   if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+        if (responseDecode is Map<String, dynamic>) {
+          PublicationModel order = PublicationModel.fromJson(responseDecode);
+          return order;
+        } else {
+          throw Exception('Respuesta vacía o formato incorrecto');
+        }
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
+
+  Future<List<PostReactionEntity>> getpostReaction(
+      int publicationId, String token) async {
+    try {
+      Uri url = Uri.parse(
+          '$defaultApiServer/Publicaciones/$publicationId/reacciones');
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      if (response.statusCode == 200) {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
 
         final List data = responseDecode;
-        return data
-            .map((json) => PostReactionModel.fromJson(json))
-            .toList();
+        return data.map((json) => PostReactionModel.fromJson(json)).toList();
       }
 
       ApiExceptionCustom exception = ApiExceptionCustom(response: response);
       exception.validateMesage();
       throw exception;
-
     } catch (e) {
       if (e is SocketException ||
           e is http.ClientException ||
@@ -80,28 +108,28 @@ class PublicationDateSourcesImp {
       throw Exception('$e');
     }
   }
-   Future<List<PublicationEntity>> getPostsDcotor(int userid,String token) async {
-   try {
-      Uri url = Uri.parse('$defaultApiServer/Publicaciones/doctor/$userid/reseñas');
+
+  Future<List<PublicationEntity>> getPostsDcotor(
+      int userid, String token) async {
+    try {
+      Uri url =
+          Uri.parse('$defaultApiServer/Publicaciones/doctor/$userid/reseñas');
       final response = await http.get(url, headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token'
       });
 
-   if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
 
         final List data = responseDecode['publicaciones'];
-        return data
-            .map((json) => PublicationModel.fromJson(json))
-            .toList();
+        return data.map((json) => PublicationModel.fromJson(json)).toList();
       }
 
       ApiExceptionCustom exception = ApiExceptionCustom(response: response);
       exception.validateMesage();
       throw exception;
-
     } catch (e) {
       if (e is SocketException ||
           e is http.ClientException ||
@@ -111,95 +139,94 @@ class PublicationDateSourcesImp {
       throw Exception('$e');
     }
   }
-Future<void> createPublication(CreatePublicationsEntity entity, String token) async {
-  try {
-    Uri url = Uri.parse('$defaultApiServer/Publicaciones');
 
-    var request = http.MultipartRequest('POST', url);
+  Future<void> createPublication(
+      CreatePublicationsEntity entity, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones');
 
-    request.headers.addAll({
-      'Authorization': 'Bearer $token',
-    });
+      var request = http.MultipartRequest('POST', url);
 
-    final model = CreatePublicationsModel.fromEntity(entity);
-
-    model.addFieldsToRequest(request);
-
-    await model.addFilesToRequest(request);
-
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw ApiExceptionCustom(response: response)..validateMesage();
-    }
-
-  } catch (e) {
-    if (e is ApiExceptionCustom) {
-      throw Exception(e.message);
-    }
-    
-    if (e is SocketException ||
-        e is http.ClientException ||
-        e is TimeoutException) {
-      throw Exception(convertMessageException(error: e));
-    }
-
-    throw Exception('$e');
-  }
-}
-
-  Future<void> deletePublication(int publicationId,String token) async {
-   try {
-    Uri url = Uri.parse('$defaultApiServer/Publicaciones/$publicationId');
-    
-    final response = await http.delete(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-                'Authorization': 'Bearer $token',
-
-      },
-    
-    );
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return;
-    }
-
-    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
-    exception.validateMesage(); 
-    throw exception;
-    
-  } catch (e) {
-    if (e is SocketException || e is http.ClientException || e is TimeoutException) {
-      throw Exception(convertMessageException(error: e));
-    }
-    throw Exception('$e');
-  }
-  }
-
-  Future<List<PublicationEntity>> getFeedPosts(int page,int pagesize,String token) async {
-   try {
-      Uri url = Uri.parse('$defaultApiServer/Publicaciones/feed?pagina=$page&tamañoPagina=$pagesize&soloSeguidos=false&soloReseñas=false&doctorId');
-      final response = await http.get(url, headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
       });
 
-   if (response.statusCode == 200) {
-        final dataUTF8 = utf8.decode(response.bodyBytes);
-        final responseDecode = jsonDecode(dataUTF8);
+      final model = CreatePublicationsModel.fromEntity(entity);
 
-        final List data = responseDecode['publicaciones'];
-        return data
-            .map((json) => PublicationModel.fromJson(json))
-            .toList();
+      model.addFieldsToRequest(request);
+
+      await model.addFilesToRequest(request);
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw ApiExceptionCustom(response: response)..validateMesage();
+      }
+    } catch (e) {
+      if (e is ApiExceptionCustom) {
+        throw Exception(e.message);
+      }
+
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+
+      throw Exception('$e');
+    }
+  }
+
+  Future<void> deletePublication(int publicationId, String token) async {
+    try {
+      Uri url = Uri.parse('$defaultApiServer/Publicaciones/$publicationId');
+
+      final response = await http.delete(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
       }
 
       ApiExceptionCustom exception = ApiExceptionCustom(response: response);
       exception.validateMesage();
       throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
+    }
+  }
 
+  Future<List<PublicationEntity>> getFeedPosts(
+      int page, int pagesize, String token) async {
+    try {
+      Uri url = Uri.parse(
+          '$defaultApiServer/Publicaciones/feed?pagina=$page&tamañoPagina=$pagesize&soloSeguidos=false&soloReseñas=false&doctorId');
+      final response = await http.get(url, headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      });
+
+      if (response.statusCode == 200) {
+        final dataUTF8 = utf8.decode(response.bodyBytes);
+        final responseDecode = jsonDecode(dataUTF8);
+
+        final List data = responseDecode['publicaciones'];
+        return data.map((json) => PublicationModel.fromJson(json)).toList();
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
     } catch (e) {
       if (e is SocketException ||
           e is http.ClientException ||
@@ -218,20 +245,17 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
         'Authorization': 'Bearer $token'
       });
 
-   if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         final dataUTF8 = utf8.decode(response.bodyBytes);
         final responseDecode = jsonDecode(dataUTF8);
 
         final List data = responseDecode;
-        return data
-            .map((json) => PublicationModel.fromJson(json))
-            .toList();
+        return data.map((json) => PublicationModel.fromJson(json)).toList();
       }
 
       ApiExceptionCustom exception = ApiExceptionCustom(response: response);
       exception.validateMesage();
       throw exception;
-
     } catch (e) {
       if (e is SocketException ||
           e is http.ClientException ||
@@ -242,42 +266,48 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
     }
   }
 
-  Future<void> likePublication(int publicationId,String tipoReaccion, String token) async {
+  Future<void> likePublication(
+      int publicationId, String tipoReaccion, String token) async {
     try {
-    Uri url = Uri.parse('$defaultApiServer/Publicaciones/$publicationId/like');
-    
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-                'Authorization': 'Bearer $token',
+      Uri url =
+          Uri.parse('$defaultApiServer/Publicaciones/$publicationId/like');
 
-      },
-      body: jsonEncode({'tipoReaccion': tipoReaccion}),
-    );
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return;
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'tipoReaccion': tipoReaccion}),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return;
+      }
+
+      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+      exception.validateMesage();
+      throw exception;
+    } catch (e) {
+      if (e is SocketException ||
+          e is http.ClientException ||
+          e is TimeoutException) {
+        throw Exception(convertMessageException(error: e));
+      }
+      throw Exception('$e');
     }
-
-    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
-    exception.validateMesage(); 
-    throw exception;
-    
-  } catch (e) {
-    if (e is SocketException || e is http.ClientException || e is TimeoutException) {
-      throw Exception(convertMessageException(error: e));
-    }
-    throw Exception('$e');
-  }
   }
 
-  Future<void> updatePublication(String descripcion, int publicationId,String token) {
+  Future<void> updatePublication(
+      String descripcion, int publicationId, String token) {
     // TODO: implement updatePublication
     throw UnimplementedError();
   }
- Future<void> addComment(int publicacionId, String comment, String token) async {
+
+  Future<void> addComment(
+      int publicacionId, String comment, String token) async {
     try {
-      Uri url = Uri.parse('$defaultApiServer/publicaciones/$publicacionId/comentarios');
+      Uri url = Uri.parse(
+          '$defaultApiServer/publicaciones/$publicacionId/comentarios');
 
       final response = await http.post(
         url,
@@ -340,9 +370,11 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
     }
   }
 
-  Future<void> deleteComment(int publicacionId, int idcomment, String token) async {
+  Future<void> deleteComment(
+      int publicacionId, int idcomment, String token) async {
     try {
-      Uri url = Uri.parse('$defaultApiServer/publicaciones/$publicacionId/comentarios/$idcomment');
+      Uri url = Uri.parse(
+          '$defaultApiServer/publicaciones/$publicacionId/comentarios/$idcomment');
 
       final response = await http.delete(
         url,
@@ -367,7 +399,9 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
       throw Exception('$e');
     }
   }
-  Future<List<GetCommentsEntity>> getPostComments(int publicacionId,int page,String token) async{
+
+  Future<List<GetCommentsEntity>> getPostComments(
+      int publicacionId, int page, String token) async {
     try {
       Uri url = Uri.parse(
         '$defaultApiServer/publicaciones/$publicacionId/comentarios?Pagina=$page&TamañoPagina=20&Orden=recientes',
@@ -400,4 +434,4 @@ Future<void> createPublication(CreatePublicationsEntity entity, String token) as
       throw Exception('$e');
     }
   }
-  }
+}

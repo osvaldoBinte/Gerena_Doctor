@@ -15,6 +15,7 @@ import 'package:gerena/features/auth/domain/usecase/login_usecase.dart';
 import 'package:gerena/features/auth/domain/usecase/request_password_code_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/get_following_by_user_usecase.dart';
 import 'package:gerena/features/followers/domain/usecase/get_user_followers_usecase.dart';
+import 'package:gerena/features/notification/domain/usecase/delete_all_notifications_usecase.dart';
 import 'package:gerena/features/notification/domain/usecase/mark_all_notifications_as_read_usecase.dart';
 import 'package:gerena/features/notification/domain/usecase/save_token_fcm_usecase.dart';
 import 'package:gerena/features/banners/data/datasources/banners_data_sources_imp.dart';
@@ -91,6 +92,7 @@ import 'package:gerena/features/publications/domain/usecase/get_my_posts_usecase
 import 'package:gerena/features/publications/domain/usecase/get_post_comments_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_doctor_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_post_reaction_usecase.dart';
+import 'package:gerena/features/publications/domain/usecase/get_posts_by_id_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/get_posts_user_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/like_publication_usecase.dart';
 import 'package:gerena/features/publications/domain/usecase/update_publication_usecase.dart';
@@ -222,6 +224,7 @@ class UsecaseConfig {
    DeleteProcedureUsecase? deleteProcedureUsecase;
    GetPostDoctorUsecase? getPostDoctorUsecase;
    GetPostsUserUsecase? getPostsUserUsecase;
+   GetPostsByIdUsecase? getPostsByIdUsecase;
    FetchDoctorByIdUsecase? fetchDoctorByIdUsecase;
 
 
@@ -229,6 +232,7 @@ class UsecaseConfig {
 
    GetNotificationUsecase? getnotificationUsecase;
    MarkAllNotificationsAsReadUsecase? markAllNotificationsAsReadUsecase;
+   DeleteAllNotificationsUsecase? deleteAllNotificationsUsecase;
 
    GetBlogGerenaUsecase? getBlogGerenaUsecase;
    GetBlogGerenaByIdUsecase? getBlogGerenaByIdUsecase;
@@ -305,6 +309,7 @@ class UsecaseConfig {
       publicationRepositoryImp = PublicationRepositoryImp(publicationDateSourcesImp: publicationDateSourcesImp!);
       followerRepositoryImp = FollowerRepositoryImp(followerDataSourcesImp: followerDataSourcesImp!);
       getPostsUserUsecase = GetPostsUserUsecase(publicationRepository: publicationRepositoryImp!);
+      getPostsByIdUsecase =GetPostsByIdUsecase(publicationRepository: publicationRepositoryImp!);
 
      loginUsecase = LoginUsecase(authRepository: authRepositoryImp!);
      saveTokenFcmUsecase = SaveTokenFcmUsecase(notificationRepository: notificationRepositoryImp!);
@@ -380,6 +385,7 @@ class UsecaseConfig {
 
       getnotificationUsecase = GetNotificationUsecase(notificationRepository: notificationRepositoryImp!);
       markAllNotificationsAsReadUsecase = MarkAllNotificationsAsReadUsecase(notificationRepository: notificationRepositoryImp!);
+      deleteAllNotificationsUsecase = DeleteAllNotificationsUsecase(notificationRepository: notificationRepositoryImp!);
 
 
       

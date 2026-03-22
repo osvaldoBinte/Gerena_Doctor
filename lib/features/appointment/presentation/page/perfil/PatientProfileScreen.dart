@@ -64,414 +64,400 @@ void _showCompleteAppointmentDialog() {
 void _showCancelAppointmentDialog() {
   ModalCancelarCita.show(appointmentEntity.id);
 }
+@override
+Widget build(BuildContext context) {
+  final isCompleted = appointmentEntity.status.toLowerCase() == 'completada';
+  final isCancelled = appointmentEntity.status.toLowerCase() == 'cancelada';
+  final isPending = appointmentEntity.status.toLowerCase() == 'pendiente' ||
+      appointmentEntity.status.toLowerCase() == 'confirmada';
 
-  @override
-  Widget build(BuildContext context) {
-    final isCompleted = appointmentEntity.status.toLowerCase() == 'completada';
-    final isCancelled = appointmentEntity.status.toLowerCase() == 'cancelada';
-    final isPending = appointmentEntity.status.toLowerCase() == 'pendiente' || 
-                      appointmentEntity.status.toLowerCase() == 'confirmada';
-
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _callPhoneNumber,
-        backgroundColor: Colors.teal[400],
-        child: const Icon(
-          Icons.phone,
-          color: Colors.white,
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: onClose,
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                size: 20,
-                                color: Colors.black87,
-                              ),
+  return Scaffold(
+    backgroundColor: Colors.grey[100],
+    floatingActionButton: FloatingActionButton(
+      onPressed: _callPhoneNumber,
+      backgroundColor: Colors.teal[400],
+      child: const Icon(Icons.phone, color: Colors.white),
+    ),
+    body: SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // ── Botón cerrar ──────────────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: onClose,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              shape: BoxShape.circle,
                             ),
+                            child: const Icon(Icons.close,
+                                size: 20, color: Colors.black87),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                GestureDetector(
-                                  onTap: _navigateToUserProfile,
-                                  child: Text(
-                                    appointmentEntity.clientName,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF1A5F7A),
-                                      decoration: TextDecoration.underline,
-                                    ),
+                  ),
+
+                  // ── Header paciente ───────────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: _navigateToUserProfile,
+                                child: Text(
+                                  appointmentEntity.clientName,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1A5F7A),
+                                    decoration: TextDecoration.underline,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'ID: ${appointmentEntity.clientId}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.teal[400],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: _navigateToUserProfile,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.teal[400]!,
-                                  width: 2,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'ID: ${appointmentEntity.clientId}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.teal[400],
                                 ),
                               ),
-                              child: CircleAvatar(
-                                radius: 35,
-                                backgroundColor: Colors.grey[300],
-                                backgroundImage: appointmentEntity.foto != null && appointmentEntity.foto!.isNotEmpty
-                                    ? NetworkImage(appointmentEntity.foto!)
-                                    : null,
-                                child: appointmentEntity.foto == null || appointmentEntity.foto!.isEmpty
-                                    ? Icon(
-                                        Icons.person,
-                                        size: 40,
-                                        color: Colors.grey[600],
-                                      )
-                                    : null,
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: _navigateToUserProfile,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.teal[400]!,
+                                width: 2,
                               ),
                             ),
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundColor: Colors.grey[300],
+                              backgroundImage: appointmentEntity.foto != null &&
+                                      appointmentEntity.foto!.isNotEmpty
+                                  ? NetworkImage(appointmentEntity.foto!)
+                                  : null,
+                              child: appointmentEntity.foto == null ||
+                                      appointmentEntity.foto!.isEmpty
+                                  ? Icon(Icons.person,
+                                      size: 40, color: Colors.grey[600])
+                                  : null,
+                            ),
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Tipo de cita (alineado a la izquierda) ────────────
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(color: Colors.grey[50]),
+                    child: Text(
+                      appointmentEntity.appointmentType,
+                      textAlign: TextAlign.start, // ✅
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            appointmentEntity.appointmentType,
+                  ),
+
+                  // ── Motivo + hora ─────────────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            appointmentEntity.consultationReason.isNotEmpty
+                                ? appointmentEntity.consultationReason
+                                : 'Sin motivo especificado',
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black87,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 16),
+                        Text(
+                          _formatTime(DateTime.parse(
+                              appointmentEntity.startDateTime)),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.teal[400],
+                          ),
+                        ),
+                      ],
                     ),
-                    
+                  ),
+
+                  const Divider(height: 1),
+
+                  // ── Detalle de la cita ────────────────────────────────
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start, // ✅
+                      children: [
+                        _buildPatientInfoRow(
+                          'Paciente',
+                          appointmentEntity.clientName,
+                          'Estado',
+                          appointmentEntity.status,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildInfoRow(
+                          'Fecha',
+                          _formatDate(DateTime.parse(
+                              appointmentEntity.startDateTime)),
+                          'Hora',
+                          _formatTime(DateTime.parse(
+                              appointmentEntity.startDateTime)),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildSingleInfoRow(
+                          'Tipo de cita',
+                          appointmentEntity.appointmentType,
+                        ),
+                        if (appointmentEntity
+                            .consultationReason.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          _buildSingleInfoRow(
+                            'Motivo de consulta',
+                            appointmentEntity.consultationReason,
+                          ),
+                        ],
+                        const SizedBox(height: 16),
+                        _buildDoctorInfoRow(
+                          'Doctor',
+                          appointmentEntity.doctorName,
+                        ),
+                        if (appointmentEntity.doctorNotes.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          _buildSingleInfoRow(
+                            'Notas del doctor',
+                            appointmentEntity.doctorNotes,
+                          ),
+                        ],
+                        if (appointmentEntity.diagnosis.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          _buildSingleInfoRow(
+                            'Diagnóstico',
+                            appointmentEntity.diagnosis,
+                          ),
+                        ],
+                        if (appointmentEntity
+                            .cancellationReason.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          _buildSingleInfoRow(
+                            'Razón de cancelación',
+                            appointmentEntity.cancellationReason,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  // ── Botones completar / cancelar ──────────────────────
+                  if (isPending) ...[
+                    const Divider(height: 1),
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text(
-                              appointmentEntity.consultationReason.isNotEmpty
-                                  ? appointmentEntity.consultationReason
-                                  : 'Sin motivo especificado',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black87,
+                            child: ElevatedButton.icon(
+                              onPressed: _showCompleteAppointmentDialog,
+                              icon: const Icon(Icons.check_circle_outline,
+                                  size: 20),
+                              label: const Text(
+                                'Completar',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[600],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Text(
-                            _formatTime(DateTime.parse(appointmentEntity.startDateTime)),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.teal[400],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _showCancelAppointmentDialog,
+                              icon: const Icon(Icons.cancel_outlined,
+                                  size: 20),
+                              label: const Text(
+                                'Cancelar',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red[600],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 2,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    
+                  ],
+
+                  // ── Historial médico ──────────────────────────────────
+                  if (_hasMedicalInfo()) ...[
                     const Divider(height: 1),
-                    
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        children: [
-                          _buildPatientInfoRow(
-                            'Paciente',
-                            appointmentEntity.clientName,
-                            'Estado',
-                            appointmentEntity.status,
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInfoRow(
-                            'Fecha',
-                            _formatDate(DateTime.parse(appointmentEntity.startDateTime)),
-                            'Hora',
-                            _formatTime(DateTime.parse(appointmentEntity.startDateTime)),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildSingleInfoRow(
-                            'Tipo de cita',
-                            appointmentEntity.appointmentType,
-                          ),
-                          if (appointmentEntity.consultationReason.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            _buildSingleInfoRow(
-                              'Motivo de consulta',
-                              appointmentEntity.consultationReason,
-                            ),
-                          ],
-                          const SizedBox(height: 16),
-                          _buildDoctorInfoRow(
-                            'Doctor',
-                            appointmentEntity.doctorName,
-                          ),
-                          if (appointmentEntity.doctorNotes.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            _buildSingleInfoRow(
-                              'Notas del doctor',
-                              appointmentEntity.doctorNotes,
-                            ),
-                          ],
-                          if (appointmentEntity.diagnosis.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            _buildSingleInfoRow(
-                              'Diagnóstico',
-                              appointmentEntity.diagnosis,
-                            ),
-                          ],
-                          if (appointmentEntity.cancellationReason.isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            _buildSingleInfoRow(
-                              'Razón de cancelación',
-                              appointmentEntity.cancellationReason,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    
-                    // 🔥 SECCIÓN DE BOTONES DE ACCIÓN
-                    if (isPending) ...[
-                      const Divider(height: 1),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _showCompleteAppointmentDialog,
-                                icon: const Icon(Icons.check_circle_outline, size: 20),
-                                label: const Text(
-                                  'Completar',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green[600],
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 2,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _showCancelAppointmentDialog,
-                                icon: const Icon(Icons.cancel_outlined, size: 20),
-                                label: const Text(
-                                  'Cancelar',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red[600],
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  elevation: 2,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    
-                    // INFORMACIÓN MÉDICA DEL PACIENTE
-                    if (_hasMedicalInfo()) ...[
-                      const Divider(height: 1),
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.medical_information,
-                                  size: 20,
-                                  color: Colors.teal[700],
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Historial Médico del Paciente',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.teal[700],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            if (appointmentEntity.alergias != null && appointmentEntity.alergias!.isNotEmpty) ...[
-                              _buildMedicalInfoCard(
-                                'Alergias',
-                                appointmentEntity.alergias!,
-                                Icons.warning_amber_rounded,
-                                Colors.orange,
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            
-                            if (appointmentEntity.padecimientos != null && appointmentEntity.padecimientos!.isNotEmpty) ...[
-                              _buildMedicalInfoCard(
-                                'Padecimientos',
-                                appointmentEntity.padecimientos!,
-                                Icons.medical_services,
-                                Colors.red,
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            
-                            if (appointmentEntity.enfermedadesCirugias != null && appointmentEntity.enfermedadesCirugias!.isNotEmpty) ...[
-                              _buildMedicalInfoCard(
-                                'Enfermedades y Cirugías',
-                                appointmentEntity.enfermedadesCirugias!,
-                                Icons.local_hospital,
-                                Colors.purple,
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            
-                            if (appointmentEntity.pruebasEstudios != null && appointmentEntity.pruebasEstudios!.isNotEmpty) ...[
-                              _buildMedicalInfoCard(
-                                'Pruebas y Estudios',
-                                appointmentEntity.pruebasEstudios!,
-                                Icons.science,
-                                Colors.blue,
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            
-                            if (appointmentEntity.comentarios != null && appointmentEntity.comentarios!.isNotEmpty) ...[
-                              _buildMedicalInfoCard(
-                                'Comentarios Adicionales',
-                                appointmentEntity.comentarios!,
-                                Icons.comment,
-                                Colors.teal,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                    
-                    const Divider(height: 1),
-                    
                     Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildMedicalSection(
-                            'ID de Cita',
-                            '#${appointmentEntity.id}',
+                          Row(
+                            children: [
+                              Icon(Icons.medical_information,
+                                  size: 20, color: Colors.teal[700]),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Historial Médico del Paciente',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.teal[700],
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
-                          _buildMedicalSection(
-                            'Inicio',
-                            _formatFullDateTime(DateTime.parse(appointmentEntity.startDateTime)),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildMedicalSection(
-                            'Fin',
-                            _formatFullDateTime(DateTime.parse(appointmentEntity.endDateTime)),
-                          ),
-                          const SizedBox(height: 20),
-                          _buildDoctorSection(),
+                          if (appointmentEntity.alergias != null &&
+                              appointmentEntity.alergias!.isNotEmpty) ...[
+                            _buildMedicalInfoCard('Alergias',
+                                appointmentEntity.alergias!,
+                                Icons.warning_amber_rounded, Colors.orange),
+                            const SizedBox(height: 12),
+                          ],
+                          if (appointmentEntity.padecimientos != null &&
+                              appointmentEntity
+                                  .padecimientos!.isNotEmpty) ...[
+                            _buildMedicalInfoCard('Padecimientos',
+                                appointmentEntity.padecimientos!,
+                                Icons.medical_services, Colors.red),
+                            const SizedBox(height: 12),
+                          ],
+                          if (appointmentEntity.enfermedadesCirugias !=
+                                  null &&
+                              appointmentEntity
+                                  .enfermedadesCirugias!.isNotEmpty) ...[
+                            _buildMedicalInfoCard(
+                                'Enfermedades y Cirugías',
+                                appointmentEntity.enfermedadesCirugias!,
+                                Icons.local_hospital,
+                                Colors.purple),
+                            const SizedBox(height: 12),
+                          ],
+                          if (appointmentEntity.pruebasEstudios != null &&
+                              appointmentEntity
+                                  .pruebasEstudios!.isNotEmpty) ...[
+                            _buildMedicalInfoCard('Pruebas y Estudios',
+                                appointmentEntity.pruebasEstudios!,
+                                Icons.science, Colors.blue),
+                            const SizedBox(height: 12),
+                          ],
+                          if (appointmentEntity.comentarios != null &&
+                              appointmentEntity.comentarios!.isNotEmpty) ...[
+                            _buildMedicalInfoCard('Comentarios Adicionales',
+                                appointmentEntity.comentarios!,
+                                Icons.comment, Colors.teal),
+                          ],
                         ],
                       ),
                     ),
                   ],
-                ),
+
+                  // ── IDs y doctor ──────────────────────────────────────
+                  const Divider(height: 1),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildMedicalSection(
+                            'ID de Cita', '#${appointmentEntity.id}'),
+                        const SizedBox(height: 16),
+                        _buildMedicalSection(
+                          'Inicio',
+                          _formatFullDateTime(DateTime.parse(
+                              appointmentEntity.startDateTime)),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMedicalSection(
+                          'Fin',
+                          _formatFullDateTime(
+                              DateTime.parse(appointmentEntity.endDateTime)),
+                        ),
+                        const SizedBox(height: 20),
+                        _buildDoctorSection(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   bool _hasMedicalInfo() {
     return (appointmentEntity.alergias != null && appointmentEntity.alergias!.isNotEmpty) ||

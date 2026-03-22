@@ -86,7 +86,7 @@ class _DoctorProfilePageState extends State<PatientViewPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: ShareAndProceduresWidget(
-                    showShareSection: false), // ✅ CAMBIAR a false
+                    showShareSection: false), 
               ),
               const SizedBox(height: GerenaColors.paddingMedium),
               Padding(

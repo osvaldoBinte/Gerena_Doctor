@@ -1,16 +1,46 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/notification/domain/entities/notification_entity.dart';
 import 'package:gerena/features/notification/presentation/page/notification_controller.dart';
 import 'package:gerena/features/notification/presentation/widget/notification_modal_loading.dart';
+import 'package:gerena/features/publications/presentation/page/postbyid/post_byId_page.dart';
 import 'package:gerena/movil/home/start_controller.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NotificationPage extends StatelessWidget {
   const NotificationPage({Key? key}) : super(key: key);
+
+  static final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+
+  static void pushPost({required int postId, int? commentId}) {
+    _navKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) => PostByIdPage(
+          postId: postId,
+          commentId: commentId,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Navigator(
+      key: _navKey,
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (_) => const _NotificationContent(),
+        );
+      },
+    );
+  }
+}
+
+class _NotificationContent extends StatelessWidget {
+  const _NotificationContent();
 
   @override
   Widget build(BuildContext context) {
@@ -30,24 +60,57 @@ class NotificationPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'NOTIFICACIONES',
-                style: GoogleFonts.rubik(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: GerenaColors.textTertiaryColor,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'NOTIFICACIONES',
+                  style: GoogleFonts.rubik(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: GerenaColors.textTertiaryColor,
+                  ),
                 ),
-              ),
+                Obx(() {
+                  if (controller.notifications.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => controller.deleteAllNotifications(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image.asset(
+                            'assets/icons/campaigndart.png',
+                            width: 20,
+                            height: 20,
+                            color: GerenaColors.primaryColor,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => controller.deleteAllNotifications(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image.asset(
+                            'assets/icons/close.png',
+                            width: 20,
+                            height: 20,
+                            color: GerenaColors.errorColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ],
             ),
             const SizedBox(height: GerenaColors.paddingLarge),
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
-                  return const Center(
-                    child: NotificatioLoading(),
-                  );
+                  return const Center(child: NotificatioLoading());
                 }
 
                 if (controller.error.value.isNotEmpty) {
@@ -61,9 +124,7 @@ class NotificationPage extends StatelessWidget {
                         Text(
                           'No tienes notificaciones',
                           style: GoogleFonts.rubik(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                              fontSize: 16, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -81,9 +142,7 @@ class NotificationPage extends StatelessWidget {
                         Text(
                           'No tienes notificaciones',
                           style: GoogleFonts.rubik(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                              fontSize: 16, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -94,8 +153,7 @@ class NotificationPage extends StatelessWidget {
                   onRefresh: () => controller.fetchNotifications(),
                   child: ListView.separated(
                     itemCount: controller.notifications.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 16),
+                    separatorBuilder: (_, __) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final notification = controller.notifications[index];
                       return _buildNotificationItem(
@@ -114,250 +172,260 @@ class NotificationPage extends StatelessWidget {
   }
 
   Widget _buildNotificationItem({
-  required NotificationEntity notification,
-  required NotificationController controller,
-}) {
-  // Determinar icono según el tipo
-  String iconPath;
-  switch (notification.type.toLowerCase()) {
-    case 'solicitudvideollamada':
-      iconPath = 'assets/icons/phone.png';
-      break;
-    case 'recordatorio':
-      iconPath = 'assets/icons/warning.png';
-      break;
-    case 'alertawebinar':
-      iconPath = 'assets/icons/campaigndart.png';
-      break;
-    case 'promocionflash':
-      iconPath = 'assets/icons/campaigndart.png';
-      break;
-    default:
-      iconPath = 'assets/icons/campaigndart.png';
-  }
-
-  bool hasActionButtons =
-      notification.type.toLowerCase() == 'solicitudvideollamada';
-
-  return GestureDetector(
-    onTap: () async {
-     try {
-    dynamic rawMetadata = notification.metadata;
-    Map metadata = {};
-
-    if (rawMetadata is String && rawMetadata.isNotEmpty) {
-      metadata = jsonDecode(rawMetadata);
-    } else if (rawMetadata is Map) {
-      metadata = rawMetadata;
+    required NotificationEntity notification,
+    required NotificationController controller,
+  }) {
+    String iconPath;
+    switch (notification.type.toLowerCase()) {
+      case 'solicitudvideollamada':
+        iconPath = 'assets/icons/phone.png';
+        break;
+      case 'recordatorio':
+        iconPath = 'assets/icons/warning.png';
+        break;
+      case 'alertawebinar':
+        iconPath = 'assets/icons/campaigndart.png';
+        break;
+      case 'promocionflash':
+        iconPath = 'assets/icons/campaigndart.png';
+        break;
+      default:
+        iconPath = 'assets/icons/campaigndart.png';
     }
 
-    final int? userId = metadata['SeguidorId'] ?? metadata['UsuarioReacciono']?? metadata['UsuarioComenta'] ;
-    final String? rol = metadata['RolUsuario'] ?? metadata['UsuarioReaccionoRol']?? metadata['RolUsuarioComenta'];
+    final bool hasActionButtons =
+        notification.type.toLowerCase() == 'solicitudvideollamada';
 
-    if (userId != null && rol != null) {
-      final startController = Get.find<StartController>();
-      if (rol == 'cliente') {
-        startController.showUserProfilePage(userData: {'userId': userId});
-      } else if (rol == 'doctor') {
-        startController.showDoctorProfilePage(doctorData: {'userId': userId});
-      }
-    }
-  } catch (e) {
-    print("Error procesando metadata: $e");
-  }
-    },
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: GerenaColors.backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          GerenaColors.mediumShadow,
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Image.asset(
-                  iconPath,
-                  width: 30,
-                  height: 30,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(
+    return GestureDetector(
+      onTap: () async {
+        try {
+          dynamic rawMetadata = notification.metadata;
+          Map metadata = {};
+
+          if (rawMetadata is String && rawMetadata.isNotEmpty) {
+            metadata = jsonDecode(rawMetadata);
+          } else if (rawMetadata is Map) {
+            metadata = rawMetadata;
+          }
+
+          // ── Reacción → abrir post inline ─────────────────────────
+          if (notification.type.toLowerCase() == 'reaccion') {
+            final int? publicacionId = metadata['PublicacionId'];
+            if (publicacionId != null) {
+              NotificationPage.pushPost(postId: publicacionId);
+            }
+            return;
+          }
+
+          // ── Comentario → abrir post inline con highlight ──────────
+          if (notification.type.toLowerCase() == 'comentario') {
+            final int? publicacionId = metadata['PublicacionId'];
+            final int? comentarioId = metadata['ComentarioId'];
+            if (publicacionId != null) {
+              NotificationPage.pushPost(
+                postId: publicacionId,
+                commentId: comentarioId,
+              );
+            }
+            return;
+          }
+
+          // ── Navegar a perfil ──────────────────────────────────────
+          final int? userId = metadata['SeguidorId'] ??
+              metadata['UsuarioReacciono'] ??
+              metadata['UsuarioComenta'];
+          final String? rol = metadata['RolUsuario'] ??
+              metadata['UsuarioReaccionoRol'] ??
+              metadata['RolUsuarioComenta'];
+
+          if (userId != null && rol != null) {
+            final startController = Get.find<StartController>();
+            if (rol == 'cliente') {
+              startController
+                  .showUserProfilePage(userData: {'userId': userId});
+            } else if (rol == 'doctor') {
+              startController
+                  .showDoctorProfilePage(doctorData: {'userId': userId});
+            }
+          }
+        } catch (e) {
+          print("Error procesando metadata: $e");
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: GerenaColors.backgroundColor,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [GerenaColors.mediumShadow],
+        ),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Image.asset(
+                    iconPath,
+                    width: 30,
+                    height: 30,
+                    errorBuilder: (_, __, ___) => const Icon(
                       Icons.notifications,
                       size: 30,
                       color: Colors.grey,
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: Text(
-                              notification.type.toUpperCase(),
-                              style: GoogleFonts.rubik(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: GerenaColors.textTertiaryColor,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (notification.createdAt != null)
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Expanded(
-                              flex: 1,
+                              flex: 3,
                               child: Text(
-                                _formatDateShort(notification.createdAt!),
+                                notification.type.toUpperCase(),
                                 style: GoogleFonts.rubik(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w300,
-                                  color: GerenaColors.textTertiary,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: GerenaColors.textTertiaryColor,
                                 ),
-                                textAlign: TextAlign.end,
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            if (notification.createdAt != null)
+                              Expanded(
+                                flex: 1,
+                                child: Text(
+                                  _formatDateShort(notification.createdAt!),
+                                  style: GoogleFonts.rubik(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w300,
+                                    color: GerenaColors.textTertiary,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          notification.message,
+                          style: GoogleFonts.rubik(
+                            fontSize: 12,
+                            color: GerenaColors.textTertiaryColor,
+                          ),
+                        ),
+                        if (notification.metadata != null &&
+                            notification.metadata is Map &&
+                            notification.metadata.containsKey('Tema')) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            notification.metadata['Tema'] ?? '',
+                            style: GoogleFonts.rubik(
+                              fontSize: 11,
+                              color: GerenaColors.textTertiaryColor,
+                            ),
+                          ),
                         ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        notification.message,
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: GerenaColors.textTertiaryColor,
-                        ),
-                      ),
-
-                      // 🔹 Mostrar metadata opcional
-                      if (notification.metadata != null &&
-                          notification.metadata is Map &&
-                          notification.metadata.containsKey('Tema')) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          notification.metadata['Tema'] ?? '',
-                          style: GoogleFonts.rubik(
-                            fontSize: 11,
-                            color: GerenaColors.textTertiaryColor,
+                        if (notification.metadata != null &&
+                            notification.metadata is Map &&
+                            notification.metadata
+                                .containsKey('FechaEvento')) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            _formatDateLong(
+                                notification.metadata['FechaEvento']),
+                            style: GoogleFonts.rubik(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: GerenaColors.textTertiaryColor,
+                            ),
                           ),
-                        ),
-                      ],
-
-                      if (notification.metadata != null &&
-                          notification.metadata is Map &&
-                          notification.metadata.containsKey('FechaEvento')) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          _formatDateLong(
-                              notification.metadata['FechaEvento']),
-                          style: GoogleFonts.rubik(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: GerenaColors.textTertiaryColor,
-                          ),
-                        ),
-                      ],
-
-                      if (notification.imageUrl != null &&
-                          notification.imageUrl!.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        ClipRRect(
-                          borderRadius: GerenaColors.smallBorderRadius,
-                          child: Image.network(
-                            notification.imageUrl!,
-                            fit: BoxFit.fill,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
+                        ],
+                        if (notification.imageUrl != null &&
+                            notification.imageUrl!.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          ClipRRect(
+                            borderRadius: GerenaColors.smallBorderRadius,
+                            child: Image.network(
+                              notification.imageUrl!,
+                              fit: BoxFit.fill,
+                              errorBuilder: (_, __, ___) => Container(
                                 height: 100,
                                 color: Colors.grey[300],
                                 child: const Center(
                                   child: Icon(Icons.image_not_supported),
                                 ),
-                              );
-                            },
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
+                        if (hasActionButtons) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => print('Cancelar videollamada'),
+                                  child: GerenaColors.widgetButton(
+                                    text: 'Cancelar',
+                                    showShadow: false,
+                                    fontSize: 10,
+                                    borderRadius: 40,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => print('Abrir chat'),
+                                  child: GerenaColors.widgetButton(
+                                    text: 'Chat',
+                                    showShadow: false,
+                                    borderRadius: 40,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => controller.markAsRead(
+                                      notification.notificationId),
+                                  child: GerenaColors.widgetButton(
+                                    text: 'Aceptar',
+                                    backgroundColor:
+                                        GerenaColors.backgroundlogin,
+                                    showShadow: false,
+                                    fontSize: 10,
+                                    borderRadius: 40,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
-
-                      if (hasActionButtons) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  print('Cancelar videollamada');
-                                },
-                                child: GerenaColors.widgetButton(
-                                  text: 'Cancelar',
-                                  showShadow: false,
-                                  fontSize: 10,
-                                  borderRadius: 40,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  print('Abrir chat');
-                                },
-                                child: GerenaColors.widgetButton(
-                                  text: 'Chat',
-                                  showShadow: false,
-                                  borderRadius: 40,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  controller.markAsRead(
-                                      notification.notificationId);
-                                },
-                                child: GerenaColors.widgetButton(
-                                  text: 'Aceptar',
-                                  backgroundColor:
-                                      GerenaColors.backgroundlogin,
-                                  showShadow: false,
-                                  fontSize: 10,
-                                  borderRadius: 40,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   String _formatDateShort(String dateStr) {
     try {
@@ -372,18 +440,8 @@ class NotificationPage extends StatelessWidget {
     try {
       final date = DateTime.parse(dateStr);
       final months = [
-        'Enero',
-        'Febrero',
-        'Marzo',
-        'Abril',
-        'Mayo',
-        'Junio',
-        'Julio',
-        'Agosto',
-        'Septiembre',
-        'Octubre',
-        'Noviembre',
-        'Diciembre'
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
       ];
       return '${date.day} de ${months[date.month - 1]} ${date.year}';
     } catch (e) {

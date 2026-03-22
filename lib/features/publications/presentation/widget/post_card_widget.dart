@@ -26,6 +26,7 @@ class PostCardWidget extends StatefulWidget {
   final VoidCallback? onReactionPressed;
   final Map<String, dynamic>? doctorData;
   final AuthorEntity? author;
+  final int? commentid;
 
   const PostCardWidget({
     Key? key,
@@ -42,6 +43,7 @@ class PostCardWidget extends StatefulWidget {
     this.onReactionPressed,
     this.doctorData,
     this.author,
+    this.commentid
   }) : super(key: key);
   @override
   State<PostCardWidget> createState() => _PostCardWidgetState();
@@ -55,19 +57,32 @@ class _PostCardWidgetState extends State<PostCardWidget> {
   final PublicationController publicationController =
       Get.find<PublicationController>();
   @override
-  void initState() {
-    super.initState();
-    postController = Get.find<PostController>();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_initialized) {
-        postController.initializeUserReaction(
-          widget.postId,
-          widget.userReaction,
-        );
-        _initialized = true;
-      }
-    });
-  }
+@override
+void initState() {
+  super.initState();
+  postController = Get.find<PostController>();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (!_initialized) {
+      postController.initializeUserReaction(
+        widget.postId,
+        widget.userReaction,
+      );
+      _initialized = true;
+    }
+
+    // ── Abrir comentarios si viene commentid ──────────────────────
+    if (widget.commentid != null) {
+      Get.bottomSheet(
+        CommentModalWidget(
+          postId: widget.postId,
+          highlightCommentId: widget.commentid,
+        ),
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+      );
+    }
+  });
+}
 
   String _formatTextWithLineBreaks(String text) {
     String processedText = text
@@ -105,7 +120,7 @@ class _PostCardWidgetState extends State<PostCardWidget> {
                           int authorId = widget.author!.id;
 
                           if (loggedUserId == authorId) {
-                         //   Get.offAllNamed(RoutesNames.homePage, arguments: 4);
+                     
                             return;
                           }
 
