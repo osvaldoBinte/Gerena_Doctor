@@ -208,7 +208,6 @@ class _NotificationContent extends StatelessWidget {
             metadata = rawMetadata;
           }
 
-          // ── Reacción → abrir post inline ─────────────────────────
           if (notification.type.toLowerCase() == 'reaccion') {
             final int? publicacionId = metadata['PublicacionId'];
             if (publicacionId != null) {
@@ -217,7 +216,6 @@ class _NotificationContent extends StatelessWidget {
             return;
           }
 
-          // ── Comentario → abrir post inline con highlight ──────────
           if (notification.type.toLowerCase() == 'comentario') {
             final int? publicacionId = metadata['PublicacionId'];
             final int? comentarioId = metadata['ComentarioId'];
@@ -230,7 +228,6 @@ class _NotificationContent extends StatelessWidget {
             return;
           }
 
-          // ── Navegar a perfil ──────────────────────────────────────
           final int? userId = metadata['SeguidorId'] ??
               metadata['UsuarioReacciono'] ??
               metadata['UsuarioComenta'];

@@ -70,7 +70,6 @@ void initState() {
       _initialized = true;
     }
 
-    // ── Abrir comentarios si viene commentid ──────────────────────
     if (widget.commentid != null) {
       Get.bottomSheet(
         CommentModalWidget(
@@ -193,7 +192,6 @@ void initState() {
                                         int authorId = widget.author!.id;
 
                                         if (loggedUserId == authorId) {
-                                        //  Get.offAllNamed(RoutesNames.homePage,arguments: 4);
                                           return;
                                         }
 
@@ -391,7 +389,6 @@ void initState() {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Texto de descripción
         AbsorbPointer(
           absorbing: false,
           child: LayoutBuilder(
@@ -459,12 +456,10 @@ void initState() {
         ),
         const SizedBox(height: 16),
 
-        // Botones de reacción y comentar
         AbsorbPointer(
           absorbing: false,
           child: Row(
             children: [
-              // Botón de reacción
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -528,7 +523,6 @@ void initState() {
               ),
               SizedBox(width: 16),
 
-              // Botón de comentar
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -573,7 +567,6 @@ void initState() {
 
         Row(
           children: [
-            // Contador de reacciones
             InkWell(
               onTap: () {
                 print('Reacciones clickeadas');
@@ -597,7 +590,6 @@ void initState() {
 
             const Spacer(),
 
-            // Información de valoración
             if (widget.rating != null)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,

@@ -165,23 +165,21 @@ class NotificationModal extends StatelessWidget {
             metadata = rawMetadata;
           }
 
-          // ── Reacción → cerrar modal + abrir post en bottom sheet ──
           if (notification.type.toLowerCase() == 'reaccion') {
             final int? publicacionId = metadata['PublicacionId'];
             if (publicacionId != null) {
-              Get.back(); // cierra el modal
+              Get.back();
               await Future.delayed(const Duration(milliseconds: 200));
               _openPostBottomSheet(context, postId: publicacionId);
             }
             return;
           }
 
-          // ── Comentario → cerrar modal + abrir post con highlight ──
           if (notification.type.toLowerCase() == 'comentario') {
             final int? publicacionId = metadata['PublicacionId'];
             final int? comentarioId = metadata['ComentarioId'];
             if (publicacionId != null) {
-              Get.back(); // cierra el modal
+              Get.back();
               await Future.delayed(const Duration(milliseconds: 200));
               _openPostBottomSheet(
                 context,
@@ -192,7 +190,6 @@ class NotificationModal extends StatelessWidget {
             return;
           }
 
-          // ── Navegar a perfil ──────────────────────────────────────
           final int? userId = metadata['SeguidorId'] ??
               metadata['UsuarioReacciono'] ??
               metadata['UsuarioComenta'];
@@ -201,7 +198,7 @@ class NotificationModal extends StatelessWidget {
               metadata['RolUsuarioComenta'];
 
           if (userId != null && rol != null) {
-            Get.back(); // cierra el modal
+            Get.back(); 
             await Future.delayed(const Duration(milliseconds: 200));
             final startController = Get.find<StartController>();
             if (rol == 'cliente') {
@@ -212,7 +209,6 @@ class NotificationModal extends StatelessWidget {
             }
           }
 
-          // ── Link genérico ─────────────────────────────────────────
           if (notification.linkUrl != null &&
               notification.linkUrl!.isNotEmpty) {
             print('Abrir: ${notification.linkUrl}');
@@ -328,7 +324,6 @@ class NotificationModal extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // ── Handle + header ──────────────────────────────────
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 16, vertical: 12),
@@ -355,7 +350,6 @@ class NotificationModal extends StatelessWidget {
                 ],
               ),
             ),
-            // ── Contenido del post ───────────────────────────────
             Expanded(
               child: PostByIdPage(
                 postId: postId,
