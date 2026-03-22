@@ -14,7 +14,6 @@ class PostByIdController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Solo lee Get.arguments si no hay parámetros directos
     final args = Get.arguments;
     if (args != null) {
       final int postId = args is Map ? args['postId'] as int : args as int;
@@ -23,7 +22,6 @@ class PostByIdController extends GetxController {
     }
   }
 
-  // ← Para uso embebido (desde NotificationPage sin Get.arguments)
   void loadPostDirect(int postId, {int? commentIdParam}) {
     commentId = commentIdParam;
     loadPost(postId);

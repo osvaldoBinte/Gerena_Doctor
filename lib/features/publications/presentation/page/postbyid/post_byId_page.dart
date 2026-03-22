@@ -8,8 +8,8 @@ import 'package:gerena/features/publications/presentation/widget/post_card_widge
 import 'package:get/get.dart';
 
 class PostByIdPage extends StatefulWidget {
-  final int? postId;       // ← opcional, para uso embebido
-  final int? commentId;    // ← opcional
+  final int? postId;      
+  final int? commentId;    
 
   const PostByIdPage({
     super.key,
@@ -31,14 +31,12 @@ class _PostByIdPageState extends State<PostByIdPage> {
     controller = Get.find<PostByIdController>();
     publicationController = Get.find<PublicationController>();
 
-    // Si viene por constructor (embebido en NotificationPage)
     if (widget.postId != null) {
       controller.loadPostDirect(
         widget.postId!,
         commentIdParam: widget.commentId,
       );
     }
-    // Si postId es null, onInit del controller ya lo cargó con Get.arguments
   }
 
   @override
@@ -51,8 +49,6 @@ class _PostByIdPageState extends State<PostByIdPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: GerenaColors.textPrimaryColor),
           onPressed: () => Navigator.of(context).pop(),
-          // ← Usa Navigator.pop en vez de Get.back() para respetar
-          //   el Navigator local de NotificationPage
         ),
         title: Text(
           'Publicación',
