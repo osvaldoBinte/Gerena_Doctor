@@ -270,15 +270,11 @@ class Membresia extends StatelessWidget {
                 );
               },
               icon: Icon(
-                subscription.cancelledAtPeriodEnd != null && subscription.cancelledAtPeriodEnd != ''
-                    ? Icons.refresh 
-                    : Icons.cancel_outlined,
+                Icons.cancel_outlined,
                 size: 18,
               ),
               label: Text(
-                subscription.cancelledAtPeriodEnd != null && subscription.cancelledAtPeriodEnd != ''
-                    ? 'Reactivar suscripción' 
-                    : 'Cancelar suscripción',
+                'Cancelar suscripción',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               style: OutlinedButton.styleFrom(
