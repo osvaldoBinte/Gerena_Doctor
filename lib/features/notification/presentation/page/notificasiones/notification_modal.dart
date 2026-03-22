@@ -11,7 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class NotificationModal extends StatelessWidget {
   const NotificationModal({Key? key}) : super(key: key);
-
+ 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<NotificationController>();
@@ -43,7 +43,7 @@ class NotificationModal extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () => controller.deleteAllNotifications(),
+                    onTap: () => controller.confirmarDelete(),
                     child: Text(
                       'Limpiar bandeja',
                       style: GoogleFonts.rubik(
@@ -153,70 +153,70 @@ class NotificationModal extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () async {
-        try {
-          controller.markAsRead(notification.notificationId);
+     onTap: () async {
+  try {
+    dynamic rawMetadata = notification.metadata;
+    Map metadata = {};
+    if (rawMetadata is String && rawMetadata.isNotEmpty) {
+      metadata = jsonDecode(rawMetadata);
+    } else if (rawMetadata is Map) {
+      metadata = rawMetadata;
+    }
 
-          dynamic rawMetadata = notification.metadata;
-          Map metadata = {};
-          if (rawMetadata is String && rawMetadata.isNotEmpty) {
-            metadata = jsonDecode(rawMetadata);
-          } else if (rawMetadata is Map) {
-            metadata = rawMetadata;
-          }
+   if (notification.type.toLowerCase() == 'reaccion') {
+  final int? publicacionId = metadata['PublicacionId'];
+  if (publicacionId != null) {
+    print('publication @$publicacionId');
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+    Get.back();
+    await Future.delayed(const Duration(milliseconds: 200));
+    _openPostBottomSheet(rootContext, postId: publicacionId);
+  }
+  _safeMarkAsRead(controller, notification.notificationId);
+  return;
+}
 
-          if (notification.type.toLowerCase() == 'reaccion') {
-            final int? publicacionId = metadata['PublicacionId'];
-            if (publicacionId != null) {
-              Get.back();
-              await Future.delayed(const Duration(milliseconds: 200));
-              _openPostBottomSheet(context, postId: publicacionId);
-            }
-            return;
-          }
+if (notification.type.toLowerCase() == 'comentario') {
+  final int? publicacionId = metadata['PublicacionId'];
+  final int? comentarioId = metadata['ComentarioId'];
+  if (publicacionId != null) {
+    final rootContext = Navigator.of(context, rootNavigator: true).context;
+    Get.back();
+    await Future.delayed(const Duration(milliseconds: 200));
+    print('comentario $comentarioId @$publicacionId');
+    _openPostBottomSheet(
+      rootContext,
+      postId: publicacionId,
+      commentId: comentarioId,
+    );
+  }
+  _safeMarkAsRead(controller, notification.notificationId);
+  return;
+}
 
-          if (notification.type.toLowerCase() == 'comentario') {
-            final int? publicacionId = metadata['PublicacionId'];
-            final int? comentarioId = metadata['ComentarioId'];
-            if (publicacionId != null) {
-              Get.back();
-              await Future.delayed(const Duration(milliseconds: 200));
-              _openPostBottomSheet(
-                context,
-                postId: publicacionId,
-                commentId: comentarioId,
-              );
-            }
-            return;
-          }
+    final int? userId = metadata['SeguidorId'] ??
+        metadata['UsuarioReacciono'] ??
+        metadata['UsuarioComenta'];
+    final String? rol = metadata['RolUsuario'] ??
+        metadata['UsuarioReaccionoRol'] ??
+        metadata['RolUsuarioComenta'];
 
-          final int? userId = metadata['SeguidorId'] ??
-              metadata['UsuarioReacciono'] ??
-              metadata['UsuarioComenta'];
-          final String? rol = metadata['RolUsuario'] ??
-              metadata['UsuarioReaccionoRol'] ??
-              metadata['RolUsuarioComenta'];
+    if (userId != null && rol != null) {
+      Get.back();
+      await Future.delayed(const Duration(milliseconds: 200));
+      final startController = Get.find<StartController>();
+      if (rol == 'cliente') {
+        startController.showUserProfilePage(userData: {'userId': userId});
+      } else if (rol == 'doctor') {
+        startController.showDoctorProfilePage(doctorData: {'userId': userId});
+      }
+    }
 
-          if (userId != null && rol != null) {
-            Get.back(); 
-            await Future.delayed(const Duration(milliseconds: 200));
-            final startController = Get.find<StartController>();
-            if (rol == 'cliente') {
-              startController.showUserProfilePage(userData: {'userId': userId});
-            } else if (rol == 'doctor') {
-              startController
-                  .showDoctorProfilePage(doctorData: {'userId': userId});
-            }
-          }
-
-          if (notification.linkUrl != null &&
-              notification.linkUrl!.isNotEmpty) {
-            print('Abrir: ${notification.linkUrl}');
-          }
-        } catch (e) {
-          print("Error procesando notificación: $e");
-        }
-      },
+    _safeMarkAsRead(controller, notification.notificationId);
+  } catch (e) {
+    print("Error procesando notificación: $e");
+  }
+},
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(12),
@@ -303,7 +303,13 @@ class NotificationModal extends StatelessWidget {
       ),
     );
   }
-
+void _safeMarkAsRead(NotificationController controller, int notificationId) {
+  try {
+    controller.markAsRead(notificationId);
+  } catch (e) {
+    print('markAsRead error: $e');
+  }
+}
   void _openPostBottomSheet(
     BuildContext context, {
     required int postId,
@@ -324,32 +330,7 @@ class NotificationModal extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade200),
-                ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.close,
-                        color: GerenaColors.textPrimaryColor),
-                    onPressed: () => Navigator.of(context).pop(),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Publicación',
-                    style:
-                        GerenaColors.headingMedium.copyWith(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
+           
             Expanded(
               child: PostByIdPage(
                 postId: postId,
@@ -376,8 +357,11 @@ class NotificationModal extends StatelessWidget {
   }
 }
 
+
 class NotificationHelper {
   static void showNotificationModal(BuildContext context) {
+    Get.find<NotificationController>().fetchNotifications();
+    
     showDialog(
       context: context,
       barrierDismissible: true,

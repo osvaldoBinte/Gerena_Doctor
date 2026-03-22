@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:gerena/common/errors/convert_message.dart';
+import 'package:gerena/common/widgets/custom_alert_type.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/notification/domain/entities/notification_entity.dart';
 import 'package:gerena/features/notification/domain/usecase/delete_all_notifications_usecase.dart';
@@ -154,7 +156,23 @@ void closePost() {
 
     notifications.refresh();
   }
-
+void confirmarDelete() {
+   showCustomAlert(
+      context: Get.context!,
+      title: '¿Limpiar bandeja?',
+      message: 'Se eliminarán todas las notificaciones. Esta acción no se puede deshacer.',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+      type: CustomAlertType.warning,
+      onConfirm: () {
+        Navigator.of(Get.context!).pop(); // cierra el alert
+       deleteAllNotifications();
+      },
+      onCancel: () {
+        Navigator.of(Get.context!).pop(); // cierra el alert
+      },
+    );
+  }
   Future<void> deleteAllNotifications() async {
     try {
       await deleteAllNotificationsUsecase.execute();

@@ -78,7 +78,7 @@ class _NotificationContent extends StatelessWidget {
                   return Row(
                     children: [
                       GestureDetector(
-                        onTap: () => controller.deleteAllNotifications(),
+                        onTap: () => controller.confirmarDelete(),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
@@ -90,7 +90,7 @@ class _NotificationContent extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => controller.deleteAllNotifications(),
+                        onTap: () => controller.confirmarDelete(),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
