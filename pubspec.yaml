@@ -54,12 +54,13 @@ dependencies:
   ffmpeg_kit_flutter_new: ^4.1.0
   firebase_core: ^4.5.0
   firebase_messaging: ^16.1.0
-
+  permission_handler: ^12.0.1
   in_app_purchase: ^3.1.13
   in_app_purchase_storekit: ^0.3.6+7
   in_app_purchase_android: ^0.3.0+18
   flutter_stripe: ^12.3.0
 
+  cached_network_image: ^3.4.1
 #flutter_native_splash:
  # color: "#004346"
   #image:  assets/logo/logo_ios.png

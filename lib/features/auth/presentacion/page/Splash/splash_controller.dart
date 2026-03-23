@@ -2,8 +2,9 @@ import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
 import 'package:get/get.dart';
-//import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'package:permission_handler/permission_handler.dart';
 class SplashController extends GetxController {
   final RxBool isLoading = true.obs;
 
@@ -15,7 +16,10 @@ class SplashController extends GetxController {
   void onInit() async {
     super.onInit();
     if (GetPlatform.isMobile) {
-    //  await _requestNotificationPermission();
+    await _requestNotificationPermission();
+
+    await _requestCameraPermission();
+    await _requestMicrophonePermission();
     }
     await checkUserSession();
   }
@@ -38,7 +42,31 @@ class SplashController extends GetxController {
     }
   }
 
-  /*Future<void> _requestNotificationPermission() async {
+  Future<void> _requestMicrophonePermission() async {
+    final status = await Permission.microphone.request();
+
+    if (status.isGranted) {
+      print('✅ Permiso de micrófono concedido');
+    } else if (status.isDenied) {
+      print('❌ Permiso de micrófono denegado');
+    } else if (status.isPermanentlyDenied) {
+      print('🚫 Permiso de micrófono permanentemente denegado');
+    }
+  }
+
+  Future<void> _requestCameraPermission() async {
+    final status = await Permission.camera.request();
+
+    if (status.isGranted) {
+      print('✅ Permiso de cámara concedido');
+    } else if (status.isDenied) {
+      print('❌ Permiso de cámara denegado');
+    } else if (status.isPermanentlyDenied) {
+      print('🚫 Permiso de cámara permanentemente denegado');
+      // await openAppSettings();
+    }
+  }
+ Future<void> _requestNotificationPermission() async {
     final FirebaseMessaging messaging = FirebaseMessaging.instance;
 
     NotificationSettings settings = await messaging.requestPermission(
@@ -61,5 +89,5 @@ class SplashController extends GetxController {
     } else {
       print('Permisos de notificaciones denegados');
     }
-  }*/
+  }
 }

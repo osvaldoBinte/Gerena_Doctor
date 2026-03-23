@@ -63,7 +63,7 @@ void main() async {
 WindowOptions windowOptions = WindowOptions(
   center: true,
   title: "Gerena",
-  backgroundColor: Colors.white, // ← color sólido, sin transparencia
+  backgroundColor: Colors.white, 
   skipTaskbar: false,
   titleBarStyle: TitleBarStyle.normal,
   windowButtonVisibility: true,

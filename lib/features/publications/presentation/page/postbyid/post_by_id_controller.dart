@@ -1,3 +1,4 @@
+import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/publications/domain/usecase/get_posts_by_id_usecase.dart';
 import 'package:get/get.dart';
@@ -11,17 +12,19 @@ class PostByIdController extends GetxController {
   final RxString errorMessage = ''.obs;
   int? commentId;
 
-  @override
-  void onInit() {
-    super.onInit();
-    final args = Get.arguments;
-    if (args != null) {
-      final int postId = args is Map ? args['postId'] as int : args as int;
+@override
+void onInit() {
+  super.onInit();
+  final args = Get.arguments;
+  if (args != null) {
+    final int postId = args is Map ? args['postId'] as int : args as int;
+
+    if (postId > 0) {
       commentId = args is Map ? args['commentId'] as int? : null;
       loadPost(postId);
     }
   }
-
+}
   void loadPostDirect(int postId, {int? commentIdParam}) {
     commentId = commentIdParam;
     loadPost(postId);
@@ -35,7 +38,7 @@ class PostByIdController extends GetxController {
       final result = await getPostsByIdUsecase.execute(postId);
       post.value = result;
     } catch (e) {
-      errorMessage.value = 'No se pudo cargar la publicación.';
+      errorMessage.value =  cleanExceptionMessage(e);
     } finally {
       isLoading.value = false;
     }

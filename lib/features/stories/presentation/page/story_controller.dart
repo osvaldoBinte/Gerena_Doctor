@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
@@ -23,6 +24,10 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   final CreateStroryUsecase createStroryUsecase;
   final SetStoryAsSeenUsecase setStoryAsSeenUsecase;
   AuthService authService = AuthService();
+
+  // ── Flag para evitar operaciones post-dispose ──
+  bool _isDisposing = false;
+
   final RxBool isModalActive = false.obs;
 
   StoryController({
@@ -31,7 +36,7 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
     required this.fetchStoriesByIdUsecase,
     required this.removeStoryUsecase,
     required this.createStroryUsecase,
-    required this.setStoryAsSeenUsecase
+    required this.setStoryAsSeenUsecase,
   });
 
   final RxList<GetStoriesEntity> allStories = <GetStoriesEntity>[].obs;
@@ -48,49 +53,62 @@ class StoryController extends GetxController with GetTickerProviderStateMixin {
   final RxInt currentStoryIndex = 0.obs;
   final RxBool isCreatingStory = false.obs;
 
-  // ✅ NUEVO: Controlador de video y estado
-  VideoPlayerController? videoController;
+  // ── Video actual ────────────────────────────
+  // ✅ Rx para que la UI reaccione cuando cambia el controller
+  final Rx<VideoPlayerController?> videoControllerRx =
+      Rx<VideoPlayerController?>(null);
+
+  VideoPlayerController? get videoController => videoControllerRx.value;
+  set videoController(VideoPlayerController? v) => videoControllerRx.value = v;
+
   final RxBool isVideoInitialized = false.obs;
-  
+
+  // ── Cache de videos precargados ─────────────
+  final Map<String, VideoPlayerController> _videoCache = {};
+  final Set<String> _initializingUrls = {};
+
+  // ── Progreso ────────────────────────────────
   AnimationController? progressController;
   Animation<double>? progressAnimation;
 
-  // ✅ NUEVO: Duración por defecto y actual
-  Duration _defaultStoryDuration = const Duration(seconds: 5);
-  Duration _currentStoryDuration = const Duration(seconds: 5);
+  // ── Flag de carga del contenido actual ──────
+  final RxBool isContentLoading = false.obs;
+
+  static const Duration _defaultImageDuration = Duration(seconds: 5);
+  static const int _preloadAhead = 2;
+
+  // ── Getters ─────────────────────────────────
 
   GetStoriesEntity? get currentUser =>
-      allStories.isNotEmpty ? allStories[currentUserIndex.value] : null;
-StoryEntity? get currentStory {
-  if (!isModalActive.value) return null;
-  if (currentUser == null || currentUser!.historias.isEmpty) return null;
-  if (currentStoryIndex.value >= currentUser!.historias.length) return null;
-  return currentUser!.historias[currentStoryIndex.value];
-}
+      allStories.isNotEmpty && currentUserIndex.value >= 0
+          ? allStories[currentUserIndex.value]
+          : null;
 
-StoryEntity? get currentMyStory {
-  if (!isModalActive.value) return null;
-  if (myStories.isEmpty) return null;
-  if (currentMyStoryIndex.value >= myStories.length) return null;
-  return myStories[currentMyStoryIndex.value];
-}
-
-List<StoryEntity> get currentUserStories {
-  if (!isModalActive.value) return [];
-  return currentUser?.historias ?? [];
-}
-  List<GetStoriesEntity> getStoriesForDisplay() {
-    return allStories;
+  StoryEntity? get currentStory {
+    if (!isModalActive.value) return null;
+    if (currentUser == null || currentUser!.historias.isEmpty) return null;
+    if (currentStoryIndex.value >= currentUser!.historias.length) return null;
+    return currentUser!.historias[currentStoryIndex.value];
   }
-  
+
+  StoryEntity? get currentMyStory {
+    if (!isModalActive.value) return null;
+    if (myStories.isEmpty) return null;
+    if (currentMyStoryIndex.value >= myStories.length) return null;
+    return myStories[currentMyStoryIndex.value];
+  }
+
+  List<StoryEntity> get currentUserStories {
+    if (!isModalActive.value) return [];
+    return currentUser?.historias ?? [];
+  }
+
+  List<GetStoriesEntity> getStoriesForDisplay() => allStories;
   bool get isMyStoryActive => isViewingMyStory.value;
-  
-  StoryEntity? get activeStory {
-    if (isViewingMyStory.value) {
-      return currentMyStory;
-    }
-    return currentStory;
-  }
+  StoryEntity? get activeStory =>
+      isViewingMyStory.value ? currentMyStory : currentStory;
+
+  // ── Lifecycle ───────────────────────────────
 
   @override
   void onInit() {
@@ -102,173 +120,510 @@ List<StoryEntity> get currentUserStories {
   @override
   void onClose() {
     progressController?.dispose();
-    videoController?.dispose();
+    _disposeAllCachedVideos();
+    videoControllerRx.value?.dispose();
     super.onClose();
   }
 
-  // ✅ NUEVO: Inicializar video si es necesario
-  Future<void> initializeVideoIfNeeded() async {
-    final story = isViewingMyStory.value 
-        ? currentMyStory
-        : currentStory;
+  // ────────────────────────────────────────────
+  // Inicialización del modal
+  // ────────────────────────────────────────────
 
+  void initializeMyStoryModal(TickerProvider vsync) {
+    _isDisposing = false;
+    isModalActive.value = true;
+    isViewingMyStory.value = true;
+    currentUserIndex.value = -1;
+    currentStoryIndex.value = 0;
+    currentMyStoryIndex.value = 0;
+    _setupProgressController(vsync);
+    _loadCurrentContent();
+  }
+
+  void initializeStoryModal(int userIndex, TickerProvider vsync) {
+    _isDisposing = false;
+    isModalActive.value = true;
+    isViewingMyStory.value = false;
+    currentUserIndex.value = userIndex;
+    currentStoryIndex.value = 0;
+    _setupProgressController(vsync);
+    _loadCurrentContent();
+    _markCurrentStoryAsSeen();
+  }
+
+  // ────────────────────────────────────────────
+  // Carga del contenido actual
+  // ────────────────────────────────────────────
+
+  Future<void> _loadCurrentContent() async {
+    if (_isDisposing || !isModalActive.value) return;
+
+    final story = isViewingMyStory.value ? currentMyStory : currentStory;
     if (story == null) return;
 
-    if (story.tipoContenido.toLowerCase() == 'video') {
-      // Pausar mientras carga
-      pauseStory();
-      await _initializeVideo(story.urlContenido);
-    } else {
-      // Para imágenes, usar duración por defecto
-      setStoryDuration(_defaultStoryDuration);
-    }
-  }
+    _stopProgress();
+    isContentLoading.value = true;
 
-  // ✅ NUEVO: Inicializar video
-  Future<void> _initializeVideo(String videoUrl) async {
-    try {
-      // Limpiar video anterior
-      videoController?.dispose();
-      videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl));
-      
-      await videoController!.initialize();
-      videoController!.setLooping(true);
-      videoController!.play();
-      
-      isVideoInitialized.value = true;
-      
-      // ✅ Establecer la duración del video y empezar la animación
-      final videoDuration = videoController!.value.duration;
-      setStoryDuration(videoDuration);
-      
-    } catch (e) {
-      debugPrint('Error initializing video: $e');
-      // Usar duración por defecto si falla
-      setStoryDuration(_defaultStoryDuration);
-    }
-  }
+    final isVideo = story.tipoContenido.toLowerCase() == 'video';
 
-  // ✅ NUEVO: Establecer duración de la historia
-  void setStoryDuration(Duration duration) {
-    _currentStoryDuration = duration;
-    if (progressController != null) {
-      progressController!.duration = duration;
-      progressController!.reset();
-      progressController!.forward();
-    }
-  }
-
-  // ✅ NUEVO: Limpiar video
-  void disposeVideo() {
-    videoController?.dispose();
-    videoController = null;
-    isVideoInitialized.value = false;
-  }
-
-  // ✅ NUEVO: Verificar y actualizar video si cambió
-  Future<void> checkAndUpdateVideo(StoryEntity newStory) async {
-    final isVideo = newStory.tipoContenido.toLowerCase() == 'video';
-    
     if (isVideo) {
-      if (videoController == null || 
-          videoController!.dataSource != newStory.urlContenido) {
-        pauseStory();
-        isVideoInitialized.value = false;
-        await _initializeVideo(newStory.urlContenido);
+      await _showVideo(story.urlContenido);
+    } else {
+      await _warmupImage(story.urlContenido);
+      if (_isDisposing || !isModalActive.value) return;
+      isContentLoading.value = false;
+      _startProgress(_defaultImageDuration);
+    }
+
+    _preloadNextStories();
+  }
+
+  // ────────────────────────────────────────────
+  // Precarga en background
+  // ────────────────────────────────────────────
+
+  void _preloadNextStories() {
+    if (_isDisposing) return;
+    final upcoming = _getUpcomingStories(_preloadAhead);
+    for (final story in upcoming) {
+      final url = story.urlContenido;
+      final isVideo = story.tipoContenido.toLowerCase() == 'video';
+      if (isVideo) {
+        if (!_videoCache.containsKey(url) &&
+            !_initializingUrls.contains(url)) {
+          _preloadVideoInBackground(url);
+        }
+      } else {
+        _preloadImageInBackground(url);
+      }
+    }
+  }
+
+  List<StoryEntity> _getUpcomingStories(int count) {
+    final result = <StoryEntity>[];
+
+    if (isViewingMyStory.value) {
+      for (int i = 1; i <= count; i++) {
+        final idx = currentMyStoryIndex.value + i;
+        if (idx < myStories.length) result.add(myStories[idx]);
       }
     } else {
-      disposeVideo();
-      setStoryDuration(_defaultStoryDuration);
+      int storyIdx = currentStoryIndex.value + 1;
+      int userIdx = currentUserIndex.value;
+
+      while (result.length < count) {
+        if (userIdx >= allStories.length) break;
+        final stories = allStories[userIdx].historias;
+
+        if (storyIdx < stories.length) {
+          result.add(stories[storyIdx]);
+          storyIdx++;
+        } else {
+          userIdx++;
+          storyIdx = 0;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  Future<void> _preloadVideoInBackground(String url) async {
+    _initializingUrls.add(url);
+    debugPrint('⏬ [Preload] Video: $url');
+
+    try {
+      final ctrl = VideoPlayerController.networkUrl(Uri.parse(url));
+      await ctrl.initialize();
+
+      if (_isDisposing || !isModalActive.value) {
+        ctrl.dispose();
+        _initializingUrls.remove(url);
+        return;
+      }
+
+      ctrl.setLooping(true);
+      _videoCache[url] = ctrl;
+      _initializingUrls.remove(url);
+      debugPrint('✅ [Preload] Video listo: $url');
+    } catch (e) {
+      _initializingUrls.remove(url);
+      debugPrint('⚠️ [Preload] Error video: $e');
     }
   }
 
-void initializeMyStoryModal(TickerProvider vsync) {
-  // ✅ NUEVO: Marcar modal como activo
-  isModalActive.value = true;
-  
-  isViewingMyStory.value = true;
-  currentUserIndex.value = -1;
-  currentStoryIndex.value = 0;
-  currentMyStoryIndex.value = 0;
-  _setupProgressController(vsync);
-  initializeVideoIfNeeded();
-}
-
-  bool hasUnviewedStories(int index) {
-    if (index >= allStories.length) return false;
-    final stories = allStories[index].historias;
-    return stories.any((story) => !story.yaVista);
+  void _preloadImageInBackground(String url) {
+    try {
+      CachedNetworkImageProvider(url).resolve(const ImageConfiguration());
+    } catch (_) {}
   }
 
-  String? getUserProfileImage(int index) {
-    if (index >= allStories.length) return null;
-    return allStories[index].fotoPerfilUrl;
+  Future<void> _warmupImage(String url) async {
+    try {
+      CachedNetworkImageProvider(url).resolve(const ImageConfiguration());
+      await Future.delayed(const Duration(milliseconds: 150));
+    } catch (_) {}
   }
 
-  String? getUserName(int index) {
-    if (index >= allStories.length) return null;
-    return allStories[index].nombreDoctor;
+  // ────────────────────────────────────────────
+  // Mostrar video (cache-first)
+  // ────────────────────────────────────────────
+
+  Future<void> _showVideo(String url) async {
+    try {
+      // 1. Cache hit → instantáneo
+      if (_videoCache.containsKey(url)) {
+        debugPrint('⚡ [Cache hit] Video: $url');
+
+        await _disposeVideoController();
+        if (_isDisposing || !isModalActive.value) return;
+
+        final cached = _videoCache.remove(url)!;
+        await cached.seekTo(Duration.zero);
+        if (_isDisposing || !isModalActive.value) {
+          cached.dispose();
+          return;
+        }
+        await cached.play();
+        if (_isDisposing || !isModalActive.value) {
+          cached.pause();
+          cached.dispose();
+          return;
+        }
+
+        // ✅ Asignar al Rx para que la UI reaccione
+        videoControllerRx.value = cached;
+        isVideoInitialized.value = true;
+        isContentLoading.value = false;
+
+        final dur = cached.value.duration;
+        _startProgress(
+            dur.inMilliseconds > 0 ? dur : _defaultImageDuration);
+        return;
+      }
+
+      // 2. Siendo precargado → esperar hasta 3s
+      if (_initializingUrls.contains(url)) {
+        debugPrint('⏳ [Preload] Esperando: $url');
+        for (int i = 0; i < 15; i++) {
+          await Future.delayed(const Duration(milliseconds: 200));
+          if (_isDisposing || !isModalActive.value) return;
+          if (_videoCache.containsKey(url)) {
+            await _showVideo(url);
+            return;
+          }
+        }
+        debugPrint('⏱️ Timeout, inicializando desde cero: $url');
+      }
+
+      // 3. Sin cache → inicializar normal
+      await _initializeVideo(url);
+    } catch (e) {
+      debugPrint('💥 _showVideo error: $e');
+      if (!_isDisposing) {
+        isContentLoading.value = false;
+        _startProgress(_defaultImageDuration);
+      }
+    }
   }
 
-  String get activeUserName {
+  Future<void> _initializeVideo(String videoUrl) async {
+    try {
+      await _disposeVideoController();
+      if (_isDisposing || !isModalActive.value) return;
+
+      final ctrl =
+          VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      await ctrl.initialize();
+
+      if (_isDisposing || !isModalActive.value) {
+        ctrl.dispose();
+        return;
+      }
+
+      ctrl.setLooping(true);
+      await ctrl.play();
+
+      if (_isDisposing || !isModalActive.value) {
+        ctrl.pause();
+        ctrl.dispose();
+        return;
+      }
+
+      // ✅ Asignar al Rx para que la UI reaccione
+      videoControllerRx.value = ctrl;
+      isVideoInitialized.value = true;
+      isContentLoading.value = false;
+
+      final dur = ctrl.value.duration;
+      _startProgress(
+          dur.inMilliseconds > 0 ? dur : _defaultImageDuration);
+    } catch (e) {
+      debugPrint('Error initializing video: $e');
+      if (!_isDisposing) {
+        isContentLoading.value = false;
+        _startProgress(_defaultImageDuration);
+      }
+    }
+  }
+
+  // ────────────────────────────────────────────
+  // Progress controller
+  // ────────────────────────────────────────────
+
+  void _setupProgressController(TickerProvider vsync) {
+    progressController?.stop();
+    progressController?.dispose();
+    progressController = null;
+    progressAnimation = null;
+
+    progressController = AnimationController(
+      duration: _defaultImageDuration,
+      vsync: vsync,
+    );
+
+    progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+          parent: progressController!, curve: Curves.linear),
+    );
+
+    progressController!.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (_isDisposing || !isModalActive.value) return;
+        if (isViewingMyStory.value) {
+          nextMyStory();
+        } else {
+          nextStory();
+        }
+      }
+    });
+  }
+
+  void _startProgress(Duration duration) {
+    if (progressController == null) return;
+    if (_isDisposing || !isModalActive.value) return;
+    progressController!.stop();
+    progressController!.duration = duration;
+    progressController!.reset();
+    progressController!.forward();
+  }
+
+  void _stopProgress() {
+    progressController?.stop();
+  }
+
+  // ────────────────────────────────────────────
+  // Pause / Resume
+  // ────────────────────────────────────────────
+
+  void pauseStory() {
+    if (isContentLoading.value) return;
+    progressController?.stop();
+    videoControllerRx.value?.pause();
+  }
+
+  void resumeStory() {
+    if (isContentLoading.value) return;
+    progressController?.forward();
+    videoControllerRx.value?.play();
+  }
+
+  // ────────────────────────────────────────────
+  // Navegación
+  // ────────────────────────────────────────────
+
+  void nextMyStory() async {
+    if (_isDisposing || !isModalActive.value) return;
+
+    if (currentMyStoryIndex.value + 1 < myStories.length) {
+      currentMyStoryIndex.value++;
+      await _disposeVideoController();
+      await _loadCurrentContent();
+    } else {
+      goToFirstUserStory();
+    }
+  }
+
+  void previousMyStory() async {
+    if (_isDisposing || !isModalActive.value) return;
+
+    if (currentMyStoryIndex.value > 0) {
+      currentMyStoryIndex.value--;
+      await _disposeVideoController();
+      await _loadCurrentContent();
+    }
+  }
+
+  void goToFirstUserStory() {
+    if (_isDisposing || !isModalActive.value) return;
+
+    if (allStories.isNotEmpty) {
+      isViewingMyStory.value = false;
+      currentUserIndex.value = 0;
+      currentStoryIndex.value = 0;
+      _loadCurrentContent();
+      _markCurrentStoryAsSeen();
+    } else {
+      _disposeVideoController();
+      if (isModalActive.value) Get.back();
+    }
+  }
+
+  void nextStory() async {
+    if (_isDisposing || !isModalActive.value) return;
+
+    if (currentStoryIndex.value + 1 < currentUserStories.length) {
+      currentStoryIndex.value++;
+      await _disposeVideoController();
+      await _loadCurrentContent();
+      _markCurrentStoryAsSeen();
+    } else if (currentUserIndex.value + 1 < allStories.length) {
+      currentUserIndex.value++;
+      currentStoryIndex.value = 0;
+      await _disposeVideoController();
+      await _loadCurrentContent();
+      _markCurrentStoryAsSeen();
+    } else {
+      await _disposeVideoController();
+      if (!_isDisposing && isModalActive.value) Get.back();
+    }
+  }
+
+  void previousStory() async {
+    if (_isDisposing || !isModalActive.value) return;
+
     if (isViewingMyStory.value) {
-      return "Mi historia";
+      if (currentMyStoryIndex.value == 0) return;
+      previousMyStory();
+    } else if (currentUserIndex.value == 0 &&
+        currentStoryIndex.value == 0 &&
+        hasMyStory.value) {
+      isViewingMyStory.value = true;
+      currentUserIndex.value = -1;
+      currentStoryIndex.value = 0;
+      currentMyStoryIndex.value = myStories.length - 1;
+      await _disposeVideoController();
+      await _loadCurrentContent();
+    } else if (currentStoryIndex.value > 0) {
+      currentStoryIndex.value--;
+      await _disposeVideoController();
+      await _loadCurrentContent();
+    } else if (currentUserIndex.value > 0) {
+      currentUserIndex.value--;
+      final prevStories = allStories[currentUserIndex.value].historias;
+      currentStoryIndex.value = prevStories.length - 1;
+      await _disposeVideoController();
+      await _loadCurrentContent();
     }
-    return currentUser?.nombreDoctor ?? "";
   }
 
-  String get activeUserImage {
-    if (isViewingMyStory.value) {
-      return "";
+  // ────────────────────────────────────────────
+  // Video helpers
+  // ────────────────────────────────────────────
+
+  Future<void> _disposeVideoController() async {
+    final ctrl = videoControllerRx.value;
+    if (ctrl != null) {
+      videoControllerRx.value = null; // ✅ limpiar Rx primero
+      isVideoInitialized.value = false;
+      try {
+        await ctrl.pause();
+        await ctrl.dispose();
+      } catch (_) {}
+    } else {
+      isVideoInitialized.value = false;
     }
-    return currentUser?.fotoPerfilUrl ?? "";
   }
-  
+
+  void disposeVideo() {
+    final ctrl = videoControllerRx.value;
+    videoControllerRx.value = null;
+    isVideoInitialized.value = false;
+    ctrl?.pause();
+    ctrl?.dispose();
+  }
+
+  void _disposeAllCachedVideos() {
+    for (final ctrl in _videoCache.values) {
+      try {
+        ctrl.dispose();
+      } catch (_) {}
+    }
+    _videoCache.clear();
+    _initializingUrls.clear();
+  }
+
+  // ────────────────────────────────────────────
+  // Dispose modal
+  // ────────────────────────────────────────────
+
   void disposeStoryModal() {
-  // ✅ CRÍTICO: Marcar modal como inactivo PRIMERO
-  isModalActive.value = false;
-  
-  // Detener video ANTES de cualquier otra cosa
-  if (videoController != null) {
-    videoController!.pause();
-    videoController!.dispose();
-    videoController = null;
-  }
-  
-  isVideoInitialized.value = false;
-  
-  // Detener y limpiar animaciones
-  progressController?.stop();
-  progressController?.dispose();
-  progressController = null;
-  
-  progressAnimation = null;
-  
-  // Resetear el flag de "Mi Historia"
-  isViewingMyStory.value = false;
-  
-  // Resetear índices
-  currentStoryIndex.value = 0;
-  currentMyStoryIndex.value = 0;
-  currentUserIndex.value = 0;
-  
-  // Resetear duración
-  _currentStoryDuration = _defaultStoryDuration;
-}
- void closeStoryModal() {
-  disposeStoryModal(); // ✅ CAMBIO: Usar el método de limpieza completo
-  Get.back();
-}
+    if (_isDisposing) return; // evitar doble dispose
+    _isDisposing = true;
+    isModalActive.value = false;
 
+    final ctrl = videoControllerRx.value;
+    videoControllerRx.value = null;
+    isVideoInitialized.value = false;
+    isContentLoading.value = false;
+
+    try {
+      ctrl?.pause();
+      ctrl?.dispose();
+    } catch (_) {}
+
+    _disposeAllCachedVideos();
+
+    progressController?.stop();
+    progressController?.dispose();
+    progressController = null;
+    progressAnimation = null;
+
+    isViewingMyStory.value = false;
+    currentStoryIndex.value = 0;
+    currentMyStoryIndex.value = 0;
+    currentUserIndex.value = 0;
+  }
+
+  void closeStoryModal() {
+    disposeStoryModal();
+    Get.back();
+  }
+
+  // ────────────────────────────────────────────
+  // Progress getters para la UI
+  // ────────────────────────────────────────────
+
+  double getStoryProgress(int index) {
+    if (index < currentStoryIndex.value) return 1.0;
+    if (index == currentStoryIndex.value) {
+      if (isContentLoading.value) return 0.0;
+      return progressAnimation?.value ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  double getMyStoryProgressAt(int index) {
+    if (!isViewingMyStory.value) return 0.0;
+    if (index < currentMyStoryIndex.value) return 1.0;
+    if (index == currentMyStoryIndex.value) {
+      if (isContentLoading.value) return 0.0;
+      return progressAnimation?.value ?? 0.0;
+    }
+    return 0.0;
+  }
+
+  // ────────────────────────────────────────────
+  // Fetch / CRUD
+  // ────────────────────────────────────────────
 
   Future<void> fetchStories() async {
     try {
       isLoading.value = true;
       error.value = '';
-      
+
       final stories = await fetchStoriesUsecase.execute();
-      
-      // ✅ ORDENAR las historias de cada usuario
+
       final sortedStories = stories.map((userStory) {
         return GetStoriesEntity(
           doctorId: userStory.doctorId,
@@ -277,9 +632,8 @@ void initializeMyStoryModal(TickerProvider vsync) {
           historias: _sortStoriesByDate(userStory.historias),
         );
       }).toList();
-      
+
       allStories.value = sortedStories;
-      
       isLoading.value = false;
     } catch (e) {
       error.value = e.toString();
@@ -287,19 +641,39 @@ void initializeMyStoryModal(TickerProvider vsync) {
     }
   }
 
+  Future<void> fetchMyStory() async {
+    try {
+      isLoadingMyStory.value = true;
+      final userId = await authService.getUsuarioId();
+
+      if (userId == null) {
+        isLoadingMyStory.value = false;
+        hasMyStory.value = false;
+        myStories.clear();
+        return;
+      }
+
+      final stories = await fetchStoriesByIdUsecase.execute(userId);
+      myStories.value = _sortStoriesByDate(stories);
+      hasMyStory.value = stories.isNotEmpty;
+      isLoadingMyStory.value = false;
+    } catch (e) {
+      myStories.clear();
+      hasMyStory.value = false;
+      isLoadingMyStory.value = false;
+    }
+  }
+
   Future<void> createStory(File file, String contentType) async {
     try {
       isCreatingStory.value = true;
 
-      final filePath = file.path;
-
       final entity = PostStoriesEntity(
         contentType: contentType,
-        file: filePath,
+        file: file.path,
       );
 
       await createStroryUsecase.execute(entity);
-
       await fetchMyStory();
       await fetchStories();
 
@@ -312,79 +686,25 @@ void initializeMyStoryModal(TickerProvider vsync) {
     }
   }
 
-  
-  Future<void> fetchMyStory() async {
-    try {
-      isLoadingMyStory.value = true;
-      final userId = await authService.getUsuarioId();
-      
-      if (userId == null) {
-        isLoadingMyStory.value = false;
-        hasMyStory.value = false;
-        myStories.clear();
-        return;
-      }
-
-      final stories = await fetchStoriesByIdUsecase.execute(userId);
-      
-      // ✅ ORDENAR mis historias por fecha de creación
-      myStories.value = _sortStoriesByDate(stories);
-      hasMyStory.value = stories.isNotEmpty;
-      isLoadingMyStory.value = false;
-    } catch (e) {
-      myStories.clear();
-      hasMyStory.value = false;
-      isLoadingMyStory.value = false;
-    }
-  }List<StoryEntity> _sortStoriesByDate(List<StoryEntity> stories) {
-  final sortedStories = List<StoryEntity>.from(stories);
-
-  sortedStories.sort((a, b) {
-    try {
-      return a.fechaCreacion.compareTo(b.fechaCreacion);
-    } catch (e) {
-      debugPrint('Error comparing dates: $e');
-      return 0;
-    }
-  });
-
-  return sortedStories;
-}
-
-  String getContentType(String filePath) {
-    final extension = filePath.toLowerCase().split('.').last;
-    
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].contains(extension)) {
-      return 'imagen';
-    }
-    
-    if (['mp4', 'mov', 'avi', 'mkv', 'flv', 'wmv', 'webm', '3gp'].contains(extension)) {
-      return 'video';
-    }
-    
-    return 'imagen';
-  }
-
   Future<void> deleteMyStory() async {
     if (currentMyStory == null) return;
 
     try {
       await removeStoryUsecase.execute(currentMyStory!.id);
-      
       myStories.removeAt(currentMyStoryIndex.value);
-      
+
       if (myStories.isEmpty) {
         hasMyStory.value = false;
-        disposeVideo(); // ✅ NUEVO: Limpiar video
+        disposeVideo();
         Get.back();
       } else {
         if (currentMyStoryIndex.value >= myStories.length) {
           currentMyStoryIndex.value = myStories.length - 1;
         }
-        // ✅ NUEVO: Verificar y actualizar video para la nueva historia
-        await checkAndUpdateVideo(currentMyStory!);
+        await _disposeVideoController();
+        await _loadCurrentContent();
       }
-      
+
       showSuccessSnackbar('Historia eliminada correctamente');
       await fetchStories();
     } catch (e) {
@@ -392,124 +712,42 @@ void initializeMyStoryModal(TickerProvider vsync) {
     }
   }
 
-void initializeStoryModal(int userIndex, TickerProvider vsync) {
-  // ✅ NUEVO: Marcar modal como activo
-  isModalActive.value = true;
-  
-  isViewingMyStory.value = false;
-  currentUserIndex.value = userIndex;
-  currentStoryIndex.value = 0;
-  _setupProgressController(vsync);
-  initializeVideoIfNeeded();
-  _markCurrentStoryAsSeen();
-}
+  Future<void> likeStory() async {
+    if (currentStory == null) return;
 
+    try {
+      await addLikeToStoryUsecase.execute(currentStory!.id);
 
-  void _setupProgressController(TickerProvider vsync) {
-    progressController?.dispose();
-    
-    progressController = AnimationController(
-      duration: _currentStoryDuration, // ✅ CAMBIO: Usar duración configurable
-      vsync: vsync,
-    );
+      final userIndex = currentUserIndex.value;
+      final storyIndex = currentStoryIndex.value;
 
-    progressAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: progressController!,
-      curve: Curves.linear,
-    ));
+      final updatedStory = StoryEntity(
+        id: currentStory!.id,
+        tipoContenido: currentStory!.tipoContenido,
+        urlContenido: currentStory!.urlContenido,
+        fechaCreacion: currentStory!.fechaCreacion,
+        fechaExpiracion: currentStory!.fechaExpiracion,
+        vistas: currentStory!.vistas,
+        likes: currentStory!.likes + 1,
+        yaVista: currentStory!.yaVista,
+        yaLikeada: true,
+      );
 
-    // ✅ CAMBIO: No iniciar automáticamente, esperar a que el video cargue
-    // progressController!.forward();
+      final updatedStories = List<StoryEntity>.from(currentUserStories);
+      updatedStories[storyIndex] = updatedStory;
 
-    progressController!.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        if (isViewingMyStory.value) {
-          nextMyStory();
-        } else {
-          nextStory();
-        }
-      }
-    });
-  }
+      final updatedUser = GetStoriesEntity(
+        doctorId: currentUser!.doctorId,
+        nombreDoctor: currentUser!.nombreDoctor,
+        fotoPerfilUrl: currentUser!.fotoPerfilUrl,
+        historias: updatedStories,
+      );
 
-  void nextMyStory() async {
-    if (currentMyStoryIndex.value + 1 < myStories.length) {
-      currentMyStoryIndex.value++;
-      // ✅ NUEVO: Verificar y actualizar video
-      await checkAndUpdateVideo(currentMyStory!);
-    } else {
-      goToFirstUserStory();
-    }
-  }
-
-  void previousMyStory() async {
-    if (currentMyStoryIndex.value > 0) {
-      currentMyStoryIndex.value--;
-      // ✅ NUEVO: Verificar y actualizar video
-      await checkAndUpdateVideo(currentMyStory!);
-    }
-  }
-
-  void goToFirstUserStory() {
-    if (allStories.isNotEmpty) {
-      isViewingMyStory.value = false;
-      currentUserIndex.value = 0;
-      currentStoryIndex.value = 0;
-      disposeVideo(); // ✅ NUEVO: Limpiar video de mis historias
-      initializeVideoIfNeeded(); // ✅ NUEVO: Inicializar video del primer usuario
-      _markCurrentStoryAsSeen();
-    } else {
-      disposeVideo();
-      Get.back();
-    }
-  }
-
-  void nextStory() async {
-    if (currentStoryIndex.value + 1 < currentUserStories.length) {
-      currentStoryIndex.value++;
-      // ✅ NUEVO: Verificar y actualizar video
-      await checkAndUpdateVideo(currentStory!);
-      _markCurrentStoryAsSeen();
-    } else {
-      if (currentUserIndex.value + 1 < allStories.length) {
-        currentUserIndex.value++;
-        currentStoryIndex.value = 0;
-        // ✅ NUEVO: Verificar y actualizar video
-        await checkAndUpdateVideo(currentStory!);
-        _markCurrentStoryAsSeen();
-      } else {
-        disposeVideo();
-        Get.back();
-      }
-    }
-  }
-
-  void previousStory() async {
-    if (isViewingMyStory.value) {
-      if (currentMyStoryIndex.value == 0) {
-        return;
-      }
-      previousMyStory();
-    } else if (currentUserIndex.value == 0 && currentStoryIndex.value == 0 && hasMyStory.value) {
-      isViewingMyStory.value = true;
-      currentUserIndex.value = -1;
-      currentStoryIndex.value = 0;
-      currentMyStoryIndex.value = myStories.length - 1;
-      // ✅ NUEVO: Verificar y actualizar video
-      await checkAndUpdateVideo(currentMyStory!);
-    } else if (currentStoryIndex.value > 0) {
-      currentStoryIndex.value--;
-      // ✅ NUEVO: Verificar y actualizar video
-      await checkAndUpdateVideo(currentStory!);
-    } else if (currentUserIndex.value > 0) {
-      currentUserIndex.value--;
-      final previousUserStories = allStories[currentUserIndex.value].historias;
-      currentStoryIndex.value = previousUserStories.length - 1;
-      // ✅ NUEVO: Verificar y actualizar video
-      await checkAndUpdateVideo(currentStory!);
+      final updatedAllStories = List<GetStoriesEntity>.from(allStories);
+      updatedAllStories[userIndex] = updatedUser;
+      allStories.value = updatedAllStories;
+    } catch (e) {
+      showErrorSnackbar('No se pudo dar like a la historia');
     }
   }
 
@@ -520,10 +758,10 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
 
     try {
       await setStoryAsSeenUsecase.execute(currentStory!.id);
-      
+
       final userIndex = currentUserIndex.value;
       final storyIndex = currentStoryIndex.value;
-      
+
       final updatedStory = StoryEntity(
         id: currentStory!.id,
         tipoContenido: currentStory!.tipoContenido,
@@ -554,112 +792,72 @@ void initializeStoryModal(int userIndex, TickerProvider vsync) {
     }
   }
 
-  void pauseStory() {
-    progressController?.stop();
-    videoController?.pause();
+  // ────────────────────────────────────────────
+  // Helpers
+  // ────────────────────────────────────────────
+
+  List<StoryEntity> _sortStoriesByDate(List<StoryEntity> stories) {
+    final sorted = List<StoryEntity>.from(stories);
+    sorted.sort((a, b) {
+      try {
+        return a.fechaCreacion.compareTo(b.fechaCreacion);
+      } catch (_) {
+        return 0;
+      }
+    });
+    return sorted;
   }
 
-  void resumeStory() {
-    progressController?.forward();
-    videoController?.play();
-  }
-
-  double getMyStoryProgress() {
-    if (isViewingMyStory.value) {
-      return progressAnimation?.value ?? 0.0;
-    }
-    return 0.0;
-  }
-
-  double getMyStoryProgressAt(int index) {
-    if (!isViewingMyStory.value) return 0.0;
-    
-    if (index < currentMyStoryIndex.value) {
-      return 1.0;
-    } else if (index == currentMyStoryIndex.value) {
-      return progressAnimation?.value ?? 0.0;
-    } else {
-      return 0.0;
-    }
-  }
-
-  Future<void> likeStory() async {
-    if (currentStory == null) return;
-
+  String getTimeAgo(DateTime fechaCreacion) {
     try {
-      await addLikeToStoryUsecase.execute(currentStory!.id);
-      
-      final userIndex = currentUserIndex.value;
-      final storyIndex = currentStoryIndex.value;
-      
-      final updatedStory = StoryEntity(
-        id: currentStory!.id,
-        tipoContenido: currentStory!.tipoContenido,
-        urlContenido: currentStory!.urlContenido,
-        fechaCreacion: currentStory!.fechaCreacion,
-        fechaExpiracion: currentStory!.fechaExpiracion,
-        vistas: currentStory!.vistas,
-        likes: currentStory!.likes + 1,
-        yaVista: currentStory!.yaVista,
-        yaLikeada: true,
-      );
-      final updatedStories = List<StoryEntity>.from(currentUserStories);
-      updatedStories[storyIndex] = updatedStory;
-
-      final updatedUser = GetStoriesEntity(
-        doctorId: currentUser!.doctorId,
-        nombreDoctor: currentUser!.nombreDoctor,
-        fotoPerfilUrl: currentUser!.fotoPerfilUrl,
-        historias: updatedStories,
-      );
-
-      final updatedAllStories = List<GetStoriesEntity>.from(allStories);
-      updatedAllStories[userIndex] = updatedUser;
-      allStories.value = updatedAllStories;
-     // showSuccessSnackbar('Te gusta la historia de ${currentUser!.nombreDoctor} ❤️');
-    
-    } catch (e) {
-      showErrorSnackbar('No se pudo dar like a la historia');
-    }
-  }
-
-  double getStoryProgress(int index) {
-    if (index < currentStoryIndex.value) {
-      return 1.0;
-    } else if (index == currentStoryIndex.value) {
-      return progressAnimation?.value ?? 0.0;
-    } else {
-      return 0.0;
-    }
-  }
-String getTimeAgo(DateTime fechaCreacion) {
-  try {
-    final createdDate = fechaCreacion; 
-    final now = DateTime.now();
-    final difference = now.difference(createdDate);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m';
-    } else {
+      final diff = DateTime.now().difference(fechaCreacion);
+      if (diff.inDays > 0) return '${diff.inDays}d';
+      if (diff.inHours > 0) return '${diff.inHours}h';
+      if (diff.inMinutes > 0) return '${diff.inMinutes}m';
       return 'Ahora';
+    } catch (_) {
+      return '';
     }
-  } catch (e) {
-    debugPrint('Error parsing date: $e');
-    return '';
   }
-}
-  bool hasStories(int index) {
-    return index < allStories.length && allStories[index].historias.isNotEmpty;
+
+  String getContentType(String filePath) {
+    final ext = filePath.toLowerCase().split('.').last;
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].contains(ext)) {
+      return 'imagen';
+    }
+    if (['mp4', 'mov', 'avi', 'mkv', 'flv', 'wmv', 'webm', '3gp']
+        .contains(ext)) {
+      return 'video';
+    }
+    return 'imagen';
   }
+
+  bool hasStories(int index) =>
+      index < allStories.length && allStories[index].historias.isNotEmpty;
 
   bool hasViewedAllStories(int index) {
     if (index >= allStories.length) return false;
-    final stories = allStories[index].historias;
-    return stories.every((story) => story.yaVista);
+    return allStories[index].historias.every((s) => s.yaVista);
   }
-  
+
+  bool hasUnviewedStories(int index) {
+    if (index >= allStories.length) return false;
+    return allStories[index].historias.any((s) => !s.yaVista);
+  }
+
+  String? getUserProfileImage(int index) {
+    if (index >= allStories.length) return null;
+    return allStories[index].fotoPerfilUrl;
+  }
+
+  String? getUserName(int index) {
+    if (index >= allStories.length) return null;
+    return allStories[index].nombreDoctor;
+  }
+
+  String get activeUserName =>
+      isViewingMyStory.value ? 'Mi historia' : currentUser?.nombreDoctor ?? '';
+
+  String get activeUserImage =>
+      isViewingMyStory.value ? '' : currentUser?.fotoPerfilUrl ?? '';
 }

@@ -6,12 +6,17 @@ import 'package:gerena/features/stories/presentation/page/story_controller.dart'
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:video_player/video_player.dart';
 
 void showStoryModal(
   BuildContext context, {
   required int userIndex,
   bool isMyStory = false,
-}) async {
+}) {
   Navigator.of(context).push(
     PageRouteBuilder(
       opaque: false,
@@ -22,10 +27,7 @@ void showStoryModal(
         );
       },
       transitionsBuilder: (_, animation, __, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
     ),
   );
@@ -61,6 +63,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
 
   @override
   void dispose() {
+    controller.disposeStoryModal();
     super.dispose();
   }
 
@@ -82,8 +85,9 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
         if (!controller.isModalActive.value) {
           return const SizedBox.shrink();
         }
+
         final isViewingMyStory = controller.isViewingMyStory.value;
-        final currentStory = isViewingMyStory 
+        final currentStory = isViewingMyStory
             ? controller.currentMyStory
             : controller.currentStory;
 
@@ -98,11 +102,29 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
             height: screenHeight,
             child: Stack(
               children: [
+                // ── Contenido (imagen o video) ─────────────
+                // ✅ _buildStoryContent NO recibe story como parámetro
+                // para evitar que quede "congelado" con la historia anterior
                 Positioned.fill(
-                  child: _buildStoryContent(currentStory),
+                  child: _buildStoryContent(),
                 ),
 
-                // Header
+                // ── Overlay de carga ──────────────────────
+                Obx(() {
+                  if (!controller.isContentLoading.value) {
+                    return const SizedBox.shrink();
+                  }
+                  return Positioned.fill(
+                    child: Container(
+                      color: Colors.black.withOpacity(0.55),
+                      child: const Center(
+                       
+                      ),
+                    ),
+                  );
+                }),
+
+                // ── Header con barra de progreso ──────────
                 Positioned(
                   top: -30,
                   left: 0,
@@ -127,77 +149,22 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Barra de progreso
+                        // Barras de progreso
                         if (isViewingMyStory) ...[
-                          Row(
-                            children: List.generate(
-                              controller.myStories.length,
-                              (index) => Expanded(
-                                child: Container(
-                                  height: 3,
-                                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  child: AnimatedBuilder(
-                                    animation: controller.progressAnimation!,
-                                    builder: (context, child) {
-                                      return Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: FractionallySizedBox(
-                                          widthFactor: controller.getMyStoryProgressAt(index),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(2),
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
+                          _buildProgressBars(
+                            count: controller.myStories.length,
+                            getProgress: controller.getMyStoryProgressAt,
                           ),
                         ] else ...[
-                          Row(
-                            children: List.generate(
-                              controller.currentUserStories.length,
-                              (index) => Expanded(
-                                child: Container(
-                                  height: 3,
-                                  margin: const EdgeInsets.symmetric(horizontal: 1),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  child: AnimatedBuilder(
-                                    animation: controller.progressAnimation!,
-                                    builder: (context, child) {
-                                      return Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: FractionallySizedBox(
-                                          widthFactor: controller.getStoryProgress(index),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(2),
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
+                          _buildProgressBars(
+                            count: controller.currentUserStories.length,
+                            getProgress: controller.getStoryProgress,
                           ),
                         ],
+
                         const SizedBox(height: 16),
 
-                        // Info del usuario con tiempo transcurrido
+                        // Info del usuario
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -206,14 +173,10 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                               height: 40,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
                               ),
-                              child: ClipOval(
-                                child: _fallbackIcon(),
-                              ),
+                              child: ClipOval(child: _buildUserAvatar(isViewingMyStory),),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -221,9 +184,11 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    isViewingMyStory 
-                                        ? "Mi historia" 
-                                        : controller.currentUser!.nombreDoctor,
+                                    isViewingMyStory
+                                        ? 'Mi historia'
+                                        : controller
+                                                .currentUser?.nombreDoctor ??
+                                            '',
                                     style: GoogleFonts.rubik(
                                       color: Colors.white,
                                       fontSize: 16,
@@ -237,9 +202,9 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                                       ],
                                     ),
                                   ),
-                                  // ✅ NUEVO: Mostrar tiempo transcurrido
                                   Text(
-                                    controller.getTimeAgo(currentStory.fechaCreacion),
+                                    controller
+                                        .getTimeAgo(currentStory.fechaCreacion),
                                     style: GoogleFonts.rubik(
                                       color: Colors.white.withOpacity(0.8),
                                       fontSize: 12,
@@ -256,7 +221,6 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                                 ],
                               ),
                             ),
-                            
                             GestureDetector(
                               onTap: () {
                                 controller.disposeStoryModal();
@@ -279,6 +243,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                   ),
                 ),
 
+                // ── Footer ────────────────────────────────
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -293,14 +258,14 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                     ),
                     child: SizedBox(
                       height: 50,
-                      child: isViewingMyStory 
+                      child: isViewingMyStory
                           ? _buildMyStoryFooter(currentStory)
                           : _buildOtherStoryFooter(currentStory),
                     ),
                   ),
                 ),
-               
-                // Áreas de navegación
+
+                // ── Área izquierda (anterior) ─────────────
                 Positioned(
                   top: 110,
                   bottom: 76 + MediaQuery.of(context).padding.bottom,
@@ -315,11 +280,12 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                       }
                     },
                     onLongPress: () => controller.pauseStory(),
-                    onLongPressEnd: (details) => controller.resumeStory(),
+                    onLongPressEnd: (_) => controller.resumeStory(),
                     child: Container(color: Colors.transparent),
                   ),
                 ),
 
+                // ── Área derecha (siguiente) ──────────────
                 Positioned(
                   top: 110,
                   bottom: 76 + MediaQuery.of(context).padding.bottom,
@@ -334,11 +300,12 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                       }
                     },
                     onLongPress: () => controller.pauseStory(),
-                    onLongPressEnd: (details) => controller.resumeStory(),
+                    onLongPressEnd: (_) => controller.resumeStory(),
                     child: Container(color: Colors.transparent),
                   ),
                 ),
 
+                // ── Centro (solo pausa) ───────────────────
                 Positioned(
                   top: 110,
                   bottom: 76 + MediaQuery.of(context).padding.bottom,
@@ -346,7 +313,7 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
                   right: screenWidth * 0.3,
                   child: GestureDetector(
                     onLongPress: () => controller.pauseStory(),
-                    onLongPressEnd: (details) => controller.resumeStory(),
+                    onLongPressEnd: (_) => controller.resumeStory(),
                     child: Container(color: Colors.transparent),
                   ),
                 ),
@@ -358,81 +325,111 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
     );
   }
 
-  Widget _fallbackIcon() {
-    return Container(
-      color: GerenaColors.backgroundColor,
-      child: const Center(
-        child: Icon(
-          Icons.person,
-          size: 20,
-          color: Colors.grey,
-        ),
-      ),
+  // ── Barras de progreso ────────────────────────
+
+  Widget _buildProgressBars({
+    required int count,
+    required double Function(int) getProgress,
+  }) {
+    return Row(
+      children: List.generate(count, (index) {
+        return Expanded(
+          child: Container(
+            height: 3,
+            margin: const EdgeInsets.symmetric(horizontal: 1),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(2),
+              color: Colors.white.withOpacity(0.3),
+            ),
+            child: _ProgressSegment(
+              controller: controller,
+              index: index,
+              getProgress: getProgress,
+            ),
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildStoryContent(StoryEntity story) {
-    final isVideo = story.tipoContenido.toLowerCase() == 'video';
+  // ── Contenido ────────────────────────────────
+  // ✅ Lee todo desde el controller via Obx,
+  //    sin recibir StoryEntity como parámetro.
+  //    Así cuando cambia la historia el Obx
+  //    reconstruye con el controller correcto.
+  Widget _buildStoryContent() {
+    return Obx(() {
+      // Leer la historia activa en este momento
+      final isViewingMyStory = controller.isViewingMyStory.value;
+      final story = isViewingMyStory
+          ? controller.currentMyStory
+          : controller.currentStory;
 
-    if (isVideo) {
-      return Obx(() {
-        if (controller.videoController != null && controller.isVideoInitialized.value) {
+      if (story == null) {
+        return Container(color: Colors.black);
+      }
+
+      final isVideo = story.tipoContenido.toLowerCase() == 'video';
+
+      if (isVideo) {
+        // ✅ Leer el Rx del controller — se reconstruye cuando cambia
+        final videoCtrl = controller.videoControllerRx.value;
+        final initialized = controller.isVideoInitialized.value;
+
+        if (initialized &&
+            videoCtrl != null &&
+            videoCtrl.value.isInitialized) {
           return Center(
             child: AspectRatio(
-              aspectRatio: controller.videoController!.value.aspectRatio,
-              child: VideoPlayer(controller.videoController!),
-            ),
-          );
-        } else {
-          return Container(
-            color: Colors.grey[900],
-            child: const Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(color: Colors.white),
-                  SizedBox(height: 16),
-                  Text(
-                    'Cargando video...',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
+              aspectRatio: videoCtrl.value.aspectRatio,
+              child: VideoPlayer(videoCtrl),
             ),
           );
         }
-      });
-    } else {
-      return Image.network(
-        story.urlContenido,
+
+        // Mientras carga el video
+        return Container(
+          color: Colors.grey[900],
+          child: const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Colors.white),
+                SizedBox(height: 16),
+                Text(
+                  'Cargando video...',
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // Imagen
+      return CachedNetworkImage(
+        imageUrl: story.urlContenido,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey[800],
-            child: const Center(
-              child: Icon(
-                Icons.error_outline,
-                color: Colors.white,
-                size: 50,
-              ),
-            ),
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: Colors.grey[900],
-            child: const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            ),
-          );
-        },
+        width: double.infinity,
+        height: double.infinity,
+        fadeInDuration: Duration.zero,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[900],
+          child: const Center(
+           
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.grey[800],
+          child: const Center(
+            child: Icon(Icons.error_outline, color: Colors.white, size: 50),
+          ),
+        ),
       );
-    }
+    });
   }
+
+  // ── Footer: mi historia ───────────────────────
 
   Widget _buildMyStoryFooter(StoryEntity story) {
     return Row(
@@ -440,60 +437,19 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.visibility,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${story.vistas}',
-                    style: GoogleFonts.rubik(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            _statChip(
+              icon: Icons.visibility,
+              iconColor: Colors.white,
+              value: '${story.vistas}',
             ),
             const SizedBox(width: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.favorite,
-                    color: Colors.red,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${story.likes}',
-                    style: GoogleFonts.rubik(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+            _statChip(
+              icon: Icons.favorite,
+              iconColor: Colors.red,
+              value: '${story.likes}',
             ),
           ],
         ),
-        
         GestureDetector(
           onTap: () => _showDeleteOptions(context),
           child: Container(
@@ -502,16 +458,42 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
               color: Colors.black.withOpacity(0.4),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.more_vert,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: const Icon(Icons.more_vert, color: Colors.white, size: 24),
           ),
         ),
       ],
     );
   }
+
+  Widget _statChip({
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 6),
+          Text(
+            value,
+            style: GoogleFonts.rubik(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Footer: historia de otro ──────────────────
 
   Widget _buildOtherStoryFooter(StoryEntity story) {
     return Align(
@@ -526,20 +508,14 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
           ),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
-            transitionBuilder: (child, animation) {
-              return ScaleTransition(
-                scale: animation,
-                child: child,
-              );
-            },
+            transitionBuilder: (child, animation) =>
+                ScaleTransition(scale: animation, child: child),
             child: Image.asset(
-              story.yaLikeada 
+              story.yaLikeada
                   ? 'assets/icons/favorite.png'
                   : 'assets/icons/favorite_border.png',
               key: ValueKey(story.yaLikeada),
-              color: story.yaLikeada 
-                  ? Colors.red
-                  : Colors.white,
+              color: story.yaLikeada ? Colors.red : Colors.white,
               width: 26,
               height: 26,
             ),
@@ -548,6 +524,52 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
       ),
     );
   }
+
+  // ── Fallback avatar ───────────────────────────
+
+  Widget _fallbackIcon() {
+    return Container(
+      color: GerenaColors.backgroundColor,
+      child: const Center(
+        child: Icon(Icons.person, size: 20, color: Colors.grey),
+      ),
+    );
+  }
+Widget _buildUserAvatar(bool isViewingMyStory) {
+  if (isViewingMyStory) {
+    // ── Mi historia → foto del usuario logueado ──
+    final PrefilDortorController userController = Get.find<PrefilDortorController>();
+    final userPhoto = userController.doctorProfile.value?.foto;
+
+    if (userPhoto != null && userPhoto.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: userPhoto,
+        fit: BoxFit.cover,
+        width: 40,
+        height: 40,
+        placeholder: (_, __) => _fallbackIcon(),
+        errorWidget: (_, __, ___) => _fallbackIcon(),
+      );
+    }
+    return _fallbackIcon();
+  }
+
+  // ── Historia de otro usuario → fotoPerfilUrl de GetStoriesEntity ──
+  final fotoUrl = controller.currentUser?.fotoPerfilUrl;
+
+  if (fotoUrl != null && fotoUrl.isNotEmpty) {
+    return CachedNetworkImage(
+      imageUrl: fotoUrl,
+      fit: BoxFit.cover,
+      width: 40,
+      height: 40,
+      placeholder: (_, __) => _fallbackIcon(),
+      errorWidget: (_, __, ___) => _fallbackIcon(),
+    );
+  }
+  return _fallbackIcon();
+}
+  // ── Diálogos eliminar ─────────────────────────
 
   void _showDeleteOptions(BuildContext context) {
     showModalBottomSheet(
@@ -575,24 +597,17 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
             ),
             const SizedBox(height: 20),
             ListTile(
-              leading: const Icon(
-                Icons.delete,
-                color: Colors.red,
-              ),
-              title: const Text(
-                'Eliminar historia',
-                style: TextStyle(color: Colors.red),
-              ),
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Eliminar historia',
+                  style: TextStyle(color: Colors.red)),
               onTap: () {
                 Get.back();
                 _confirmDeleteStory(context);
               },
             ),
             ListTile(
-              leading: Icon(
-                Icons.close,
-                color: GerenaColors.textSecondaryColor,
-              ),
+              leading:
+                  Icon(Icons.close, color: GerenaColors.textSecondaryColor),
               title: const Text('Cancelar'),
               onTap: () => Get.back(),
             ),
@@ -606,30 +621,100 @@ class _StoryModalWidgetState extends State<StoryModalWidget>
   void _confirmDeleteStory(BuildContext context) {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         title: const Text('Eliminar historia'),
-        content: const Text('¿Estás seguro de que deseas eliminar tu historia? Esta acción no se puede deshacer.'),
+        content: const Text(
+            '¿Estás seguro de que deseas eliminar tu historia? Esta acción no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text(
-              'Cancelar',
-              style: TextStyle(color: GerenaColors.textSecondaryColor),
-            ),
+            child: Text('Cancelar',
+                style: TextStyle(color: GerenaColors.textSecondaryColor)),
           ),
           TextButton(
             onPressed: () async {
               Get.back();
               await controller.deleteMyStory();
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Eliminar'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// _ProgressSegment
+// ─────────────────────────────────────────────
+class _ProgressSegment extends StatefulWidget {
+  final StoryController controller;
+  final int index;
+  final double Function(int) getProgress;
+
+  const _ProgressSegment({
+    required this.controller,
+    required this.index,
+    required this.getProgress,
+  });
+
+  @override
+  State<_ProgressSegment> createState() => _ProgressSegmentState();
+}
+
+class _ProgressSegmentState extends State<_ProgressSegment> {
+  Animation<double>? _currentAnimation;
+  Worker? worker;
+
+  @override
+  void initState() {
+    super.initState();
+    worker = ever(widget.controller.isContentLoading, (_) {
+      _reattachAnimation();
+    });
+    _reattachAnimation();
+  }
+
+  void _reattachAnimation() {
+    final anim = widget.controller.progressAnimation;
+    if (anim == _currentAnimation) return;
+
+    _currentAnimation?.removeListener(_onAnimationTick);
+    _currentAnimation = anim;
+    _currentAnimation?.addListener(_onAnimationTick);
+
+    if (mounted) setState(() {});
+  }
+
+  void _onAnimationTick() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    worker?.dispose();
+    _currentAnimation?.removeListener(_onAnimationTick);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = widget.controller.isContentLoading.value
+        ? 0.0
+        : widget.getProgress(widget.index);
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: progress.clamp(0.0, 1.0),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }
