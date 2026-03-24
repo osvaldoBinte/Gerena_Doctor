@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:gerena/common/services/auth_service.dart';
-import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/marketplace/domain/entities/payment/payment_method_entity.dart';
 import 'package:gerena/features/marketplace/domain/usecase/payment/attach_payment_method_to_customer_usecase.dart';
@@ -29,7 +28,7 @@ class PaymentCartController extends GetxController {
     required this.attachPaymentMethodToCustomerUsecase,
     required this.deletePaymentMethodUsecase,
     required this.savecardUsecase,
-    required this.deletePaymentMethodBackUsecase
+    required this.deletePaymentMethodBackUsecase,
   });
 
   // Observables
@@ -37,29 +36,35 @@ class PaymentCartController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool isProcessing = false.obs;
   final RxString customerId = ''.obs;
+
+  // CardField solo para iOS
   final Rx<CardFieldInputDetails?> cardDetails = Rx<CardFieldInputDetails?>(null);
-  
+
   // Text Controllers
   final nameController = TextEditingController();
   final cardNumberController = TextEditingController();
   final expiryController = TextEditingController();
   final cvcController = TextEditingController();
 
-  // Para validación manual
+  // Validación manual (Android + Desktop)
   final RxBool isManualCardValid = false.obs;
 
-  // Detectar si es plataforma móvil
+  // Detectar plataforma
   bool get isMobilePlatform {
     if (kIsWeb) return false;
     return Platform.isAndroid || Platform.isIOS;
+  }
+
+  // 👇 iOS usa CardField nativo, Android y Desktop usan campos manuales
+  bool get useNativeCardField {
+    if (kIsWeb) return false;
+    return Platform.isIOS;
   }
 
   @override
   void onInit() {
     super.onInit();
     loadPaymentMethods();
-    
-    // Escuchar cambios en los campos manuales para validación
     cardNumberController.addListener(_validateManualCard);
     expiryController.addListener(_validateManualCard);
     cvcController.addListener(_validateManualCard);
@@ -74,13 +79,12 @@ class PaymentCartController extends GetxController {
     super.onClose();
   }
 
-  /// Validar campos manuales
+  /// Validar campos manuales (Android + Desktop)
   void _validateManualCard() {
     final cardNumber = cardNumberController.text.replaceAll(' ', '');
     final expiry = expiryController.text;
     final cvc = cvcController.text;
 
-    // Validación básica
     final isCardNumberValid = cardNumber.length >= 15 && cardNumber.length <= 16;
     final isExpiryValid = expiry.length == 5 && expiry.contains('/');
     final isCvcValid = cvc.length >= 3 && cvc.length <= 4;
@@ -88,7 +92,7 @@ class PaymentCartController extends GetxController {
     isManualCardValid.value = isCardNumberValid && isExpiryValid && isCvcValid;
   }
 
-  /// Actualizar los detalles de la tarjeta desde el CardFormField (móvil)
+  /// Actualizar detalles desde CardField (solo iOS)
   void updateCardDetails(CardFieldInputDetails? details) {
     cardDetails.value = details;
     print('📝 Card changed: complete=${details?.complete}');
@@ -96,11 +100,12 @@ class PaymentCartController extends GetxController {
 
   /// Validar si la tarjeta está completa
   bool get isCardValid {
-    if (isMobilePlatform) {
+    if (useNativeCardField) {
+      // iOS: usar CardField
       return cardDetails.value?.complete == true;
-    } else {
-      return isManualCardValid.value;
     }
+    // Android + Desktop: usar campos manuales
+    return isManualCardValid.value;
   }
 
   /// Cargar métodos de pago
@@ -109,7 +114,7 @@ class PaymentCartController extends GetxController {
       print('📥 Cargando métodos de pago...');
       isLoading.value = true;
 
-      customerId.value = await authService.getStripeCustomerId() ?? 
+      customerId.value = await authService.getStripeCustomerId() ??
           (throw Exception('No se encontró el ID de cliente de Stripe.'));
       print('👤 Customer ID: ${customerId.value}');
 
@@ -135,16 +140,15 @@ class PaymentCartController extends GetxController {
 
     try {
       print('💳 Iniciando proceso de agregar tarjeta...');
-      
-      final cardholderName = nameController.text.isNotEmpty 
-          ? nameController.text 
+      final cardholderName = nameController.text.isNotEmpty
+          ? nameController.text
           : null;
 
-      if (isMobilePlatform) {
-        // Usar CardFormField nativo
+      if (useNativeCardField) {
+        // iOS: CardField nativo → createPaymentMethodUsecase usa el CardField internamente
         await addPaymentMethod(cardholderName: cardholderName);
       } else {
-        // Usar campos manuales para escritorio
+        // Android + Desktop: campos manuales → Stripe.instance.createPaymentMethod
         await addPaymentMethodManual(cardholderName: cardholderName);
       }
 
@@ -154,10 +158,10 @@ class PaymentCartController extends GetxController {
       expiryController.clear();
       cvcController.clear();
       cardDetails.value = null;
+      isManualCardValid.value = false;
 
       print('✅ Proceso completado exitosamente');
       return true;
-      
     } catch (e) {
       print('❌ Error en handleAddCard: $e');
       return false;
@@ -166,12 +170,12 @@ class PaymentCartController extends GetxController {
     }
   }
 
-  /// Agregar payment method con CardFormField (móvil)
+  /// Agregar payment method con CardField (solo iOS)
   Future<void> addPaymentMethod({String? cardholderName}) async {
     try {
       isLoading.value = true;
 
-      print('💳 Paso 1: Creando payment method...');
+      print('💳 Paso 1: Creando payment method (iOS CardField)...');
       final paymentMethod = await createPaymentMethodUsecase.execute(
         cardholderName: cardholderName,
       );
@@ -199,112 +203,106 @@ class PaymentCartController extends GetxController {
     }
   }
 
-  /// Agregar payment method manualmente (escritorio)
-  Future<void> addPaymentMethodManual({String? cardholderName}) async {
-    try {
-      isLoading.value = true;
+ Future<void> addPaymentMethodManual({String? cardholderName}) async {
+  try {
+    isLoading.value = true;
 
-    
-      // Crear PaymentMethod usando Stripe SDK
-      final billingDetails = BillingDetails(
-        name: cardholderName,
-      );
+    final rawNumber = cardNumberController.text.replaceAll(' ', '');
+    final expiryParts = expiryController.text.split('/');
+    final expMonth = int.tryParse(expiryParts[0]) ?? 0;
+    final expYearShort = int.tryParse(
+      expiryParts.length > 1 ? expiryParts[1] : '',
+    ) ?? 0;
+    final expYear = expYearShort < 100 ? 2000 + expYearShort : expYearShort;
+    final cvc = cvcController.text;
 
-      final paymentMethodParams = PaymentMethodParams.card(
+    print('💳 Paso 1: Inyectando datos de tarjeta...');
+    await Stripe.instance.dangerouslyUpdateCardDetails(
+      CardDetails(
+        number: rawNumber,
+        expirationMonth: expMonth,
+        expirationYear: expYear,
+        cvc: cvc,
+      ),
+    );
+
+    print('💳 Paso 2: Creando payment method...');
+    final billingDetails = BillingDetails(name: cardholderName);
+
+    final paymentMethodResult = await Stripe.instance.createPaymentMethod(
+      params: PaymentMethodParams.card(
         paymentMethodData: PaymentMethodData(
           billingDetails: billingDetails,
         ),
+      ),
+    );
+    print('✅ Payment method creado: ${paymentMethodResult.id}');
+
+    print('🔗 Paso 3: Adjuntando al customer...');
+    await attachPaymentMethodToCustomerUsecase.execute(
+      paymentMethodId: paymentMethodResult.id,
+      customerId: customerId.value,
+    );
+    print('✅ Payment method adjuntado');
+
+    print('💾 Paso 4: Guardando en backend...');
+    await savecardUsecase.execute(paymentMethodResult.id);
+    print('✅ Tarjeta guardada en backend');
+
+    // 👇 Recargar lista desde backend para evitar problemas Entity vs Model
+    await loadPaymentMethods();
+    showSuccessSnackbar('Tarjeta agregada correctamente');
+
+  } catch (e) {
+    print('❌ Error: $e');
+    showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
+    rethrow;
+  } finally {
+    isLoading.value = false;
+  }
+}
+  /// Eliminar payment method
+  Future<void> deletePaymentMethod(String backendId, {String? stripeId}) async {
+    try {
+      print('🗑️ Eliminando tarjeta...');
+      print('📍 Backend ID: $backendId');
+      print('📍 Stripe ID: $stripeId');
+      isLoading.value = true;
+
+      final paymentMethod = paymentMethods.firstWhere(
+        (pm) => pm.id == backendId,
+        orElse: () => throw Exception('Tarjeta no encontrada'),
       );
 
-      // Crear el payment method
-      final paymentMethodResult = await Stripe.instance.createPaymentMethod(
-        params: paymentMethodParams,
-      );
+      final stripePaymentId = stripeId ?? paymentMethod.paymentMethodId;
 
-      print('✅ Payment method creado: ${paymentMethodResult.id}');
+      if (stripePaymentId == null) {
+        throw Exception('No se encontró el ID de Stripe para esta tarjeta');
+      }
 
-      print('🔗 Paso 2: Adjuntando al customer...');
-      await attachPaymentMethodToCustomerUsecase.execute(
-        paymentMethodId: paymentMethodResult.id,
-        customerId: customerId.value,
-      );
-      print('✅ Payment method adjuntado');
+      print('🔹 Paso 1: Eliminando de Stripe ($stripePaymentId)...');
+      await deletePaymentMethodUsecase.execute(stripePaymentId);
+      print('✅ Eliminado de Stripe');
 
-      print('💾 Paso 3: Guardando tarjeta en backend...');
-      await savecardUsecase.execute(paymentMethodResult.id);
-      print('✅ Tarjeta guardada en backend');
+      print('🔹 Paso 2: Eliminando del backend (ID: $backendId)...');
+      final backendIdInt = int.tryParse(backendId);
+      if (backendIdInt == null) throw Exception('ID del backend inválido');
+      await deletePaymentMethodBackUsecase.execute(backendIdInt);
+      print('✅ Eliminado del backend');
 
-      // Convertir a entidad y agregar a la lista
-      final paymentMethodEntity = PaymentMethodEntity(
-        id: paymentMethodResult.id,
-        last4: paymentMethodResult.card.last4 ?? '',
-        brand: paymentMethodResult.card.brand ?? 'unknown',
-        expMonth: paymentMethodResult.card.expMonth ?? 0,
-        expYear: paymentMethodResult.card.expYear ?? 0,
-        cardholderName: cardholderName,
-      );
-
-      paymentMethods.add(paymentMethodEntity);
-      showSuccessSnackbar('Tarjeta agregada correctamente');
+      paymentMethods.removeWhere((pm) => pm.id == backendId);
+      showSuccessSnackbar('Tarjeta eliminada correctamente');
     } catch (e) {
-      print('❌ Error: $e');
+      print('❌ Error al eliminar: $e');
       showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
-      rethrow;
     } finally {
       isLoading.value = false;
     }
   }
 
-/// Eliminar payment method (tanto de Stripe como del backend)
-Future<void> deletePaymentMethod(String backendId, {String? stripeId}) async {
-  try {
-    print('🗑️ Eliminando tarjeta...');
-    print('📍 Backend ID: $backendId');
-    print('📍 Stripe ID: $stripeId');
-    isLoading.value = true;
-
-    // Buscar la tarjeta en la lista para obtener el Stripe ID si no se proporcionó
-    final paymentMethod = paymentMethods.firstWhere(
-      (pm) => pm.id == backendId,
-      orElse: () => throw Exception('Tarjeta no encontrada'),
-    );
-
-    final stripePaymentId = stripeId ?? paymentMethod.paymentMethodId;
-
-    if (stripePaymentId == null) {
-      throw Exception('No se encontró el ID de Stripe para esta tarjeta');
-    }
-
-    // ✅ Paso 1: Eliminar de Stripe
-    print('🔹 Paso 1: Eliminando de Stripe ($stripePaymentId)...');
-    await deletePaymentMethodUsecase.execute(stripePaymentId);
-    print('✅ Eliminado de Stripe');
-
-    // ✅ Paso 2: Eliminar del backend
-    print('🔹 Paso 2: Eliminando del backend (ID: $backendId)...');
-    final backendIdInt = int.tryParse(backendId);
-    if (backendIdInt == null) {
-      throw Exception('ID del backend inválido');
-    }
-    await deletePaymentMethodBackUsecase.execute(backendIdInt);
-    print('✅ Eliminado del backend');
-
-    // ✅ Paso 3: Remover de la lista local
-    paymentMethods.removeWhere((pm) => pm.id == backendId);
-
-    showSuccessSnackbar('Tarjeta eliminada correctamente');
-  } catch (e) {
-    print('❌ Error al eliminar: $e');
-    showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
-  } finally {
-    isLoading.value = false;
-  }
-}
-
   /// Formatear número de tarjeta para display
   String formatCardNumber(String last4, String brand) {
-    String brandPrefix = '';
-
+    String brandPrefix;
     switch (brand.toLowerCase()) {
       case 'visa':
         brandPrefix = 'VISA';
@@ -318,7 +316,6 @@ Future<void> deletePaymentMethod(String backendId, {String? stripeId}) async {
       default:
         brandPrefix = brand.toUpperCase();
     }
-
     return '$brandPrefix •••• $last4';
   }
 }

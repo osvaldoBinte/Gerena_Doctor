@@ -1,3 +1,4 @@
+import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/features/publications/domain/entities/myposts/publication_entity.dart';
 import 'package:gerena/features/review/domain/usecase/my_review_usecase.dart';
 import 'package:get/get.dart';
@@ -27,7 +28,7 @@ class ReviewController extends GetxController {
       reviews.value = result;
       
     } catch (e) {
-      errorMessage.value = 'Error al cargar las reseñas: $e';
+      errorMessage.value =  cleanExceptionMessage(e);
       print('Error en loadReviews: $e');
     } finally {
       isLoading.value = false;

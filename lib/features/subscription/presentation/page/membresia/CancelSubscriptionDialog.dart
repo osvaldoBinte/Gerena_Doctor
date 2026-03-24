@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:get/get.dart';
 
@@ -7,7 +8,8 @@ class CancelSubscriptionDialog extends StatefulWidget {
   const CancelSubscriptionDialog({Key? key}) : super(key: key);
 
   @override
-  State<CancelSubscriptionDialog> createState() => _CancelSubscriptionDialogState();
+  State<CancelSubscriptionDialog> createState() =>
+      _CancelSubscriptionDialogState();
 }
 
 class _CancelSubscriptionDialogState extends State<CancelSubscriptionDialog> {
@@ -31,7 +33,8 @@ class _CancelSubscriptionDialogState extends State<CancelSubscriptionDialog> {
       child: Container(
         constraints: BoxConstraints(
           maxWidth: 500,
-          maxHeight: MediaQuery.of(context).size.height * 0.85, // 👈 Límite de altura
+          maxHeight:
+              MediaQuery.of(context).size.height * 0.85, // 👈 Límite de altura
         ),
         padding: const EdgeInsets.all(24),
         child: Obx(() {
@@ -57,7 +60,8 @@ class _CancelSubscriptionDialogState extends State<CancelSubscriptionDialog> {
             );
           }
 
-          return SingleChildScrollView( // 👈 Scroll agregado
+          return SingleChildScrollView(
+            // 👈 Scroll agregado
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +158,9 @@ class _CancelSubscriptionDialogState extends State<CancelSubscriptionDialog> {
                         ? 'Tu suscripción se cancelará ahora y perderás el acceso de inmediato'
                         : 'Tu suscripción se mantendrá hasta el final del período actual',
                     style: GerenaColors.bodySmall.copyWith(
-                      color: cancelImmediately ? Colors.red : GerenaColors.textSecondaryColor,
+                      color: cancelImmediately
+                          ? Colors.red
+                          : GerenaColors.textSecondaryColor,
                     ),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
@@ -166,60 +172,49 @@ class _CancelSubscriptionDialogState extends State<CancelSubscriptionDialog> {
                 const Divider(),
                 const SizedBox(height: 16),
 
-                // Botones de acción
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: GerenaColors.primaryColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final reason = reasonController.text.trim();
+
+                        if (reason.isEmpty) {
+                          showErrorSnackbar(
+                              'Por favor indica el motivo de la cancelación');
+                          return;
+                        }
+
+                        Navigator.pop(context);
+                        await controller.cancelSubscription(
+                            cancelImmediately, reason);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          'Mantener suscripción',
-                          style: TextStyle(color: GerenaColors.primaryColor),
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        'Cancelar suscripción',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final reason = reasonController.text.trim();
-                          
-                          if (reason.isEmpty) {
-                            Get.snackbar(
-                              'Campo requerido',
-                              'Por favor indica el motivo de la cancelación',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.orange,
-                              colorText: Colors.white,
-                            );
-                            return;
-                          }
-
-                          // Cerrar diálogo
-                          Navigator.pop(context);
-                          
-                          // Ejecutar cancelación
-                          await controller.cancelSubscription(cancelImmediately, reason);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: GerenaColors.primaryColor),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          'Cancelar suscripción',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text(
+                        'Mantener suscripción',
+                        style: TextStyle(color: GerenaColors.primaryColor),
                       ),
                     ),
                   ],

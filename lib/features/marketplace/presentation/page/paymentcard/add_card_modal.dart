@@ -53,11 +53,9 @@ class AddCardModal extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // ⚠️ Mensaje para plataforma desktop
               if (GetPlatform.isDesktop)
                 _buildDesktopWarning()
               else
-                // 📱 Formulario completo para móvil
                 _buildMobileForm(controller, context),
             ],
           ),
@@ -66,7 +64,6 @@ class AddCardModal extends StatelessWidget {
     );
   }
 
-  /// Widget de advertencia para desktop
   Widget _buildDesktopWarning() {
     return Column(
       children: [
@@ -82,11 +79,7 @@ class AddCardModal extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(
-                Icons.smartphone,
-                size: 64,
-                color: GerenaColors.primaryColor,
-              ),
+              Icon(Icons.smartphone, size: 64, color: GerenaColors.primaryColor),
               const SizedBox(height: 16),
               Text(
                 'Agregar tarjetas solo en móvil',
@@ -99,7 +92,7 @@ class AddCardModal extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Por seguridad y cumplimiento con las políticas  '
+                'Por seguridad y cumplimiento con las políticas '
                 'la función de agregar tarjetas solo está disponible en la aplicación móvil.',
                 style: GoogleFonts.rubik(
                   fontSize: 14,
@@ -117,19 +110,12 @@ class AddCardModal extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: GerenaColors.primaryColor,
-                      size: 20,
-                    ),
+                    Icon(Icons.info_outline, color: GerenaColors.primaryColor, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Descarga la app móvil de Gerena para gestionar tus métodos de pago',
-                        style: GoogleFonts.rubik(
-                          fontSize: 12,
-                          color: GerenaColors.textPrimaryColor,
-                        ),
+                        style: GoogleFonts.rubik(fontSize: 12, color: GerenaColors.textPrimaryColor),
                       ),
                     ),
                   ],
@@ -153,7 +139,6 @@ class AddCardModal extends StatelessWidget {
     );
   }
 
-  /// Formulario completo para móvil
   Widget _buildMobileForm(PaymentCartController controller, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,43 +186,31 @@ class AddCardModal extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        // CardFormField para móvil
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: GerenaColors.colorinput,
-              width: 1.5,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: CardFormField(
-            onCardChanged: (details) => controller.updateCardDetails(details),
-            style: CardFormStyle(
-              borderColor: Colors.black,
-              textColor: Colors.black,
-              fontSize: 16,
-              placeholderColor: Colors.grey.shade600,
-              backgroundColor:  GerenaColors.secondaryColor,
-              cursorColor: Colors.black,
-            ),
-            enablePostalCode: false,
-          ),
-        ),
+        // 👇 iOS usa CardField nativo, Android usa campos manuales
+        if (controller.useNativeCardField)
+          _buildIOSCardField(controller)
+        else
+          _buildAndroidCardFields(controller),
+
         const SizedBox(height: 15),
 
         // Indicador de validez
         Obx(() {
+          // 👇 Leer ambos observables para que Obx se suscriba
+          final _ = controller.cardDetails.value;
+          final __ = controller.isManualCardValid.value;
           final isValid = controller.isCardValid;
-          if (!isValid && controller.cardDetails.value == null) {
+
+          if (!isValid &&
+              controller.cardDetails.value == null &&
+              !controller.isManualCardValid.value) {
             return const SizedBox.shrink();
           }
 
           return Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isValid 
+              color: isValid
                   ? GerenaColors.successColor.withOpacity(0.1)
                   : GerenaColors.warningColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
@@ -246,22 +219,16 @@ class AddCardModal extends StatelessWidget {
               children: [
                 Icon(
                   isValid ? Icons.check_circle : Icons.info_outline,
-                  color: isValid 
-                      ? GerenaColors.successColor 
-                      : GerenaColors.warningColor,
+                  color: isValid ? GerenaColors.successColor : GerenaColors.warningColor,
                   size: 18,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isValid 
-                        ? '✓ Tarjeta válida'
-                        : 'Completa todos los campos',
+                    isValid ? '✓ Tarjeta válida' : 'Completa todos los campos',
                     style: GoogleFonts.rubik(
                       fontSize: 12,
-                      color: isValid 
-                          ? GerenaColors.successColor 
-                          : GerenaColors.warningColor,
+                      color: isValid ? GerenaColors.successColor : GerenaColors.warningColor,
                     ),
                   ),
                 ),
@@ -277,9 +244,7 @@ class AddCardModal extends StatelessWidget {
           decoration: BoxDecoration(
             color: GerenaColors.primaryColor.withOpacity(0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: GerenaColors.primaryColor.withOpacity(0.2),
-            ),
+            border: Border.all(color: GerenaColors.primaryColor.withOpacity(0.2)),
           ),
           child: Row(
             children: [
@@ -288,10 +253,7 @@ class AddCardModal extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Tu información está protegida con encriptación de nivel bancario',
-                  style: GoogleFonts.rubik(
-                    fontSize: 11,
-                    color: GerenaColors.textPrimaryColor,
-                  ),
+                  style: GoogleFonts.rubik(fontSize: 11, color: GerenaColors.textPrimaryColor),
                 ),
               ),
             ],
@@ -300,50 +262,161 @@ class AddCardModal extends StatelessWidget {
         const SizedBox(height: 20),
 
         // Botones
-        Obx(() => Row(
+        Obx(() {
+          // 👇 Leer todos los observables relevantes
+          final _ = controller.cardDetails.value;
+          final __ = controller.isManualCardValid.value;
+          final isValid = controller.isCardValid;
+          final isProcessing = controller.isProcessing.value;
+
+          return Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: Opacity(
+                  opacity: (isValid && !isProcessing) ? 1.0 : 0.5,
+                  child: GerenaColors.createPrimaryButton(
+                    text: isProcessing ? 'Procesando...' : 'Agregar tarjeta',
+                    onPressed: (isValid && !isProcessing)
+                        ? () async {
+                            final success = await controller.handleAddCard();
+                            if (success && context.mounted) {
+                              Navigator.pop(context);
+                            }
+                          }
+                        : () {},
+                    isFullWidth: true,
+                    height: 48,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: GerenaColors.createSecondaryButton(
+                  text: 'Cancelar',
+                  onPressed: isProcessing ? () {} : () => Navigator.pop(context),
+                  isFullWidth: true,
+                  height: 48,
+                ),
+              ),
+            ],
+          );
+        }),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  /// CardField nativo solo para iOS
+  Widget _buildIOSCardField(PaymentCartController controller) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: GerenaColors.colorinput, width: 1.5),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      child: CardField(
+        onCardChanged: (details) => controller.updateCardDetails(details),
+        enablePostalCode: false,
+        cursorColor: Colors.black,
+        numberHintText: '1234 5678 9012 3456',
+        expirationHintText: 'MM/AA',
+        cvcHintText: 'CVC',
+        decoration: InputDecoration(
+          fillColor: Colors.white,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Campos manuales para Android (evita conflictos con React Native de Stripe)
+  Widget _buildAndroidCardFields(PaymentCartController controller) {
+    final inputDecoration = InputDecoration(
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: GerenaColors.colorinput),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: GerenaColors.secondaryColor, width: 2),
+      ),
+      isDense: true,
+    );
+
+    return Column(
+      children: [
+        // Número de tarjeta
+        TextField(
+          controller: controller.cardNumberController,
+          keyboardType: TextInputType.number,
+          style: GoogleFonts.rubik(fontSize: 16, color: Colors.black),
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(16),
+            _CardNumberInputFormatter(),
+          ],
+          decoration: inputDecoration.copyWith(
+            hintText: '1234 5678 9012 3456',
+            hintStyle: GoogleFonts.rubik(color: Colors.grey, fontSize: 16),
+            prefixIcon: Icon(Icons.credit_card, color: GerenaColors.primaryColor, size: 20),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
           children: [
+            // Fecha de expiración
             Expanded(
-              child: GerenaColors.createSecondaryButton(
-                text: 'Cancelar',
-                onPressed: controller.isProcessing.value 
-                    ? () {} 
-                    : () => Navigator.pop(context),
-                isFullWidth: true,
-                height: 45,
+              child: TextField(
+                controller: controller.expiryController,
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.rubik(fontSize: 16, color: Colors.black),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(4),
+                  _ExpiryDateInputFormatter(),
+                ],
+                decoration: inputDecoration.copyWith(
+                  hintText: 'MM/AA',
+                  hintStyle: GoogleFonts.rubik(color: Colors.grey, fontSize: 16),
+                ),
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
+            // CVC
             Expanded(
-              child: Opacity(
-                opacity: (controller.isCardValid && !controller.isProcessing.value) 
-                    ? 1.0 
-                    : 0.5,
-                child: GerenaColors.createPrimaryButton(
-                  text: controller.isProcessing.value 
-                      ? 'Procesando...' 
-                      : 'Agregar',
-                  onPressed: (controller.isCardValid && !controller.isProcessing.value)
-                      ? () async {
-                          final success = await controller.handleAddCard();
-                          if (success && context.mounted) {
-                            Navigator.pop(context);
-                          }
-                        }
-                      : () {},
-                  isFullWidth: true,
-                  height: 45,
+              child: TextField(
+                controller: controller.cvcController,
+                keyboardType: TextInputType.number,
+                obscureText: true,
+                style: GoogleFonts.rubik(fontSize: 16, color: Colors.black),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(4),
+                ],
+                decoration: inputDecoration.copyWith(
+                  hintText: 'CVC',
+                  hintStyle: GoogleFonts.rubik(color: Colors.grey, fontSize: 16),
+                  prefixIcon: Icon(Icons.lock_outline, color: GerenaColors.primaryColor, size: 20),
                 ),
               ),
             ),
           ],
-        )),
-        const SizedBox(height: 20),
+        ),
       ],
     );
   }
 }
 
-// Formateador para número de tarjeta (ya no se usa en móvil, pero lo dejo por si acaso)
 class _CardNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -352,14 +425,14 @@ class _CardNumberInputFormatter extends TextInputFormatter {
   ) {
     final text = newValue.text.replaceAll(' ', '');
     final buffer = StringBuffer();
-    
+
     for (int i = 0; i < text.length; i++) {
       buffer.write(text[i]);
       if ((i + 1) % 4 == 0 && i + 1 != text.length) {
         buffer.write(' ');
       }
     }
-    
+
     final formatted = buffer.toString();
     return TextEditingValue(
       text: formatted,
@@ -368,7 +441,6 @@ class _CardNumberInputFormatter extends TextInputFormatter {
   }
 }
 
-// Formateador para fecha de expiración (ya no se usa en móvil, pero lo dejo por si acaso)
 class _ExpiryDateInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -376,24 +448,18 @@ class _ExpiryDateInputFormatter extends TextInputFormatter {
     TextEditingValue newValue,
   ) {
     final text = newValue.text.replaceAll('/', '');
-    
-    // Validar mes mientras el usuario escribe
+
     if (text.length >= 2) {
       final month = int.tryParse(text.substring(0, 2));
-      if (month != null && month > 12) {
-        return oldValue;
-      }
+      if (month != null && month > 12) return oldValue;
     }
-    
+
     final buffer = StringBuffer();
-    
     for (int i = 0; i < text.length; i++) {
       buffer.write(text[i]);
-      if (i == 1 && text.length > 2) {
-        buffer.write('/');
-      }
+      if (i == 1 && text.length > 2) buffer.write('/');
     }
-    
+
     final formatted = buffer.toString();
     return TextEditingValue(
       text: formatted,

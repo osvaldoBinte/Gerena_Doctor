@@ -130,6 +130,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
                             buildProfileMenuItem('Historial de pedidos'),
                             buildProfileMenuItem('Membresía'),
                             buildProfileMenuItem('Preguntas frecuentes'),
+                                  buildProfileMenuItem('Metodos de pago'),
                             GestureDetector(
                               onTap: () {
                                 Get.toNamed(RoutesNames.loginPage);

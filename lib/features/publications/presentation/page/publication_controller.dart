@@ -83,7 +83,7 @@ class PublicationController extends GetxController {
       
     } catch (e) {
       hasError.value = true;
-      errorMessage.value = e.toString();
+      errorMessage.value =cleanExceptionMessage(e);
       print('Error al cargar posts: $e');
       showErrorSnackbar('Error al cargar publicaciones');
     } finally {

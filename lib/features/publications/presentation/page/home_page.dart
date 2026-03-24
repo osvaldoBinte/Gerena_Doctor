@@ -369,7 +369,7 @@ class _GerenaFeedScreenState extends State<HomePageMovil> {
           Icon(Icons.error_outline, size: 60, color: Colors.red),
           SizedBox(height: 16),
           Text(
-            'Error al cargar publicaciones',
+            publicationController.errorMessage.value ,
             style: GoogleFonts.rubik(fontSize: 16),
           ),
           SizedBox(height: 8),

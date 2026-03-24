@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/features/marketplace/domain/entities/categories/categories_entity.dart';
 import 'package:gerena/features/marketplace/domain/entities/medications/medications_entity.dart';
 import 'package:gerena/features/marketplace/domain/usecase/get_category_usecase.dart';
@@ -68,7 +69,7 @@ class CategoryController extends GetxController {
       filteredCategories.value = result;
       
     } catch (e) {
-      errorMessage.value = 'Error al cargar categorías: $e';
+      errorMessage.value = cleanExceptionMessage(e);
       print('Error en fetchCategories: $e');
     } finally {
       isLoading.value = false;

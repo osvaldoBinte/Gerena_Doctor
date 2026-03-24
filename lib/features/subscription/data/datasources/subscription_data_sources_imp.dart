@@ -71,34 +71,45 @@ class SubscriptionDataSourcesImp {
     }
   }
   Future<void> cancelSubscription(bool cancelarInmediatamente, String motivo, String token) async {
-    try {
-      Uri url = Uri.parse('${AppConstants.serverBase}/Suscripciones/cancelar');
-      final response = await http.put(url,
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token'
-          },
-          body: jsonEncode(<String, dynamic>{
-            'cancelarInmediatamente': cancelarInmediatamente,
-            'motivo': motivo,
-          }));
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return;
-      }
-      ApiExceptionCustom exception = ApiExceptionCustom(response: response);
-      exception.validateMesage();
-      throw exception;
-    } catch (e) {
-      if (e is SocketException ||
-          e is http.ClientException ||
-          e is TimeoutException) {
-        throw Exception(convertMessageException(error: e));
-      }
-      print('error: $e');
-      throw Exception('$e');
-      
+  try {
+    Uri url = Uri.parse('${AppConstants.serverBase}/Suscripciones/cancelar');
+
+    final body = jsonEncode(<String, dynamic>{
+      'cancelarInmediatamente': cancelarInmediatamente,
+      'motivo': motivo,
+    });
+
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      },
+      body: body,
+    );
+
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print('--- Cancelación exitosa ---');
+      return;
     }
-  } 
+
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+
+  } catch (e) {
+    if (e is SocketException ||
+        e is http.ClientException ||
+        e is TimeoutException) {
+      final mensaje = convertMessageException(error: e);
+      print('Error de red manejado: $mensaje');
+      throw Exception(mensaje);
+    }
+
+    throw Exception('$e');
+  }
+}
   Future<void> reactivateSubscription(String token ) async {
    try{
       Uri url = Uri.parse('${AppConstants.serverBase}/Suscripciones/reactivar');

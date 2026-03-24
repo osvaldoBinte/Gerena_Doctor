@@ -176,45 +176,41 @@ class SubscriptionController extends GetxController {
     loadSubscriptionData();
   }
 
-  Future<void> loadSubscriptionData() async {
+Future<void> loadSubscriptionData() async {
+  isLoading.value = true;         
+  try {
     await Future.wait([
       fetchPlans(),
       fetchMySubscription(),
     ]);
+  } finally {
+    isLoading.value = false;        
   }
+}
 
-  Future<void> fetchPlans() async {
-    try {
-      isLoading.value = true;
-      errorMessage.value = '';
-      final result = await getAllPlansUsecase.execute();
-      plans.value = result;
-      
-      // Debug: mostrar planes obtenidos
-      print('📋 Planes obtenidos del backend:');
-      for (var plan in plans) {
-        print('   - ${plan.name} (ID: ${plan.id})');
-      }
-    } catch (e) {
-      errorMessage.value = 'Error al cargar los planes: $e';
-      print('Error fetching plans: $e');
-    } finally {
-      isLoading.value = false;
-    }
+Future<void> fetchPlans() async {
+  try {
+    errorMessage.value = '';
+    final result = await getAllPlansUsecase.execute();
+    plans.value = result;
+  } catch (e) {
+    errorMessage.value = 'Error al cargar los planes: $e';
+    print('Error fetching plans: $e');
   }
+}
 
-  Future<void> fetchMySubscription() async {
-    try {
-      final subscription = await getMySubscriptionUsecase.execute();
-      currentSubscription.value = subscription;
-      hasActiveSubscription.value = subscription.state?.toLowerCase() == 'active';
-      print('✅ Suscripción actual: ${subscription.planname} - Estado: ${subscription.state}');
-    } catch (e) {
-      print('ℹ️ No hay suscripción activa: $e');
-      currentSubscription.value = null;
-      hasActiveSubscription.value = false;
-    }
+Future<void> fetchMySubscription() async {
+  try {
+    final subscription = await getMySubscriptionUsecase.execute();
+    currentSubscription.value = subscription;
+    hasActiveSubscription.value = subscription.state?.toLowerCase() == 'active';
+    print('✅ Suscripción actual: ${subscription.planname} - Estado: ${subscription.state}');
+  } catch (e) {
+    print('ℹ️ No hay suscripción activa: $e');
+    currentSubscription.value = null;  
+    hasActiveSubscription.value = false; 
   }
+}
 
   bool isCurrentPlan(int planId) {
     if (currentSubscription.value == null) return false;

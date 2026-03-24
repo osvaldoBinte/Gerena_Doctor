@@ -1,3 +1,4 @@
+import 'package:gerena/common/errors/subscripcion_inactiva_exception.dart';
 import 'package:gerena/common/services/auth_service.dart';
 import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/features/doctors/domain/usecase/doctor_profile_usecase.dart';
@@ -24,23 +25,25 @@ class SplashController extends GetxController {
     await checkUserSession();
   }
 
-  Future<void> checkUserSession() async {
-    try {
-      await doctorProfileUsecase.execute();
+Future<void> checkUserSession() async {
+  try {
+    await doctorProfileUsecase.execute();
 
-      if (GetPlatform.isMobile) {
-        //    await _requestNotificationPermission();
-//
-        Get.offAllNamed(RoutesNames.homePage, arguments: 0);
-      } else {
-        Get.toNamed(RoutesNames.dashboardSPage);
-      }
-    } catch (e) {
-      Get.offAllNamed(RoutesNames.loginPage);
-    } finally {
-      isLoading.value = false;
+    if (GetPlatform.isMobile) {
+      Get.offAllNamed(RoutesNames.homePage, arguments: 0);
+    } else {
+      Get.toNamed(RoutesNames.dashboardSPage);
     }
+  } on SubscripcionInactivaException catch (_) {
+      Get.offAllNamed(RoutesNames.membresia, arguments: {'isRequired': true});
+
+  } catch (e) {
+    // Cualquier otro error (token inválido, sin conexión, etc.) → login
+    Get.offAllNamed(RoutesNames.loginPage);
+  } finally {
+    isLoading.value = false;
   }
+}
 
   Future<void> _requestMicrophonePermission() async {
     final status = await Permission.microphone.request();

@@ -261,6 +261,9 @@ class GerenaColors {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       );
+
+
+      
   static Widget createStarRating({
     required double rating,
     int maxStars = 5,

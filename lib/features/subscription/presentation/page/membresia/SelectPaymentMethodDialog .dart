@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/add_card_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/paymentcard/payment_cart_controller.dart';
@@ -14,6 +15,8 @@ class SelectPaymentMethodDialog extends StatelessWidget {
     required this.plan,
   }) : super(key: key);
   void _showAddCardModal(BuildContext context) {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+
     try {
       showDialog(
         context: context,

@@ -285,6 +285,7 @@ Widget _buildRightSections() {
                       
                         buildProfileMenuItem('Preguntas frecuentes'),
                         buildProfileMenuItem('Cerrar sesión'),
+                        buildProfileMenuItem('Metodos de pago'),
                       ],
                     ),
                   ],

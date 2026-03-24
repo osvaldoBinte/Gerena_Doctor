@@ -63,7 +63,13 @@ class AppPages {
     GetPage(name: RoutesNames.postdetail, page: ()=>PostByIdPage()),
     GetPage(name: RoutesNames.productDetail, page: () => ProductDetailPage()),
     GetPage(name: RoutesNames.calendar, page: () => CalendarWidget()),
-    GetPage(name: RoutesNames.membresia, page: () => MembresiaPage()),
+    GetPage(name: RoutesNames.paymentCardsScreen, page: () => PaymentCardsScreen()),
+GetPage(
+  name: RoutesNames.membresia,
+  page: () => MembresiaPage(
+    isRequired: Get.arguments?['isRequired'] ?? false,
+  ),
+),
     GetPage(
         name: RoutesNames.historia, page: () => HistorialDePedidosContent()),
     GetPage(name: RoutesNames.passwordreset, page: () => PasswordResetPage()),

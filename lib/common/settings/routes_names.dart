@@ -20,5 +20,6 @@ class RoutesNames {
   static const String preguntasFrecuentes = '/preguntas-frecuentes';
   static const String membresia = '/membresia';
   static const String postdetail = '/post-detail';
+  static const String paymentCardsScreen = '/payment-cards-screen';
 
 }

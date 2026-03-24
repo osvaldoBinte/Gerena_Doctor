@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:gerena/common/constants/constants.dart';
 import 'package:gerena/common/errors/api_errors.dart';
+import 'package:gerena/common/errors/subscripcion_inactiva_exception.dart';
 import 'package:gerena/features/doctors/data/model/docotor_by_Id_model.dart';
 import 'package:gerena/features/doctors/data/model/doctor_model.dart';
 import 'package:gerena/features/doctors/data/model/doctoravailability/doctor_availability_model.dart';
@@ -15,28 +16,35 @@ import 'package:http/http.dart' as http;
 class DoctosDataSourcesImp {
 
     String defaultApiServer = AppConstants.serverBase;
- Future<DoctorEntity> getDoctorProfile({required String token}) async {
+Future<DoctorEntity> getDoctorProfile({required String token}) async {
   try {
     Uri url = Uri.parse('$defaultApiServer/Doctores/mi-perfil');
     final response = await http.get(url, headers: <String, String>{
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     });
-    
+
     if (response.statusCode == 200) {
       final dataUTF8 = utf8.decode(response.bodyBytes);
       final responseDecode = jsonDecode(dataUTF8);
-      
-       if (responseDecode is Map<String, dynamic>) {
-        DoctorModel order = DoctorModel.fromJson(responseDecode);
-        return order;
-      } else {
-        throw Exception('Respuesta vacía o formato incorrecto');
+      if (responseDecode is Map<String, dynamic>) {
+        return DoctorModel.fromJson(responseDecode);
       }
+      throw Exception('Respuesta vacía o formato incorrecto');
     }
-    
-    throw ApiExceptionCustom(response: response);
+
+    if (response.statusCode == 403) {
+      throw SubscripcionInactivaException.fromResponse(response);
+    }
+
+    // 👇 Cualquier otro error (401, 404, 500, etc.)
+    ApiExceptionCustom exception = ApiExceptionCustom(response: response);
+    exception.validateMesage();
+    throw exception;
+
   } catch (e) {
+    if (e is SubscripcionInactivaException) rethrow;
+    if (e is ApiExceptionCustom) rethrow;  // 👈 también dejar pasar este
     if (e is SocketException || e is http.ClientException || e is TimeoutException) {
       throw Exception(convertMessageException(error: e));
     }

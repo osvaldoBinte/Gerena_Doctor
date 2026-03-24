@@ -60,15 +60,17 @@ void main() async {
     final minWidth = (screenSize.width * 0.8).clamp(1000.0, 1400.0);
     final minHeight = (screenSize.height * 0.8).clamp(700.0, 900.0);
 
-WindowOptions windowOptions = WindowOptions(
-  center: true,
-  title: "Gerena",
-  backgroundColor: Colors.white, 
-  skipTaskbar: false,
-  titleBarStyle: TitleBarStyle.normal,
-  windowButtonVisibility: true,
-);
-    await windowManager.setSize(Size(windowWidth, windowHeight));
+
+    WindowOptions windowOptions = const WindowOptions(
+      center: true,
+      title: "Gerena",
+      //backgroundColor: Color.fromARGB(100, 33, 33, 33),
+      //backgroundColor: const Color(0xFF1A73E8),
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.normal,
+      windowButtonVisibility: true,
+      
+    ); await windowManager.setSize(Size(windowWidth, windowHeight));
     await windowManager.setMinimumSize(Size(minWidth, minHeight));
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {

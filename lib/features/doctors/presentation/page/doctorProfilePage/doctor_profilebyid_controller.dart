@@ -1,4 +1,5 @@
 
+import 'package:gerena/common/errors/convert_message.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/doctorprocedures/domain/entities/getprocedures/get_procedures_entity.dart';
 import 'package:gerena/features/doctorprocedures/domain/usecase/get_procedures_by_doctor_usecase.dart';
@@ -215,7 +216,7 @@ class DoctorProfilebyidController extends GetxController {
       print('✅ Reseñas cargadas: ${reviews.length}');
       
     } catch (e) {
-      errorMessageReviews.value = 'Error al cargar las reseñas: $e';
+      errorMessageReviews.value = cleanExceptionMessage(e);
       print('❌ Error en loadReviews: $e');
       showErrorSnackbar('No se pudieron cargar las reseñas');
     } finally {

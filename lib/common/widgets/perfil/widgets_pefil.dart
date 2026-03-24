@@ -84,7 +84,12 @@ void _handleMenuNavigation(String menuTitle) {
     case 'Contáctanos':
       print('Navegando a Contáctanos');
       break;
-      
+    case 'Metodos de pago':
+     GetPlatform.isMobile
+        ? Get.toNamed(RoutesNames.paymentCardsScreen)
+        : Get.find<DashboardController>().showMembresia();
+     
+      break;  
     case 'Sugerencias':
       try {
         dashboardController.showUSugerencia();

@@ -58,9 +58,6 @@ class AppointmentDataSourcesImp {
           .toList(),
     });
 
-    print('URL: $url');
-    print('TOKEN: $token');
-    print('BODY: $body');
 
     final response = await http.post(
       url,
@@ -71,15 +68,11 @@ class AppointmentDataSourcesImp {
       body: body,
     );
 
-    print('STATUS CODE: ${response.statusCode}');
-    print('RESPONSE BODY: ${response.body}');
-
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('Disponibilidad agregada correctamente');
       return;
     }
 
-    print('Error en la petición');
 
     ApiExceptionCustom exception = ApiExceptionCustom(response: response);
     exception.validateMesage();

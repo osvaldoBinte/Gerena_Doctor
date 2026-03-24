@@ -36,7 +36,7 @@ class PaymentCardsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(25),
                   onTap: () {
                     if (GetPlatform.isMobile) {
-                      Get.offAllNamed(RoutesNames.shoppdingcart);
+                       Navigator.of(context).pop();
                     } else {
                       navigationController.navigateToStore();
                     }
