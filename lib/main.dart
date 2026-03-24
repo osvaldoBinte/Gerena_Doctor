@@ -76,7 +76,9 @@ void main() async {
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
-      await windowManager.maximize();
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await windowManager.maximize();
+      });
     });
   }
 

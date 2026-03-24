@@ -73,7 +73,17 @@ dependencies:
     #image_dark: assets/logo/logo_ios.png
     #icon_background_color_dark: "#004346"
 
-
+msix_config:
+  display_name: Gerena
+  publisher_display_name: Grupo Gerena
+  identity_name: BinteConsulting.Gerena
+  msix_version: 1.0.13.0
+  description: Gerena - Plataforma médica
+  publisher: CN=Grupo Gerena, O=Grupo Gerena, L=Tuxtla Gutierrez, S=Chiapas, C=MX
+  logo_path: assets/logo/logoAPP.jpg
+  capabilities: internetClient
+  languages: es-mx, en-us
+  architecture: x64
 
 
 
@@ -104,6 +114,7 @@ dev_dependencies:
     sdk: flutter
   flutter_localizations: 
     sdk: flutter
+  msix: ^3.16.13
   #rename: ^3.0.1
  # change_app_package_name: ^1.1.0
 #  flutter_launcher_icons: ^0.13.1

@@ -283,9 +283,9 @@ Widget _buildRightSections() {
                         buildProfileMenuItem('Historial de pedidos'),
                         buildProfileMenuItem('Membresía'),
                       
+                        buildProfileMenuItem('Metodos de pago'),
                         buildProfileMenuItem('Preguntas frecuentes'),
                         buildProfileMenuItem('Cerrar sesión'),
-                        buildProfileMenuItem('Metodos de pago'),
                       ],
                     ),
                   ],

@@ -87,7 +87,7 @@ void _handleMenuNavigation(String menuTitle) {
     case 'Metodos de pago':
      GetPlatform.isMobile
         ? Get.toNamed(RoutesNames.paymentCardsScreen)
-        : Get.find<DashboardController>().showMembresia();
+        :  Get.find<ShopNavigationController>().navigateToPaymentCards();   Get.to(() => GlobalShopInterface());
      
       break;  
     case 'Sugerencias':
