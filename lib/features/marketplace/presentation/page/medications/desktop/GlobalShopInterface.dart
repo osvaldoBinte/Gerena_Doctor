@@ -120,11 +120,8 @@ class GlobalShopInterface extends StatelessWidget {
                             );
                           } else if (navigationController.currentView.value ==
                               1) {
-                            return  Expanded(
-                                    child: CartPageContent(
-                                    
-                                    ),
-                                  );
+                               return CartPageContent();
+
                           } 
 else if (navigationController.currentView.value == 2 &&
     navigationController.selectedProductId.value != null) {

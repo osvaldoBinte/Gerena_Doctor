@@ -3,7 +3,6 @@ import 'package:gerena/common/settings/routes_names.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
 import 'package:gerena/common/widgets/simple_counter.dart';
 import 'package:gerena/features/marketplace/domain/entities/addresses/addresses_entity.dart';
-import 'package:gerena/features/marketplace/presentation/page/addresses/add_address_modal.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/addresses_controller.dart';
 import 'package:gerena/features/marketplace/presentation/page/addresses/getaddress_/address_selector_widget.dart';
 import 'package:gerena/features/marketplace/presentation/page/shopping/shopping_cart_controller.dart';
@@ -12,26 +11,39 @@ import 'package:gerena/features/marketplace/presentation/page/widget/image_place
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CartPageContent extends StatelessWidget {
-  CartPageContent({Key? key}) : super(key: key);
+class CartPageContent extends StatefulWidget {
+  const CartPageContent({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final cartController = Get.find<ShoppingCartController>();
-    final navigationController = Get.find<ShopNavigationController>();
-    final addressesController = Get.find<AddressesController>();
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      cartController.loadAvailablePoints();
-    });
-    
+  State<CartPageContent> createState() => _CartPageContentState();
+}
+
+class _CartPageContentState extends State<CartPageContent> {
+  late final ShoppingCartController cartController;
+  late final ShopNavigationController navigationController;
+  late final AddressesController addressesController;
+
+  @override
+  void initState() {
+    super.initState();
+    cartController = Get.find<ShoppingCartController>();
+    navigationController = Get.find<ShopNavigationController>();
+    addressesController = Get.find<AddressesController>();
+
     ever(addressesController.selectedAddress, (AddressesEntity? address) {
       if (address != null) {
         cartController.selectAddress(address.id.toString());
         print('📍 Dirección sincronizada en cart controller: ${address.id}');
       }
     });
-    
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cartController.loadAvailablePoints();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: GerenaColors.backgroundColorfondo,
       appBar: PreferredSize(
@@ -61,7 +73,7 @@ class CartPageContent extends StatelessWidget {
                   size: 100,
                   color: Colors.grey[400],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   'Tu carrito está vacío',
                   style: GoogleFonts.rubik(
@@ -70,7 +82,7 @@ class CartPageContent extends StatelessWidget {
                     color: GerenaColors.textTertiaryColor,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'Agrega productos para continuar',
                   style: GoogleFonts.rubik(
@@ -78,17 +90,18 @@ class CartPageContent extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: GetPlatform.isMobile
                       ? () => Get.offAllNamed(RoutesNames.categoryById)
                       : () => navigationController.navigateToStore(),
-                  icon: Icon(Icons.shopping_bag),
-                  label: Text('IR A LA TIENDA'),
+                  icon: const Icon(Icons.shopping_bag),
+                  label: const Text('IR A LA TIENDA'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: GerenaColors.primaryColor,
                     foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -105,10 +118,12 @@ class CartPageContent extends StatelessWidget {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 10000),
             padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width > 600 ? 40.0 : 16.0,
+              horizontal:
+                  MediaQuery.of(context).size.width > 600 ? 40.0 : 16.0,
             ),
             child: Column(
               children: [
+                // ── Header ──────────────────────────────────────────
                 Row(
                   children: [
                     InkWell(
@@ -120,11 +135,11 @@ class CartPageContent extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: GerenaColors.secondaryColor,
                               shape: BoxShape.circle,
                             ),
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: const Icon(
                               Icons.arrow_back,
                               color: GerenaColors.textLightColor,
@@ -145,13 +160,17 @@ class CartPageContent extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // ── Body Card ────────────────────────────────────────
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal:
-                          MediaQuery.of(context).size.width > 600 ? 50.0 : 0.0,
-                      vertical:
-                          MediaQuery.of(context).size.width > 600 ? 10.0 : 8.0,
+                      horizontal: MediaQuery.of(context).size.width > 600
+                          ? 50.0
+                          : 0.0,
+                      vertical: MediaQuery.of(context).size.width > 600
+                          ? 10.0
+                          : 8.0,
                     ),
                     child: Card(
                       elevation: GetPlatform.isMobile ? 0 : 2,
@@ -169,6 +188,7 @@ class CartPageContent extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
+                              // ── Productos ──────────────────────────
                               Column(
                                 children: [
                                   if (response != null)
@@ -178,8 +198,8 @@ class CartPageContent extends StatelessWidget {
                                                 _buildCartItem(
                                                   item.nombreMedicamento,
                                                   item.alerta ?? '',
-                                                  item.imagen ?? "",
-                                                  "\$${item.precioActual.toStringAsFixed(2)} MXN",
+                                                  item.imagen ?? '',
+                                                  '\$${item.precioActual.toStringAsFixed(2)} MXN',
                                                   medicamentoId:
                                                       item.medicamentoId,
                                                   cantidad:
@@ -187,17 +207,15 @@ class CartPageContent extends StatelessWidget {
                                                   hasDiscount:
                                                       item.precioAnterior >
                                                           item.precioActual,
-                                                  originalPrice: item
-                                                              .precioAnterior >
-                                                          item.precioActual
-                                                      ? "\$${item.precioAnterior.toStringAsFixed(2)} MXN"
-                                                      : null,
+                                                  originalPrice:
+                                                      item.precioAnterior >
+                                                              item.precioActual
+                                                          ? '\$${item.precioAnterior.toStringAsFixed(2)} MXN'
+                                                          : null,
                                                   sinStock: item.sinStock,
                                                   oferta: item.oferta ?? false,
-                                                  cartController:
-                                                      cartController,
                                                 ),
-                                                SizedBox(height: 10),
+                                                const SizedBox(height: 10),
                                               ],
                                             ))
                                         .toList(),
@@ -205,9 +223,9 @@ class CartPageContent extends StatelessWidget {
                                 ],
                               ),
                               const SizedBox(height: 30),
-                              
-                              // DIRECCIÓN DE ENTREGA
-                              _buildSection("DIRECCIÓN DE ENTREGA"),
+
+                              // ── Dirección ──────────────────────────
+                              _buildSection('DIRECCIÓN DE ENTREGA'),
                               const SizedBox(height: 15),
                               AddressSelectorWidget(
                                 addressesController: addressesController,
@@ -219,20 +237,17 @@ class CartPageContent extends StatelessWidget {
                                 },
                               ),
                               const SizedBox(height: 30),
-                              
-                              // SECCIÓN DE PUNTOS
+
+                              // ── Puntos ─────────────────────────────
                               Obx(() {
                                 final points =
                                     cartController.availablePoints.value;
-
-                                if (points <= 0) {
-                                  return SizedBox.shrink();
-                                }
+                                if (points <= 0) return const SizedBox.shrink();
 
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    _buildSection("USAR PUNTOS"),
+                                    _buildSection('USAR PUNTOS'),
                                     const SizedBox(height: 15),
                                     Container(
                                       padding: const EdgeInsets.all(16),
@@ -249,10 +264,9 @@ class CartPageContent extends StatelessWidget {
                                         children: [
                                           Row(
                                             children: [
-                                              Icon(
+                                              const Icon(
                                                 Icons.monetization_on,
-                                                color:
-                                                    GerenaColors.primaryColor,
+                                                color: GerenaColors.primaryColor,
                                                 size: 24,
                                               ),
                                               const SizedBox(width: 12),
@@ -284,22 +298,19 @@ class CartPageContent extends StatelessWidget {
                                               Obx(() => Switch(
                                                     value: cartController
                                                         .usePoints.value,
-                                                    onChanged: (value) {
-                                                      cartController
-                                                          .toggleUsePoints(
-                                                              value);
-                                                    },
+                                                    onChanged: (value) =>
+                                                        cartController
+                                                            .toggleUsePoints(
+                                                                value),
                                                     activeColor: GerenaColors
                                                         .primaryColor,
                                                   )),
                                             ],
                                           ),
                                           Obx(() {
-                                            if (!cartController
-                                                .usePoints.value) {
-                                              return SizedBox.shrink();
+                                            if (!cartController.usePoints.value) {
+                                              return const SizedBox.shrink();
                                             }
-
                                             return Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -307,7 +318,6 @@ class CartPageContent extends StatelessWidget {
                                                 const SizedBox(height: 16),
                                                 const Divider(),
                                                 const SizedBox(height: 16),
-
                                                 Text(
                                                   '¿Cuántos puntos deseas usar?',
                                                   style: GoogleFonts.rubik(
@@ -318,27 +328,23 @@ class CartPageContent extends StatelessWidget {
                                                   ),
                                                 ),
                                                 const SizedBox(height: 12),
-
                                                 Row(
                                                   children: [
                                                     Expanded(
                                                       child: TextField(
                                                         keyboardType:
-                                                            TextInputType
-                                                                .number,
+                                                            TextInputType.number,
                                                         decoration:
                                                             InputDecoration(
                                                           hintText:
                                                               'Puntos a usar',
-                                                          border:
-                                                              OutlineInputBorder(
+                                                          border: OutlineInputBorder(
                                                             borderRadius:
                                                                 BorderRadius
-                                                                    .circular(
-                                                                        8),
+                                                                    .circular(8),
                                                           ),
                                                           contentPadding:
-                                                              EdgeInsets
+                                                              const EdgeInsets
                                                                   .symmetric(
                                                             horizontal: 12,
                                                             vertical: 12,
@@ -346,54 +352,47 @@ class CartPageContent extends StatelessWidget {
                                                           suffixText: 'pts',
                                                         ),
                                                         onChanged: (value) {
-                                                          final points =
-                                                              int.tryParse(
-                                                                      value) ??
-                                                                  0;
+                                                          final p = int.tryParse(
+                                                                  value) ??
+                                                              0;
                                                           cartController
                                                               .updatePointsToUse(
-                                                                  points);
+                                                                  p);
                                                         },
                                                         controller:
                                                             TextEditingController(
                                                           text: cartController
                                                               .pointsToUse.value
                                                               .toString(),
-                                                        )..selection = TextSelection
-                                                                  .fromPosition(
-                                                                TextPosition(
-                                                                  offset: cartController
-                                                                      .pointsToUse
-                                                                      .value
-                                                                      .toString()
-                                                                      .length,
-                                                                ),
-                                                              ),
+                                                        )..selection =
+                                                                TextSelection.fromPosition(
+                                                                    TextPosition(
+                                                                        offset: cartController
+                                                                            .pointsToUse
+                                                                            .value
+                                                                            .toString()
+                                                                            .length)),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 12),
                                                     ElevatedButton(
-                                                      onPressed: () {
-                                                        final maxPoints =
-                                                            cartController
-                                                                .availablePoints
-                                                                .value;
-                                                        cartController
-                                                            .updatePointsToUse(
-                                                                maxPoints);
-                                                      },
+                                                      onPressed: () =>
+                                                          cartController
+                                                              .updatePointsToUse(
+                                                                  cartController
+                                                                      .availablePoints
+                                                                      .value),
                                                       style: ElevatedButton
                                                           .styleFrom(
                                                         backgroundColor:
                                                             GerenaColors
                                                                 .primaryColor,
-                                                        shape:
-                                                            RoundedRectangleBorder(
+                                                        shape: RoundedRectangleBorder(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(8),
                                                         ),
-                                                        padding: EdgeInsets
+                                                        padding: const EdgeInsets
                                                             .symmetric(
                                                           horizontal: 16,
                                                           vertical: 12,
@@ -401,30 +400,27 @@ class CartPageContent extends StatelessWidget {
                                                       ),
                                                       child: Text(
                                                         'Máximo',
-                                                        style:
-                                                            GoogleFonts.rubik(
+                                                        style: GoogleFonts.rubik(
                                                           color: Colors.white,
                                                         ),
                                                       ),
                                                     ),
                                                   ],
                                                 ),
-
                                                 const SizedBox(height: 12),
-
                                                 Container(
-                                                  padding: EdgeInsets.all(12),
+                                                  padding:
+                                                      const EdgeInsets.all(12),
                                                   decoration: BoxDecoration(
                                                     color: GerenaColors
                                                         .primaryColor
                                                         .withOpacity(0.1),
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
+                                                        BorderRadius.circular(8),
                                                   ),
                                                   child: Row(
                                                     children: [
-                                                      Icon(
+                                                      const Icon(
                                                         Icons.info_outline,
                                                         size: 18,
                                                         color: GerenaColors
@@ -459,34 +455,90 @@ class CartPageContent extends StatelessWidget {
                                   ],
                                 );
                               }),
-                              
+
                               const SizedBox(height: 30),
                               Divider(color: GerenaColors.textTertiaryColor),
                               const SizedBox(height: 30),
 
-                              _buildSection("RESUMEN"),
+                              // ── Facturación ────────────────────────
+                              Obx(() => Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: Colors.grey[300]!),
+                                      borderRadius: BorderRadius.circular(8),
+                                      color:
+                                          GerenaColors.colorSubsCardBackground,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.receipt_long,
+                                          color: GerenaColors.primaryColor,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Facturación',
+                                                style: GoogleFonts.rubik(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: GerenaColors
+                                                      .textPrimaryColor,
+                                                ),
+                                              ),
+                                              Text(
+                                                cartController
+                                                        .invoiceRequired.value
+                                                    ? 'Se generará factura para este pedido'
+                                                    : 'Sin factura',
+                                                style: GoogleFonts.rubik(
+                                                  fontSize: 12,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Switch(
+                                          value: cartController
+                                              .invoiceRequired.value,
+                                          onChanged: cartController
+                                              .toggleInvoiceRequired,
+                                          activeColor: GerenaColors.primaryColor,
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                              const SizedBox(height: 30),
+
+                              // ── Resumen ────────────────────────────
+                              _buildSection('RESUMEN'),
                               const SizedBox(height: 15),
 
-                              // Subtotal
                               _buildSummaryItem(
-                                  "Subtotal",
-                                  response != null
-                                      ? "${response.totalActual.toStringAsFixed(2)} MXN"
-                                      : "0.00 MXN"),
+                                'Subtotal',
+                                response != null
+                                    ? '\$${response.totalActual.toStringAsFixed(2)} MXN'
+                                    : '0.00 MXN',
+                              ),
                               Divider(color: GerenaColors.textTertiaryColor),
-
 
                               Obx(() {
                                 if (!cartController.usePoints.value ||
                                     cartController.pointsDiscount.value <= 0) {
-                                  return SizedBox.shrink();
+                                  return const SizedBox.shrink();
                                 }
-
                                 return Column(
                                   children: [
                                     _buildSummaryItem(
-                                      "Descuento por puntos (${cartController.pointsToUse.value} pts)",
-                                      "-${cartController.pointsDiscount.value.toStringAsFixed(2)} MXN",
+                                      'Descuento por puntos (${cartController.pointsToUse.value} pts)',
+                                      '-${cartController.pointsDiscount.value.toStringAsFixed(2)} MXN',
                                       valueColor: GerenaColors.descuento,
                                     ),
                                     Divider(
@@ -495,58 +547,50 @@ class CartPageContent extends StatelessWidget {
                                 );
                               }),
 
-
                               _buildSummaryItem(
-                                  "Gastos de envío",
-                                  response != null
-                                      ? "\$${response.gastoEnvio.toStringAsFixed(2)} MXN"
-                                      : "0.00 MXN"),
+                                'Gastos de envío',
+                                response != null
+                                    ? '\$${response.gastoEnvio.toStringAsFixed(2)} MXN'
+                                    : '0.00 MXN',
+                              ),
                               Divider(color: GerenaColors.textTertiaryColor),
 
-
                               _buildSummaryItem(
-                                  "IVA",
-                                  response != null
-                                      ? "\$${response.iva.toStringAsFixed(2)} MXN"
-                                      : "0.00 MXN"),
-
+                                'IVA',
+                                response != null
+                                    ? '\$${response.iva.toStringAsFixed(2)} MXN'
+                                    : '0.00 MXN',
+                              ),
                               const Divider(height: 30),
 
-
+                              // ── Total ──────────────────────────────
                               Obx(() => _buildTotalRow(
-                                    "TOTAL:",
-                                    "\$${cartController.finalTotal.toStringAsFixed(2)} MXN",
+                                    'TOTAL:',
+                                    '\$${cartController.finalTotal.toStringAsFixed(2)} MXN',
                                   )),
-
                               const SizedBox(height: 16),
-                              
 
-const SizedBox(height: 16),
+                              // ── Botón confirmar ────────────────────
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Container(
+                                child: SizedBox(
                                   height: 40,
                                   child: Obx(() => ElevatedButton(
                                         onPressed: response != null &&
+                                                !cartController.isLoading.value &&
                                                 !cartController
-                                                    .isLoading.value &&
-                                                !cartController
-                                                    .isProcessingOrder
-                                                    .value &&
+                                                    .isProcessingOrder.value &&
                                                 cartController
                                                     .selectedAddressId
                                                     .value
                                                     .isNotEmpty
-                                            ? () async {
-                                                await cartController
-                                                    .confirmOrder();
-                                              }
+                                            ? () async => await cartController
+                                                .confirmOrder()
                                             : null,
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
                                               GerenaColors.secondaryColor,
-                                          foregroundColor:
-                                              GerenaColors.cardColor,
+                                          foregroundColor: GerenaColors.cardColor,
                                           disabledBackgroundColor:
                                               Colors.grey[300],
                                           shape: RoundedRectangleBorder(
@@ -558,7 +602,7 @@ const SizedBox(height: 16),
                                         ),
                                         child: cartController
                                                 .isProcessingOrder.value
-                                            ? SizedBox(
+                                            ?  SizedBox(
                                                 width: 20,
                                                 height: 20,
                                                 child:
@@ -570,7 +614,7 @@ const SizedBox(height: 16),
                                                 ),
                                               )
                                             : Text(
-                                                "CONFIRMAR PEDIDO",
+                                                'CONFIRMAR PEDIDO',
                                                 style: GoogleFonts.rubik(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -595,7 +639,8 @@ const SizedBox(height: 16),
     );
   }
 
-  
+  // ── Helpers ────────────────────────────────────────────────────────────────
+
   Widget _buildCartItem(
     String title,
     String description,
@@ -607,7 +652,6 @@ const SizedBox(height: 16),
     String? originalPrice,
     bool sinStock = false,
     bool oferta = false,
-    required ShoppingCartController cartController,
   }) {
     return Padding(
       padding: const EdgeInsets.only(right: 16.0),
@@ -618,18 +662,14 @@ const SizedBox(height: 16),
           children: [
             Stack(
               children: [
-                Center(
-                  child: _buildProductImage(imagePath),
-                ),
+                Center(child: _buildProductImage(imagePath)),
                 if (oferta && !sinStock)
                   Positioned(
                     top: 0,
                     left: 0,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(4),
@@ -637,18 +677,15 @@ const SizedBox(height: 16),
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
                             blurRadius: 4,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.local_offer,
-                            color: Colors.white,
-                            size: 12,
-                          ),
+                          const Icon(Icons.local_offer,
+                              color: Colors.white, size: 12),
                           const SizedBox(width: 4),
                           Text(
                             'OFERTA',
@@ -682,14 +719,12 @@ const SizedBox(height: 16),
                                 padding: const EdgeInsets.only(bottom: 4),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 2,
-                                  ),
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
                                         Colors.red[700]!,
-                                        Colors.red[500]!,
+                                        Colors.red[500]!
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(4),
@@ -697,11 +732,8 @@ const SizedBox(height: 16),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(
-                                        Icons.local_offer,
-                                        color: Colors.white,
-                                        size: 12,
-                                      ),
+                                      const Icon(Icons.local_offer,
+                                          color: Colors.white, size: 12),
                                       const SizedBox(width: 4),
                                       Text(
                                         '¡EN OFERTA!',
@@ -728,7 +760,7 @@ const SizedBox(height: 16),
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.delete_outline, color: Colors.red),
+                        icon: const Icon(Icons.delete_outline, color: Colors.red),
                         onPressed: () =>
                             cartController.removeFromCart(medicamentoId),
                         tooltip: 'Eliminar producto',
@@ -740,9 +772,7 @@ const SizedBox(height: 16),
                   if (description.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: sinStock
                             ? Colors.red.withOpacity(0.1)
@@ -769,8 +799,9 @@ const SizedBox(height: 16),
                               description,
                               style: GoogleFonts.rubik(
                                 fontSize: 12,
-                                color:
-                                    sinStock ? Colors.red : Colors.orange[900],
+                                color: sinStock
+                                    ? Colors.red
+                                    : Colors.orange[900],
                                 fontWeight: FontWeight.w500,
                               ),
                               maxLines: 2,
@@ -785,27 +816,21 @@ const SizedBox(height: 16),
                   if (sinStock)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 5),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'SIN STOCK',
-                              style: GoogleFonts.rubik(
-                                fontSize: 10,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'SIN STOCK',
+                          style: GoogleFonts.rubik(
+                            fontSize: 10,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
+                        ),
                       ),
                     ),
 
@@ -831,20 +856,19 @@ const SizedBox(height: 16),
                                 Text(
                                   price,
                                   style: GoogleFonts.rubik(
-                                    color:
-                                        oferta ? Colors.red[700] : Colors.red,
+                                    color: oferta
+                                        ? Colors.red[700]
+                                        : Colors.red,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
                                 ),
-                                if (oferta && originalPrice != null)
+                                if (oferta)
                                   Padding(
                                     padding: const EdgeInsets.only(left: 6),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
+                                          horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: Colors.green,
                                         borderRadius: BorderRadius.circular(4),
@@ -875,10 +899,8 @@ const SizedBox(height: 16),
                       ),
                       simpleCounter(
                         initialValue: cantidad,
-                        onChanged: (newValue) {
-                          cartController.updateQuantity(
-                              medicamentoId, newValue);
-                        },
+                        onChanged: (newValue) =>
+                            cartController.updateQuantity(medicamentoId, newValue),
                         enabled: !sinStock,
                       ),
                     ],
@@ -898,12 +920,10 @@ const SizedBox(height: 16),
           double.parse(originalPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
       final current =
           double.parse(currentPrice.replaceAll(RegExp(r'[^0-9.]'), ''));
-
       if (original <= 0) return '';
-
       final discount = ((original - current) / original * 100).round();
       return '-$discount%';
-    } catch (e) {
+    } catch (_) {
       return '';
     }
   }
@@ -929,24 +949,16 @@ const SizedBox(height: 16),
   }
 
   Widget _buildSummaryItem(String label, String value, {Color? valueColor}) {
-    final Color finalValueColor = valueColor ?? GerenaColors.textTertiaryColor;
-
+    final color = valueColor ?? GerenaColors.textTertiaryColor;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: GoogleFonts.rubik(color: finalValueColor),
-          ),
-          Text(
-            value,
-            style: GoogleFonts.rubik(
-              fontWeight: FontWeight.w500,
-              color: finalValueColor,
-            ),
-          ),
+          Text(label, style: GoogleFonts.rubik(color: color)),
+          Text(value,
+              style:
+                  GoogleFonts.rubik(fontWeight: FontWeight.w500, color: color)),
         ],
       ),
     );
@@ -954,11 +966,8 @@ const SizedBox(height: 16),
 
   Widget _buildTotalRow(String label, String value) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Expanded(
-          flex: 4,
-          child: Container(),
-        ),
         Text(
           label,
           style: GoogleFonts.rubik(
@@ -967,10 +976,7 @@ const SizedBox(height: 16),
             color: GerenaColors.textTertiaryColor,
           ),
         ),
-        Expanded(
-          flex: 1,
-          child: Container(),
-        ),
+        const SizedBox(width: 12),
         Text(
           value,
           style: GoogleFonts.rubik(

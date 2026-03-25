@@ -5,10 +5,11 @@ import 'package:gerena/features/marketplace/data/model/shoppingcart/shopping_car
 import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shopping_cart_items_entity.dart';
 
 class ShoppingCartItemsModel extends ShoppingCartItemsEntity {
-  ShoppingCartItemsModel({required super.shopping});
+  ShoppingCartItemsModel({required super.shopping, required super.invoicerequired});
 
   factory ShoppingCartItemsModel.fromEntity(ShoppingCartItemsEntity entity) {
     return ShoppingCartItemsModel(
+      invoicerequired: entity.invoicerequired,
       shopping: entity.shopping
           .map((item) => ShoppingCartPostModel.fromEntity(item))
           .toList(),
@@ -20,6 +21,7 @@ class ShoppingCartItemsModel extends ShoppingCartItemsEntity {
       'items': shopping
           .map((item) => (item as ShoppingCartPostModel).toJson())
           .toList(),
+       'requiereFactura':invoicerequired   
     };
   }
 
