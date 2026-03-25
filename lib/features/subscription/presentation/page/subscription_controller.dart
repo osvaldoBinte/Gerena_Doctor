@@ -125,7 +125,7 @@ class SubscriptionController extends GetxController {
   // ✅ MÉTODO ACTUALIZADO - Usa normalización para buscar el producto
   ProductDetails? getIAPProduct(ViewAllPlansEntity plan) {
     final normalizedName = _normalizeProductId(plan.name);
-    final productId = 'dev.binteconsulting.gerena.subscription.$normalizedName';
+    final productId = 'com.gerena.subscription.$normalizedName';
     
     print('🔍 Buscando producto IAP: $productId');
     final product = iapProducts.firstWhereOrNull((p) => p.id == productId);

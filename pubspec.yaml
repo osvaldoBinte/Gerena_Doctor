@@ -74,20 +74,18 @@ dependencies:
     #icon_background_color_dark: "#004346"
 
 msix_config:
-  display_name: Gerena
+  display_name: Gerena Dashboard Especialistas
   publisher_display_name: Grupo Gerena
-  identity_name: BinteConsulting.Gerena
+  identity_name: GrupoGerena.GerenaDashboardEspecialistas
   msix_version: 1.0.13.0
   description: Gerena - Plataforma médica
-  publisher: CN=Grupo Gerena, O=Grupo Gerena, L=Tuxtla Gutierrez, S=Chiapas, C=MX
+  publisher: CN=FB471D46-CF4A-417B-9007-F447811CA293
   logo_path: assets/logo/logoAPP.jpg
   capabilities: internetClient
   languages: es-mx, en-us
   architecture: x64
-
-
-
-
+  store: true
+  
 #flutter_launcher_icons:
  # android: true
   #ios: true

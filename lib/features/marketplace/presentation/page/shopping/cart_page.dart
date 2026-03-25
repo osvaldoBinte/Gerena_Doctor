@@ -520,37 +520,8 @@ class CartPageContent extends StatelessWidget {
 
                               const SizedBox(height: 16),
                               
-// Aviso de costos de envío
-Container(
-  padding: const EdgeInsets.all(12),
-  decoration: BoxDecoration(
-    color: Colors.amber.withOpacity(0.08),
-    borderRadius: BorderRadius.circular(8),
-    border: Border.all(color: Colors.amber.withOpacity(0.4)),
-  ),
-  child: Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Icon(Icons.info_outline, size: 16, color: Colors.amber[700]),
-      const SizedBox(width: 8),
-      Expanded(
-        child: Text(
-          'Los costos de envío están sujetos a variación y serán revisados y confirmados con su ejecutivo de ventas. '
-          'En el caso de envíos foráneos, los tiempos de entrega pueden presentar variaciones debido a la logística '
-          'de la paquetería, situación ajena a Gerena.',
-          style: GoogleFonts.rubik(
-            fontSize: 11,
-            color: Colors.amber[900],
-            height: 1.5,
-          ),
-        ),
-      ),
-    ],
-  ),
-),
 
 const SizedBox(height: 16),
-                              // BOTÓN DE CONFIRMAR PEDIDO (sin validar método de pago)
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Container(
