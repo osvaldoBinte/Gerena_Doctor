@@ -152,7 +152,7 @@ class WishlistController extends GetxController {
       isLoading.value = true;
       error.value = '';
 
-      final entity = ShoppingCartItemsEntity(shopping: wishlistItems);
+      final entity = ShoppingCartItemsEntity(shopping: wishlistItems,invoicerequired :false);
 
       final response = await shoppingCartUsecase.execute(entity);
 

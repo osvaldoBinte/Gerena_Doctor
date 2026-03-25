@@ -2,9 +2,9 @@ import 'package:gerena/features/marketplace/domain/entities/shoppingcart/shoppin
 
 class ShoppingCartItemsEntity {
   List<ShoppingCartPostEntity> shopping;
-  final bool? invoicerequired;
+  final bool invoicerequired;
   ShoppingCartItemsEntity({
     required this.shopping,
-     this.invoicerequired
+    required this.invoicerequired
   });
 }

@@ -40,6 +40,7 @@ class ShoppingCartController extends GetxController {
   final RxBool isProcessingOrder = false.obs;
 
   final RxBool isBuyNowModeActive = false.obs;
+final RxBool isValidating = false.obs; // para re-validaciones silenciosas
 
   final RxBool usePoints = false.obs;
   final RxInt pointsToUse = 0.obs;
@@ -463,40 +464,42 @@ class ShoppingCartController extends GetxController {
     }
   }
 
-  void toggleInvoiceRequired(bool value) {
-    invoiceRequired.value = value;
-    validateCart();
+void toggleInvoiceRequired(bool value) {
+  invoiceRequired.value = value;
+  validateCart(silent: true); // ← no dispara el spinner global
+}
+
+ Future<void> validateCart({bool silent = false}) async {
+  if (cartItems.isEmpty) {
+    cartResponse.value = null;
+    return;
   }
 
-  Future<void> validateCart() async {
-    if (cartItems.isEmpty) {
-      cartResponse.value = null;
-      return;
+  try {
+    if (silent) {
+      isValidating.value = true; // solo actualiza datos, no muestra spinner
+    } else {
+      isLoading.value = true;    // carga inicial → spinner completo
     }
+    error.value = '';
 
-    try {
-      isLoading.value = true;
-      error.value = '';
+    final entity = ShoppingCartItemsEntity(
+      shopping: cartItems,
+      invoicerequired: invoiceRequired.value,
+    );
 
-      final entity = ShoppingCartItemsEntity(
-        shopping: cartItems,
-        invoicerequired: invoiceRequired.value,
-      );
+    final response = await shoppingCartUsecase.execute(entity);
+    cartResponse.value = response;
 
-      final response = await shoppingCartUsecase.execute(entity);
-      cartResponse.value = response;
-
-      print(
-          '✅ Carrito validado: ${response.itenms.length} items | Factura: ${invoiceRequired.value}');
-    } catch (e, stackTrace) {
-      error.value = 'Error al validar carrito: $e';
-      print('❌ Error validating cart: $e\n$stackTrace');
-      showErrorSnackbar('No se pudo validar el carrito');
-    } finally {
-      isLoading.value = false;
-    }
+  } catch (e, stackTrace) {
+    error.value = 'Error al validar carrito: $e';
+    print('❌ Error validating cart: $e\n$stackTrace');
+    showErrorSnackbar('No se pudo validar el carrito');
+  } finally {
+    isLoading.value = false;
+    isValidating.value = false;
   }
-
+}
   Future<void> clearCart() async {
     cartItems.clear();
     cartResponse.value = null;
