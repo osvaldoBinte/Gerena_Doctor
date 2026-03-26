@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/common/widgets/getx_snackbacr_helper.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/subscription/presentation/page/subscription_controller.dart';
 import 'package:get/get.dart';
@@ -180,7 +181,7 @@ class _CancelSubscriptionDialogState extends State<CancelSubscriptionDialog> {
                         final reason = reasonController.text.trim();
 
                         if (reason.isEmpty) {
-                          showErrorSnackbar(
+                          showGetxErrorSnackbar(
                               'Por favor indica el motivo de la cancelación');
                           return;
                         }

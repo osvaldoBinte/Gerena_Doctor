@@ -288,8 +288,7 @@ class Membresia extends StatelessWidget {
             ),
           ),
 
-          // Botón de restaurar compras solo en iOS
-          if (Platform.isIOS) ...[
+         /*if (Platform.isIOS) ...[
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
@@ -312,7 +311,7 @@ class Membresia extends StatelessWidget {
                 ),
               ),
             ),
-          ],
+          ],*/
         ],
       ),
     );

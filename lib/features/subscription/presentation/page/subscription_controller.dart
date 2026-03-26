@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gerena/common/theme/App_Theme.dart';
+import 'package:gerena/common/widgets/getx_snackbacr_helper.dart';
 import 'package:gerena/common/widgets/snackbar_helper.dart';
 import 'package:gerena/features/subscription/domain/entities/mysubcription/my_subcription_entity.dart';
 import 'package:gerena/features/subscription/domain/entities/view_all_plans_entity.dart';
@@ -152,10 +153,10 @@ class SubscriptionController extends GetxController {
         Platform.isIOS ? 'ios' : 'android',
       );
 
-      showSuccessSnackbar('Suscripción activada correctamente');
+      showGetxSuccessSnackbar('Suscripción activada correctamente');
       await loadSubscriptionData();
     } catch (e) {
-      showErrorSnackbar('Error al validar la compra: ${e.toString()}');
+      showGetxErrorSnackbar('Error al validar la compra: ${e.toString()}');
       print('❌ Error validando compra: $e');
     } finally {
       isLoading.value = false;
@@ -163,7 +164,7 @@ class SubscriptionController extends GetxController {
   }
 
   void _handlePurchaseError(String error) {
-    showErrorSnackbar('Error en la compra: $error');
+    showGetxErrorSnackbar('Error en la compra: $error');
     isLoading.value = false;
   }
 
@@ -172,7 +173,7 @@ class SubscriptionController extends GetxController {
   }
 
   void _handlePurchaseRestored(PurchaseDetails purchaseDetails) {
-    showSuccessSnackbar('Suscripción restaurada correctamente');
+    showGetxSuccessSnackbar('Suscripción restaurada correctamente');
     loadSubscriptionData();
   }
 
@@ -231,19 +232,19 @@ Future<void> fetchMySubscription() async {
   Future<void> _subscribeToPlanViaIAP(int planId) async {
     try {
       if (hasActiveSubscription.value) {
-        showErrorSnackbar('Ya tienes una suscripción activa. Usa la opción de cambiar plan.');
+        showGetxErrorSnackbar('Ya tienes una suscripción activa. Usa la opción de cambiar plan.');
         return;
       }
 
       final plan = plans.firstWhereOrNull((p) => p.id == planId);
       if (plan == null) {
-        showErrorSnackbar('Plan no encontrado');
+        showGetxErrorSnackbar('Plan no encontrado');
         return;
       }
 
       final product = getIAPProduct(plan);
       if (product == null) {
-        showErrorSnackbar('Producto de App Store no disponible para este plan');
+        showGetxErrorSnackbar('Producto de App Store no disponible para este plan');
         return;
       }
 
@@ -253,13 +254,13 @@ Future<void> fetchMySubscription() async {
       
       if (!success) {
         isLoading.value = false;
-        showErrorSnackbar('No se pudo iniciar la compra');
+        showGetxErrorSnackbar('No se pudo iniciar la compra');
       }
       // El resto se maneja en _handlePurchaseSuccess
       
     } catch (e) {
       isLoading.value = false;
-      showErrorSnackbar('Error al iniciar la compra: $e');
+      showGetxErrorSnackbar('Error al iniciar la compra: $e');
       print('Error subscribing via IAP: $e');
     }
   }
@@ -267,12 +268,12 @@ Future<void> fetchMySubscription() async {
   Future<void> _subscribeToPlanViaStripe(int planId) async {
     try {
       if (hasActiveSubscription.value) {
-        showErrorSnackbar('Ya tienes una suscripción activa. Usa la opción de cambiar plan.');
+        showGetxErrorSnackbar('Ya tienes una suscripción activa. Usa la opción de cambiar plan.');
         return;
       }
 
       if (selectedPaymentMethodId.value.isEmpty) {
-        showErrorSnackbar('Por favor selecciona un método de pago');
+        showGetxErrorSnackbar('Por favor selecciona un método de pago');
         return;
       }
 
@@ -283,13 +284,13 @@ Future<void> fetchMySubscription() async {
         planId,
       );
       
-      showSuccessSnackbar('Suscripción realizada correctamente');
+      showGetxSuccessSnackbar('Suscripción realizada correctamente');
       
       await loadSubscriptionData();
       selectedPaymentMethodId.value = '';
       
     } catch (e) {
-      showErrorSnackbar('Error al suscribirse al plan: ${e.toString().replaceAll('Exception: ', '')}');
+      showGetxErrorSnackbar('Error al suscribirse al plan: ${e.toString().replaceAll('Exception: ', '')}');
       print('Error subscribing to plan: $e');
     } finally {
       isLoading.value = false;
@@ -298,7 +299,7 @@ Future<void> fetchMySubscription() async {
 
   Future<void> restorePurchases() async {
     if (!Platform.isIOS || !isIAPAvailable.value) {
-      showErrorSnackbar('La restauración solo está disponible en iOS');
+      showGetxErrorSnackbar('La restauración solo está disponible en iOS');
       return;
     }
 
@@ -307,7 +308,7 @@ Future<void> fetchMySubscription() async {
       await _iapService.restorePurchases();
       showSnackBar('Buscando compras anteriores...', GerenaColors.primaryColor);
     } catch (e) {
-      showErrorSnackbar('Error al restaurar compras: $e');
+      showGetxErrorSnackbar('Error al restaurar compras: $e');
     } finally {
       isLoading.value = false;
     }
@@ -316,7 +317,7 @@ Future<void> fetchMySubscription() async {
   Future<void> changeSubscriptionPlan(int newPlanId, bool immediateChange) async {
     try {
       if (!hasActiveSubscription.value) {
-        showErrorSnackbar('No tienes una suscripción activa para cambiar');
+        showGetxErrorSnackbar('No tienes una suscripción activa para cambiar');
         return;
       }
 
@@ -329,7 +330,7 @@ Future<void> fetchMySubscription() async {
       
       await changeSubscriptionPlanUsecase.execute(newPlanId, immediateChange);
       
-      showSuccessSnackbar(
+      showGetxSuccessSnackbar(
         immediateChange 
             ? 'Plan cambiado inmediatamente' 
             : 'El cambio se aplicará al final del período actual'
@@ -338,7 +339,7 @@ Future<void> fetchMySubscription() async {
       await loadSubscriptionData();
       
     } catch (e) {
-      showErrorSnackbar('Error al cambiar el plan: ${e.toString().replaceAll('Exception: ', '')}');
+      showGetxErrorSnackbar('Error al cambiar el plan: ${e.toString().replaceAll('Exception: ', '')}');
       print('Error changing subscription plan: $e');
     } finally {
       isLoading.value = false;
@@ -348,12 +349,12 @@ Future<void> fetchMySubscription() async {
   Future<void> cancelSubscription(bool cancelImmediately, String reason) async {
     try {
       if (!hasActiveSubscription.value) {
-        showErrorSnackbar('No tienes una suscripción activa para cancelar');
+        showGetxErrorSnackbar('No tienes una suscripción activa para cancelar');
         return;
       }
 
       if (reason.trim().isEmpty) {
-        showErrorSnackbar('Por favor indica el motivo de la cancelación');
+        showGetxErrorSnackbar('Por favor indica el motivo de la cancelación');
         return;
       }
 
@@ -361,7 +362,7 @@ Future<void> fetchMySubscription() async {
       
       await postCancelSubcriptionUsecase.execute(cancelImmediately, reason);
       
-      showSuccessSnackbar(
+      showGetxSuccessSnackbar(
         cancelImmediately 
             ? 'Tu suscripción ha sido cancelada inmediatamente' 
             : 'Tu suscripción se cancelará al final del período actual'
@@ -370,7 +371,7 @@ Future<void> fetchMySubscription() async {
       await loadSubscriptionData();
       
     } catch (e) {
-      showErrorSnackbar('Error al cancelar la suscripción: ${e.toString().replaceAll('Exception: ', '')}');
+      showGetxErrorSnackbar('Error al cancelar la suscripción: ${e.toString().replaceAll('Exception: ', '')}');
       print('Error cancelling subscription: $e');
     } finally {
       isCancelling.value = false;

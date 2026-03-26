@@ -26,8 +26,7 @@ void main() async {
   }
 
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await PreferencesUser().initiPrefs();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform); await PreferencesUser().initiPrefs();
   await NotificationService().initialize();
 
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -77,7 +76,10 @@ void main() async {
       await windowManager.show();
       await windowManager.focus();
       WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await Future.delayed(const Duration(milliseconds: 100));
+
         await windowManager.maximize();
+        
       });
     });
   }
