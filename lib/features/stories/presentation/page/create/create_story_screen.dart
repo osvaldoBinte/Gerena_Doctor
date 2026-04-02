@@ -11,19 +11,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter/services.dart';import 'dart:io';
-
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:photo_manager/photo_manager.dart';
-import 'package:video_player/video_player.dart';
 import 'package:flutter/services.dart';
-
-// ─────────────────────────────────────────────
-// DraggableStoryText
-// ─────────────────────────────────────────────
 class DraggableStoryText extends StatefulWidget {
   final String text;
   final Color color;
@@ -165,9 +153,6 @@ class _DraggableStoryTextState extends State<DraggableStoryText> {
   }
 }
 
-// ─────────────────────────────────────────────
-// CreateStoryScreen
-// ─────────────────────────────────────────────
 class CreateStoryScreen extends StatefulWidget {
   const CreateStoryScreen({Key? key}) : super(key: key);
 
@@ -296,7 +281,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
     });
   }
 
-  // ── Cámara ──────────────────────────────────
   Widget _buildCameraScreen() {
     return Scaffold(
       backgroundColor: Colors.black,
@@ -590,16 +574,8 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
     });
   }
 
-  // ── Preview ─────────────────────────────────
   Widget _buildPreviewScreen() {
-    // ✅ Capturar el tamaño real de pantalla aquí.
-    // Este valor es la referencia que FFmpeg usará para calcular
-    // qué tan grande dibujar el texto en el video de forma que
-    // coincida visualmente con lo que el usuario vio en la preview.
-    //
-    // Por ejemplo: pantalla 390px lógicos, video 1080px reales
-    //   scaleX = 1080 / 390 ≈ 2.77
-    //   fontSize en video = 28 * 2.77 ≈ 77px → mismo tamaño visual
+ 
     final size = MediaQuery.of(context).size;
     controller.previewScreenWidth  = size.width;
     controller.previewScreenHeight = size.height;
@@ -610,7 +586,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
         onTap: () => controller.selectText(null),
         child: Stack(
           children: [
-            // 1. Contenido + textos draggables
             RepaintBoundary(
               key: controller.repaintBoundaryKey,
               child: Stack(
@@ -662,7 +637,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
                     }),
                   ),
 
-                  // Textos draggables
                   Obx(() {
                     return Stack(
                       children: controller.storyTexts.map((storyText) {
@@ -700,20 +674,16 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
               ),
             ),
 
-            // 2. Header
             _buildPreviewHeader(),
 
-            // 3. Botón texto
             Obx(() => _isDraggingText.value
                 ? const SizedBox.shrink()
                 : _buildAddTextButton()),
 
-            // 4. Zona de basura
             Obx(() => _isDraggingText.value
                 ? _buildTrashZone()
                 : const SizedBox.shrink()),
 
-            // 5. Editor fullscreen
             Obx(() => controller.isEditingText.value
                 ? _FullscreenTextEditorOverlay(controller: controller)
                 : const SizedBox.shrink()),
@@ -873,9 +843,6 @@ class _CreateStoryScreenState extends State<CreateStoryScreen>
   }
 }
 
-// ─────────────────────────────────────────────
-// _FullscreenTextEditorOverlay
-// ─────────────────────────────────────────────
 class _FullscreenTextEditorOverlay extends StatefulWidget {
   final CreateStoryController controller;
   const _FullscreenTextEditorOverlay({required this.controller});
@@ -929,7 +896,6 @@ class _FullscreenTextEditorOverlayState
           child: SafeArea(
             child: Column(
               children: [
-                // ── Top bar ──────────────────────────────
                 Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 10),
@@ -952,7 +918,6 @@ class _FullscreenTextEditorOverlayState
                       ),
                       const Spacer(),
 
-                      // Alineación
                       ...['left', 'center', 'right'].map((a) {
                         return Obx(() {
                           final isActive =
@@ -989,7 +954,7 @@ class _FullscreenTextEditorOverlayState
 
                       const Spacer(),
 
-                      // Listo
+                    
                       GestureDetector(
                         onTap: () => widget.controller
                             .confirmTextEdit(_textCtrl.text),
@@ -1011,7 +976,6 @@ class _FullscreenTextEditorOverlayState
                   ),
                 ),
 
-                // ── TextField ─────────────────────────────
                 Expanded(
                   child: Center(
                     child: Obx(() {
@@ -1086,7 +1050,6 @@ class _FullscreenTextEditorOverlayState
                   ),
                 ),
 
-                // ── Estilos ───────────────────────────────
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
@@ -1139,7 +1102,6 @@ class _FullscreenTextEditorOverlayState
                   ),
                 ),
 
-                // ── Colores ───────────────────────────────
                 SizedBox(
                   height: 52,
                   child: ListView.builder(
